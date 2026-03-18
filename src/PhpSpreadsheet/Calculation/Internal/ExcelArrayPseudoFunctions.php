@@ -61,7 +61,7 @@ class ExcelArrayPseudoFunctions
         $calcEngine = Calculation::getInstance($worksheet->getParent());
         $result = $calcEngine->calculateCellValue($referenceCell, false);
         if (!is_array($result)) {
-            $result = ExcelError::REF();
+            return ExcelError::REF();
         }
 
         // Ensure that our array result dimensions match the specified array formula range dimensions,

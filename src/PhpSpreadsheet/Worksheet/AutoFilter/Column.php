@@ -47,16 +47,6 @@ class Column
     ];
 
     /**
-     * Autofilter.
-     */
-    private ?AutoFilter $parent;
-
-    /**
-     * Autofilter Column Index.
-     */
-    private string $columnIndex;
-
-    /**
      * Autofilter Column Filter Type.
      */
     private string $filterType = self::AUTOFILTER_FILTERTYPE_FILTER;
@@ -83,13 +73,11 @@ class Column
     /**
      * Create a new Column.
      *
-     * @param string $column Column (e.g. A)
+     * @param string $columnIndex Column (e.g. A)
      * @param ?AutoFilter $parent Autofilter for this column
      */
-    public function __construct(string $column, ?AutoFilter $parent = null)
+    public function __construct(private string $columnIndex, private ?AutoFilter $parent = null)
     {
-        $this->columnIndex = $column;
-        $this->parent = $parent;
     }
 
     public function setEvaluatedFalse(): void
@@ -254,11 +242,7 @@ class Column
      */
     public function getAttribute(string $name): null|float|int|string
     {
-        if (isset($this->attributes[$name])) {
-            return $this->attributes[$name];
-        }
-
-        return null;
+        return $this->attributes[$name] ?? null;
     }
 
     public function ruleCount(): int

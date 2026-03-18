@@ -24,7 +24,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Ods\Cell\Style;
  */
 class Content extends WriterPart
 {
-    private Formula $formulaConvertor;
+    private readonly Formula $formulaConvertor;
 
     /**
      * Set parent Ods writer.
@@ -125,7 +125,7 @@ class Content extends WriterPart
             $spreadsheet->getSheet($sheetIndex)->calculateArrays($this->getParentWriter()->getPreCalculateFormulas());
             $objWriter->startElement('table:table');
             $objWriter->writeAttribute('table:name', $spreadsheet->getSheet($sheetIndex)->getTitle());
-            $objWriter->writeAttribute('table:style-name', Style::TABLE_STYLE_PREFIX . (string) ($sheetIndex + 1));
+            $objWriter->writeAttribute('table:style-name', Style::TABLE_STYLE_PREFIX . ($sheetIndex + 1));
             $objWriter->writeElement('office:forms');
             $lastColumn = 0;
             foreach ($spreadsheet->getSheet($sheetIndex)->getColumnDimensions() as $columnDimension) {
@@ -230,12 +230,12 @@ class Content extends WriterPart
                         try {
                             $formulaValue = $cell->getCalculatedValueString();
                             $formulaValueCalc = $cell->getCalculatedValue();
-                        } catch (CalculationException $e) {
+                        } catch (CalculationException) {
                             $formulaValue = $formulaValueCalc = ExcelError::CALC();
                         }
                     }
                     if (isset($attributes['ref'])) {
-                        if (Preg::isMatch('/^([A-Z]{1,3})([0-9]{1,7})(:([A-Z]{1,3})([0-9]{1,7}))?$/', (string) $attributes['ref'], $matches)) {
+                        if (Preg::isMatch('/^([A-Z]{1,3})([0-9]{1,7})(:([A-Z]{1,3})([0-9]{1,7}))?$/', $attributes['ref'], $matches)) {
                             $matrixRowSpan = 1;
                             $matrixColSpan = 1;
                             if (isset($matches[3])) {

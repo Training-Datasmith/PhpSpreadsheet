@@ -17,7 +17,7 @@ class StandardDeviations
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function STDEV(mixed ...$args)
+    public static function STDEV(mixed ...$args): string|float
     {
         $result = Variances::VAR(...$args);
         if (!is_numeric($result)) {

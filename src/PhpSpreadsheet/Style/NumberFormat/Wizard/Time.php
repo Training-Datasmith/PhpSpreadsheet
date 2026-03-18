@@ -81,7 +81,7 @@ class Time extends DateTimeWizard
             is_array($separators) ? $separators : [$separators],
             count($formatBlocks) - 1
         );
-        $this->formatBlocks = array_map([$this, 'mapFormatBlocks'], $formatBlocks);
+        $this->formatBlocks = array_map($this->mapFormatBlocks(...), $formatBlocks);
     }
 
     private function mapFormatBlocks(string $value): string
@@ -90,7 +90,8 @@ class Time extends DateTimeWizard
         //     except for AM/PM, which is set to uppercase
         if (in_array(mb_strtolower($value), self::TIME_BLOCKS, true)) {
             return mb_strtolower($value);
-        } elseif (mb_strtoupper($value) === self::MORNING_AFTERNOON) {
+        }
+        if (mb_strtoupper($value) === self::MORNING_AFTERNOON) {
             return mb_strtoupper($value);
         }
 
@@ -100,6 +101,6 @@ class Time extends DateTimeWizard
 
     public function format(): string
     {
-        return implode('', array_map([$this, 'intersperse'], $this->formatBlocks, $this->separators));
+        return implode('', array_map($this->intersperse(...), $this->formatBlocks, $this->separators));
     }
 }

@@ -17,7 +17,7 @@ class TorowTocol
     {
         $result = self::torow($array, $ignore, $byColumn);
         if (is_array($result)) {
-            return array_map((fn ($x) => [$x]), $result);
+            return array_map((fn ($x): array => [$x]), $result);
         }
 
         return $result;
@@ -76,12 +76,18 @@ class TorowTocol
             }
             foreach ($row as $cell) {
                 if ($cell === null) {
-                    if ($ignore === 1 || $ignore === 3) {
+                    if ($ignore === 1) {
+                        continue;
+                    }
+                    if ($ignore === 3) {
                         continue;
                     }
                     $cell = 0;
                 } elseif (ErrorValue::isError($cell, true)) {
-                    if ($ignore === 2 || $ignore === 3) {
+                    if ($ignore === 2) {
+                        continue;
+                    }
+                    if ($ignore === 3) {
                         continue;
                     }
                 }

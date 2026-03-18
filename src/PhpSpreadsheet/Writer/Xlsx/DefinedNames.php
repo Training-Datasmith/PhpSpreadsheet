@@ -14,14 +14,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet as ActualWorksheet;
 
 class DefinedNames
 {
-    private XMLWriter $objWriter;
-
-    private Spreadsheet $spreadsheet;
-
-    public function __construct(XMLWriter $objWriter, Spreadsheet $spreadsheet)
+    public function __construct(private readonly XMLWriter $objWriter, private readonly Spreadsheet $spreadsheet)
     {
-        $this->objWriter = $objWriter;
-        $this->spreadsheet = $spreadsheet;
     }
 
     public function write(): void
@@ -200,7 +194,7 @@ class DefinedNames
             $splitRanges
         );
 
-        $lengths = array_map([StringHelper::class, 'strlenAllowNull'], array_column($splitRanges[0], 0));
+        $lengths = array_map(StringHelper::strlenAllowNull(...), array_column($splitRanges[0], 0));
         $offsets = array_column($splitRanges[0], 1);
 
         $worksheets = $splitRanges[2];
@@ -235,7 +229,7 @@ class DefinedNames
         }
 
         if (str_starts_with($definedRange, '=')) {
-            $definedRange = substr($definedRange, 1);
+            return substr($definedRange, 1);
         }
 
         return $definedRange;

@@ -143,7 +143,7 @@ abstract class DatabaseAbstract
         }
 
         $rowQuery = array_map(
-            fn ($rowValue): string => (count($rowValue) > 1) ? 'AND(' . implode(',', $rowValue) . ')' : ($rowValue[0] ?? ''), // @phpstan-ignore-line
+            fn (array $rowValue): string => (count($rowValue) > 1) ? 'AND(' . implode(',', $rowValue) . ')' : ($rowValue[0] ?? ''), // @phpstan-ignore-line
             $baseQuery
         );
 
@@ -164,7 +164,7 @@ abstract class DatabaseAbstract
         $wildcard = WildcardMatch::wildcard($matches['operand']);
         $condition = "WILDCARDMATCH([:{$criterionName}],{$wildcard})";
         if ($trueFalse === false) {
-            $condition = "NOT({$condition})";
+            return "NOT({$condition})";
         }
 
         return $condition;

@@ -357,7 +357,7 @@ class Borders extends Supervisor
             . $this->getBottom()->getHashCode()
             . $this->getDiagonal()->getHashCode()
             . $this->getDiagonalDirection()
-            . __CLASS__
+            . self::class
         );
     }
 

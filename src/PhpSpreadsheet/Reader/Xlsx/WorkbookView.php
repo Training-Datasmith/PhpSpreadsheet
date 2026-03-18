@@ -7,11 +7,8 @@ use SimpleXMLElement;
 
 class WorkbookView
 {
-    private Spreadsheet $spreadsheet;
-
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(private readonly Spreadsheet $spreadsheet)
     {
-        $this->spreadsheet = $spreadsheet;
     }
 
     /** @param array<int, ?int> $mapSheetId */

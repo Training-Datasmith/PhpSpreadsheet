@@ -30,7 +30,7 @@ abstract class JpGraphRendererBase implements IRenderer
 
     private const DEFAULT_HEIGHT = 480.0;
 
-    private static $colourSet = [
+    private static array $colourSet = [
         'mediumpurple1', 'palegreen3', 'gold1', 'cadetblue1',
         'darkmagenta', 'coral', 'dodgerblue3', 'eggplant',
         'mediumblue', 'magenta', 'sandybrown', 'cyan',
@@ -40,22 +40,19 @@ abstract class JpGraphRendererBase implements IRenderer
 
     private static array $markSet;
 
-    private Chart $chart;
-
     private $graph;
 
-    private static $plotColour = 0;
+    private static int $plotColour = 0;
 
-    private static $plotMark = 0;
+    private static int $plotMark = 0;
 
     /**
      * Create a new jpgraph.
      */
-    public function __construct(Chart $chart)
+    public function __construct(private readonly Chart $chart)
     {
         static::init();
         $this->graph = null;
-        $this->chart = $chart;
 
         self::$markSet = [
             'diamond' => MARK_DIAMOND,
@@ -85,7 +82,7 @@ abstract class JpGraphRendererBase implements IRenderer
      */
     abstract protected static function init(): void;
 
-    private function formatPointMarker($seriesPlot, $markerID)
+    private function formatPointMarker($seriesPlot, ?string $markerID)
     {
         $plotMarkKeys = array_keys(self::$markSet);
         if ($markerID === null) {
@@ -112,7 +109,7 @@ abstract class JpGraphRendererBase implements IRenderer
         return $seriesPlot;
     }
 
-    private function formatDataSetLabels(int $groupID, array $datasetLabels, $rotation = '')
+    private function formatDataSetLabels(int $groupID, array $datasetLabels, string $rotation = ''): array
     {
         $datasetLabelFormatCode = $this->chart->getPlotArea()->getPlotGroupByIndex($groupID)->getPlotCategoryByIndex(0)->getFormatCode() ?? '';
         //    Retrieve any label formatting code
@@ -129,9 +126,7 @@ abstract class JpGraphRendererBase implements IRenderer
                 }
             } else {
                 //    Format labels according to any formatting code
-                if ($datasetLabelFormatCode !== null) {
-                    $datasetLabels[$i] = NumberFormat::toFormattedString($datasetLabel, $datasetLabelFormatCode);
-                }
+                $datasetLabels[$i] = NumberFormat::toFormattedString($datasetLabel, $datasetLabelFormatCode);
             }
             ++$testCurrentIndex;
         }
@@ -139,7 +134,7 @@ abstract class JpGraphRendererBase implements IRenderer
         return $datasetLabels;
     }
 
-    private function percentageSumCalculation(int $groupID, $seriesCount)
+    private function percentageSumCalculation(int $groupID, int $seriesCount): ?array
     {
         $sumValues = [];
         //    Adjust our values to a percentage value across all series in the group
@@ -161,7 +156,7 @@ abstract class JpGraphRendererBase implements IRenderer
         return $sumValues;
     }
 
-    private function percentageAdjustValues(array $dataValues, array $sumValues)
+    private function percentageAdjustValues(array $dataValues, array $sumValues): array
     {
         foreach ($dataValues as $k => $dataValue) {
             $dataValues[$k] = $dataValue / $sumValues[$k] * 100;
@@ -170,7 +165,7 @@ abstract class JpGraphRendererBase implements IRenderer
         return $dataValues;
     }
 
-    private function getCaption($captionElement)
+    private function getCaption(?\PhpOffice\PhpSpreadsheet\Chart\Title $captionElement): \PhpOffice\PhpSpreadsheet\RichText\RichText|string|null
     {
         //    Read any caption
         $caption = ($captionElement !== null) ? $captionElement->getCaption() : null;
@@ -600,7 +595,7 @@ abstract class JpGraphRendererBase implements IRenderer
         $this->graph->Add($seriesPlot);
     }
 
-    private function renderAreaChart($groupCount): void
+    private function renderAreaChart(int $groupCount): void
     {
         $this->renderCartesianPlotArea();
 
@@ -609,7 +604,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderLineChart($groupCount): void
+    private function renderLineChart(int $groupCount): void
     {
         $this->renderCartesianPlotArea();
 
@@ -618,7 +613,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderBarChart($groupCount, ?string $dimensions = '2d'): void
+    private function renderBarChart(int $groupCount, ?string $dimensions = '2d'): void
     {
         $this->renderCartesianPlotArea();
 
@@ -627,7 +622,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderScatterChart($groupCount): void
+    private function renderScatterChart(int $groupCount): void
     {
         $this->renderCartesianPlotArea('linlin');
 
@@ -636,7 +631,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderBubbleChart($groupCount): void
+    private function renderBubbleChart(int $groupCount): void
     {
         $this->renderCartesianPlotArea('linlin');
 
@@ -645,7 +640,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderPieChart($groupCount, ?string $dimensions = '2d', bool $doughnut = false, bool $multiplePlots = false): void
+    private function renderPieChart(int $groupCount, ?string $dimensions = '2d', bool $doughnut = false, bool $multiplePlots = false): void
     {
         $this->renderPiePlotArea();
 
@@ -715,7 +710,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderRadarChart($groupCount): void
+    private function renderRadarChart(int $groupCount): void
     {
         $this->renderRadarPlotArea();
 
@@ -724,7 +719,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderStockChart($groupCount): void
+    private function renderStockChart(int $groupCount): void
     {
         $this->renderCartesianPlotArea('intint');
 
@@ -733,7 +728,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderContourChart($groupCount): void
+    private function renderContourChart(int $groupCount): void
     {
         $this->renderCartesianPlotArea('intint');
 
@@ -742,7 +737,7 @@ abstract class JpGraphRendererBase implements IRenderer
         }
     }
 
-    private function renderCombinationChart($groupCount, $outputDestination): bool
+    private function renderCombinationChart(int $groupCount, ?string $outputDestination): bool
     {
         $this->renderCartesianPlotArea();
 

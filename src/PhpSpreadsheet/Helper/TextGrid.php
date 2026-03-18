@@ -6,8 +6,6 @@ use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 
 class TextGrid
 {
-    protected bool $isCli;
-
     /** @var mixed[][] */
     protected array $matrix;
 
@@ -19,16 +17,8 @@ class TextGrid
 
     protected string $gridDisplay;
 
-    protected bool $rowDividers = false;
-
-    protected bool $rowHeaders = true;
-
-    protected bool $columnHeaders = true;
-
-    protected TextGridRightAlign $numbersRight = TextGridRightAlign::none;
-
     /** @param mixed[][] $matrix */
-    public function __construct(array $matrix, bool $isCli = true, bool $rowDividers = false, bool $rowHeaders = true, bool $columnHeaders = true, TextGridRightAlign $numbersRight = TextGridRightAlign::none)
+    public function __construct(array $matrix, protected bool $isCli = true, protected bool $rowDividers = false, protected bool $rowHeaders = true, protected bool $columnHeaders = true, protected TextGridRightAlign $numbersRight = TextGridRightAlign::none)
     {
         $this->rows = array_keys($matrix);
         $this->columns = array_keys($matrix[$this->rows[0]]);
@@ -36,17 +26,12 @@ class TextGrid
         $matrix = array_values($matrix);
         array_walk(
             $matrix,
-            function (&$row): void {
+            function (array &$row): void {
                 $row = array_values($row);
             }
         );
 
         $this->matrix = $matrix;
-        $this->isCli = $isCli;
-        $this->rowDividers = $rowDividers;
-        $this->rowHeaders = $rowHeaders;
-        $this->columnHeaders = $columnHeaders;
-        $this->numbersRight = $numbersRight;
     }
 
     public function setNumbersRight(TextGridRightAlign $numbersRight): void
@@ -153,7 +138,7 @@ class TextGrid
         }
         foreach ($this->columns as $column => $reference) {
             $this->gridDisplay .= '+-';
-            $this->gridDisplay .= str_pad((string) '', $columnWidths[$column] + 1, '-');
+            $this->gridDisplay .= str_pad('', $columnWidths[$column] + 1, '-');
         }
         $this->gridDisplay .= '+' . PHP_EOL;
     }

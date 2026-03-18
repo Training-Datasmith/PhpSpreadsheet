@@ -439,7 +439,7 @@ class Html extends BaseReader
     /** @param string[] $attributeArray */
     private function processDomElementSpanEtc(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
     {
-        if (in_array((string) $child->nodeName, self::SPAN_ETC, true)) {
+        if (in_array($child->nodeName, self::SPAN_ETC, true)) {
             if (isset($attributeArray['class']) && $attributeArray['class'] === 'comment') {
                 $sheet->getComment($column . $row)
                     ->getText()
@@ -526,7 +526,7 @@ class Html extends BaseReader
     /** @param string[] $attributeArray */
     private function processDomElementH1Etc(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
     {
-        if (in_array((string) $child->nodeName, self::H1_ETC, true)) {
+        if (in_array($child->nodeName, self::H1_ETC, true)) {
             if ($this->tableLevel > 0) {
                 //    If we're inside a table, replace with a newline
                 $cellContent .= $cellContent ? "\n" : '';
@@ -710,7 +710,7 @@ class Html extends BaseReader
     private function processDomElementThTd(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
     {
         while (isset($this->rowspan[$column . $row])) {
-            $temp = (string) $column;
+            $temp = $column;
             $column = StringHelper::stringIncrement($temp);
         }
         $this->processDomElement($child, $sheet, $row, $column, $cellContent);
@@ -822,9 +822,9 @@ class Html extends BaseReader
     {
         $properties = $spreadsheet->getProperties();
         foreach ($dom->getElementsByTagName('meta') as $meta) {
-            $metaContent = (string) $meta->getAttribute('content');
+            $metaContent = $meta->getAttribute('content');
             if ($metaContent !== '') {
-                $metaName = (string) $meta->getAttribute('name');
+                $metaName = $meta->getAttribute('name');
                 switch ($metaName) {
                     case 'author':
                         $properties->setCreator($metaContent);
@@ -907,7 +907,7 @@ class Html extends BaseReader
             $highend = "\u{10ffff}";
             $regexp = "/[$lowend-$highend]/u";
             /** @var callable $callback */
-            $callback = [self::class, 'replaceNonAscii'];
+            $callback = self::replaceNonAscii(...);
             $convert = preg_replace_callback($regexp, $callback, $convert);
         }
 
@@ -944,7 +944,7 @@ class Html extends BaseReader
         if ($loaded === false) {
             throw new Exception('Failed to load content as a DOM Document', 0, $e ?? null);
         }
-        $spreadsheet = $spreadsheet ?? $this->newSpreadsheet();
+        $spreadsheet ??= $this->newSpreadsheet();
         $spreadsheet->setValueBinder($this->valueBinder);
         self::loadProperties($dom, $spreadsheet);
 

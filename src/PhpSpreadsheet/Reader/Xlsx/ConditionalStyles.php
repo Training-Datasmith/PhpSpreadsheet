@@ -18,25 +18,12 @@ use stdClass;
 
 class ConditionalStyles
 {
-    private Worksheet $worksheet;
-
-    private SimpleXMLElement $worksheetXml;
-
     /** @var string[] */
     private array $ns;
 
-    /** @var Style[] */
-    private array $dxfs;
-
-    private StyleReader $styleReader;
-
     /** @param Style[] $dxfs */
-    public function __construct(Worksheet $workSheet, SimpleXMLElement $worksheetXml, array $dxfs, StyleReader $styleReader)
+    public function __construct(private readonly Worksheet $worksheet, private readonly SimpleXMLElement $worksheetXml, private array $dxfs, private readonly StyleReader $styleReader)
     {
-        $this->worksheet = $workSheet;
-        $this->worksheetXml = $worksheetXml;
-        $this->dxfs = $dxfs;
-        $this->styleReader = $styleReader;
     }
 
     public function load(): void
@@ -114,10 +101,10 @@ class ConditionalStyles
                     continue;
                 }
                 $conditionType = (string) $attributes->type;
-                if (
-                    !Conditional::isValidConditionType($conditionType)
-                    || $conditionType === Conditional::CONDITION_DATABAR
-                ) {
+                if (!Conditional::isValidConditionType($conditionType)) {
+                    continue;
+                }
+                if ($conditionType === Conditional::CONDITION_DATABAR) {
                     continue;
                 }
 
@@ -212,7 +199,7 @@ class ConditionalStyles
             // Extract all cell references in $cellRangeReference
             // N.B. In Excel UI, intersection is space and union is comma.
             // But in Xml, intersection is comma and union is space.
-            $cellRangeReference = str_replace(['$', ' ', ',', '^'], ['', '^', ' ', ','], strtoupper($cellRangeReference));
+            $cellRangeReference = str_replace(['$', ' ', ',', '^'], ['', '^', ' ', ','], strtoupper((string) $cellRangeReference));
 
             foreach ($conditionalStyles as $cs) {
                 $scale = $cs->getColorScale();

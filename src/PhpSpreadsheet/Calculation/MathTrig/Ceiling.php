@@ -31,7 +31,7 @@ class Ceiling
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function ceiling($number, $significance = null)
+    public static function ceiling($number, $significance = null): array|string|float
     {
         if (is_array($number) || is_array($significance)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $significance);

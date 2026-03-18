@@ -70,11 +70,6 @@ class TableStyle
     const TABLE_STYLE_DARK11 = 'TableStyleDark11';
 
     /**
-     * Theme.
-     */
-    private string $theme;
-
-    /**
      * Show First Column.
      */
     private bool $showFirstColumn = false;
@@ -109,9 +104,8 @@ class TableStyle
      *
      * @param string $theme (e.g. TableStyle::TABLE_STYLE_MEDIUM2)
      */
-    public function __construct(string $theme = self::TABLE_STYLE_MEDIUM2)
+    public function __construct(private string $theme = self::TABLE_STYLE_MEDIUM2)
     {
-        $this->theme = $theme;
     }
 
     /**

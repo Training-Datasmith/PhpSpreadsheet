@@ -14,10 +14,6 @@ use SimpleXMLElement;
 
 class Styles
 {
-    private Spreadsheet $spreadsheet;
-
-    protected bool $readDataOnly;
-
     /** @var array<string, string[]> */
     public static array $mappings = [
         'borderStyle' => [
@@ -79,10 +75,8 @@ class Styles
         ],
     ];
 
-    public function __construct(Spreadsheet $spreadsheet, bool $readDataOnly)
+    public function __construct(private readonly Spreadsheet $spreadsheet, protected bool $readDataOnly)
     {
-        $this->spreadsheet = $spreadsheet;
-        $this->readDataOnly = $readDataOnly;
     }
 
     public function read(SimpleXMLElement $sheet, int $maxRow, int $maxCol): void
@@ -155,9 +149,8 @@ class Styles
         if ($rotation >= 270 && $rotation <= 360) {
             $rotation -= 360;
         }
-        $rotation = (abs($rotation) > 90) ? 0 : $rotation;
 
-        return $rotation;
+        return (abs($rotation) > 90) ? 0 : $rotation;
     }
 
     /** @param mixed[][] $styleArray */
@@ -233,9 +226,8 @@ class Styles
         $endColumn = Coordinate::stringFromColumnIndex($endColumn + 1);
 
         $endRow = 1 + (($styleAttributes['endRow'] > $maxRow) ? $maxRow : (int) $styleAttributes['endRow']);
-        $cellRange = $startColumn . $startRow . ':' . $endColumn . $endRow;
 
-        return $cellRange;
+        return $startColumn . $startRow . ':' . $endColumn . $endRow;
     }
 
     /**

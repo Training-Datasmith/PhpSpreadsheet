@@ -65,10 +65,7 @@ class ChainedBlockStream
 
             return false;
         }
-        $this->ole = $GLOBALS['_OLE_INSTANCES'][$this->params['oleInstanceId']]; //* @phpstan-ignore-line
-        if (!($this->ole instanceof OLE)) { //* @phpstan-ignore-line
-            throw new Exception('class is not OLE');
-        }
+        $this->ole = $GLOBALS['_OLE_INSTANCES'][$this->params['oleInstanceId']];
 
         $blockId = $this->params['blockId'];
         $this->data = '';
@@ -85,7 +82,6 @@ class ChainedBlockStream
         } else {
             // Block id refers to big blocks
             while ($blockId != -2) {
-                /** @var int $blockId */
                 $pos = $this->ole->getBlockOffset($blockId);
                 fseek($this->ole->_file_handle, $pos);
                 $this->data .= fread($this->ole->_file_handle, $this->ole->bigBlockSize);
@@ -124,7 +120,7 @@ class ChainedBlockStream
         if ($this->stream_eof()) {
             return false;
         }
-        $s = substr($this->data, (int) $this->pos, $count);
+        $s = substr($this->data, $this->pos, $count);
         $this->pos += $count;
 
         return $s;

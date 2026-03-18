@@ -379,7 +379,7 @@ class DataValidation
             . $this->promptTitle
             . $this->prompt
             . $this->sqref
-            . __CLASS__
+            . self::class
         );
     }
 

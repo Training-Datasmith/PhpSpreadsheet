@@ -34,7 +34,7 @@ class Gamma extends GammaBase
             return $e->getMessage();
         }
 
-        if ((((int) $value) == ((float) $value)) && $value <= 0.0) {
+        if ((((int) $value) == ($value)) && $value <= 0.0) {
             return ExcelError::NAN();
         }
 
@@ -58,7 +58,7 @@ class Gamma extends GammaBase
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function distribution(mixed $value, mixed $a, mixed $b, mixed $cumulative)
+    public static function distribution(mixed $value, mixed $a, mixed $b, mixed $cumulative): array|string|float
     {
         if (is_array($value) || is_array($a) || is_array($b) || is_array($cumulative)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $a, $b, $cumulative);

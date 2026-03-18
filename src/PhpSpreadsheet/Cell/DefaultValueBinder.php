@@ -81,7 +81,7 @@ class DefaultValueBinder implements IValueBinder
             $value = (string) $value;
         }
         if (!is_string($value)) {
-            $gettype = is_object($value) ? get_class($value) : gettype($value);
+            $gettype = get_debug_type($value);
 
             throw new SpreadsheetException("unusable type $gettype");
         }

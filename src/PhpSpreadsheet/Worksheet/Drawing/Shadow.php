@@ -226,7 +226,7 @@ class Shadow implements IComparable
             . $this->alignment
             . $this->color->getHashCode()
             . $this->alpha
-            . __CLASS__
+            . self::class
         );
     }
 

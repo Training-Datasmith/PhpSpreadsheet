@@ -18,7 +18,7 @@ class File
      */
     public static function setUseUploadTempDirectory(bool $useUploadTempDir): void
     {
-        self::$useUploadTempDirectory = (bool) $useUploadTempDir;
+        self::$useUploadTempDirectory = $useUploadTempDir;
     }
 
     /**

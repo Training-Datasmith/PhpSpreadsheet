@@ -179,7 +179,7 @@ class NumberFormatter extends BaseFormatter
                 // It will, at least, be an accurate representation,
                 //  even if formatted incorrectly.
                 // This is needed for absolute values >=1E18.
-                $result = self::f2s($valueFloat);
+                return self::f2s($valueFloat);
             }
 
             return $result;
@@ -289,7 +289,7 @@ class NumberFormatter extends BaseFormatter
             $value = str_pad(rtrim($value, '0. '), $length, ' ', STR_PAD_RIGHT);
         }
         if (str_contains($preDecimal, '?')) {
-            $value = str_pad(ltrim($value, '0, '), $length, ' ', STR_PAD_LEFT);
+            return str_pad(ltrim($value, '0, '), $length, ' ', STR_PAD_LEFT);
         }
 
         return $value;

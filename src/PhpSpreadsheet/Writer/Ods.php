@@ -21,19 +21,19 @@ class Ods extends BaseWriter
      */
     private Spreadsheet $spreadSheet;
 
-    private Content $writerPartContent;
+    private readonly Content $writerPartContent;
 
-    private Meta $writerPartMeta;
+    private readonly Meta $writerPartMeta;
 
-    private MetaInf $writerPartMetaInf;
+    private readonly MetaInf $writerPartMetaInf;
 
-    private Mimetype $writerPartMimetype;
+    private readonly Mimetype $writerPartMimetype;
 
-    private Settings $writerPartSettings;
+    private readonly Settings $writerPartSettings;
 
-    private Styles $writerPartStyles;
+    private readonly Styles $writerPartStyles;
 
-    private Thumbnails $writerPartThumbnails;
+    private readonly Thumbnails $writerPartThumbnails;
 
     /**
      * Create a new Ods.

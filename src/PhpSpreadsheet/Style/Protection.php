@@ -173,7 +173,7 @@ class Protection extends Supervisor
         return md5(
             $this->locked
             . $this->hidden
-            . __CLASS__
+            . self::class
         );
     }
 

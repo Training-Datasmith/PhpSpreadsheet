@@ -96,9 +96,8 @@ class CodePage
                 }
 
                 throw new PhpSpreadsheetException("Code page $codePage not implemented on this system.");
-            } else {
-                return $value;
             }
+            return $value;
         }
         if ($codePage == 720 || $codePage == 32769) {
             throw new PhpSpreadsheetException("Code page $codePage not supported."); //    OEM Arabic

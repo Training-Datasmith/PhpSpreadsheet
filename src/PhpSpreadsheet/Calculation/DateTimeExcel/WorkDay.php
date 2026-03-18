@@ -52,12 +52,12 @@ class WorkDay
         try {
             $startDate = Helpers::getDateValue($startDate);
             $endDays = Helpers::validateNumericNull($endDays);
-            $holidayArray = array_map([Helpers::class, 'getDateValue'], Functions::flattenArray($dateArgs));
+            $holidayArray = array_map(Helpers::getDateValue(...), Functions::flattenArray($dateArgs));
         } catch (Exception $e) {
             return $e->getMessage();
         }
 
-        $startDate = (float) floor($startDate);
+        $startDate = floor($startDate);
         $endDays = (int) floor($endDays);
         //    If endDays is 0, we always return startDate
         if ($endDays == 0) {
@@ -85,7 +85,7 @@ class WorkDay
         }
 
         //    Add endDays
-        $endDate = (float) $startDate + ((int) ($endDays / 5) * 7);
+        $endDate = $startDate + ((int) ($endDays / 5) * 7);
         $endDays = $endDays % 5;
         while ($endDays > 0) {
             ++$endDate;
@@ -148,7 +148,7 @@ class WorkDay
         }
 
         //    Add endDays
-        $endDate = (float) $startDate + ((int) ($endDays / 5) * 7);
+        $endDate = $startDate + ((int) ($endDays / 5) * 7);
         $endDays = $endDays % 5;
         while ($endDays < 0) {
             --$endDate;

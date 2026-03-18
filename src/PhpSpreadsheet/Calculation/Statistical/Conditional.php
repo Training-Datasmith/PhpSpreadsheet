@@ -126,7 +126,8 @@ class Conditional
     {
         if (empty($args)) {
             return 0;
-        } elseif (count($args) === 2) {
+        }
+        if (count($args) === 2) {
             return self::COUNTIF(...$args);
         }
 
@@ -227,7 +228,8 @@ class Conditional
     {
         if (empty($args)) {
             return 0.0;
-        } elseif (count($args) === 3) {
+        }
+        if (count($args) === 3) {
             return self::SUMIF($args[1], $args[2], $args[0]);
         }
 
@@ -351,8 +353,6 @@ class Conditional
             $valueRange = $range;
         }
 
-        $database = array_map(null, array_merge([self::CONDITION_COLUMN_NAME], $range), array_merge([self::VALUE_COLUMN_NAME], $valueRange));
-
-        return $database;
+        return array_map(null, array_merge([self::CONDITION_COLUMN_NAME], $range), array_merge([self::VALUE_COLUMN_NAME], $valueRange));
     }
 }

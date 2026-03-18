@@ -37,11 +37,6 @@ class Legend
      */
     private bool $overlay = true;
 
-    /**
-     * Legend Layout.
-     */
-    private ?Layout $layout;
-
     private GridLines $borderLines;
 
     private ChartColor $fillColor;
@@ -51,10 +46,12 @@ class Legend
     /**
      * Create a new Legend.
      */
-    public function __construct(string $position = self::POSITION_RIGHT, ?Layout $layout = null, bool $overlay = false)
+    public function __construct(string $position = self::POSITION_RIGHT, /**
+     * Legend Layout.
+     */
+    private ?Layout $layout = null, bool $overlay = false)
     {
         $this->setPosition($position);
-        $this->layout = $layout;
         $this->setOverlay($overlay);
         $this->borderLines = new GridLines();
         $this->fillColor = new ChartColor();

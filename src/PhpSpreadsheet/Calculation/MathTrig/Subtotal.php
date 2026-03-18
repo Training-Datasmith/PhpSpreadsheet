@@ -19,7 +19,7 @@ class Subtotal
     {
         return array_filter(
             $args,
-            function ($index) use ($cellReference) {
+            function ($index) use ($cellReference): bool {
                 $explodeArray = explode('.', $index);
                 $row = $explodeArray[1] ?? '';
                 if (!is_numeric($row)) {
@@ -41,7 +41,7 @@ class Subtotal
     {
         return array_filter(
             $args,
-            function ($index) use ($cellReference) {
+            function ($index) use ($cellReference): bool {
                 $explodeArray = explode('.', $index);
                 $row = $explodeArray[1] ?? '';
 

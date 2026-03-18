@@ -38,18 +38,12 @@ class TableDxfsStyle
     private ?Style $secondRowStripeStyle = null;
 
     /**
-     * Name of the style.
-     */
-    private string $name;
-
-    /**
      * Create a new Table Style.
      *
      * @param string $name The name
      */
-    public function __construct(string $name)
+    public function __construct(private readonly string $name)
     {
-        $this->name = $name;
     }
 
     /**

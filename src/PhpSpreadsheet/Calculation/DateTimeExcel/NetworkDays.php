@@ -71,12 +71,20 @@ class NetworkDays
         //    Test any extra holiday parameters
         $holidayCountedArray = [];
         foreach ($holidayArray as $holidayDate) {
-            if (($holidayDate >= $startDate) && ($holidayDate <= $endDate)) {
-                if ((Week::day($holidayDate, 2) < 6) && (!in_array($holidayDate, $holidayCountedArray))) {
-                    --$partWeekDays;
-                    $holidayCountedArray[] = $holidayDate;
-                }
+            if (!($holidayDate >= $startDate)) {
+                continue;
             }
+            if (!($holidayDate <= $endDate)) {
+                continue;
+            }
+            if (!(Week::day($holidayDate, 2) < 6)) {
+                continue;
+            }
+            if (in_array($holidayDate, $holidayCountedArray)) {
+                continue;
+            }
+            --$partWeekDays;
+            $holidayCountedArray[] = $holidayDate;
         }
 
         return self::applySign($wholeWeekDays + $partWeekDays, $sDate, $eDate);
@@ -86,7 +94,7 @@ class NetworkDays
     {
         $startDow = 6 - (int) Week::day($startDate, 2);
         if ($startDow < 0) {
-            $startDow = 5;
+            return 5;
         }
 
         return $startDow;
@@ -96,7 +104,7 @@ class NetworkDays
     {
         $endDow = (int) Week::day($endDate, 2);
         if ($endDow >= 6) {
-            $endDow = 0;
+            return 0;
         }
 
         return $endDow;

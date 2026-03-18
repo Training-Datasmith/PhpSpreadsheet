@@ -48,7 +48,7 @@ class Gnumeric extends BaseReader
      */
     private Spreadsheet $spreadsheet;
 
-    private ReferenceHelper $referenceHelper;
+    private readonly ReferenceHelper $referenceHelper;
 
     /** @var array{'dataType': string[]} */
     public static array $mappings = [
@@ -202,7 +202,7 @@ class Gnumeric extends BaseReader
             }
         }
         if ($data !== '') {
-            $data = $this->getSecurityScannerOrThrow()->scan($data);
+            return $this->getSecurityScannerOrThrow()->scan($data);
         }
 
         return $data;
@@ -217,7 +217,7 @@ class Gnumeric extends BaseReader
     private function processComments(SimpleXMLElement $sheet): void
     {
         if ((!$this->readDataOnly) && (isset($sheet->Objects))) {
-            foreach ($sheet->Objects->children(self::NAMESPACE_GNM) as $key => $comment) {
+            foreach ($sheet->Objects->children(self::NAMESPACE_GNM) as $comment) {
                 $commentAttributes = $comment->attributes();
                 //    Only comment objects are handled at the moment
                 if ($commentAttributes && $commentAttributes->Text) {
@@ -529,7 +529,10 @@ class Gnumeric extends BaseReader
             foreach ($gnmXML->Names->Name as $definedName) {
                 $name = (string) $definedName->name;
                 $value = (string) $definedName->value;
-                if (stripos($value, '#REF!') !== false || empty($value)) {
+                if (stripos($value, '#REF!') !== false) {
+                    continue;
+                }
+                if (empty($value)) {
                     continue;
                 }
 
@@ -613,13 +616,10 @@ class Gnumeric extends BaseReader
     private function getArrayFormulaRange(string $column, int $row, int $cols, int $rows): string
     {
         $arrayFormulaRange = $column . $row;
-        $arrayFormulaRange .= ':'
-            . Coordinate::stringFromColumnIndex(
-                Coordinate::columnIndexFromString($column)
-                + $cols - 1
-            )
-            . (string) ($row + $rows - 1);
 
-        return $arrayFormulaRange;
+        return $arrayFormulaRange . (':' . Coordinate::stringFromColumnIndex(
+            Coordinate::columnIndexFromString($column)
+            + $cols - 1
+        ) . (($row + $rows - 1)));
     }
 }

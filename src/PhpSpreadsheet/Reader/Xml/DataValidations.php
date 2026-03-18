@@ -41,7 +41,7 @@ class DataValidations
         $xmlX = $worksheet->children(Namespaces::URN_EXCEL);
         $sheet = $spreadsheet->getActiveSheet();
         /** @var callable $pregCallback */
-        $pregCallback = [$this, 'replaceR1C1'];
+        $pregCallback = $this->replaceR1C1(...);
         foreach ($xmlX->DataValidation as $dataValidation) {
             $combinedCells = '';
             $separator = '';
@@ -62,7 +62,7 @@ class DataValidations
                     case 'Range':
                         foreach (explode(',', $tagValue) as $range) {
                             $cell = '';
-                            if (preg_match('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', (string) $range, $selectionMatches) === 1) {
+                            if (preg_match('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', $range, $selectionMatches) === 1) {
                                 // range
                                 $firstCell = Coordinate::stringFromColumnIndex((int) $selectionMatches[2])
                                     . $selectionMatches[1];
@@ -75,7 +75,7 @@ class DataValidations
                                 $sheet->getCell($firstCell);
                                 $combinedCells .= "$separator$cell";
                                 $separator = ' ';
-                            } elseif (preg_match('/^R(\d+)C(\d+)$/', (string) $range, $selectionMatches) === 1) {
+                            } elseif (preg_match('/^R(\d+)C(\d+)$/', $range, $selectionMatches) === 1) {
                                 // cell
                                 $cell = Coordinate::stringFromColumnIndex((int) $selectionMatches[2])
                                     . $selectionMatches[1];
@@ -84,7 +84,7 @@ class DataValidations
                                 $this->thisColumn = (int) $selectionMatches[2];
                                 $combinedCells .= "$separator$cell";
                                 $separator = ' ';
-                            } elseif (preg_match('/^C(\d+)(:C(]\d+))?$/', (string) $range, $selectionMatches) === 1) {
+                            } elseif (preg_match('/^C(\d+)(:C(]\d+))?$/', $range, $selectionMatches) === 1) {
                                 // column
                                 $firstCol = $selectionMatches[1];
                                 $firstColString = Coordinate::stringFromColumnIndex((int) $firstCol);
@@ -96,7 +96,7 @@ class DataValidations
                                 $sheet->getCell($firstCell);
                                 $combinedCells .= "$separator$cell";
                                 $separator = ' ';
-                            } elseif (preg_match('/^R(\d+)(:R(]\d+))?$/', (string) $range, $selectionMatches)) {
+                            } elseif (preg_match('/^R(\d+)(:R(]\d+))?$/', $range, $selectionMatches)) {
                                 // row
                                 $firstRow = $selectionMatches[1];
                                 $lastRow = $selectionMatches[3] ?? $firstRow;

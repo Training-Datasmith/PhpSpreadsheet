@@ -90,8 +90,8 @@ class Matrix
             return self::evaluateArrayArgumentsSubsetFrom([self::class, __FUNCTION__], 1, $matrix, $rowNum, $columnNum);
         }
 
-        $rowNum = $rowNum ?? 0;
-        $columnNum = $columnNum ?? 0;
+        $rowNum ??= 0;
+        $columnNum ??= 0;
         if (is_scalar($matrix)) {
             if ($rowNum === 0 || $rowNum === 1) {
                 if ($columnNum === 0 || $columnNum === 1) {

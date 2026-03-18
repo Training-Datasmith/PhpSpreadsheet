@@ -117,22 +117,22 @@ class Layout
             $this->yMode = $layout['yMode'];
         }
         if (isset($layout['x'])) {
-            $this->xPos = (float) $layout['x'];
+            $this->xPos = $layout['x'];
         }
         if (isset($layout['y'])) {
-            $this->yPos = (float) $layout['y'];
+            $this->yPos = $layout['y'];
         }
         if (isset($layout['w'])) {
-            $this->width = (float) $layout['w'];
+            $this->width = $layout['w'];
         }
         if (isset($layout['h'])) {
-            $this->height = (float) $layout['h'];
+            $this->height = $layout['h'];
         }
         if (isset($layout['dLblPos'])) {
-            $this->dLblPos = (string) $layout['dLblPos'];
+            $this->dLblPos = $layout['dLblPos'];
         }
         if (isset($layout['numFmtCode'])) {
-            $this->numFmtCode = (string) $layout['numFmtCode'];
+            $this->numFmtCode = $layout['numFmtCode'];
         }
         $this->initBoolean($layout, 'showLegendKey');
         $this->initBoolean($layout, 'showVal');

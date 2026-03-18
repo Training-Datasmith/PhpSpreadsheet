@@ -118,13 +118,6 @@ class Protection
     private int $spinCount = 10000;
 
     /**
-     * Create a new Protection.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Is some sort of protection enabled?
      */
     public function isProtectionEnabled(): bool

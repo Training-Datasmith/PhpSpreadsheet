@@ -63,7 +63,7 @@ class StudentT
     /**
      * @return array<mixed>|float|string The result, or a string containing an error
      */
-    private static function calcDistribution(mixed $value, mixed $degrees, mixed $tails, callable $callback)
+    private static function calcDistribution(mixed $value, mixed $degrees, mixed $tails, callable $callback): array|string|float
     {
         if (is_array($value) || is_array($degrees) || is_array($tails)) {
             return self::evaluateArrayArguments($callback, $value, $degrees, $tails);
@@ -124,7 +124,7 @@ class StudentT
      *
      * @return array<mixed>|float|string The result, or a string containing an error
      */
-    public static function tDotDist(mixed $value, mixed $degrees, mixed $cumulative)
+    public static function tDotDist(mixed $value, mixed $degrees, mixed $cumulative): array|string|float
     {
         if (is_array($value) || is_array($degrees) || is_array($cumulative)) {
             return self::evaluateArrayArguments(self::tDotDist(...), $value, $degrees, $cumulative);
@@ -152,7 +152,7 @@ class StudentT
         $h16 = 0.5;
         $result = Beta::distribution($f16, $g16, $h16);
         if (is_numeric($result)) {
-            $result = ($value < 0) ? (0.5 * $result) : (1 - 0.5 * $result);
+            return ($value < 0) ? (0.5 * $result) : (1 - 0.5 * $result);
         }
 
         return $result;
@@ -198,7 +198,7 @@ class StudentT
     /**
      * @return array<mixed>|float|string The result, or a string containing an error
      */
-    private static function calcInverse(mixed $probability, mixed $degrees, int $tails, callable $callback2)
+    private static function calcInverse(mixed $probability, mixed $degrees, int $tails, callable $callback2): array|string|int|float
     {
         if (is_array($probability) || is_array($degrees)) {
             return self::evaluateArrayArguments($callback2, $probability, $degrees, $tails);
@@ -308,7 +308,7 @@ class StudentT
                                 + $y * .6936233982E-12))))))))))
         );
         if ($p > 0.5) {
-            $x = -$x;
+            return -$x;
         }
 
         return $x;

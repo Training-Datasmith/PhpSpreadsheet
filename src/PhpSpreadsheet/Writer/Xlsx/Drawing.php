@@ -290,7 +290,7 @@ class Drawing extends WriterPart
             } else {
                 // a:stretch
                 $objWriter->startElement('a:stretch');
-                $objWriter->writeElement('a:fillRect', null);
+                $objWriter->writeElement('a:fillRect');
                 $objWriter->endElement();
             }
 
@@ -317,7 +317,7 @@ class Drawing extends WriterPart
             $objWriter->writeAttribute('prst', 'rect');
 
             // a:avLst
-            $objWriter->writeElement('a:avLst', null);
+            $objWriter->writeElement('a:avLst');
 
             $objWriter->endElement();
 
@@ -353,7 +353,7 @@ class Drawing extends WriterPart
             $objWriter->endElement();
 
             // xdr:clientData
-            $objWriter->writeElement('xdr:clientData', null);
+            $objWriter->writeElement('xdr:clientData');
 
             $objWriter->endElement();
         } else {
@@ -519,7 +519,7 @@ class Drawing extends WriterPart
             throw new WriterException('Regexp failure in writeVMLHeaderFooterImage');
             // @codeCoverageIgnoreEnd
         }
-        $id = 1500 + ((int) substr($m[1], 0, 2) * 1);
+        $id = 1500 + ((int) substr((string) $m[1], 0, 2));
 
         // Calculate offset
         $width = $image->getWidth();

@@ -319,7 +319,7 @@ class Color extends Supervisor
      *
      * @return int|string The red colour component
      */
-    public static function getRed(string $rgbValue, bool $hex = true)
+    public static function getRed(string $rgbValue, bool $hex = true): string|int
     {
         return self::getColourComponent($rgbValue, strlen($rgbValue) - 6, $hex);
     }
@@ -333,7 +333,7 @@ class Color extends Supervisor
      *
      * @return int|string The green colour component
      */
-    public static function getGreen(string $rgbValue, bool $hex = true)
+    public static function getGreen(string $rgbValue, bool $hex = true): string|int
     {
         return self::getColourComponent($rgbValue, strlen($rgbValue) - 4, $hex);
     }
@@ -347,7 +347,7 @@ class Color extends Supervisor
      *
      * @return int|string The blue colour component
      */
-    public static function getBlue(string $rgbValue, bool $hex = true)
+    public static function getBlue(string $rgbValue, bool $hex = true): string|int
     {
         return self::getColourComponent($rgbValue, strlen($rgbValue) - 2, $hex);
     }
@@ -385,9 +385,6 @@ class Color extends Supervisor
      */
     public static function indexedColor(int $colorIndex, bool $background = false, ?array $palette = null): self
     {
-        // Clean parameter
-        $colorIndex = (int) $colorIndex;
-
         if (empty($palette)) {
             if (isset(self::INDEXED_COLORS[$colorIndex])) {
                 return new self(self::INDEXED_COLORS[$colorIndex]);
@@ -414,8 +411,8 @@ class Color extends Supervisor
 
         return md5(
             $this->argb
-            . (string) $this->theme
-            . __CLASS__
+            . $this->theme
+            . self::class
         );
     }
 

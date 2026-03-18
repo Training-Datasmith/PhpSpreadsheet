@@ -8,11 +8,8 @@ use SimpleXMLElement;
 
 class Properties
 {
-    private Spreadsheet $spreadsheet;
-
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(private readonly Spreadsheet $spreadsheet)
     {
-        $this->spreadsheet = $spreadsheet;
     }
 
     /** @param array{meta?: string, office?: string, dc?: string} $namespacesMeta */
@@ -30,7 +27,7 @@ class Properties
             if (isset($namespacesMeta['dc'])) {
                 $officePropertyMeta = $officePropertyData->children($namespacesMeta['meta'] ?? '');
             }
-            $officePropertyMeta = $officePropertyMeta ?? [];
+            $officePropertyMeta ??= [];
             foreach ($officePropertyMeta as $propertyName => $propertyValue) {
                 $this->setMetaProperties($namespacesMeta, $propertyValue, $propertyName, $docProps);
             }

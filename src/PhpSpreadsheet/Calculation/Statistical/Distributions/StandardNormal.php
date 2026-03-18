@@ -30,7 +30,7 @@ class StandardNormal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function cumulative(mixed $value)
+    public static function cumulative(mixed $value): string|float|array
     {
         return Normal::distribution($value, 0, 1, true);
     }
@@ -55,7 +55,7 @@ class StandardNormal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function distribution(mixed $value, mixed $cumulative)
+    public static function distribution(mixed $value, mixed $cumulative): string|float|array
     {
         return Normal::distribution($value, 0, 1, $cumulative);
     }
@@ -76,7 +76,7 @@ class StandardNormal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function inverse(mixed $value)
+    public static function inverse(mixed $value): string|float|array
     {
         return Normal::inverse($value, 0, 1);
     }
@@ -127,7 +127,7 @@ class StandardNormal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function zTest(mixed $dataSet, mixed $m0, mixed $sigma = null)
+    public static function zTest(mixed $dataSet, mixed $m0, mixed $sigma = null): array|string|int|float
     {
         if (is_array($m0) || is_array($sigma)) {
             return self::evaluateArrayArgumentsSubsetFrom([self::class, __FUNCTION__], 1, $dataSet, $m0, $sigma);

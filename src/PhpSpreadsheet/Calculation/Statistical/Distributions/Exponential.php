@@ -46,9 +46,9 @@ class Exponential
         }
 
         if ($cumulative === true) {
-            return 1 - exp(0 - $value * $lambda);
+            return 1 - exp(-($value * $lambda));
         }
 
-        return $lambda * exp(0 - $value * $lambda);
+        return $lambda * exp(-($value * $lambda));
     }
 }

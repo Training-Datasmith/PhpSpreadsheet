@@ -52,20 +52,17 @@ class Escher
     private int $pos;
 
     /**
-     * The object to be returned by the reader. Modified during load.
-     *
-     * @var T
-     */
-    private BSE|BstoreContainer|DgContainer|DggContainer|\PhpOffice\PhpSpreadsheet\Shared\Escher|SpContainer|SpgrContainer $object;
-
-    /**
      * Create a new Escher instance.
      *
      * @param T $object
      */
-    public function __construct(BSE|BstoreContainer|DgContainer|DggContainer|\PhpOffice\PhpSpreadsheet\Shared\Escher|SpContainer|SpgrContainer $object)
+    public function __construct(
+        /**
+         * The object to be returned by the reader. Modified during load.
+         */
+        private readonly BSE|BstoreContainer|DgContainer|DggContainer|\PhpOffice\PhpSpreadsheet\Shared\Escher|SpContainer|SpgrContainer $object
+    )
     {
-        $this->object = $object;
     }
 
     private const WHICH_ROUTINE = [

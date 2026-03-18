@@ -24,10 +24,16 @@ class FormattedNumber
      */
     public static function convertToNumberIfFormatted(float|string &$operand): bool
     {
-        return self::convertToNumberIfNumeric($operand)
-            || self::convertToNumberIfFraction($operand)
-            || self::convertToNumberIfPercent($operand)
-            || self::convertToNumberIfCurrency($operand);
+        if (self::convertToNumberIfNumeric($operand)) {
+            return true;
+        }
+        if (self::convertToNumberIfFraction($operand)) {
+            return true;
+        }
+        if (self::convertToNumberIfPercent($operand)) {
+            return true;
+        }
+        return self::convertToNumberIfCurrency($operand);
     }
 
     /**

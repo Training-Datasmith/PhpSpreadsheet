@@ -36,7 +36,7 @@ class Base
         }
 
         try {
-            $number = (float) floor(Helpers::validateNumericNullBool($number));
+            $number = floor(Helpers::validateNumericNullBool($number));
             $radix = (int) Helpers::validateNumericNullBool($radix);
         } catch (Exception $e) {
             return $e->getMessage();
@@ -52,7 +52,7 @@ class Base
                 return ExcelError::NAN(); // Numeric range constraints
             }
 
-            $outcome = strtoupper((string) base_convert("$number", 10, $radix));
+            $outcome = strtoupper(base_convert("$number", 10, $radix));
             if ($minLength !== null) {
                 $outcome = str_pad($outcome, (int) $minLength, '0', STR_PAD_LEFT); // String padding
             }

@@ -11,9 +11,7 @@ class CashFlowValidations extends FinancialValidations
 {
     public static function validateRate(mixed $rate): float
     {
-        $rate = self::validateFloat($rate);
-
-        return $rate;
+        return self::validateFloat($rate);
     }
 
     public static function validatePeriodType(mixed $type): int

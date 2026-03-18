@@ -65,7 +65,7 @@ class Run extends TextElement implements ITextElement
         return md5(
             $this->getText()
             . (($this->font === null) ? '' : $this->font->getHashCode())
-            . __CLASS__
+            . self::class
         );
     }
 }

@@ -73,8 +73,10 @@ class Variances extends VarianceBase
         foreach ($aArgs as $k => $arg) {
             if ((is_string($arg)) && (Functions::isValue($k))) {
                 return ExcelError::VALUE();
-            } elseif ((is_string($arg)) && (!Functions::isMatrixValue($k))) {
-            } else {
+            }
+            if ((is_string($arg)) && (!Functions::isMatrixValue($k))) {
+            }
+            else {
                 // Is it a numeric value?
                 if ((is_numeric($arg)) || (is_bool($arg)) || ((is_string($arg) && ($arg != '')))) {
                     $arg = self::datatypeAdjustmentAllowStrings($arg);
@@ -162,8 +164,10 @@ class Variances extends VarianceBase
         foreach ($aArgs as $k => $arg) {
             if ((is_string($arg)) && (Functions::isValue($k))) {
                 return ExcelError::VALUE();
-            } elseif ((is_string($arg)) && (!Functions::isMatrixValue($k))) {
-            } else {
+            }
+            if ((is_string($arg)) && (!Functions::isMatrixValue($k))) {
+            }
+            else {
                 // Is it a numeric value?
                 if ((is_numeric($arg)) || (is_bool($arg)) || ((is_string($arg) && ($arg != '')))) {
                     $arg = self::datatypeAdjustmentAllowStrings($arg);

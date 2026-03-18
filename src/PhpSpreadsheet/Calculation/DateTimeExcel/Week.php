@@ -254,9 +254,8 @@ class Week
         if (!array_key_exists($method, Constants::METHODARR)) {
             throw new Exception(ExcelError::NAN());
         }
-        $method = Constants::METHODARR[$method];
 
-        return $method;
+        return Constants::METHODARR[$method];
     }
 
     private static function buggyWeekNum1900(int $method): bool

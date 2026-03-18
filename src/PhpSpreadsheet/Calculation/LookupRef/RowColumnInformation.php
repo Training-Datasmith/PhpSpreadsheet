@@ -53,7 +53,7 @@ class RowColumnInformation
 
         if (is_array($cellAddress)) {
             foreach ($cellAddress as $columnKey => $value) {
-                $columnKey = (string) preg_replace('/[^a-z]/i', '', $columnKey);
+                $columnKey = (string) preg_replace('/[^a-z]/i', '', (string) $columnKey);
 
                 return Coordinate::columnIndexFromString($columnKey);
             }
@@ -61,7 +61,7 @@ class RowColumnInformation
             return self::cellColumn($cell);
         }
 
-        $cellAddress = $cellAddress ?? '';
+        $cellAddress ??= '';
         if ($cell != null) {
             [,, $sheetName] = Helpers::extractWorksheet($cellAddress, $cell);
             [,, $cellAddress] = Helpers::extractCellAddresses($cellAddress, true, $cell->getWorksheet(), $sheetName);
@@ -113,9 +113,7 @@ class RowColumnInformation
         if (!is_array($cellAddress)) {
             return ExcelError::VALUE();
         }
-
-        reset($cellAddress);
-        $isMatrix = (is_numeric(key($cellAddress)));
+        $isMatrix = (is_numeric(array_key_first($cellAddress)));
         [$columns, $rows] = Calculation::getMatrixDimensions($cellAddress);
 
         if ($isMatrix) {
@@ -164,15 +162,15 @@ class RowColumnInformation
 
         if (is_array($cellAddress)) {
             foreach ($cellAddress as $rowKey => $rowValue) {
-                foreach ($rowValue as $columnKey => $cellValue) {
-                    return (int) preg_replace('/\D/', '', $rowKey);
+                foreach ($rowValue as $cellValue) {
+                    return (int) preg_replace('/\D/', '', (string) $rowKey);
                 }
             }
 
             return self::cellRow($cell);
         }
 
-        $cellAddress = $cellAddress ?? '';
+        $cellAddress ??= '';
         if ($cell !== null) {
             [,, $sheetName] = Helpers::extractWorksheet($cellAddress, $cell);
             [,, $cellAddress] = Helpers::extractCellAddresses($cellAddress, true, $cell->getWorksheet(), $sheetName);
@@ -218,9 +216,7 @@ class RowColumnInformation
         if (!is_array($cellAddress)) {
             return ExcelError::VALUE();
         }
-
-        reset($cellAddress);
-        $isMatrix = (is_numeric(key($cellAddress)));
+        $isMatrix = (is_numeric(array_key_first($cellAddress)));
         [$columns, $rows] = Calculation::getMatrixDimensions($cellAddress);
 
         if ($isMatrix) {

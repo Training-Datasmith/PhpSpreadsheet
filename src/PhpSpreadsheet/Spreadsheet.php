@@ -175,7 +175,7 @@ class Spreadsheet implements JsonSerializable
      */
     private int $tabRatio = 600;
 
-    private Theme $theme;
+    private readonly Theme $theme;
 
     private ?IValueBinder $valueBinder = null;
 
@@ -229,7 +229,7 @@ class Spreadsheet implements JsonSerializable
      */
     public function setHasMacros(bool $hasMacros): void
     {
-        $this->hasMacros = (bool) $hasMacros;
+        $this->hasMacros = $hasMacros;
     }
 
     /**
@@ -1520,7 +1520,7 @@ class Spreadsheet implements JsonSerializable
      */
     public function setShowHorizontalScroll(bool $showHorizontalScroll): void
     {
-        $this->showHorizontalScroll = (bool) $showHorizontalScroll;
+        $this->showHorizontalScroll = $showHorizontalScroll;
     }
 
     /**
@@ -1540,7 +1540,7 @@ class Spreadsheet implements JsonSerializable
      */
     public function setShowVerticalScroll(bool $showVerticalScroll): void
     {
-        $this->showVerticalScroll = (bool) $showVerticalScroll;
+        $this->showVerticalScroll = $showVerticalScroll;
     }
 
     /**
@@ -1560,7 +1560,7 @@ class Spreadsheet implements JsonSerializable
      */
     public function setShowSheetTabs(bool $showSheetTabs): void
     {
-        $this->showSheetTabs = (bool) $showSheetTabs;
+        $this->showSheetTabs = $showSheetTabs;
     }
 
     /**
@@ -1580,7 +1580,7 @@ class Spreadsheet implements JsonSerializable
      */
     public function setMinimized(bool $minimized): void
     {
-        $this->minimized = (bool) $minimized;
+        $this->minimized = $minimized;
     }
 
     /**
@@ -1602,7 +1602,7 @@ class Spreadsheet implements JsonSerializable
      */
     public function setAutoFilterDateGrouping(bool $autoFilterDateGrouping): void
     {
-        $this->autoFilterDateGrouping = (bool) $autoFilterDateGrouping;
+        $this->autoFilterDateGrouping = $autoFilterDateGrouping;
     }
 
     /**
@@ -1623,7 +1623,7 @@ class Spreadsheet implements JsonSerializable
     public function setFirstSheetIndex(int $firstSheetIndex): void
     {
         if ($firstSheetIndex >= 0) {
-            $this->firstSheetIndex = (int) $firstSheetIndex;
+            $this->firstSheetIndex = $firstSheetIndex;
         } else {
             throw new Exception('First sheet index must be a positive integer.');
         }
@@ -1690,7 +1690,7 @@ class Spreadsheet implements JsonSerializable
     public function setTabRatio(int $tabRatio): void
     {
         if ($tabRatio >= 0 && $tabRatio <= 1000) {
-            $this->tabRatio = (int) $tabRatio;
+            $this->tabRatio = $tabRatio;
         } else {
             throw new Exception('Tab ratio must be between 0 and 1000.');
         }

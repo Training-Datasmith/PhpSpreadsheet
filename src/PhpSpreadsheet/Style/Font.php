@@ -748,7 +748,7 @@ class Font extends Supervisor
         return
             $underlineColor->getValue()
             . $underlineColor->getType()
-            . (string) $underlineColor->getAlpha();
+            . $underlineColor->getAlpha();
     }
 
     /**
@@ -787,7 +787,7 @@ class Font extends Supervisor
                     (string) $this->cap,
                 ]
             )
-            . __CLASS__
+            . self::class
         );
     }
 

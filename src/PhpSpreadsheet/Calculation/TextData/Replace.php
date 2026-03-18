@@ -47,7 +47,7 @@ class Replace
         }
         $returnValue = $left . $newText . $right;
         if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-            $returnValue = ExcelError::VALUE();
+            return ExcelError::VALUE();
         }
 
         return $returnValue;
@@ -94,7 +94,7 @@ class Replace
             return $e->getMessage();
         }
         if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-            $returnValue = ExcelError::VALUE();
+            return ExcelError::VALUE();
         }
 
         return $returnValue;

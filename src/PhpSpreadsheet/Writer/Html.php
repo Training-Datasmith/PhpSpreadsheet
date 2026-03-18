@@ -60,11 +60,6 @@ class Html extends BaseWriter
     private const BRX = '<br          />';
 
     /**
-     * Spreadsheet object.
-     */
-    protected Spreadsheet $spreadsheet;
-
-    /**
      * Sheet index to write.
      */
     private ?int $sheetIndex = 0;
@@ -127,7 +122,7 @@ class Html extends BaseWriter
     /**
      * Default font.
      */
-    private Font $defaultFont;
+    private readonly Font $defaultFont;
 
     /**
      * Flag whether spans have been calculated.
@@ -203,9 +198,11 @@ class Html extends BaseWriter
     /**
      * Create a new HTML.
      */
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(/**
+     * Spreadsheet object.
+     */
+    protected Spreadsheet $spreadsheet)
     {
-        $this->spreadsheet = $spreadsheet;
         $this->defaultFont = $this->spreadsheet->getDefaultStyle()->getFont();
         $calc = Calculation::getInstance($this->spreadsheet);
         $this->getTrue = $calc->getTRUE();
@@ -348,7 +345,7 @@ class Html extends BaseWriter
      *
      * @param int|string $borderStyle Sheet index
      */
-    private function mapBorderStyle($borderStyle): string
+    private function mapBorderStyle(string $borderStyle): string
     {
         return self::BORDER_ARR[$borderStyle] ?? '1px solid';
     }
@@ -392,7 +389,7 @@ class Html extends BaseWriter
      */
     public function setGenerateSheetNavigationBlock(bool $generateSheetNavigationBlock): static
     {
-        $this->generateSheetNavigationBlock = (bool) $generateSheetNavigationBlock;
+        $this->generateSheetNavigationBlock = $generateSheetNavigationBlock;
 
         return $this;
     }
@@ -491,9 +488,8 @@ class Html extends BaseWriter
 
         $html .= '  </head>' . $this->lineEnding;
         $html .= '' . $this->lineEnding;
-        $html .= '  <body>' . $this->lineEnding;
 
-        return $html;
+        return $html . ('  <body>' . $this->lineEnding);
     }
 
     /** @return Worksheet[] */
@@ -501,12 +497,10 @@ class Html extends BaseWriter
     {
         // Fetch sheets
         if ($this->sheetIndex === null) {
-            $sheets = $this->spreadsheet->getAllSheets();
-        } else {
-            $sheets = [$this->spreadsheet->getSheet($this->sheetIndex)];
+            return $this->spreadsheet->getAllSheets();
         }
 
-        return $sheets;
+        return [$this->spreadsheet->getSheet($this->sheetIndex)];
     }
 
     /** @return array{int, int, int} */
@@ -588,7 +582,7 @@ class Html extends BaseWriter
             $this->sheetDrawings = [];
             $condStylesCollection = $sheet->getConditionalStylesCollection();
             foreach ($condStylesCollection as $condStyles) {
-                foreach ($condStyles as $key => $cs) {
+                foreach ($condStyles as $cs) {
                     if ($cs->getConditionType() === Conditional::CONDITION_COLORSCALE) {
                         $cs->getColorScale()?->setScaleArray();
                     }
@@ -1167,12 +1161,12 @@ class Html extends BaseWriter
         if ($textAlign) {
             $css['text-align'] = $textAlign;
             if (in_array($textAlign, ['left', 'right'])) {
-                $css['padding-' . $textAlign] = (string) ($alignment->getIndent() * Alignment::INDENT_UNITS_TO_PIXELS) . 'px';
+                $css['padding-' . $textAlign] = ($alignment->getIndent() * Alignment::INDENT_UNITS_TO_PIXELS) . 'px';
             }
         } else {
             $indent = $alignment->getIndent();
             if ($indent !== 0) {
-                $css['text-indent'] = (string) ($alignment->getIndent() * Alignment::INDENT_UNITS_TO_PIXELS) . 'px';
+                $css['text-indent'] = ($alignment->getIndent() * Alignment::INDENT_UNITS_TO_PIXELS) . 'px';
             }
         }
         $rotation = $alignment->getTextRotation();
@@ -1319,9 +1313,8 @@ class Html extends BaseWriter
         // Construct HTML
         $html = '';
         $html .= '  </body>' . $this->lineEnding;
-        $html .= '</html>' . $this->lineEnding;
 
-        return $html;
+        return $html . ('</html>' . $this->lineEnding);
     }
 
     private function getDir(Worksheet $worksheet): string
@@ -1586,7 +1579,7 @@ class Html extends BaseWriter
             $cellData = NumberFormat::toFormattedString(
                 $origData2,
                 $formatCode ?? NumberFormat::FORMAT_GENERAL,
-                [$this, 'formatColor']
+                $this->formatColor(...)
             );
 
             if ($cellData === $origData) {
@@ -1631,7 +1624,7 @@ class Html extends BaseWriter
                     } elseif (is_string($calculatedValue)) {
                         $dataType = DataType::TYPE_STRING;
                     }
-                } catch (CalculationException $exception) {
+                } catch (CalculationException) {
                     $calculatedValue = '#ERROR';
                     $dataType = DataType::TYPE_ERROR;
                 }
@@ -1688,7 +1681,6 @@ class Html extends BaseWriter
 
     /**
      * @param string|string[] $cssClass
-     * @param Conditional[] $condStyles
      */
     private function generateRowWriteCell(
         string &$html,
@@ -1701,8 +1693,7 @@ class Html extends BaseWriter
         array|string $cssClass,
         int $colNum,
         int $sheetIndex,
-        int $row,
-        array $condStyles = []
+        int $row
     ): void {
         // Image?
         $htmlx = $this->writeImageInCell($coordinate);
@@ -1772,7 +1763,7 @@ class Html extends BaseWriter
                     $width += $this->columnWidths[$sheetIndex][$i];
                 }
             }
-            $xcssClass['width'] = (string) $width . 'pt';
+            $xcssClass['width'] = $width . 'pt';
             // We must also explicitly write the height of the <td> element because TCPDF
             // does not recognize e.g. <tr style="height:50pt">
             if (isset($this->cssStyles['table.sheet' . $sheetIndex . ' tr.row' . $row]['height'])) {
@@ -1835,7 +1826,7 @@ class Html extends BaseWriter
                 $holdCss = '';
             }
             foreach ($styles as $key => $value) {
-                if (!str_starts_with($key, 'border-') || $value !== 'none #000000') {
+                if (!str_starts_with((string) $key, 'border-') || $value !== 'none #000000') {
                     $html .= $key . ':' . $value . ';';
                 }
             }
@@ -1943,7 +1934,7 @@ class Html extends BaseWriter
 
             // Write
             if ($writeCell) {
-                $this->generateRowWriteCell($html, $worksheet, $coordinate, $cellType, $cellData, $colSpan, $rowSpan, $cssClass, $colNum, $sheetIndex, $row, $condStyles);
+                $this->generateRowWriteCell($html, $worksheet, $coordinate, $cellType, $cellData, $colSpan, $rowSpan, $cssClass, $colNum, $sheetIndex, $row);
             }
 
             // Next column
@@ -1966,7 +1957,7 @@ class Html extends BaseWriter
     {
         return Preg::replaceCallback(
             '/[\x00-\x1f]/',
-            fn (array $matches) => '&#' . ord($matches[0]) . ';',
+            fn (array $matches): string => '&#' . ord($matches[0]) . ';',
             $convert
         );
     }
@@ -1982,9 +1973,8 @@ class Html extends BaseWriter
         foreach ($values as $property => $value) {
             $pairs[] = $property . ':' . $value;
         }
-        $string = implode('; ', $pairs);
 
-        return $string;
+        return implode('; ', $pairs);
     }
 
     /**
@@ -2106,7 +2096,7 @@ class Html extends BaseWriter
 
         // color span tag
         if ($color !== null) {
-            $result = '<span style="color:' . $color . '">' . $result . '</span>';
+            return '<span style="color:' . $color . '">' . $result . '</span>';
         }
 
         return $result;
@@ -2348,7 +2338,7 @@ class Html extends BaseWriter
         return $this;
     }
 
-    private static function nl2brx(string $string, bool $useXhtml = false): string
+    private static function nl2brx(string $string): string
     {
         return str_replace(
             ["\r\n", "\n\r", "\r", "\n"],

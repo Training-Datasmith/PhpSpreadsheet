@@ -288,7 +288,7 @@ class Styles extends BaseParserClass
     {
         $style = $this->getAttribute($borderXml, 'style');
         if ($style !== '') {
-            $border->setBorderStyle((string) $style);
+            $border->setBorderStyle($style);
         } else {
             $border->setBorderStyle(Border::BORDER_NONE);
         }
@@ -299,17 +299,17 @@ class Styles extends BaseParserClass
 
     public function readAlignmentStyle(Alignment $alignment, SimpleXMLElement $alignmentXml): void
     {
-        $horizontal = (string) $this->getAttribute($alignmentXml, 'horizontal');
+        $horizontal = $this->getAttribute($alignmentXml, 'horizontal');
         if ($horizontal !== '') {
             $alignment->setHorizontal($horizontal);
         }
-        $justifyLastLine = (string) $this->getAttribute($alignmentXml, 'justifyLastLine');
+        $justifyLastLine = $this->getAttribute($alignmentXml, 'justifyLastLine');
         if ($justifyLastLine !== '') {
             $alignment->setJustifyLastLine(
                 self::boolean($justifyLastLine)
             );
         }
-        $vertical = (string) $this->getAttribute($alignmentXml, 'vertical');
+        $vertical = $this->getAttribute($alignmentXml, 'vertical');
         if ($vertical !== '') {
             $alignment->setVertical($vertical);
         }
@@ -321,9 +321,9 @@ class Styles extends BaseParserClass
         $alignment->setTextRotation($textRotation);
 
         $wrapText = $this->getAttribute($alignmentXml, 'wrapText');
-        $alignment->setWrapText(self::boolean((string) $wrapText));
+        $alignment->setWrapText(self::boolean($wrapText));
         $shrinkToFit = $this->getAttribute($alignmentXml, 'shrinkToFit');
-        $alignment->setShrinkToFit(self::boolean((string) $shrinkToFit));
+        $alignment->setShrinkToFit(self::boolean($shrinkToFit));
         $indent = (int) $this->getAttribute($alignmentXml, 'indent');
         $alignment->setIndent(max($indent, 0));
         $readingOrder = (int) $this->getAttribute($alignmentXml, 'readingOrder');
@@ -333,7 +333,7 @@ class Styles extends BaseParserClass
     private static function formatGeneral(string $formatString): string
     {
         if ($formatString === 'GENERAL') {
-            $formatString = NumberFormat::FORMAT_GENERAL;
+            return NumberFormat::FORMAT_GENERAL;
         }
 
         return $formatString;
@@ -419,7 +419,7 @@ class Styles extends BaseParserClass
             }
         }
         if ($hidden !== '') {
-            if (self::boolean((string) $hidden)) {
+            if (self::boolean($hidden)) {
                 $docStyle->getProtection()->setHidden(Protection::PROTECTION_PROTECTED);
             } else {
                 $docStyle->getProtection()->setHidden(Protection::PROTECTION_UNPROTECTED);
@@ -430,12 +430,11 @@ class Styles extends BaseParserClass
     public function readColorTheme(SimpleXMLElement $color): int
     {
         $attr = $this->getStyleAttributes($color);
-        $retVal = -1;
         if (isset($attr['theme']) && is_numeric((string) $attr['theme']) && !isset($attr['tint'])) {
-            $retVal = (int) $attr['theme'];
+            return (int) $attr['theme'];
         }
 
-        return $retVal;
+        return -1;
     }
 
     public function readColor(SimpleXMLElement $color, bool $background = false): string

@@ -388,7 +388,7 @@ class Font
             try {
                 $columnWidthAdjust = ceil(
                     self::getTextWidthPixelsExact(
-                        str_repeat('n', 1 * (($filterAdjustment ? 3 : 1) + ($indentAdjustment * 2))),
+                        str_repeat('n', (($filterAdjustment ? 3 : 1) + ($indentAdjustment * 2))),
                         $font,
                         0
                     ) * 1.07
@@ -404,7 +404,7 @@ class Font
 
         if ($approximate) {
             $columnWidthAdjust = self::getTextWidthPixelsApprox(
-                str_repeat('n', 1 * (($filterAdjustment ? 3 : 1) + ($indentAdjustment * 2))),
+                str_repeat('n', (($filterAdjustment ? 3 : 1) + ($indentAdjustment * 2))),
                 $font,
                 0
             );
@@ -461,16 +461,10 @@ class Font
         // Result varies with font name and size.
         switch ($fontName) {
             case 'Arial':
-                // value 8 was set because of experience in different exports at Arial 10 font.
-                $columnWidth = (int) (8 * StringHelper::countCharactersDbcs($columnText));
-                $columnWidth = $columnWidth * $fontSize / 10; // extrapolate from font size
-
-                break;
             case 'Verdana':
-                // value 8 was found via interpolation by inspecting real Excel files with Verdana 10 font.
-                $columnWidth = (int) (8 * StringHelper::countCharactersDbcs($columnText));
+                // value 8 was set because of experience in different exports at Arial 10 font.
+                $columnWidth = 8 * StringHelper::countCharactersDbcs($columnText);
                 $columnWidth = $columnWidth * $fontSize / 10; // extrapolate from font size
-
                 break;
             default:
                 // just assume Calibri

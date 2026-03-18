@@ -66,7 +66,7 @@ class DataType
 
         // we require that newline is represented as "\n" in core, not as "\r\n" or "\r"
         if (!$preserveCr) {
-            $textValue = str_replace(["\r\n", "\r"], "\n", $textValue);
+            return str_replace(["\r\n", "\r"], "\n", $textValue);
         }
 
         return $textValue;
@@ -85,7 +85,7 @@ class DataType
         $value = ($value === null) ? $default : StringHelper::convertToString($value, false, $default);
 
         if (!isset(self::$errorCodes[$value])) {
-            $value = $default;
+            return $default;
         }
 
         return $value;

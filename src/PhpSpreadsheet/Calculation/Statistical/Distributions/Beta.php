@@ -42,8 +42,8 @@ class Beta
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $alpha, $beta, $rMin, $rMax);
         }
 
-        $rMin = $rMin ?? 0.0;
-        $rMax = $rMax ?? 1.0;
+        $rMin ??= 0.0;
+        $rMax ??= 1.0;
 
         try {
             $value = DistributionValidations::validateFloat($value);
@@ -95,8 +95,8 @@ class Beta
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $probability, $alpha, $beta, $rMin, $rMax);
         }
 
-        $rMin = $rMin ?? 0.0;
-        $rMax = $rMax ?? 1.0;
+        $rMin ??= 0.0;
+        $rMax ??= 1.0;
 
         try {
             $probability = DistributionValidations::validateProbability($probability);
@@ -164,13 +164,15 @@ class Beta
     {
         if ($x <= 0.0) {
             return 0.0;
-        } elseif ($x >= 1.0) {
+        }
+        if ($x >= 1.0) {
             return 1.0;
-        } elseif (($p <= 0.0) || ($q <= 0.0) || (($p + $q) > self::LOG_GAMMA_X_MAX_VALUE)) {
+        }
+        if (($p <= 0.0) || ($q <= 0.0) || (($p + $q) > self::LOG_GAMMA_X_MAX_VALUE)) {
             return 0.0;
         }
 
-        $beta_gam = exp((0 - self::logBeta($p, $q)) + $p * log($x) + $q * log(1.0 - $x));
+        $beta_gam = exp((-self::logBeta($p, $q)) + $p * log($x) + $q * log(1.0 - $x));
         if ($x < ($p + 1.0) / ($p + $q + 2.0)) {
             return $beta_gam * self::betaFraction($x, $p, $q) / $p;
         }

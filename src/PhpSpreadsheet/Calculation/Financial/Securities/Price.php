@@ -81,9 +81,8 @@ class Price
         for ($k = 0; $k <= $n; ++$k) {
             $result += $rfp / ($baseYF ** ($k + $de));
         }
-        $result -= $rfp * ($a / $e);
 
-        return $result;
+        return $result - $rfp * ($a / $e);
     }
 
     /**
@@ -113,7 +112,7 @@ class Price
         mixed $discount,
         mixed $redemption,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD
-    ) {
+    ): string|float {
         $settlement = Functions::flattenSingleValue($settlement);
         $maturity = Functions::flattenSingleValue($maturity);
         $discount = Functions::flattenSingleValue($discount);
@@ -169,7 +168,7 @@ class Price
         mixed $rate,
         mixed $yield,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD
-    ) {
+    ): string|float {
         $settlement = Functions::flattenSingleValue($settlement);
         $maturity = Functions::flattenSingleValue($maturity);
         $issue = Functions::flattenSingleValue($issue);
@@ -244,7 +243,7 @@ class Price
         mixed $investment,
         mixed $discount,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD
-    ) {
+    ): string|float {
         $settlement = Functions::flattenSingleValue($settlement);
         $maturity = Functions::flattenSingleValue($maturity);
         $investment = Functions::flattenSingleValue($investment);

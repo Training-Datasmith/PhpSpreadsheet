@@ -59,82 +59,82 @@ class Xlsx extends BaseWriter
      *
      * @var HashTable<Conditional>
      */
-    private HashTable $stylesConditionalHashTable;
+    private readonly HashTable $stylesConditionalHashTable;
 
     /**
      * Private unique Style HashTable.
      *
      * @var HashTable<\PhpOffice\PhpSpreadsheet\Style\Style>
      */
-    private HashTable $styleHashTable;
+    private readonly HashTable $styleHashTable;
 
     /**
      * Private unique Fill HashTable.
      *
      * @var HashTable<Fill>
      */
-    private HashTable $fillHashTable;
+    private readonly HashTable $fillHashTable;
 
     /**
      * Private unique \PhpOffice\PhpSpreadsheet\Style\Font HashTable.
      *
      * @var HashTable<Font>
      */
-    private HashTable $fontHashTable;
+    private readonly HashTable $fontHashTable;
 
     /**
      * Private unique Borders HashTable.
      *
      * @var HashTable<Borders>
      */
-    private HashTable $bordersHashTable;
+    private readonly HashTable $bordersHashTable;
 
     /**
      * Private unique NumberFormat HashTable.
      *
      * @var HashTable<NumberFormat>
      */
-    private HashTable $numFmtHashTable;
+    private readonly HashTable $numFmtHashTable;
 
     /**
      * Private unique \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet\BaseDrawing HashTable.
      *
      * @var HashTable<BaseDrawing>
      */
-    private HashTable $drawingHashTable;
+    private readonly HashTable $drawingHashTable;
 
     /**
      * Private handle for zip stream.
      */
     private ZipStream $zip;
 
-    private Chart $writerPartChart;
+    private readonly Chart $writerPartChart;
 
-    private Comments $writerPartComments;
+    private readonly Comments $writerPartComments;
 
-    private ContentTypes $writerPartContentTypes;
+    private readonly ContentTypes $writerPartContentTypes;
 
-    private DocProps $writerPartDocProps;
+    private readonly DocProps $writerPartDocProps;
 
-    private Drawing $writerPartDrawing;
+    private readonly Drawing $writerPartDrawing;
 
-    private Rels $writerPartRels;
+    private readonly Rels $writerPartRels;
 
-    private RelsRibbon $writerPartRelsRibbon;
+    private readonly RelsRibbon $writerPartRelsRibbon;
 
-    private RelsVBA $writerPartRelsVBA;
+    private readonly RelsVBA $writerPartRelsVBA;
 
-    private StringTable $writerPartStringTable;
+    private readonly StringTable $writerPartStringTable;
 
-    private Style $writerPartStyle;
+    private readonly Style $writerPartStyle;
 
-    private Theme $writerPartTheme;
+    private readonly Theme $writerPartTheme;
 
-    private Table $writerPartTable;
+    private readonly Table $writerPartTable;
 
-    private Workbook $writerPartWorkbook;
+    private readonly Workbook $writerPartWorkbook;
 
-    private Worksheet $writerPartWorksheet;
+    private readonly Worksheet $writerPartWorksheet;
 
     private bool $explicitStyle0 = false;
 
@@ -767,12 +767,9 @@ class Xlsx extends BaseWriter
 
                     break;
 
-                case 2: // JPEG
-                    $data = file_get_contents($filename);
+                case 2:
 
-                    break;
-
-                case 3: // PNG
+                case 3: // JPEG
                     $data = file_get_contents($filename);
 
                     break;
@@ -884,7 +881,16 @@ class Xlsx extends BaseWriter
             $mediaFiles = $sheetData['drawingMediaFiles'] ?? [];
             /** @var ?string $sourceFile */
             $sourceFile = $sheetData['drawingSourceFile'] ?? null;
-            if (($sheetData['drawingPassThroughEnabled'] ?? false) !== true || $mediaFiles === [] || !is_string($sourceFile) || !file_exists($sourceFile)) {
+            if (($sheetData['drawingPassThroughEnabled'] ?? false) !== true) {
+                continue;
+            }
+            if ($mediaFiles === []) {
+                continue;
+            }
+            if (!is_string($sourceFile)) {
+                continue;
+            }
+            if (!file_exists($sourceFile)) {
                 continue;
             }
 

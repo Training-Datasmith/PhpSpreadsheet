@@ -36,20 +36,20 @@ class FractionFormatter extends BaseFormatter
 
         $adjustedDecimalPart = (int) round((int) $decimalPart / $fractionDivisor, 0);
         $adjustedDecimalDivisor = $decimalDivisor / $fractionDivisor;
-
-        if ((str_contains($formatIntegerPart, '0'))) {
+        if (str_contains($formatIntegerPart, '0')) {
             return "{$sign}{$integerPart} {$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
-        } elseif ((str_contains($formatIntegerPart, '#'))) {
+        }
+        if (str_contains($formatIntegerPart, '#')) {
             if ($integerPart == 0) {
                 return "{$sign}{$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
             }
-
             return "{$sign}{$integerPart} {$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
-        } elseif ((str_starts_with($formatIntegerPart, '? ?'))) {
+        }
+
+        if (str_starts_with($formatIntegerPart, '? ?')) {
             if ($integerPart == 0) {
                 $integerPart = '';
             }
-
             return "{$sign}{$integerPart} {$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
         }
 
@@ -60,11 +60,10 @@ class FractionFormatter extends BaseFormatter
 
     private static function getDecimal(string $value): string
     {
-        $decimalPart = '0';
         if (preg_match('/^\d*[.](\d*[1-9])0*$/', $value, $matches) === 1) {
-            $decimalPart = $matches[1];
+            return $matches[1];
         }
 
-        return $decimalPart;
+        return '0';
     }
 }

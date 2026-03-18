@@ -229,8 +229,10 @@ class Style extends WriterPart
         if ($fill->getFillType() === Fill::FILL_NONE) {
             return false;
         }
-
-        return $fill->getFillType() === Fill::FILL_SOLID || $fill->getColorsChanged();
+        if ($fill->getFillType() === Fill::FILL_SOLID) {
+            return true;
+        }
+        return $fill->getColorsChanged();
     }
 
     /**
@@ -244,7 +246,7 @@ class Style extends WriterPart
         // patternFill
         $objWriter->startElement('patternFill');
         if ($fill->getFillType()) {
-            $objWriter->writeAttribute('patternType', (string) $fill->getFillType());
+            $objWriter->writeAttribute('patternType', $fill->getFillType());
         }
 
         if (self::writePatternColors($fill)) {
@@ -441,7 +443,7 @@ class Style extends WriterPart
         }
 
         if ($style->getNumberFormat()->getBuiltInFormatCode() === false) {
-            $objWriter->writeAttribute('numFmtId', (string) (int) ($this->getParentWriter()->getNumFmtHashTable()->getIndexForHashCode($style->getNumberFormat()->getHashCode()) + 164));
+            $objWriter->writeAttribute('numFmtId', (string) $this->getParentWriter()->getNumFmtHashTable()->getIndexForHashCode($style->getNumberFormat()->getHashCode()) + 164);
         } else {
             $objWriter->writeAttribute('numFmtId', (string) (int) $style->getNumberFormat()->getBuiltInFormatCode());
         }

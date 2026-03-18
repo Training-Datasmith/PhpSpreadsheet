@@ -431,10 +431,11 @@ class PageSetup
      */
     public function isColumnsToRepeatAtLeftSet(): bool
     {
-        if (!empty($this->columnsToRepeatAtLeft)) {
-            if ($this->columnsToRepeatAtLeft[0] != '' && $this->columnsToRepeatAtLeft[1] != '') {
-                return true;
-            }
+        if (empty($this->columnsToRepeatAtLeft)) {
+            return false;
+        }
+        if ($this->columnsToRepeatAtLeft[0] != '' && $this->columnsToRepeatAtLeft[1] != '') {
+            return true;
         }
 
         return false;
@@ -484,10 +485,11 @@ class PageSetup
      */
     public function isRowsToRepeatAtTopSet(): bool
     {
-        if (!empty($this->rowsToRepeatAtTop)) {
-            if ($this->rowsToRepeatAtTop[0] != 0 && $this->rowsToRepeatAtTop[1] != 0) {
-                return true;
-            }
+        if (empty($this->rowsToRepeatAtTop)) {
+            return false;
+        }
+        if ($this->rowsToRepeatAtTop[0] != 0 && $this->rowsToRepeatAtTop[1] != 0) {
+            return true;
         }
 
         return false;
@@ -659,9 +661,11 @@ class PageSetup
     {
         if (str_contains($value, '!')) {
             throw new PhpSpreadsheetException('Cell coordinate must not specify a worksheet.');
-        } elseif (!str_contains($value, ':')) {
+        }
+        if (!str_contains($value, ':')) {
             throw new PhpSpreadsheetException('Cell coordinate must be a range of cells.');
-        } elseif (str_contains($value, '$')) {
+        }
+        if (str_contains($value, '$')) {
             throw new PhpSpreadsheetException('Cell coordinate must not be absolute.');
         }
         $value = strtoupper($value);
@@ -689,7 +693,7 @@ class PageSetup
             } else {
                 $printAreas = explode(',', (string) $this->printArea);
                 if ($index < 0) {
-                    $index = (int) abs($index) - 1;
+                    $index = abs($index) - 1;
                 }
                 if ($index > count($printAreas)) {
                     throw new PhpSpreadsheetException('Invalid index for setting print range.');

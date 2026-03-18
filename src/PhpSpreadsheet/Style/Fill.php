@@ -283,8 +283,13 @@ class Fill extends Supervisor
         } else {
             $changed = $this->colorChanged;
         }
-
-        return $changed || $this->startColor->getHasChanged() || $this->endColor->getHasChanged();
+        if ($changed) {
+            return true;
+        }
+        if ($this->startColor->getHasChanged()) {
+            return true;
+        }
+        return $this->endColor->getHasChanged();
     }
 
     /**
@@ -305,8 +310,8 @@ class Fill extends Supervisor
             . $this->getRotation()
             . ($this->getFillType() !== self::FILL_NONE ? $this->getStartColor()->getHashCode() : '')
             . ($this->getFillType() !== self::FILL_NONE ? $this->getEndColor()->getHashCode() : '')
-            . ((string) $this->getColorsChanged())
-            . __CLASS__
+            . ($this->getColorsChanged())
+            . self::class
         );
     }
 

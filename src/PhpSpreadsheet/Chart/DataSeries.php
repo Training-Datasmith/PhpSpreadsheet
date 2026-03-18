@@ -47,31 +47,9 @@ class DataSeries
     const VALID_EMPTY_AS = [self::EMPTY_AS_GAP, self::EMPTY_AS_ZERO, self::EMPTY_AS_SPAN];
 
     /**
-     * Series Plot Type.
-     */
-    private ?string $plotType;
-
-    /**
-     * Plot Grouping Type.
-     */
-    private ?string $plotGrouping;
-
-    /**
      * Plot Direction.
      */
     private string $plotDirection;
-
-    /**
-     * Plot Style.
-     */
-    private ?string $plotStyle;
-
-    /**
-     * Order of plots in Series.
-     *
-     * @var int[]
-     */
-    private array $plotOrder;
 
     /**
      * Plot Label.
@@ -86,11 +64,6 @@ class DataSeries
      * @var DataSeriesValues[]
      */
     private array $plotCategory;
-
-    /**
-     * Smooth Line. Must be specified for both DataSeries and DataSeriesValues.
-     */
-    private bool $smoothLine;
 
     /**
      * Plot Values.
@@ -115,19 +88,31 @@ class DataSeries
      * @param DataSeriesValues[] $plotValues
      */
     public function __construct(
-        null|string $plotType = null,
-        null|string $plotGrouping = null,
-        array $plotOrder = [],
+        /**
+         * Series Plot Type.
+         */
+        private ?string $plotType = null,
+        /**
+         * Plot Grouping Type.
+         */
+        private ?string $plotGrouping = null,
+        /**
+         * Order of plots in Series.
+         */
+        private readonly array $plotOrder = [],
         array $plotLabel = [],
         array $plotCategory = [],
         array $plotValues = [],
         ?string $plotDirection = null,
-        bool $smoothLine = false,
-        ?string $plotStyle = null
+        /**
+         * Smooth Line. Must be specified for both DataSeries and DataSeriesValues.
+         */
+        private bool $smoothLine = false,
+        /**
+         * Plot Style.
+         */
+        private ?string $plotStyle = null
     ) {
-        $this->plotType = $plotType;
-        $this->plotGrouping = $plotGrouping;
-        $this->plotOrder = $plotOrder;
         $keys = array_keys($plotValues);
         $this->plotValues = $plotValues;
         if (!isset($plotLabel[$keys[0]])) {
@@ -139,9 +124,6 @@ class DataSeries
             $plotCategory[$keys[0]] = new DataSeriesValues();
         }
         $this->plotCategory = $plotCategory;
-
-        $this->smoothLine = (bool) $smoothLine;
-        $this->plotStyle = $plotStyle;
 
         if ($plotDirection === null) {
             $plotDirection = self::DIRECTION_COL;
@@ -264,7 +246,8 @@ class DataSeries
         $keys = array_keys($this->plotCategory);
         if (in_array($index, $keys)) {
             return $this->plotCategory[$index];
-        } elseif (isset($keys[$index])) {
+        }
+        if (isset($keys[$index])) {
             return $this->plotCategory[$keys[$index]];
         }
 

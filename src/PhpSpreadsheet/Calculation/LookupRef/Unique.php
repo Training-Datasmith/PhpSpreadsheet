@@ -112,9 +112,7 @@ class Unique
             return ExcelError::CALC();
         }
 
-        $result = array_keys($result);
-
-        return $result;
+        return array_keys($result);
     }
 
     /**
@@ -126,7 +124,7 @@ class Unique
     {
         $caseInsensitiveCounts = array_count_values(
             array_map(
-                fn (string $value): string => StringHelper::strToUpper($value),
+                StringHelper::strToUpper(...),
                 $caseSensitiveLookupValues
             )
         );

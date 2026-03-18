@@ -19,22 +19,16 @@ class CellReferenceHelper
 
     protected bool $beforeRowAbsolute = false;
 
-    protected int $numberOfColumns;
-
-    protected int $numberOfRows;
-
-    public function __construct(string $beforeCellAddress = 'A1', int $numberOfColumns = 0, int $numberOfRows = 0)
+    public function __construct(string $beforeCellAddress = 'A1', protected int $numberOfColumns = 0, protected int $numberOfRows = 0)
     {
         $this->beforeColumnAbsolute = $beforeCellAddress[0] === '$';
-        $this->beforeRowAbsolute = strpos($beforeCellAddress, '$', 1) !== false;
+        $this->beforeRowAbsolute = str_contains(substr($beforeCellAddress, 1), '$');
         $this->beforeCellAddress = str_replace('$', '', $beforeCellAddress);
-        $this->numberOfColumns = $numberOfColumns;
-        $this->numberOfRows = $numberOfRows;
 
         // Get coordinate of $beforeCellAddress
         [$beforeColumn, $beforeRow] = Coordinate::coordinateFromString($beforeCellAddress);
         $this->beforeColumnString = $beforeColumn;
-        $this->beforeColumn = (int) Coordinate::columnIndexFromString($beforeColumn);
+        $this->beforeColumn = Coordinate::columnIndexFromString($beforeColumn);
         $this->beforeRow = (int) $beforeRow;
     }
 
@@ -144,17 +138,15 @@ class CellReferenceHelper
         [$cellColumn, $cellRow] = Coordinate::coordinateFromString($cellAddress);
         $cellColumnIndex = Coordinate::columnIndexFromString($cellColumn);
         //    Is cell within the range of rows/columns if we're deleting
-        if (
-            $this->numberOfRows < 0
-            && ($cellRow >= ($this->beforeRow + $this->numberOfRows))
-            && ($cellRow < $this->beforeRow)
-        ) {
+        if ($this->numberOfRows < 0
+        && ($cellRow >= ($this->beforeRow + $this->numberOfRows))
+        && ($cellRow < $this->beforeRow)) {
             return true;
-        } elseif (
-            $this->numberOfColumns < 0
-            && ($cellColumnIndex >= ($this->beforeColumn + $this->numberOfColumns))
-            && ($cellColumnIndex < $this->beforeColumn)
-        ) {
+        }
+        //    Is cell within the range of rows/columns if we're deleting
+        if ($this->numberOfColumns < 0
+        && ($cellColumnIndex >= ($this->beforeColumn + $this->numberOfColumns))
+        && ($cellColumnIndex < $this->beforeColumn)) {
             return true;
         }
 

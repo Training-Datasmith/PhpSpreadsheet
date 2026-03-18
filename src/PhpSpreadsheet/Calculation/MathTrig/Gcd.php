@@ -37,7 +37,7 @@ class Gcd
      *
      * @return float|int|string Greatest Common Divisor, or a string containing an error
      */
-    public static function evaluate(mixed ...$args)
+    public static function evaluate(mixed ...$args): string|float|int
     {
         try {
             $arrayArgs = [];
@@ -55,7 +55,7 @@ class Gcd
         if (count($arrayArgs) <= 0) {
             return ExcelError::VALUE();
         }
-        $gcd = (int) array_pop($arrayArgs);
+        $gcd = array_pop($arrayArgs);
         do {
             $gcd = self::evaluateGCD($gcd, (int) array_pop($arrayArgs));
         } while (!empty($arrayArgs));

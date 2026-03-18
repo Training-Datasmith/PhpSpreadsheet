@@ -23,7 +23,7 @@ abstract class GammaBase
             return self::incompleteGamma($a, $value / $b) / self::gammaValue($a);
         }
 
-        return (1 / ($b ** $a * self::gammaValue($a))) * $value ** ($a - 1) * exp(0 - ($value / $b));
+        return (1 / ($b ** $a * self::gammaValue($a))) * $value ** ($a - 1) * exp(-($value / $b));
     }
 
     /** @return float|string */
@@ -88,7 +88,7 @@ abstract class GammaBase
             $summer += ($x ** $n / $divisor);
         }
 
-        return $x ** $a * exp(0 - $x) * $summer;
+        return $x ** $a * exp(-$x) * $summer;
     }
 
     private const GAMMA_VALUE_P0 = 1.000000000190015;
@@ -119,7 +119,7 @@ abstract class GammaBase
             $summer += (self::GAMMA_VALUE_P[$j] / ++$y);
         }
 
-        return exp(0 - $tmp + log(self::SQRT2PI * $summer / $x));
+        return exp(-$tmp + log(self::SQRT2PI * $summer / $x));
     }
 
     private const LG_D1 = -0.5772156649015328605195174;

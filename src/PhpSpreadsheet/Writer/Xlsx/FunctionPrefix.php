@@ -205,7 +205,7 @@ class FunctionPrefix
     {
         $functionString = Preg::replaceCallback(
             Calculation::CALCULATION_REGEXP_CELLREF_SPILL,
-            fn (array $matches) => 'ANCHORARRAY(' . substr((string) $matches[0], 0, -1) . ')',
+            fn (array $matches): string => 'ANCHORARRAY(' . substr((string) $matches[0], 0, -1) . ')',
             $functionString
         );
 

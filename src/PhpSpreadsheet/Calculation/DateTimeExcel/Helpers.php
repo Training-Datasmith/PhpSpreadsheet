@@ -87,7 +87,7 @@ class Helpers
      *
      * @param float|int $dateValue date to be adjusted
      */
-    public static function adjustDateByMonths($dateValue = 0, float $adjustmentMonths = 0): DateTime
+    public static function adjustDateByMonths(float|int $dateValue = 0, float $adjustmentMonths = 0): DateTime
     {
         // Execute function
         $PHPDateObject = SharedDateHelper::excelToDateTimeObject($dateValue);

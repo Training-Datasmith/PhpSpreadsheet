@@ -181,15 +181,15 @@ class Theme
         }
         $this->themeColorName = $name;
         if ($name === self::COLOR_SCHEME_2007_2010_NAME) {
-            $themeColors = $themeColors ?? self::COLOR_SCHEME_2007_2010;
+            $themeColors ??= self::COLOR_SCHEME_2007_2010;
             $this->majorFontLatin = 'Cambria';
             $this->minorFontLatin = 'Calibri';
         } elseif ($name === self::COLOR_SCHEME_2013_2022_NAME) {
-            $themeColors = $themeColors ?? self::COLOR_SCHEME_2013_2022;
+            $themeColors ??= self::COLOR_SCHEME_2013_2022;
             $this->majorFontLatin = 'Calibri Light';
             $this->minorFontLatin = 'Calibri';
         } elseif ($name === self::COLOR_SCHEME_2023_PLUS_NAME) {
-            $themeColors = $themeColors ?? self::COLOR_SCHEME_2023_PLUS;
+            $themeColors ??= self::COLOR_SCHEME_2023_PLUS;
             $this->majorFontLatin = 'Aptos Display';
             $this->minorFontLatin = 'Aptos Narrow';
         }

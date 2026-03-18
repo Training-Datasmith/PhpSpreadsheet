@@ -12,14 +12,8 @@ use SimpleXMLElement;
 
 class ColumnAndRowAttributes extends BaseParserClass
 {
-    private Worksheet $worksheet;
-
-    private ?SimpleXMLElement $worksheetXml;
-
-    public function __construct(Worksheet $workSheet, ?SimpleXMLElement $worksheetXml = null)
+    public function __construct(private readonly Worksheet $worksheet, private readonly ?SimpleXMLElement $worksheetXml = null)
     {
-        $this->worksheet = $workSheet;
-        $this->worksheetXml = $worksheetXml;
     }
 
     /**

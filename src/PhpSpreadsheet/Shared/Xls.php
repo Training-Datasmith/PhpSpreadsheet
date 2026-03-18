@@ -43,12 +43,10 @@ class Xls
 
         // now find the effective column width in pixels
         if (isset($columnDimensions[$col]) && !$columnDimensions[$col]->getVisible()) {
-            $effectivePixelWidth = 0;
-        } else {
-            $effectivePixelWidth = $pixelWidth;
+            return 0;
         }
 
-        return $effectivePixelWidth;
+        return $pixelWidth;
     }
 
     /**

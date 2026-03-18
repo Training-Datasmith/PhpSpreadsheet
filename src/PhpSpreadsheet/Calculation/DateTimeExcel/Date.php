@@ -113,7 +113,7 @@ class Date
             $year += 1900;
         }
 
-        return (int) $year;
+        return $year;
     }
 
     /**

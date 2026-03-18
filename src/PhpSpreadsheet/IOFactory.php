@@ -171,7 +171,7 @@ abstract class IOFactory
 
         $testReaders = self::$readers;
         if ($readers !== null) {
-            $readers = array_map('strtoupper', $readers);
+            $readers = array_map(strtoupper(...), $readers);
             $testReaders = array_filter(
                 self::$readers,
                 fn (string $readerType): bool => in_array(strtoupper($readerType), $readers, true),

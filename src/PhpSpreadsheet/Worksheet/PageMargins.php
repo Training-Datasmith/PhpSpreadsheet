@@ -35,13 +35,6 @@ class PageMargins
     private float $footer = 0.3;
 
     /**
-     * Create a new PageMargins.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Get Left.
      */
     public function getLeft(): float

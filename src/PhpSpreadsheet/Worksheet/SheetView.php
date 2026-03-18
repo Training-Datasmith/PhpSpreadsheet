@@ -61,13 +61,6 @@ class SheetView
     private string $sheetviewType = self::SHEETVIEW_NORMAL;
 
     /**
-     * Create a new SheetView.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Get ZoomScale.
      */
     public function getZoomScale(): ?int

@@ -4,16 +4,6 @@ namespace PhpOffice\PhpSpreadsheet\Cell;
 
 class Hyperlink
 {
-    /**
-     * URL to link the cell to.
-     */
-    private string $url;
-
-    /**
-     * Tooltip to display on the hyperlink.
-     */
-    private string $tooltip;
-
     private string $display = '';
 
     /**
@@ -22,11 +12,8 @@ class Hyperlink
      * @param string $url Url to link the cell to
      * @param string $tooltip Tooltip to display on the hyperlink
      */
-    public function __construct(string $url = '', string $tooltip = '')
+    public function __construct(private string $url = '', private string $tooltip = '')
     {
-        // Initialise member variables
-        $this->url = $url;
-        $this->tooltip = $tooltip;
     }
 
     /**
@@ -113,7 +100,7 @@ class Hyperlink
             . ','
             . $this->display
             . ','
-            . __CLASS__
+            . self::class
         );
     }
 }

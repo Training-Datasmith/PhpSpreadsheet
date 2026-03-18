@@ -34,7 +34,6 @@ class Style
         $numberFormatStyleParser = new Style\NumberFormat();
 
         foreach ($stylesXml as $style) {
-            /** @var SimpleXMLElement $style */
             $style_ss = self::getAttributes($style, $namespaces['ss']);
             $styleID = (string) $style_ss['ID'];
             $this->styles[$styleID] = $this->styles['Default'] ?? [];
@@ -110,6 +109,6 @@ class Style
 
     private static function getSxml(?SimpleXMLElement $simple): SimpleXMLElement
     {
-        return ($simple !== null) ? $simple : new SimpleXMLElement('<xml></xml>');
+        return $simple ?? new SimpleXMLElement('<xml></xml>');
     }
 }

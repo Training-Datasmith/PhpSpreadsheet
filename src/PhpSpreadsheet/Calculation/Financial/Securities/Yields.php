@@ -38,7 +38,7 @@ class Yields
         mixed $price,
         mixed $redemption,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD
-    ) {
+    ): string|float {
         $settlement = Functions::flattenSingleValue($settlement);
         $maturity = Functions::flattenSingleValue($maturity);
         $price = Functions::flattenSingleValue($price);
@@ -99,7 +99,7 @@ class Yields
         mixed $rate,
         mixed $price,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD
-    ) {
+    ): string|float {
         $settlement = Functions::flattenSingleValue($settlement);
         $maturity = Functions::flattenSingleValue($maturity);
         $issue = Functions::flattenSingleValue($issue);

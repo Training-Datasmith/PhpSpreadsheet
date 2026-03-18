@@ -526,7 +526,7 @@ class Alignment extends Supervisor
             . ($this->shrinkToFit ? 't' : 'f')
             . $this->indent
             . $this->readOrder
-            . __CLASS__
+            . self::class
         );
     }
 

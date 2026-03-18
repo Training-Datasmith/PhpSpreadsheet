@@ -226,12 +226,7 @@ class Rels extends WriterPart
 
         if (($worksheet->getDrawingCollection()->count() > 0) || (count($charts) > 0) || $drawingOriginalIds) {
             $rId = 1;
-
-            // Use original $relPath to get original $rId.
-            // Take first. In future can be overwritten.
-            // (! synchronize with \PhpOffice\PhpSpreadsheet\Writer\Xlsx\Worksheet::writeDrawings)
-            reset($drawingOriginalIds);
-            $relPath = key($drawingOriginalIds);
+            $relPath = array_key_first($drawingOriginalIds);
             if (isset($relPath, $drawingOriginalIds[$relPath])) {
                 $rId = (int) (substr($drawingOriginalIds[$relPath], 3));
             }
@@ -336,7 +331,7 @@ class Rels extends WriterPart
         }
 
         foreach ($unparsedLoadedData['sheets'][$worksheet->getCodeName()][$relationship] as $rId => $value) {
-            if (!str_starts_with($rId, '_headerfooter_vml')) {
+            if (!str_starts_with((string) $rId, '_headerfooter_vml')) {
                 /** @var string[] $value */
                 $this->writeRelationship(
                     $objWriter,

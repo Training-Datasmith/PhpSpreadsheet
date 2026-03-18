@@ -73,7 +73,7 @@ class Sine
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function asin($number)
+    public static function asin($number): array|string|float
     {
         if (is_array($number)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
@@ -99,7 +99,7 @@ class Sine
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function asinh($number)
+    public static function asinh($number): array|string|float
     {
         if (is_array($number)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);

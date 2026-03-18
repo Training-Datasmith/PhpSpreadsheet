@@ -84,7 +84,7 @@ class ExponentialBestFit extends BestFit
     private function exponentialRegression(array $yValues, array $xValues, bool $const): void
     {
         $adjustedYValues = array_map(
-            fn ($value): float => ($value < 0.0) ? 0 - log(abs($value)) : log($value),
+            fn (float $value): float => ($value < 0.0) ? -log(abs($value)) : log($value),
             $yValues
         );
 
@@ -102,7 +102,7 @@ class ExponentialBestFit extends BestFit
         parent::__construct($yValues, $xValues);
 
         if (!$this->error) {
-            $this->exponentialRegression($yValues, $xValues, (bool) $const);
+            $this->exponentialRegression($yValues, $xValues, $const);
         }
     }
 }

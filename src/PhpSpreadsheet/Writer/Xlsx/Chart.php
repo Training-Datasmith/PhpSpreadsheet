@@ -1791,7 +1791,7 @@ class Chart extends WriterPart
             return;
         }
         $objWriter->startElement('a:softEdge');
-        $objWriter->writeAttribute('rad', Properties::pointsToXml((float) $softEdgeSize));
+        $objWriter->writeAttribute('rad', Properties::pointsToXml($softEdgeSize));
         $objWriter->endElement(); //end softEdge
     }
 
@@ -1865,12 +1865,11 @@ class Chart extends WriterPart
             $alpha = $chartColor->getAlpha();
             if (is_numeric($alpha)) {
                 $objWriter->startElement('a:alpha');
-                $objWriter->writeAttribute('val', ChartColor::alphaToXml((int) $alpha));
+                $objWriter->writeAttribute('val', ChartColor::alphaToXml($alpha));
                 $objWriter->endElement(); // a:alpha
             }
             $brightness = $chartColor->getBrightness();
             if (is_numeric($brightness)) {
-                $brightness = (int) $brightness;
                 $lumOff = 100 - $brightness;
                 $objWriter->startElement('a:lumMod');
                 $objWriter->writeAttribute('val', ChartColor::alphaToXml($brightness));

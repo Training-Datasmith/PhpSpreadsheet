@@ -11,9 +11,6 @@ class ConditionalFormattingRuleExtension
 
     private string $id;
 
-    /** @var string Conditional Formatting Rule */
-    private string $cfRule;
-
     private ConditionalDataBarExtension $dataBar;
 
     /** @var string Sequence of References */
@@ -22,14 +19,14 @@ class ConditionalFormattingRuleExtension
     /**
      * ConditionalFormattingRuleExtension constructor.
      */
-    public function __construct(?string $id = null, string $cfRule = self::CONDITION_EXTENSION_DATABAR)
+    public function __construct(?string $id = null, /** @var string Conditional Formatting Rule */
+    private string $cfRule = self::CONDITION_EXTENSION_DATABAR)
     {
         if (null === $id) {
             $this->id = '{' . $this->generateUuid() . '}';
         } else {
             $this->id = $id;
         }
-        $this->cfRule = $cfRule;
     }
 
     private function generateUuid(): string
@@ -68,7 +65,10 @@ class ConditionalFormattingRuleExtension
                 foreach ($extFormattingsXml->children($ns['x14']) as $extFormattingXml) {
                     $extCfRuleXml = $extFormattingXml->cfRule;
                     $attributes = $extCfRuleXml->attributes();
-                    if (!$attributes || ((string) $attributes->type) !== Conditional::CONDITION_DATABAR) {
+                    if (!$attributes) {
+                        continue;
+                    }
+                    if (((string) $attributes->type) !== Conditional::CONDITION_DATABAR) {
                         continue;
                     }
 

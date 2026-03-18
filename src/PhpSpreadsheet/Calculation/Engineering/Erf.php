@@ -66,7 +66,7 @@ class Erf
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function ERFPRECISE(mixed $limit)
+    public static function ERFPRECISE(mixed $limit): array|float|string
     {
         if (is_array($limit)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $limit);

@@ -70,9 +70,8 @@ class ConditionalFormatting extends Xls
         $cellRangeAddressList = ($xls->version == self::XLS_BIFF8)
             ? Biff8::readBIFF8CellRangeAddressList(substr($recordData, 12))
             : Biff5::readBIFF5CellRangeAddressList(substr($recordData, 12));
-        $cellRangeAddresses = $cellRangeAddressList['cellRangeAddresses'];
 
-        return $cellRangeAddresses;
+        return $cellRangeAddressList['cellRangeAddresses'];
     }
 
     /** @param string[] $cellRangeAddresses */

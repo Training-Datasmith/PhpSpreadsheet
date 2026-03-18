@@ -210,7 +210,7 @@ class StringTable extends WriterPart
             $textRun = $richText;
             $richText = new RichText();
             $run = $richText->createTextRun($textRun ?? '');
-            $run->setFont(null);
+            $run->setFont();
         }
 
         if ($prefix !== '') {
@@ -307,7 +307,7 @@ class StringTable extends WriterPart
                 $alpha = $underlineColor->getAlpha();
                 if (is_numeric($alpha)) {
                     $objWriter->startElement($prefix . 'alpha');
-                    $objWriter->writeAttribute('val', ChartColor::alphaToXml((int) $alpha));
+                    $objWriter->writeAttribute('val', ChartColor::alphaToXml($alpha));
                     $objWriter->endElement();
                 }
                 $objWriter->endElement(); // srgbClr/schemeClr/prstClr

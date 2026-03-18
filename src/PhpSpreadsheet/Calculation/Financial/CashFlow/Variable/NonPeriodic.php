@@ -166,10 +166,11 @@ class NonPeriodic
         $foundneg = false;
         for ($i = 0; $i < $valCount; ++$i) {
             $fld = $values[$i];
-            if (!is_numeric($fld)) { //* @phpstan-ignore-line
+            if (!is_numeric($fld)) {
+                //* @phpstan-ignore-line
                 return ExcelError::VALUE();
-            } elseif ($fld > 0) {
-                $foundpos = true;
+            }
+            if ($fld > 0) { $foundpos = true;
             } elseif ($fld < 0) {
                 $foundneg = true;
             }

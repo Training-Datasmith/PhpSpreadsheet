@@ -24,7 +24,7 @@ class Percentiles
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function PERCENTILE(mixed ...$args)
+    public static function PERCENTILE(mixed ...$args): string|float
     {
         $aArgs = Functions::flattenArray($args);
 
@@ -209,7 +209,7 @@ class Percentiles
     {
         return array_filter(
             $dataSet,
-            fn ($value): bool => is_numeric($value)
+            is_numeric(...)
         );
     }
 }

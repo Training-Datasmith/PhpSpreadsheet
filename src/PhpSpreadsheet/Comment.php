@@ -281,7 +281,7 @@ class Comment implements IComparable, Stringable
             . $this->alignment
             . $this->textboxDirection
             . ($this->hasBackgroundImage() ? $this->backgroundImage->getHashCode() : '')
-            . __CLASS__
+            . self::class
         );
     }
 

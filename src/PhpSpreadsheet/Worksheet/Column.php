@@ -4,21 +4,17 @@ namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 class Column
 {
-    private Worksheet $worksheet;
-
-    /**
-     * Column index.
-     */
-    private string $columnIndex;
-
     /**
      * Create a new column.
      */
-    public function __construct(Worksheet $worksheet, string $columnIndex = 'A')
+    public function __construct(
+        private Worksheet $worksheet,
+        /**
+         * Column index.
+         */
+        private readonly string $columnIndex = 'A'
+    )
     {
-        // Set parent and column index
-        $this->worksheet = $worksheet;
-        $this->columnIndex = $columnIndex;
     }
 
     /**

@@ -149,13 +149,6 @@ class HeaderFooter
     private array $headerFooterImages = [];
 
     /**
-     * Create a new HeaderFooter.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Get OddHeader.
      */
     public function getOddHeader(): string

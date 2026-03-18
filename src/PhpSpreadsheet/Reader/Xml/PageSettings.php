@@ -14,7 +14,7 @@ class PageSettings
      * paperSize: int,
      * horizontalCentered: bool, verticalCentered: bool, leftMargin: float, rightMargin: float, topMargin: float,
      * bottomMargin: float, headerMargin: float, footerMargin: float}&stdClass) */
-    private stdClass $printSettings;
+    private readonly stdClass $printSettings;
 
     public function __construct(SimpleXMLElement $xmlX)
     {

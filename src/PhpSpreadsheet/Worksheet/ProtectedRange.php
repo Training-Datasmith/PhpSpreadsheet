@@ -6,23 +6,11 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class ProtectedRange
 {
-    private string $name = '';
-
-    private string $password = '';
-
-    private string $sqref;
-
-    private string $securityDescriptor = '';
-
     /**
      * No setters aside from constructor.
      */
-    public function __construct(string $sqref, string $password = '', string $name = '', string $securityDescriptor = '')
+    public function __construct(private readonly string $sqref, private readonly string $password = '', private readonly string $name = '', private readonly string $securityDescriptor = '')
     {
-        $this->sqref = $sqref;
-        $this->name = $name;
-        $this->password = $password;
-        $this->securityDescriptor = $securityDescriptor;
     }
 
     public function getSqref(): string

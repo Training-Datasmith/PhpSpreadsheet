@@ -169,9 +169,8 @@ class MatrixFunctions
         try {
             $dimension = (int) Helpers::validateNumericNullBool($dimension);
             Helpers::validatePositive($dimension, ExcelError::VALUE());
-            $matrix = Builder::createIdentityMatrix($dimension, 0)->toArray();
 
-            return $matrix;
+            return Builder::createIdentityMatrix($dimension, 0)->toArray();
         } catch (Exception $e) {
             return $e->getMessage();
         }

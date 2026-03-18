@@ -56,11 +56,11 @@ class Poisson
                 $summer += $mean ** $i / $fact;
             }
 
-            return exp(0 - $mean) * $summer;
+            return exp(-$mean) * $summer;
         }
         /** @var float $fact */
         $fact = MathTrig\Factorial::fact($value);
 
-        return (exp(0 - $mean) * $mean ** $value) / $fact;
+        return (exp(-$mean) * $mean ** $value) / $fact;
     }
 }

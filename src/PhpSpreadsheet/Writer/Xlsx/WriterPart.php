@@ -7,11 +7,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 abstract class WriterPart
 {
     /**
-     * Parent Xlsx object.
-     */
-    private Xlsx $parentWriter;
-
-    /**
      * Get parent Xlsx object.
      */
     public function getParentWriter(): Xlsx
@@ -22,8 +17,12 @@ abstract class WriterPart
     /**
      * Set parent Xlsx object.
      */
-    public function __construct(Xlsx $writer)
+    public function __construct(
+        /**
+         * Parent Xlsx object.
+         */
+        private readonly Xlsx $parentWriter
+    )
     {
-        $this->parentWriter = $writer;
     }
 }

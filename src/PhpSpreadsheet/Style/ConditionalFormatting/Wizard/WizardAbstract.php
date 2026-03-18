@@ -116,7 +116,7 @@ abstract class WizardAbstract
             if ($i) {
                 $value = (string) preg_replace_callback(
                     '/' . Calculation::CALCULATION_REGEXP_CELLREF_RELATIVE . '/i',
-                    fn ($matches): string => self::reverseCellAdjustment($matches, $referenceColumnIndex, $referenceRow),
+                    fn (array $matches): string => self::reverseCellAdjustment($matches, $referenceColumnIndex, $referenceRow),
                     $value
                 );
             }
@@ -157,7 +157,7 @@ abstract class WizardAbstract
             if ($i) {
                 $value = (string) preg_replace_callback(
                     '/' . Calculation::CALCULATION_REGEXP_CELLREF_RELATIVE . '/i',
-                    [$this, 'conditionCellAdjustment'],
+                    $this->conditionCellAdjustment(...),
                     $value
                 );
             }
@@ -176,7 +176,7 @@ abstract class WizardAbstract
     protected function adjustConditionsForCellReferences(array $conditions): array
     {
         return array_map(
-            [$this, 'cellConditionCheck'],
+            $this->cellConditionCheck(...),
             $conditions
         );
     }

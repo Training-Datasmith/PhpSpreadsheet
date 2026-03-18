@@ -20,7 +20,8 @@ class AdvancedValueBinder extends DefaultValueBinder implements IValueBinder
     {
         if ($value === null) {
             return parent::bindValue($cell, $value);
-        } elseif (is_string($value)) {
+        }
+        if (is_string($value)) {
             // sanitize UTF-8 strings
             $value = StringHelper::sanitizeUTF8($value);
         }
@@ -33,18 +34,20 @@ class AdvancedValueBinder extends DefaultValueBinder implements IValueBinder
             //    Test for booleans using locale-setting
             if (StringHelper::strToUpper($value) === Calculation::getTRUE()) {
                 $cell->setValueExplicit(true, DataType::TYPE_BOOL);
-
-                return true;
-            } elseif (StringHelper::strToUpper($value) === Calculation::getFALSE()) {
-                $cell->setValueExplicit(false, DataType::TYPE_BOOL);
-
                 return true;
             }
-
+            //    Test for booleans using locale-setting
+            if (StringHelper::strToUpper($value) === Calculation::getFALSE()) {
+                $cell->setValueExplicit(false, DataType::TYPE_BOOL);
+                return true;
+            }
             // Check for fractions
             if (preg_match('~^([+-]?)\s*(\d+)\s*/\s*(\d+)$~', $value, $matches)) {
                 return $this->setProperFraction($matches, $cell);
-            } elseif (preg_match('~^([+-]?)(\d+)\s+(\d+)\s*/\s*(\d+)$~', $value, $matches)) {
+            }
+
+            // Check for fractions
+            if (preg_match('~^([+-]?)(\d+)\s+(\d+)\s*/\s*(\d+)$~', $value, $matches)) {
                 return $this->setImproperFraction($matches, $cell);
             }
 

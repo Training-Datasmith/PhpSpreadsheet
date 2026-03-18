@@ -64,7 +64,7 @@ class Xf
     /**
      * 1 bit, apparently not used.
      */
-    private int $textJustLast;
+    private readonly int $textJustLast;
 
     /**
      * The cell's foreground color.
@@ -99,14 +99,12 @@ class Xf
     //private $diag; // theoretically int, not yet implemented
     private int $diagColor;
 
-    private Style $style;
-
     /**
      * Constructor.
      *
      * @param Style $style The XF format
      */
-    public function __construct(Style $style)
+    public function __construct(private readonly Style $style)
     {
         $this->isStyleXf = false;
         $this->fontIndex = 0;
@@ -125,7 +123,6 @@ class Xf
         $this->leftBorderColor = 0x40;
         $this->rightBorderColor = 0x40;
         $this->diagColor = 0x40;
-        $this->style = $style;
     }
 
     /**

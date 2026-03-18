@@ -21,7 +21,7 @@ class Cosecant
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function csc($angle)
+    public static function csc($angle): array|string|float
     {
         if (is_array($angle)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
@@ -47,7 +47,7 @@ class Cosecant
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function csch($angle)
+    public static function csch($angle): array|string|float
     {
         if (is_array($angle)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);

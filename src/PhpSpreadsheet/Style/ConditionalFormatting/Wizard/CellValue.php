@@ -46,11 +46,6 @@ class CellValue extends WizardAbstract implements WizardInterface
      */
     protected array $operandValueType = [];
 
-    public function __construct(string $cellRange)
-    {
-        parent::__construct($cellRange);
-    }
-
     protected function operator(string $operator): void
     {
         if ((!isset(self::SINGLE_OPERATORS[$operator])) && (!isset(self::RANGE_OPERATORS[$operator]))) {
@@ -95,7 +90,7 @@ class CellValue extends WizardAbstract implements WizardInterface
         if (!isset(self::RANGE_OPERATORS[$this->operator])) {
             unset($this->operand[1], $this->operandValueType[1]);
         }
-        $values = array_map([$this, 'wrapValue'], $this->operand, $this->operandValueType);
+        $values = array_map($this->wrapValue(...), $this->operand, $this->operandValueType);
 
         $conditional = new Conditional();
         $conditional->setConditionType(Conditional::CONDITION_CELLIS);

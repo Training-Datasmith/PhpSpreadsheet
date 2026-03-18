@@ -46,11 +46,6 @@ class TextValue extends WizardAbstract implements WizardInterface
 
     protected string $operandValueType;
 
-    public function __construct(string $cellRange)
-    {
-        parent::__construct($cellRange);
-    }
-
     protected function operator(string $operator): void
     {
         if (!isset(self::OPERATORS[$operator])) {

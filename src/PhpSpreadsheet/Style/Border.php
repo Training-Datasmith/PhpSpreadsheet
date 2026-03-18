@@ -212,7 +212,7 @@ class Border extends Supervisor
         return md5(
             $this->borderStyle
             . $this->color->getHashCode()
-            . __CLASS__
+            . self::class
         );
     }
 

@@ -53,7 +53,7 @@ class Xlsx extends BaseReader
     /**
      * ReferenceHelper instance.
      */
-    private ReferenceHelper $referenceHelper;
+    private readonly ReferenceHelper $referenceHelper;
 
     private ZipArchive $zip;
 
@@ -324,7 +324,8 @@ class Xlsx extends BaseReader
         $value = isset($c->v) ? (string) $c->v : null;
         if ($value == '0') {
             return false;
-        } elseif ($value == '1') {
+        }
+        if ($value == '1') {
             return true;
         }
 
@@ -648,7 +649,6 @@ class Xlsx extends BaseReader
                     $this->styleReader->setNamespace($mainNS);
                     if (!$this->readDataOnly/* && $xmlStyles*/) {
                         foreach ($xfTags as $xfTag) {
-                            /** @var SimpleXMLElement $xfTag */
                             $xf = self::getAttributes($xfTag);
                             $numFmt = null;
 
@@ -711,7 +711,6 @@ class Xlsx extends BaseReader
                         }
 
                         foreach ($cellXfTags as $xfTag) {
-                            /** @var SimpleXMLElement $xfTag */
                             $xf = self::getAttributes($xfTag);
                             $numFmt = NumberFormat::FORMAT_GENERAL;
                             if ($numFmts && $xf['numFmtId']) {
@@ -1379,18 +1378,16 @@ class Xlsx extends BaseReader
                                 }
 
                                 // unparsed vmlDrawing
-                                if ($unparsedVmlDrawings) {
-                                    foreach ($unparsedVmlDrawings as $rId => $relPath) {
-                                        /** @var mixed[][][] $unparsedLoadedData */
-                                        $rId = substr($rId, 3); // rIdXXX
-                                        /** @var mixed[][] */
-                                        $unparsedVmlDrawing = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['vmlDrawings'];
-                                        $unparsedVmlDrawing[$rId] = [];
-                                        $unparsedVmlDrawing[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $relPath);
-                                        $unparsedVmlDrawing[$rId]['relFilePath'] = $relPath;
-                                        $unparsedVmlDrawing[$rId]['content'] = $this->getSecurityScannerOrThrow()->scan($this->getFromZipArchive($zip, $unparsedVmlDrawing[$rId]['filePath']));
-                                        unset($unparsedVmlDrawing);
-                                    }
+                                foreach ($unparsedVmlDrawings as $rId => $relPath) {
+                                    /** @var mixed[][][] $unparsedLoadedData */
+                                    $rId = substr($rId, 3); // rIdXXX
+                                    /** @var mixed[][] */
+                                    $unparsedVmlDrawing = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['vmlDrawings'];
+                                    $unparsedVmlDrawing[$rId] = [];
+                                    $unparsedVmlDrawing[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $relPath);
+                                    $unparsedVmlDrawing[$rId]['relFilePath'] = $relPath;
+                                    $unparsedVmlDrawing[$rId]['content'] = $this->getSecurityScannerOrThrow()->scan($this->getFromZipArchive($zip, $unparsedVmlDrawing[$rId]['filePath']));
+                                    unset($unparsedVmlDrawing);
                                 }
 
                                 // Header/footer images
@@ -1608,13 +1605,13 @@ class Xlsx extends BaseReader
                                                     }
                                                     $objDrawing->setCoordinates(Coordinate::stringFromColumnIndex(((int) $oneCellAnchor->from->col) + 1) . ($oneCellAnchor->from->row + 1));
 
-                                                    $objDrawing->setOffsetX((int) Drawing::EMUToPixels($oneCellAnchor->from->colOff));
+                                                    $objDrawing->setOffsetX(Drawing::EMUToPixels($oneCellAnchor->from->colOff));
                                                     $objDrawing->setOffsetY(Drawing::EMUToPixels($oneCellAnchor->from->rowOff));
                                                     $objDrawing->setResizeProportional(false);
                                                     $objDrawing->setWidth(Drawing::EMUToPixels(self::getArrayItemIntOrSxml(self::getAttributes($oneCellAnchor->ext), 'cx')));
                                                     $objDrawing->setHeight(Drawing::EMUToPixels(self::getArrayItemIntOrSxml(self::getAttributes($oneCellAnchor->ext), 'cy')));
                                                     if ($xfrm) {
-                                                        $objDrawing->setRotation((int) Drawing::angleToDegrees(self::getArrayItemIntOrSxml(self::getAttributes($xfrm), 'rot')));
+                                                        $objDrawing->setRotation(Drawing::angleToDegrees(self::getArrayItemIntOrSxml(self::getAttributes($xfrm), 'rot')));
                                                         $objDrawing->setFlipVertical((bool) self::getArrayItem(self::getAttributes($xfrm), 'flipV'));
                                                         $objDrawing->setFlipHorizontal((bool) self::getArrayItem(self::getAttributes($xfrm), 'flipH'));
                                                     }
@@ -1684,7 +1681,7 @@ class Xlsx extends BaseReader
                                                     if (isset($editAs, $editAs['editAs'])) {
                                                         $objDrawing->setEditAs($editAs['editAs']);
                                                     }
-                                                    $objDrawing->setName((string) self::getArrayItemString(self::getAttributes($twoCellAnchor->pic->nvPicPr->cNvPr), 'name'));
+                                                    $objDrawing->setName(self::getArrayItemString(self::getAttributes($twoCellAnchor->pic->nvPicPr->cNvPr), 'name'));
                                                     $objDrawing->setDescription(self::getArrayItemString(self::getAttributes($twoCellAnchor->pic->nvPicPr->cNvPr), 'descr'));
                                                     $embedImageKey = self::getArrayItemString(
                                                         self::getAttributes($blip, $xmlNamespaceBase),
@@ -1837,8 +1834,8 @@ class Xlsx extends BaseReader
                             }
 
                             /** @var mixed[][][][] $unparsedLoadedData */
-                            $this->readFormControlProperties($excel, $dir, $fileWorksheet, $docSheet, $unparsedLoadedData);
-                            $this->readPrinterSettings($excel, $dir, $fileWorksheet, $docSheet, $unparsedLoadedData);
+                            $this->readFormControlProperties($dir, $fileWorksheet, $docSheet, $unparsedLoadedData);
+                            $this->readPrinterSettings($dir, $fileWorksheet, $docSheet, $unparsedLoadedData);
 
                             // Loop through definedNames
                             if ($xmlWorkbook->definedNames) {
@@ -2165,7 +2162,7 @@ class Xlsx extends BaseReader
                     if ((string) $ele['Type'] === Namespaces::SCHEMA_OFFICE_DOCUMENT . '/image') {
                         // an image ?
                         $customUIImagesNames[(string) $ele['Id']] = (string) $ele['Target'];
-                        $customUIImagesBinaries[(string) $ele['Target']] = $this->getFromZipArchive($zip, $baseDir . '/' . (string) $ele['Target']);
+                        $customUIImagesBinaries[(string) $ele['Target']] = $this->getFromZipArchive($zip, $baseDir . '/' . $ele['Target']);
                     }
                 }
             }
@@ -2375,7 +2372,7 @@ class Xlsx extends BaseReader
     }
 
     /** @param mixed[][][][] $unparsedLoadedData */
-    private function readFormControlProperties(Spreadsheet $excel, string $dir, string $fileWorksheet, Worksheet $docSheet, array &$unparsedLoadedData): void
+    private function readFormControlProperties(string $dir, string $fileWorksheet, Worksheet $docSheet, array &$unparsedLoadedData): void
     {
         $zip = $this->zip;
         if ($zip->locateName(dirname("$dir/$fileWorksheet") . '/_rels/' . basename($fileWorksheet) . '.rels') === false) {
@@ -2391,7 +2388,6 @@ class Xlsx extends BaseReader
             }
         }
 
-        /** @var mixed[][] */
         $unparsedCtrlProps = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['ctrlProps'];
         foreach ($ctrlProps as $rId => $ctrlProp) {
             $rId = substr($rId, 3); // rIdXXX
@@ -2404,7 +2400,7 @@ class Xlsx extends BaseReader
     }
 
     /** @param mixed[][][][] $unparsedLoadedData */
-    private function readPrinterSettings(Spreadsheet $excel, string $dir, string $fileWorksheet, Worksheet $docSheet, array &$unparsedLoadedData): void
+    private function readPrinterSettings(string $dir, string $fileWorksheet, Worksheet $docSheet, array &$unparsedLoadedData): void
     {
         if ($this->readDataOnly) {
             return;
@@ -2423,7 +2419,6 @@ class Xlsx extends BaseReader
             }
         }
 
-        /** @var mixed[][] */
         $unparsedPrinterSettings = &$unparsedLoadedData['sheets'][$docSheet->getCodeName()]['printerSettings'];
         foreach ($sheetPrinterSettings as $rId => $printerSettings) {
             $rId = substr($rId, 3); // rIdXXX
@@ -2431,7 +2426,7 @@ class Xlsx extends BaseReader
                 $rId = $rId . 'ps'; // rIdXXX, add 'ps' suffix to avoid identical resource identifier collision with unparsed vmlDrawing
             }
             $unparsedPrinterSettings[$rId] = [];
-            $target = (string) str_replace('/xl/', '../', (string) $printerSettings['Target']);
+            $target = str_replace('/xl/', '../', (string) $printerSettings['Target']);
             $unparsedPrinterSettings[$rId]['filePath'] = self::dirAdd("$dir/$fileWorksheet", $target);
             $unparsedPrinterSettings[$rId]['relFilePath'] = $target;
             $unparsedPrinterSettings[$rId]['content'] = $this->getSecurityScannerOrThrow()->scan($this->getFromZipArchive($zip, $unparsedPrinterSettings[$rId]['filePath']));
@@ -2506,7 +2501,7 @@ class Xlsx extends BaseReader
         string $relsName
     ): void {
         if ($xmlSheet && $xmlSheet->picture) {
-            $id = (string) self::getArrayItemString(self::getAttributes($xmlSheet->picture, Namespaces::SCHEMA_OFFICE_DOCUMENT), 'id');
+            $id = self::getArrayItemString(self::getAttributes($xmlSheet->picture, Namespaces::SCHEMA_OFFICE_DOCUMENT), 'id');
             $rels = $this->loadZip($relsName);
             foreach ($rels->Relationship as $rel) {
                 $attrs = $rel->attributes() ?? [];

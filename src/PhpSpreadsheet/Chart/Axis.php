@@ -199,12 +199,14 @@ class Axis extends Properties
      */
     public function getAxisOptionsProperty(string $property): ?string
     {
-        if ($property === 'textRotation') {
-            if ($this->axisText !== null) {
-                if ($this->axisText->getRotation() !== null) {
-                    return (string) $this->axisText->getRotation();
-                }
-            }
+        if ($property !== 'textRotation') {
+            return $this->axisOptions[$property];
+        }
+        if ($this->axisText === null) {
+            return $this->axisOptions[$property];
+        }
+        if ($this->axisText->getRotation() !== null) {
+            return (string) $this->axisText->getRotation();
         }
 
         return $this->axisOptions[$property];
@@ -215,7 +217,7 @@ class Axis extends Properties
      */
     public function setAxisOrientation(string $orientation): void
     {
-        $this->axisOptions['orientation'] = (string) $orientation;
+        $this->axisOptions['orientation'] = $orientation;
     }
 
     public function getAxisType(): string
@@ -335,7 +337,6 @@ class Axis extends Properties
     public function __clone()
     {
         parent::__clone();
-        $this->majorGridlines = ($this->majorGridlines === null) ? null : clone $this->majorGridlines;
         $this->majorGridlines = ($this->minorGridlines === null) ? null : clone $this->minorGridlines;
         $this->axisText = ($this->axisText === null) ? null : clone $this->axisText;
         $this->dispUnitsTitle = ($this->dispUnitsTitle === null) ? null : clone $this->dispUnitsTitle;

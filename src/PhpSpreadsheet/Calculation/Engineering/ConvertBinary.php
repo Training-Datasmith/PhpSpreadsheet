@@ -27,7 +27,7 @@ class ConvertBinary extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toDecimal($value)
+    public static function toDecimal($value): array|string|float|int
     {
         if (is_array($value)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
@@ -147,7 +147,7 @@ class ConvertBinary extends ConvertBase
         if (strlen($value) == 10 && $value[0] === '1') { //    Two's Complement
             return str_repeat('7', 6) . strtoupper(decoct((int) bindec("11$value")));
         }
-        $octVal = (string) decoct((int) bindec($value));
+        $octVal = decoct((int) bindec($value));
 
         return self::nbrConversionFormat($octVal, $places);
     }

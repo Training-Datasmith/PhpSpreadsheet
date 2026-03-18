@@ -198,9 +198,7 @@ class Depreciation
             return ExcelError::NAN();
         }
 
-        $syd = (($cost - $salvage) * ($life - $period + 1) * 2) / ($life * ($life + 1));
-
-        return $syd;
+        return (($cost - $salvage) * ($life - $period + 1) * 2) / ($life * ($life + 1));
     }
 
     private static function validateCost(mixed $cost, bool $negativeValueAllowed = false): float

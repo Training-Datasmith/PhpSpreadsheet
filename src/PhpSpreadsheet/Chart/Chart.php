@@ -8,59 +8,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class Chart
 {
     /**
-     * Chart Name.
-     */
-    private string $name;
-
-    /**
      * Worksheet.
      */
     private ?Worksheet $worksheet = null;
 
     /**
-     * Chart Title.
-     */
-    private ?Title $title;
-
-    /**
-     * Chart Legend.
-     */
-    private ?Legend $legend;
-
-    /**
-     * X-Axis Label.
-     */
-    private ?Title $xAxisLabel;
-
-    /**
-     * Y-Axis Label.
-     */
-    private ?Title $yAxisLabel;
-
-    /**
-     * Chart Plot Area.
-     */
-    private ?PlotArea $plotArea;
-
-    /**
-     * Plot Visible Only.
-     */
-    private bool $plotVisibleOnly;
-
-    /**
      * Display Blanks as.
      */
     private string $displayBlanksAs;
-
-    /**
-     * Chart Asix Y as.
-     */
-    private Axis $yAxis;
-
-    /**
-     * Chart Asix X as.
-     */
-    private Axis $xAxis;
 
     /**
      * Top-Left Cell Position.
@@ -128,18 +83,30 @@ class Chart
      * Create a new Chart.
      * majorGridlines and minorGridlines are deprecated, moved to Axis.
      */
-    public function __construct(string $name, ?Title $title = null, ?Legend $legend = null, ?PlotArea $plotArea = null, bool $plotVisibleOnly = true, string $displayBlanksAs = DataSeries::DEFAULT_EMPTY_AS, ?Title $xAxisLabel = null, ?Title $yAxisLabel = null, ?Axis $xAxis = null, ?Axis $yAxis = null, ?GridLines $majorGridlines = null, ?GridLines $minorGridlines = null)
+    public function __construct(/**
+     * Chart Name.
+     */
+    private string $name, /**
+     * Chart Title.
+     */
+    private ?Title $title = null, /**
+     * Chart Legend.
+     */
+    private ?Legend $legend = null, /**
+     * Chart Plot Area.
+     */
+    private ?PlotArea $plotArea = null, /**
+     * Plot Visible Only.
+     */
+    private bool $plotVisibleOnly = true, string $displayBlanksAs = DataSeries::DEFAULT_EMPTY_AS, /**
+     * X-Axis Label.
+     */
+    private ?Title $xAxisLabel = null, /**
+     * Y-Axis Label.
+     */
+    private ?Title $yAxisLabel = null, private ?Axis $xAxis = new Axis(), private ?Axis $yAxis = new Axis(), ?GridLines $majorGridlines = null, ?GridLines $minorGridlines = null)
     {
-        $this->name = $name;
-        $this->title = $title;
-        $this->legend = $legend;
-        $this->xAxisLabel = $xAxisLabel;
-        $this->yAxisLabel = $yAxisLabel;
-        $this->plotArea = $plotArea;
-        $this->plotVisibleOnly = $plotVisibleOnly;
         $this->setDisplayBlanksAs($displayBlanksAs);
-        $this->xAxis = $xAxis ?? new Axis();
-        $this->yAxis = $yAxis ?? new Axis();
         if ($majorGridlines !== null) {
             $this->yAxis->setMajorGridlines($majorGridlines);
         }

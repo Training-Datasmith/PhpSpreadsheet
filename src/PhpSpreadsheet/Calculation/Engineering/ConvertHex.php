@@ -78,7 +78,7 @@ class ConvertHex extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toDecimal($value)
+    public static function toDecimal($value): array|string|float|int
     {
         if (is_array($value)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);

@@ -162,7 +162,7 @@ class Concatenate
 
         $returnValue ??= implode($delimiter, $aArgs);
         if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-            $returnValue = ExcelError::CALC();
+            return ExcelError::CALC();
         }
 
         return $returnValue;

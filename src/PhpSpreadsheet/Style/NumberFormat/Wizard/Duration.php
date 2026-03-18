@@ -117,7 +117,7 @@ class Duration extends DateTimeWizard
             is_array($separators) ? $separators : [$separators],
             count($formatBlocks) - 1
         );
-        $this->formatBlocks = array_map([$this, 'mapFormatBlocks'], $formatBlocks);
+        $this->formatBlocks = array_map($this->mapFormatBlocks(...), $formatBlocks);
 
         if ($this->durationIsSet === false) {
             // We need at least one duration mask, so if none has been set we change the first mask element
@@ -148,6 +148,6 @@ class Duration extends DateTimeWizard
 
     public function format(): string
     {
-        return implode('', array_map([$this, 'intersperse'], $this->formatBlocks, $this->separators));
+        return implode('', array_map($this->intersperse(...), $this->formatBlocks, $this->separators));
     }
 }

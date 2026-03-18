@@ -137,7 +137,7 @@ class CalculationLocale extends CalculationBase
 
             try {
                 $functionNamesFile = $this->getLocaleFile($localeDir, $locale, $language, 'functions');
-            } catch (Exception $e) {
+            } catch (Exception) {
                 continue;
             }
             //    Retrieve the list of locale or language specific function names
@@ -145,7 +145,7 @@ class CalculationLocale extends CalculationBase
             foreach ($localeFunctions as $localeFunction) {
                 [$localeFunction] = explode('##', $localeFunction); //    Strip out comments
                 if (str_contains($localeFunction, '=')) {
-                    [$fName, $lfName] = array_map('trim', explode('=', $localeFunction));
+                    [$fName, $lfName] = array_map(trim(...), explode('=', $localeFunction));
                     if ($fName === 'FALSE') {
                         $falseTrueArray[0][] = $lfName;
                     } elseif ($fName === 'TRUE') {
@@ -189,7 +189,7 @@ class CalculationLocale extends CalculationBase
                 //    Search for a file with a list of function names for locale
                 try {
                     $functionNamesFile = $this->getLocaleFile($localeDir, $locale, $language, 'functions');
-                } catch (Exception $e) {
+                } catch (Exception) {
                     return false;
                 }
 
@@ -199,7 +199,7 @@ class CalculationLocale extends CalculationBase
                 foreach ($localeFunctions as $localeFunction) {
                     [$localeFunction] = explode('##', $localeFunction); //    Strip out comments
                     if (str_contains($localeFunction, '=')) {
-                        [$fName, $lfName] = array_map('trim', explode('=', $localeFunction));
+                        [$fName, $lfName] = array_map(trim(...), explode('=', $localeFunction));
                         if ((str_starts_with($fName, '*') || isset($phpSpreadsheetFunctions[$fName])) && ($lfName != '') && ($fName != $lfName)) {
                             self::$localeFunctions[$fName] = $lfName;
                         }
@@ -223,7 +223,7 @@ class CalculationLocale extends CalculationBase
                 foreach ($localeSettings as $localeSetting) {
                     [$localeSetting] = explode('##', $localeSetting); //    Strip out comments
                     if (str_contains($localeSetting, '=')) {
-                        [$settingName, $settingValue] = array_map('trim', explode('=', $localeSetting));
+                        [$settingName, $settingValue] = array_map(trim(...), explode('=', $localeSetting));
                         $settingName = strtoupper($settingName);
                         if ($settingValue !== '') {
                             switch ($settingName) {
@@ -300,9 +300,8 @@ class CalculationLocale extends CalculationBase
         $formula = self::translateSeparator($fromSeparator, $toSeparator, $formula, $inFunctionBracesLevel);
         // Restore matrix separators
         $formula = self::translateSeparator('|', ';', $formula, $inMatrixBracesLevel, self::FORMULA_OPEN_MATRIX_BRACE, self::FORMULA_CLOSE_MATRIX_BRACE);
-        $formula = self::translateSeparator('!', ',', $formula, $inMatrixBracesLevel, self::FORMULA_OPEN_MATRIX_BRACE, self::FORMULA_CLOSE_MATRIX_BRACE);
 
-        return $formula;
+        return self::translateSeparator('!', ',', $formula, $inMatrixBracesLevel, self::FORMULA_OPEN_MATRIX_BRACE, self::FORMULA_CLOSE_MATRIX_BRACE);
     }
 
     /**
@@ -354,7 +353,7 @@ class CalculationLocale extends CalculationBase
         if (self::$functionReplaceFromExcel === null) {
             self::$functionReplaceFromExcel = [];
             foreach (array_keys(self::$localeFunctions) as $excelFunctionName) {
-                self::$functionReplaceFromExcel[] = '/(@?[^\w\.])' . preg_quote($excelFunctionName, '/') . '([\s]*\()/ui';
+                self::$functionReplaceFromExcel[] = '/(@?[^\w\.])' . preg_quote((string) $excelFunctionName, '/') . '([\s]*\()/ui';
             }
             foreach (array_keys(self::$localeBoolean) as $excelBoolean) {
                 self::$functionReplaceFromExcel[] = '/(@?[^\w\.])' . preg_quote($excelBoolean, '/') . '([^\w\.])/ui';
@@ -401,7 +400,7 @@ class CalculationLocale extends CalculationBase
         if (self::$functionReplaceToExcel === null) {
             self::$functionReplaceToExcel = [];
             foreach (array_keys(self::$localeFunctions) as $excelFunctionName) {
-                self::$functionReplaceToExcel[] = '$1' . trim($excelFunctionName) . '$2';
+                self::$functionReplaceToExcel[] = '$1' . trim((string) $excelFunctionName) . '$2';
             }
             foreach (array_keys(self::$localeBoolean) as $excelBoolean) {
                 self::$functionReplaceToExcel[] = '$1' . trim($excelBoolean) . '$2';

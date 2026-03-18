@@ -30,11 +30,9 @@ class AutoFilter extends WriterPart
             $objWriter->writeAttribute('ref', str_replace('$', '', $range));
 
             $columns = $worksheet->getAutoFilter()->getColumns();
-            if (count($columns) > 0) {
-                foreach ($columns as $columnID => $column) {
-                    $colId = $worksheet->getAutoFilter()->getColumnOffset($columnID);
-                    self::writeAutoFilterColumn($objWriter, $column, $colId);
-                }
+            foreach ($columns as $columnID => $column) {
+                $colId = $worksheet->getAutoFilter()->getColumnOffset($columnID);
+                self::writeAutoFilterColumn($objWriter, $column, $colId);
             }
             $objWriter->endElement();
         }

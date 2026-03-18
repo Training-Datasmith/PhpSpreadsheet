@@ -46,7 +46,8 @@ class CellRange implements AddressRange, Stringable
             //    own exception.
             if ($fromWorksheet->getTitle() !== $toWorksheet->getTitle()) {
                 throw new Exception('3d Cell Ranges are not supported');
-            } elseif ($fromWorksheet->getParent() !== $toWorksheet->getParent()) {
+            }
+            if ($fromWorksheet->getParent() !== $toWorksheet->getParent()) {
                 throw new Exception('Worksheets must be in the same spreadsheet');
             }
         }
@@ -54,12 +55,11 @@ class CellRange implements AddressRange, Stringable
 
     private function cellAddressWrapper(int $column, int $row, ?Worksheet $worksheet = null): CellAddress
     {
-        $cellAddress = Coordinate::stringFromColumnIndex($column) . (string) $row;
+        $cellAddress = Coordinate::stringFromColumnIndex($column) . $row;
 
         return new class ($cellAddress, $worksheet) extends CellAddress {
-            public function nextRow(int $offset = 1): CellAddress
+            public function nextRow(int $offset = 1): \AnonymousClasseb686a09e052390a23ac77e0ec4936c8
             {
-                /** @var CellAddress $result */
                 $result = parent::nextRow($offset);
                 $this->rowId = $result->rowId;
                 $this->cellAddress = $result->cellAddress;
@@ -67,9 +67,8 @@ class CellRange implements AddressRange, Stringable
                 return $this;
             }
 
-            public function previousRow(int $offset = 1): CellAddress
+            public function previousRow(int $offset = 1): \AnonymousClasseb686a09e052390a23ac77e0ec4936c8
             {
-                /** @var CellAddress $result */
                 $result = parent::previousRow($offset);
                 $this->rowId = $result->rowId;
                 $this->cellAddress = $result->cellAddress;
@@ -77,9 +76,8 @@ class CellRange implements AddressRange, Stringable
                 return $this;
             }
 
-            public function nextColumn(int $offset = 1): CellAddress
+            public function nextColumn(int $offset = 1): \AnonymousClasseb686a09e052390a23ac77e0ec4936c8
             {
-                /** @var CellAddress $result */
                 $result = parent::nextColumn($offset);
                 $this->columnId = $result->columnId;
                 $this->columnName = $result->columnName;
@@ -88,9 +86,8 @@ class CellRange implements AddressRange, Stringable
                 return $this;
             }
 
-            public function previousColumn(int $offset = 1): CellAddress
+            public function previousColumn(int $offset = 1): \AnonymousClasseb686a09e052390a23ac77e0ec4936c8
             {
-                /** @var CellAddress $result */
                 $result = parent::previousColumn($offset);
                 $this->columnId = $result->columnId;
                 $this->columnName = $result->columnName;

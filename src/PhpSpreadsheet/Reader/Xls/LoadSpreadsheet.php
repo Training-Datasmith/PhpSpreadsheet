@@ -289,15 +289,13 @@ class LoadSpreadsheet extends Xls
 
                         break;
                     case self::XLS_TYPE_DIMENSION:
+                    case self::XLS_TYPE_DBCELL:
+                    default:
                         $xls->readDefault();
 
                         break;
                     case self::XLS_TYPE_ROW:
                         $xls->readRow();
-
-                        break;
-                    case self::XLS_TYPE_DBCELL:
-                        $xls->readDefault();
 
                         break;
                     case self::XLS_TYPE_RK:
@@ -421,10 +419,6 @@ class LoadSpreadsheet extends Xls
                         $xls->readDefault();
 
                         break 2;
-                    default:
-                        $xls->readDefault();
-
-                        break;
                 }
             }
 
@@ -560,27 +554,25 @@ class LoadSpreadsheet extends Xls
                 }
             }
 
-            if (!empty($xls->cellNotes)) {
-                foreach ($xls->cellNotes as $note => $noteDetails) {
-                    /** @var array{author: string, cellRef: string, objTextData?: mixed[]} $noteDetails */
-                    if (!isset($noteDetails['objTextData'])) {
-                        if (isset($xls->textObjects[$note])) {
-                            $textObject = $xls->textObjects[$note];
-                            $noteDetails['objTextData'] = $textObject;
-                        } else {
-                            $noteDetails['objTextData']['text'] = '';
-                        }
+            foreach ($xls->cellNotes as $note => $noteDetails) {
+                /** @var array{author: string, cellRef: string, objTextData?: mixed[]} $noteDetails */
+                if (!isset($noteDetails['objTextData'])) {
+                    if (isset($xls->textObjects[$note])) {
+                        $textObject = $xls->textObjects[$note];
+                        $noteDetails['objTextData'] = $textObject;
+                    } else {
+                        $noteDetails['objTextData']['text'] = '';
                     }
-                    $cellAddress = str_replace('$', '', $noteDetails['cellRef']);
-                    /** @var string */
-                    $tempDetails = $noteDetails['objTextData']['text'];
-                    $xls->phpSheet
-                        ->getComment($cellAddress)
-                        ->setAuthor($noteDetails['author'])
-                        ->setText(
-                            $xls->parseRichText($tempDetails)
-                        );
                 }
+                $cellAddress = str_replace('$', '', $noteDetails['cellRef']);
+                /** @var string */
+                $tempDetails = $noteDetails['objTextData']['text'];
+                $xls->phpSheet
+                    ->getComment($cellAddress)
+                    ->setAuthor($noteDetails['author'])
+                    ->setText(
+                        $xls->parseRichText($tempDetails)
+                    );
             }
             if ($selectedCells !== '') {
                 $xls->phpSheet->setSelectedCells($selectedCells);
@@ -611,7 +603,7 @@ class LoadSpreadsheet extends Xls
                             //        Foo!$C$7:$J$66
                             //        Bar!$A$1:$IV$2
                             $explodes = Worksheet::extractSheetTitle($range, true, true);
-                            $sheetName = (string) $explodes[0];
+                            $sheetName = $explodes[0];
                             if (!str_contains($explodes[1], ':')) {
                                 $explodes[1] = $explodes[1] . ':' . $explodes[1];
                             }

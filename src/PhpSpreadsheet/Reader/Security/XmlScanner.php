@@ -9,14 +9,11 @@ class XmlScanner
     private const ENCODING_PATTERN = '/encoding\s*=\s*(["\'])(.+?)\1/s';
     private const ENCODING_UTF7 = '/encoding\s*=\s*(["\'])UTF-7\1/si';
 
-    private string $pattern;
-
     /** @var ?callable */
     private $callback;
 
-    public function __construct(string $pattern = '<!DOCTYPE')
+    public function __construct(private readonly string $pattern = '<!DOCTYPE')
     {
-        $this->pattern = $pattern;
     }
 
     public static function getInstance(Reader\IReader $reader): self
@@ -56,7 +53,7 @@ class XmlScanner
             throw new Reader\Exception('UTF-7 encoding not permitted');
         }
         if (substr($xml, 0, Reader\Csv::UTF8_BOM_LEN) === Reader\Csv::UTF8_BOM) {
-            $xml = substr($xml, Reader\Csv::UTF8_BOM_LEN);
+            return substr($xml, Reader\Csv::UTF8_BOM_LEN);
         }
 
         return $xml;
@@ -100,7 +97,7 @@ class XmlScanner
         }
 
         if ($this->callback !== null) {
-            $xml = call_user_func($this->callback, $xml);
+            return call_user_func($this->callback, $xml);
         }
         /** @var string $xml */
 

@@ -31,7 +31,7 @@ class Operations
      *
      * @return bool|string the logical AND of the arguments
      */
-    public static function logicalAnd(mixed ...$args)
+    public static function logicalAnd(mixed ...$args): bool|string
     {
         return self::countTrueValues($args, fn (int $trueValueCount, int $count): bool => $trueValueCount === $count);
     }
@@ -56,7 +56,7 @@ class Operations
      *
      * @return bool|string the logical OR of the arguments
      */
-    public static function logicalOr(mixed ...$args)
+    public static function logicalOr(mixed ...$args): bool|string
     {
         return self::countTrueValues($args, fn (int $trueValueCount): bool => $trueValueCount > 0);
     }
@@ -83,7 +83,7 @@ class Operations
      *
      * @return bool|string the logical XOR of the arguments
      */
-    public static function logicalXor(mixed ...$args)
+    public static function logicalXor(mixed ...$args): bool|string
     {
         return self::countTrueValues($args, fn (int $trueValueCount): bool => $trueValueCount % 2 === 1);
     }
@@ -120,7 +120,8 @@ class Operations
             $logical = mb_strtoupper($logical, 'UTF-8');
             if (($logical == 'TRUE') || ($logical == Calculation::getTRUE())) {
                 return false;
-            } elseif (($logical == 'FALSE') || ($logical == Calculation::getFALSE())) {
+            }
+            if (($logical == 'FALSE') || ($logical == Calculation::getFALSE())) {
                 return true;
             }
 

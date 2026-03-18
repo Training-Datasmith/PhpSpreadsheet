@@ -49,9 +49,9 @@ class Weibull
         }
 
         if ($cumulative) {
-            return 1 - exp(0 - ($value / $beta) ** $alpha);
+            return 1 - exp(-($value / $beta) ** $alpha);
         }
 
-        return ($alpha / $beta ** $alpha) * $value ** ($alpha - 1) * exp(0 - ($value / $beta) ** $alpha);
+        return ($alpha / $beta ** $alpha) * $value ** ($alpha - 1) * exp(-($value / $beta) ** $alpha);
     }
 }

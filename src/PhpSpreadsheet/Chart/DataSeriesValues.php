@@ -22,21 +22,6 @@ class DataSeriesValues extends Properties
      */
     private string $dataType;
 
-    /**
-     * Series Data Source.
-     */
-    private ?string $dataSource;
-
-    /**
-     * Format Code.
-     */
-    private ?string $formatCode;
-
-    /**
-     * Series Point Marker.
-     */
-    private ?string $pointMarker;
-
     private ChartColor $markerFillColor;
 
     private ChartColor $markerBorderColor;
@@ -47,23 +32,11 @@ class DataSeriesValues extends Properties
     private int $pointSize = 3;
 
     /**
-     * Point Count (The number of datapoints in the dataseries).
-     */
-    private int $pointCount;
-
-    /**
-     * Data Values.
-     *
-     * @var null|mixed[]
-     */
-    private ?array $dataValues;
-
-    /**
      * Fill color (can be array with colors if dataseries have custom colors).
      *
      * @var null|ChartColor|ChartColor[]
      */
-    private $fillColor;
+    private array|\PhpOffice\PhpSpreadsheet\Chart\ChartColor|null $fillColor = null;
 
     private bool $scatterLines = true;
 
@@ -82,11 +55,26 @@ class DataSeriesValues extends Properties
      */
     public function __construct(
         string $dataType = self::DATASERIES_TYPE_NUMBER,
-        ?string $dataSource = null,
-        ?string $formatCode = null,
-        int $pointCount = 0,
-        ?array $dataValues = [],
-        ?string $marker = null,
+        /**
+         * Series Data Source.
+         */
+        private ?string $dataSource = null,
+        /**
+         * Format Code.
+         */
+        private ?string $formatCode = null,
+        /**
+         * Point Count (The number of datapoints in the dataseries).
+         */
+        private int $pointCount = 0,
+        /**
+         * Data Values.
+         */
+        private ?array $dataValues = [],
+        /**
+         * Series Point Marker.
+         */
+        private ?string $pointMarker = null,
         null|ChartColor|array|string $fillColor = null,
         int|string $pointSize = 3
     ) {
@@ -94,11 +82,6 @@ class DataSeriesValues extends Properties
         $this->markerFillColor = new ChartColor();
         $this->markerBorderColor = new ChartColor();
         $this->setDataType($dataType);
-        $this->dataSource = $dataSource;
-        $this->formatCode = $formatCode;
-        $this->pointCount = $pointCount;
-        $this->dataValues = $dataValues;
-        $this->pointMarker = $marker;
         if ($fillColor !== null) {
             $this->setFillColor($fillColor);
         }
@@ -411,7 +394,8 @@ class DataSeriesValues extends Properties
         $count = count($this->dataValues);
         if ($count == 0) {
             return null;
-        } elseif ($count == 1) {
+        }
+        if ($count == 1) {
             return $this->dataValues[0];
         }
 

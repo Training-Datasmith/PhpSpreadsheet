@@ -72,10 +72,10 @@ class Time
             $calendar = SharedDateHelper::getExcelCalendar();
             $date = (int) ($calendar !== SharedDateHelper::CALENDAR_WINDOWS_1900);
 
-            return (float) SharedDateHelper::formattedPHPToExcel($calendar, 1, $date, $hour, $minute, $second);
+            return SharedDateHelper::formattedPHPToExcel($calendar, 1, $date, $hour, $minute, $second);
         }
         if ($retType === Functions::RETURNDATE_UNIX_TIMESTAMP) {
-            return (int) SharedDateHelper::excelToTimestamp(SharedDateHelper::formattedPHPToExcel(1970, 1, 1, $hour, $minute, $second)); // -2147468400; //    -2147472000 + 3600
+            return SharedDateHelper::excelToTimestamp(SharedDateHelper::formattedPHPToExcel(1970, 1, 1, $hour, $minute, $second)); // -2147468400; //    -2147472000 + 3600
         }
         // RETURNDATE_PHP_DATETIME_OBJECT
         // Hour has already been normalized (0-23) above
@@ -117,7 +117,7 @@ class Time
      */
     private static function toIntWithNullBool(mixed $value): int
     {
-        $value = $value ?? 0;
+        $value ??= 0;
         if (is_bool($value)) {
             $value = (int) $value;
         }

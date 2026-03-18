@@ -18,11 +18,6 @@ class Cells
     private CacheInterface $cache;
 
     /**
-     * Parent worksheet.
-     */
-    private ?Worksheet $parent;
-
-    /**
      * The currently active Cell.
      */
     private ?Cell $currentCell = null;
@@ -74,12 +69,8 @@ class Cells
      *
      * @param Worksheet $parent The worksheet for this cell collection
      */
-    public function __construct(Worksheet $parent, CacheInterface $cache)
+    public function __construct(private ?Worksheet $parent, CacheInterface $cache)
     {
-        // Set our parent worksheet.
-        // This is maintained here to facilitate re-attaching it to Cell objects when
-        // they are woken from a serialized state
-        $this->parent = $parent;
         $this->cache = $cache;
         $this->cachePrefix = $this->getUniqueID();
     }
@@ -279,7 +270,10 @@ class Cells
         $toRow = $row * AddressRange::MAX_COLUMN_INT;
         $fromRow = --$row * AddressRange::MAX_COLUMN_INT;
         foreach ($this->index as $coordinate) {
-            if ($coordinate < $fromRow || $coordinate >= $toRow) {
+            if ($coordinate < $fromRow) {
+                continue;
+            }
+            if ($coordinate >= $toRow) {
                 continue;
             }
             $column = ($coordinate % AddressRange::MAX_COLUMN_INT) ?: AddressRange::MAX_COLUMN_INT;

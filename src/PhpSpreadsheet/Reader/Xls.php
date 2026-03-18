@@ -867,7 +867,7 @@ class Xls extends XlsBase
         // move stream pointer to next record
         $this->pos += 4 + $length;
 
-        if (substr($recordData, 0, 2) !== "\x01\x00" || substr($recordData, 4, 2) !== "\x01\x00") {
+        if (!str_starts_with($recordData, "\x01\x00") || substr($recordData, 4, 2) !== "\x01\x00") {
             throw new Exception('Unsupported encryption algorithm');
         }
         if (!$this->verifyPassword($this->encryptionPassword, substr($recordData, 6, 16), substr($recordData, 22, 16), substr($recordData, 38, 16), $this->md5Ctxt)) {
@@ -1956,7 +1956,6 @@ class Xls extends XlsBase
         // loop through the Unicode strings (16-bit length)
         for ($i = 0; $i < $nm && $pos < $limitposSST; ++$i) {
             // number of characters in the Unicode string
-            /** @var int $pos */
             $numChars = self::getUInt2d($recordData, $pos);
             /** @var int $pos */
             $pos += 2;
@@ -2096,7 +2095,6 @@ class Xls extends XlsBase
                 // list of formatting runs
                 for ($j = 0; $j < $formattingRuns; ++$j) {
                     // first formatted character; zero-based
-                    /** @var int $pos */
                     $charPos = self::getUInt2d($recordData, $pos + $j * 4);
 
                     // index to font record
@@ -2453,7 +2451,7 @@ class Xls extends XlsBase
                 $this->phpSheet->getPageSetup()->setOrientation(((bool) $isPortrait) ? PageSetup::ORIENTATION_PORTRAIT : PageSetup::ORIENTATION_LANDSCAPE);
 
                 $this->phpSheet->getPageSetup()->setScale($scale, false);
-                $this->phpSheet->getPageSetup()->setFitToPage((bool) $this->isFitToPages);
+                $this->phpSheet->getPageSetup()->setFitToPage($this->isFitToPages);
                 $this->phpSheet->getPageSetup()->setFitToWidth($fitToWidth, false);
                 $this->phpSheet->getPageSetup()->setFitToHeight($fitToHeight, false);
             }
@@ -3116,14 +3114,10 @@ class Xls extends XlsBase
 
         if ($this->version == self::XLS_BIFF8) {
             $string = self::readUnicodeStringLong($recordData);
-            $value = $string['value'];
-        } else {
-            $string = $this->readByteStringLong($recordData);
-            $value = $string['value'];
+            return $string['value'];
         }
-        /** @var string $value */
-
-        return $value;
+        $string = $this->readByteStringLong($recordData);
+        return $string['value'];
     }
 
     /**
@@ -3792,6 +3786,7 @@ class Xls extends XlsBase
 
                     break;
                 case 'UNC':
+                default:
                     // section 5.58.4: Hyperlink to a File with UNC (Universal Naming Convention) Path
                     // todo: implement
                     return;
@@ -3801,8 +3796,6 @@ class Xls extends XlsBase
                     $url = 'sheet://';
 
                     break;
-                default:
-                    return;
             }
 
             if ($hasText) {
@@ -4172,9 +4165,7 @@ class Xls extends XlsBase
             $formulaData = substr($formulaData, $token['size']);
         }
 
-        $formulaString = $this->createFormulaFromTokens($tokens, $additionalData);
-
-        return $formulaString;
+        return $this->createFormulaFromTokens($tokens, $additionalData);
     }
 
     /**
@@ -4195,12 +4186,12 @@ class Xls extends XlsBase
         $formulaStrings = [];
         foreach ($tokens as $token) {
             // initialize spaces
-            $space0 = $space0 ?? ''; // spaces before next token, not tParen
-            $space1 = $space1 ?? ''; // carriage returns before next token, not tParen
-            $space2 = $space2 ?? ''; // spaces before opening parenthesis
-            $space3 = $space3 ?? ''; // carriage returns before opening parenthesis
-            $space4 = $space4 ?? ''; // spaces before closing parenthesis
-            $space5 = $space5 ?? ''; // carriage returns before closing parenthesis
+            $space0 ??= ''; // spaces before next token, not tParen
+            $space1 ??= ''; // carriage returns before next token, not tParen
+            $space2 ??= ''; // spaces before opening parenthesis
+            $space3 ??= ''; // carriage returns before opening parenthesis
+            $space4 ??= ''; // spaces before closing parenthesis
+            $space5 ??= ''; // carriage returns before closing parenthesis
             /** @var string */
             $tokenData = $token['data'] ?? '';
             switch ($token['name']) {
@@ -4355,9 +4346,8 @@ class Xls extends XlsBase
                     break;
             }
         }
-        $formulaString = $formulaStrings[0];
 
-        return $formulaString;
+        return $formulaStrings[0];
     }
 
     /**
@@ -4810,7 +4800,7 @@ class Xls extends XlsBase
                     // and we may assume that they are not present: []*/:\?
                     // 'u' qualifier makes it risky to use Preg::isMatch here
                     if (preg_match("/[ !\"@#£$%&{()}<>=+'|^,;-]/u", $sheetRange)) {
-                        $sheetRange = "'$sheetRange'";
+                        return "'$sheetRange'";
                     }
 
                     return $sheetRange;

@@ -71,13 +71,16 @@ class Deviations
 
             foreach ($aArgs as $k => $arg) {
                 if ((is_bool($arg)) && (!Functions::isMatrixValue($k))) {
-                } else {
-                    // Is it a numeric value?
-                    if ((is_numeric($arg)) && (!is_string($arg))) {
-                        $summer += (($arg - $mean) / $stdDev) ** 4;
-                        ++$count;
-                    }
+                    continue;
                 }
+                if (!is_numeric($arg)) {
+                    continue;
+                }
+                if (is_string($arg)) {
+                    continue;
+                }
+                $summer += (($arg - $mean) / $stdDev) ** 4;
+                ++$count;
             }
 
             if ($count > 3) {

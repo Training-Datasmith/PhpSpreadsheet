@@ -533,7 +533,7 @@ class ConvertUOM
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function CONVERT($value, $fromUOM, $toUOM)
+    public static function CONVERT($value, $fromUOM, $toUOM): array|string|float|int
     {
         if (is_array($value) || is_array($fromUOM) || is_array($toUOM)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $fromUOM, $toUOM);
@@ -556,14 +556,16 @@ class ConvertUOM
 
         // @var float $value
         $value *= $fromMultiplier;
-
         if (($fromUOM === $toUOM) && ($fromMultiplier === $toMultiplier)) {
             //    We've already factored $fromMultiplier into the value, so we need
             //        to reverse it again
             return $value / $fromMultiplier;
-        } elseif ($fromUOM === $toUOM) {
+        }
+        if ($fromUOM === $toUOM) {
             return $value / $toMultiplier;
-        } elseif ($fromCategory === self::CATEGORY_TEMPERATURE) {
+        }
+
+        if ($fromCategory === self::CATEGORY_TEMPERATURE) {
             return self::convertTemperature($fromUOM, $toUOM, $value);
         }
 

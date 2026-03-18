@@ -62,11 +62,6 @@ class Worksheet extends BIFFwriter
     private static int $always1 = 1;
 
     /**
-     * Formula parser.
-     */
-    private Parser $parser;
-
-    /**
      * Array containing format information for columns.
      *
      * @var array<array{int, int, float, int, int, int}>
@@ -86,19 +81,7 @@ class Worksheet extends BIFFwriter
     /**
      * Auto outline styles.
      */
-    private bool $outlineStyle;
-
-    /**
-     * Whether to have outline summary below.
-     * Not currently used.
-     */
-    private bool $outlineBelow; //* @phpstan-ignore-line
-
-    /**
-     * Whether to have outline summary at the right.
-     * Not currently used.
-     */
-    private bool $outlineRight; //* @phpstan-ignore-line
+    private bool $outlineStyle; //* @phpstan-ignore-line
 
     /**
      * Reference to the total number of strings in the workbook.
@@ -127,27 +110,22 @@ class Worksheet extends BIFFwriter
     /**
      * Index of first used row (at least 0).
      */
-    private int $firstRowIndex;
+    private readonly int $firstRowIndex;
 
     /**
      * Index of last used row. (no used rows means -1).
      */
-    private int $lastRowIndex;
+    private readonly int $lastRowIndex;
 
     /**
      * Index of first used column (at least 0).
      */
-    private int $firstColumnIndex;
+    private readonly int $firstColumnIndex;
 
     /**
      * Index of last used column (no used columns means -1).
      */
-    private int $lastColumnIndex;
-
-    /**
-     * Sheet object.
-     */
-    public \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $phpSheet;
+    private readonly int $lastColumnIndex;
 
     /**
      * Escher object corresponding to MSODRAWING.
@@ -161,11 +139,7 @@ class Worksheet extends BIFFwriter
      */
     public array $fontHashIndex;
 
-    private bool $preCalculateFormulas;
-
     private int $printHeaders;
-
-    private ?Workbook $writerWorkbook;
 
     /**
      * Constructor.
@@ -178,19 +152,14 @@ class Worksheet extends BIFFwriter
      * @param bool $preCalculateFormulas Flag indicating whether formulas should be calculated or just written
      * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $phpSheet The worksheet to write
      */
-    public function __construct(int &$str_total, int &$str_unique, array &$str_table, array &$colors, Parser $parser, bool $preCalculateFormulas, \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $phpSheet, ?Workbook $writerWorkbook = null)
+    public function __construct(int &$str_total, int &$str_unique, array &$str_table, array &$colors, private readonly Parser $parser, private readonly bool $preCalculateFormulas, public \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $phpSheet, private readonly ?Workbook $writerWorkbook = null)
     {
         // It needs to call its parent's constructor explicitly
         parent::__construct();
-
-        $this->preCalculateFormulas = $preCalculateFormulas;
         $this->stringTotal = &$str_total;
         $this->stringUnique = &$str_unique;
         $this->stringTable = &$str_table;
         $this->colors = &$colors;
-        $this->parser = $parser;
-
-        $this->phpSheet = $phpSheet;
 
         $this->columnInfo = [];
         $this->activePane = 3;
@@ -198,8 +167,6 @@ class Worksheet extends BIFFwriter
         $this->printHeaders = 0;
 
         $this->outlineStyle = false;
-        $this->outlineBelow = true;
-        $this->outlineRight = true;
         $this->outlineOn = true;
 
         $this->fontHashIndex = [];
@@ -220,7 +187,6 @@ class Worksheet extends BIFFwriter
         // Column methods return 1-based values (columnIndexFromString('A') = 1), so subtract 1
         $this->firstColumnIndex = Coordinate::columnIndexFromString($minC) - 1;
         $this->lastColumnIndex = min(255, Coordinate::columnIndexFromString($maxC) - 1);
-        $this->writerWorkbook = $writerWorkbook;
     }
 
     /**
@@ -561,24 +527,22 @@ class Worksheet extends BIFFwriter
                 }
             }
         }
-        if (!empty($arrConditionalStyles)) {
-            // Write ConditionalFormattingTable records
-            foreach ($arrConditionalStyles as $cellCoordinate => $conditionalStyles) {
-                $cfHeaderWritten = false;
-                foreach ($conditionalStyles as $conditional) {
-                    /** @var Conditional $conditional */
-                    if (
-                        $conditional->getConditionType() === Conditional::CONDITION_EXPRESSION
-                        || $conditional->getConditionType() === Conditional::CONDITION_CELLIS
-                    ) {
-                        // Write CFHEADER record (only if there are Conditional Styles that we are able to write)
-                        if ($cfHeaderWritten === false) {
-                            $cfHeaderWritten = $this->writeCFHeader($cellCoordinate, $conditionalStyles);
-                        }
-                        if ($cfHeaderWritten === true) {
-                            // Write CFRULE record
-                            $this->writeCFRule($conditionalFormulaHelper, $conditional, $cellCoordinate);
-                        }
+        // Write ConditionalFormattingTable records
+        foreach ($arrConditionalStyles as $cellCoordinate => $conditionalStyles) {
+            $cfHeaderWritten = false;
+            foreach ($conditionalStyles as $conditional) {
+                /** @var Conditional $conditional */
+                if (
+                    $conditional->getConditionType() === Conditional::CONDITION_EXPRESSION
+                    || $conditional->getConditionType() === Conditional::CONDITION_CELLIS
+                ) {
+                    // Write CFHEADER record (only if there are Conditional Styles that we are able to write)
+                    if ($cfHeaderWritten === false) {
+                        $cfHeaderWritten = $this->writeCFHeader($cellCoordinate, $conditionalStyles);
+                    }
+                    if ($cfHeaderWritten === true) {
+                        // Write CFRULE record
+                        $this->writeCFRule($conditionalFormulaHelper, $conditional, $cellCoordinate);
                     }
                 }
             }
@@ -661,8 +625,6 @@ class Worksheet extends BIFFwriter
     public function setOutline(bool $visible = true, bool $symbols_below = true, bool $symbols_right = true, bool $auto_style = false): void
     {
         $this->outlineOn = $visible;
-        $this->outlineBelow = $symbols_below;
-        $this->outlineRight = $symbols_right;
         $this->outlineStyle = $auto_style;
     }
 
@@ -1301,7 +1263,7 @@ class Worksheet extends BIFFwriter
         }
 
         // convert to twips
-        $defaultRowHeight = (int) 20 * $defaultRowHeight;
+        $defaultRowHeight = 20 * $defaultRowHeight;
 
         $record = 0x0225; // Record identifier
         $length = 0x0004; // Number of bytes to follow
@@ -1573,7 +1535,7 @@ class Worksheet extends BIFFwriter
         foreach ($this->phpSheet->getProtectedCellRanges() as $range => $protectedCells) {
             $password = $protectedCells->getPassword();
             // number of ranges, e.g. 'A1:B3 C20:D25'
-            $cellRanges = explode(' ', $range);
+            $cellRanges = explode(' ', (string) $range);
             $cref = count($cellRanges);
 
             $recordData = pack(
@@ -2669,7 +2631,7 @@ class Worksheet extends BIFFwriter
         $dataValidationCollection1 = $this->phpSheet->getDataValidationCollection();
         $dataValidationCollection = [];
         foreach ($dataValidationCollection1 as $key => $dataValidation) {
-            $keyParts = explode(' ', $key);
+            $keyParts = explode(' ', (string) $key);
             foreach ($keyParts as $keyPart) {
                 $dataValidationCollection[$keyPart] = $dataValidation;
             }
@@ -2760,7 +2722,7 @@ class Worksheet extends BIFFwriter
                     $this->parser->parse($formula1);
                     $formula1 = $this->parser->toReversePolish();
                     $sz1 = strlen($formula1);
-                } catch (PhpSpreadsheetException $e) {
+                } catch (PhpSpreadsheetException) {
                     $sz1 = 0;
                     $formula1 = '';
                 }

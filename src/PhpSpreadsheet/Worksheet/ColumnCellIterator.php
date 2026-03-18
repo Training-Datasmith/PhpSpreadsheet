@@ -19,7 +19,7 @@ class ColumnCellIterator extends CellIterator
     /**
      * Column index.
      */
-    private int $columnIndex;
+    private readonly int $columnIndex;
 
     /**
      * Start position.

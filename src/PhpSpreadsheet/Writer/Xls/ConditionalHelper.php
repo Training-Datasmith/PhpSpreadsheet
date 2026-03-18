@@ -8,11 +8,6 @@ use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\Wizard;
 
 class ConditionalHelper
 {
-    /**
-     * Formula parser.
-     */
-    protected Parser $parser;
-
     protected mixed $condition;
 
     protected string $cellRange;
@@ -21,9 +16,13 @@ class ConditionalHelper
 
     protected int $size;
 
-    public function __construct(Parser $parser)
+    public function __construct(
+        /**
+         * Formula parser.
+         */
+        protected Parser $parser
+    )
     {
-        $this->parser = $parser;
     }
 
     public function processCondition(mixed $condition, string $cellRange): void

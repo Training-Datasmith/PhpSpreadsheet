@@ -21,7 +21,7 @@ class Secant
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function sec($angle)
+    public static function sec($angle): array|string|float
     {
         if (is_array($angle)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
@@ -47,7 +47,7 @@ class Secant
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function sech($angle)
+    public static function sech($angle): array|string|float
     {
         if (is_array($angle)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);

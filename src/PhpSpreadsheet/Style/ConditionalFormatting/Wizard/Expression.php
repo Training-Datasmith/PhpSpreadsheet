@@ -13,11 +13,6 @@ class Expression extends WizardAbstract implements WizardInterface
 {
     protected string $expression;
 
-    public function __construct(string $cellRange)
-    {
-        parent::__construct($cellRange);
-    }
-
     public function expression(string $expression): self
     {
         $expression = $this->validateOperand($expression, Wizard::VALUE_TYPE_FORMULA);

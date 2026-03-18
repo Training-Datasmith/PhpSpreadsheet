@@ -588,6 +588,6 @@ class Table implements Stringable
      */
     public function __toString(): string
     {
-        return (string) $this->range;
+        return $this->range;
     }
 }

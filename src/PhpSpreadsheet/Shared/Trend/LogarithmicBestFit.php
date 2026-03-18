@@ -56,7 +56,7 @@ class LogarithmicBestFit extends BestFit
     private function logarithmicRegression(array $yValues, array $xValues, bool $const): void
     {
         $adjustedYValues = array_map(
-            fn ($value): float => ($value < 0.0) ? 0 - log(abs($value)) : log($value),
+            fn (float $value): float => ($value < 0.0) ? -log(abs($value)) : log($value),
             $yValues
         );
 
@@ -74,7 +74,7 @@ class LogarithmicBestFit extends BestFit
         parent::__construct($yValues, $xValues);
 
         if (!$this->error) {
-            $this->logarithmicRegression($yValues, $xValues, (bool) $const);
+            $this->logarithmicRegression($yValues, $xValues, $const);
         }
     }
 }

@@ -122,9 +122,9 @@ class ConditionalColorScale
         if ($this->sqref !== null && $this->worksheet !== null) {
             $values = $this->worksheet->rangesToArray($this->sqref, null, true, true, true);
             $this->valueArray = [];
-            foreach ($values as $key => $value) {
+            foreach ($values as $value) {
                 /** @var array<float|int|string> $value */
-                foreach ($value as $k => $v) {
+                foreach ($value as $v) {
                     $this->valueArray[] = (float) $v;
                 }
             }
@@ -199,7 +199,7 @@ class ConditionalColorScale
 
                 return (float) $temp;
             case 'percentile':
-                return (float) Percentiles::PERCENTILE($this->valueArray, (float) ($value / 100));
+                return (float) Percentiles::PERCENTILE($this->valueArray, $value / 100);
             case 'formula':
                 return $formula;
             case 'percent':
@@ -210,7 +210,7 @@ class ConditionalColorScale
                 $max = max($this->valueArray);
                 $max = (float) $max;
 
-                return $min + (float) ($value / 100) * ($max - $min);
+                return $min + $value / 100 * ($max - $min);
             default:
                 return 0;
         }
@@ -229,7 +229,7 @@ class ConditionalColorScale
             } else {
                 $this->minValue = $this->getLimitValue($this->minimumConditionalFormatValueObject->getType(), (float) $this->minimumConditionalFormatValueObject->getValue(), (float) $this->minimumConditionalFormatValueObject->getCellFormula());
                 $this->maxValue = $this->getLimitValue($this->maximumConditionalFormatValueObject->getType(), (float) $this->maximumConditionalFormatValueObject->getValue(), (float) $this->maximumConditionalFormatValueObject->getCellFormula());
-                $this->midValue = (float) ($this->minValue + $this->maxValue) / 2;
+                $this->midValue = $this->minValue + $this->maxValue / 2;
                 $blend = 0.5;
 
                 $minColor = $this->minimumColor->getARGB();

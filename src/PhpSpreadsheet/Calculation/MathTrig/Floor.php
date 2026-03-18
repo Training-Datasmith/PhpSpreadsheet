@@ -36,7 +36,7 @@ class Floor
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function floor(mixed $number, mixed $significance = null)
+    public static function floor(mixed $number, mixed $significance = null): array|string|float
     {
         if (is_array($number) || is_array($significance)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $significance);
@@ -75,7 +75,7 @@ class Floor
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function math(mixed $number, mixed $significance = null, mixed $mode = 0, bool $checkSigns = false)
+    public static function math(mixed $number, mixed $significance = null, mixed $mode = 0, bool $checkSigns = false): array|string|float
     {
         if (is_array($number) || is_array($significance) || is_array($mode)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $significance, $mode);
@@ -137,7 +137,7 @@ class Floor
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function precise($number, $significance = 1)
+    public static function precise($number, $significance = 1): array|string|float
     {
         if (is_array($number) || is_array($significance)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $significance);
@@ -196,7 +196,10 @@ class Floor
      */
     private static function floorMathTest(float $number, float $significance, int $mode): bool
     {
-        return Helpers::returnSign($significance) == -1 || (Helpers::returnSign($number) == -1 && !empty($mode));
+        if (Helpers::returnSign($significance) == -1) {
+            return true;
+        }
+        return Helpers::returnSign($number) == -1 && !empty($mode);
     }
 
     /**

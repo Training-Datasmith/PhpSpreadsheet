@@ -286,11 +286,7 @@ abstract class BaseReader implements IReader
     {
         $this->processFlags($flags);
 
-        try {
-            return $this->loadSpreadsheetFromFile($filename);
-        } catch (ReaderException $e) {
-            throw $e;
-        }
+        return $this->loadSpreadsheetFromFile($filename);
     }
 
     /**

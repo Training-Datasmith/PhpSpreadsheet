@@ -397,7 +397,7 @@ class StringHelper
         $textValue = str_replace(["\xef\xbf\xbe", "\xef\xbf\xbf"], "\xef\xbf\xbd", $textValue);
         $subst = mb_substitute_character(); // default is question mark
         mb_substitute_character(65533); // Unicode substitution character
-        $returnValue = (string) mb_convert_encoding($textValue, 'UTF-8', 'UTF-8');
+        $returnValue = mb_convert_encoding($textValue, 'UTF-8', 'UTF-8');
         mb_substitute_character($subst);
 
         return $returnValue;
@@ -825,8 +825,8 @@ class StringHelper
         }
         $localeCalc = $locale;
         if (Preg::isMatch('/^([a-z][a-z])_([a-z][a-z])(?:[.]utf-8)?$/i', $locale, $matches)) {
-            $locale = strtolower($matches[1]) . '_' . strtoupper($matches[2]);
-            $localeCalc = strtolower($matches[1]) . '_' . strtolower($matches[2]);
+            $locale = strtolower((string) $matches[1]) . '_' . strtoupper((string) $matches[2]);
+            $localeCalc = strtolower((string) $matches[1]) . '_' . strtolower((string) $matches[2]);
         }
         if (!class_exists(static::$testClass)) {
             return false;

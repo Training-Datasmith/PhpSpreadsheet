@@ -486,15 +486,11 @@ class Parser
         'BAHTTEXT' => [368, 1, 0, 0],
     ];
 
-    private Spreadsheet $spreadsheet;
-
     /**
      * The class constructor.
      */
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(private readonly Spreadsheet $spreadsheet)
     {
-        $this->spreadsheet = $spreadsheet;
-
         $this->currentCharacter = 0;
         $this->currentToken = ''; // The token we are working on.
         $this->formula = ''; // The formula to parse.
@@ -789,9 +785,7 @@ class Parser
                 ++$nameReference;
             }
 
-            $ptgRef = pack('Cvxx', $this->ptg['ptgName'], $nameReference);
-
-            return $ptgRef;
+            return pack('Cvxx', $this->ptg['ptgName'], $nameReference);
             // @codeCoverageIgnoreEnd
         }
 
@@ -986,9 +980,9 @@ class Parser
         $row = $match[4];
 
         // Convert base26 column string to a number.
-        $expn = strlen($col_ref) - 1;
+        $expn = strlen((string) $col_ref) - 1;
         $col = 0;
-        $col_ref_length = strlen($col_ref);
+        $col_ref_length = strlen((string) $col_ref);
         for ($i = 0; $i < $col_ref_length; ++$i) {
             $col += (ord($col_ref[$i]) - 64) * 26 ** $expn;
             --$expn;
@@ -1295,17 +1289,18 @@ class Parser
 
             return $result;
         }
-        if ($this->currentToken == '-') { // negative value
+        if ($this->currentToken == '-') {
+            // negative value
             // catch "-" Term
             $this->advance();
             $result2 = $this->expression();
-
             return $this->createTree('ptgUminus', $result2, '');
-        } elseif ($this->currentToken == '+') { // positive value
+        }
+        if ($this->currentToken == '+') {
+            // positive value
             // catch "+" Term
             $this->advance();
             $result2 = $this->expression();
-
             return $this->createTree('ptgUplus', $result2, '');
         }
         $result = $this->term();
@@ -1647,7 +1642,6 @@ class Parser
             if ($left_tree !== '' || $tree['right'] !== '') {
                 /** @var string */
                 $treeValueString = $tree['value'];
-                /** @var int */
                 $treeRightInt = is_numeric($tree['right']) ? ((int) $tree['right']) : 0;
 
                 return $left_tree . $this->convertFunction($treeValueString, $treeRightInt);

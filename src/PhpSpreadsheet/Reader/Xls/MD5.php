@@ -69,10 +69,10 @@ class MD5
         $C = $this->c;
         $D = $this->d;
 
-        $F = [self::class, 'f'];
-        $G = [self::class, 'g'];
-        $H = [self::class, 'h'];
-        $I = [self::class, 'i'];
+        $F = self::f(...);
+        $G = self::g(...);
+        $H = self::h(...);
+        $I = self::i(...);
 
         // ROUND 1
         self::step($F, $A, $B, $C, $D, $words[0], 7, 0xD76AA478);
@@ -173,14 +173,14 @@ class MD5
     }
 
     /** @param float|int $t may be float on 32-bit system */
-    private static function step(callable $func, int &$A, int $B, int $C, int $D, int $M, int $s, $t): void
+    private static function step(callable $func, int &$A, int $B, int $C, int $D, int $M, int $s, int $t): void
     {
         $t = self::signedInt($t);
         /** @var int */
         $temp = call_user_func($func, $B, $C, $D);
         $A = (int) ($A + $temp + $M + $t) & self::$allOneBits;
         $A = self::rotate($A, $s);
-        $A = (int) ($B + $A) & self::$allOneBits;
+        $A = $B + $A & self::$allOneBits;
     }
 
     /** @param float|int $result may be float on 32-bit system */

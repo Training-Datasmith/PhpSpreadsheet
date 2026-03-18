@@ -56,32 +56,20 @@ class FormulaToken
     const TOKEN_SUBTYPE_UNION = 'Union';
 
     /**
-     * Value.
-     */
-    private string $value;
-
-    /**
-     * Token Type (represented by TOKEN_TYPE_*).
-     */
-    private string $tokenType;
-
-    /**
-     * Token SubType (represented by TOKEN_SUBTYPE_*).
-     */
-    private string $tokenSubType;
-
-    /**
      * Create a new FormulaToken.
      *
      * @param string $tokenType Token type (represented by TOKEN_TYPE_*)
      * @param string $tokenSubType Token Subtype (represented by TOKEN_SUBTYPE_*)
      */
-    public function __construct(string $value, string $tokenType = self::TOKEN_TYPE_UNKNOWN, string $tokenSubType = self::TOKEN_SUBTYPE_NOTHING)
+    public function __construct(
+        /**
+         * Value.
+         */
+        private string $value,
+        private string $tokenType = self::TOKEN_TYPE_UNKNOWN,
+        private string $tokenSubType = self::TOKEN_SUBTYPE_NOTHING
+    )
     {
-        // Initialise values
-        $this->value = $value;
-        $this->tokenType = $tokenType;
-        $this->tokenSubType = $tokenSubType;
     }
 
     /**

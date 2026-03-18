@@ -8,14 +8,8 @@ use SimpleXMLElement;
 
 class Properties
 {
-    private XmlScanner $securityScanner;
-
-    private DocumentProperties $docProps;
-
-    public function __construct(XmlScanner $securityScanner, DocumentProperties $docProps)
+    public function __construct(private readonly XmlScanner $securityScanner, private readonly DocumentProperties $docProps)
     {
-        $this->securityScanner = $securityScanner;
-        $this->docProps = $docProps;
     }
 
     private function extractPropertyData(string $propertyData): ?SimpleXMLElement

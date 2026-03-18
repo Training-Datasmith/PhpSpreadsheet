@@ -31,8 +31,6 @@ class CellMatcher
         Conditional::CONDITION_UNIQUE => "COUNTIF('%s'!%s,%s)=1",
     ];
 
-    protected Cell $cell;
-
     protected int $cellRow;
 
     protected Worksheet $worksheet;
@@ -49,10 +47,9 @@ class CellMatcher
 
     protected Calculation $engine;
 
-    public function __construct(Cell $cell, string $conditionalRange)
+    public function __construct(protected Cell $cell, string $conditionalRange)
     {
-        $this->cell = $cell;
-        $this->worksheet = $cell->getWorksheet();
+        $this->worksheet = $this->cell->getWorksheet();
         [$this->cellColumn, $this->cellRow] = Coordinate::indexesFromString($this->cell->getCoordinate());
         $this->setReferenceCellForExpressions($conditionalRange);
 
@@ -70,7 +67,7 @@ class CellMatcher
         $rangeSets = [];
         foreach ($conditionalRange as $rangeSet) {
             $absoluteRangeSet = array_map(
-                [Coordinate::class, 'absoluteCoordinate'],
+                Coordinate::absoluteCoordinate(...),
                 $rangeSet
             );
             $rangeSets[] = implode(':', $absoluteRangeSet);
@@ -121,7 +118,8 @@ class CellMatcher
         if (!is_numeric($value)) {
             if (is_bool($value)) {
                 return $value ? 'TRUE' : 'FALSE';
-            } elseif ($value === null) {
+            }
+            if ($value === null) {
                 return 'NULL';
             }
 
@@ -184,7 +182,7 @@ class CellMatcher
             if ($i) {
                 $value = (string) preg_replace_callback(
                     '/' . Calculation::CALCULATION_REGEXP_CELLREF_RELATIVE . '/i',
-                    [$this, 'conditionCellAdjustment'],
+                    $this->conditionCellAdjustment(...),
                     $value
                 );
             }
@@ -203,7 +201,7 @@ class CellMatcher
     protected function adjustConditionsForCellReferences(array $conditions): array
     {
         return array_map(
-            [$this, 'cellConditionCheck'],
+            $this->cellConditionCheck(...),
             $conditions
         );
     }
@@ -216,7 +214,6 @@ class CellMatcher
 
         $operator = self::COMPARISON_OPERATORS[$conditional->getOperatorType()];
         $conditions = $this->adjustConditionsForCellReferences($conditional->getConditions());
-        /** @var float|int|string */
         $temp1 = $this->wrapCellValue();
         /** @var scalar */
         $temp2 = array_pop($conditions);
@@ -269,7 +266,6 @@ class CellMatcher
         $conditions = $this->adjustConditionsForCellReferences($conditional->getConditions());
         /** @var string */
         $expression = array_pop($conditions);
-        /** @var float|int|string */
         $temp = $this->wrapCellValue();
 
         $expression = (string) preg_replace(

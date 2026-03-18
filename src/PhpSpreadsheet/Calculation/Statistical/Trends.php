@@ -60,10 +60,11 @@ class Trends
     {
         $yValueCount = count($yValues);
         $xValueCount = count($xValues);
-
         if (($yValueCount === 0) || ($yValueCount !== $xValueCount)) {
             throw new Exception(ExcelError::NA());
-        } elseif ($yValueCount === 1) {
+        }
+
+        if ($yValueCount === 1) {
             throw new Exception(ExcelError::DIV0());
         }
     }
@@ -130,7 +131,7 @@ class Trends
      * @return array<mixed>|bool|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function FORECAST(mixed $xValue, array $yValues, array $xValues)
+    public static function FORECAST(mixed $xValue, array $yValues, array $xValues): array|string|float
     {
         if (is_array($xValue)) {
             return self::evaluateArrayArgumentsSubset([self::class, __FUNCTION__], 1, $xValue, $yValues, $xValues);
@@ -343,7 +344,7 @@ class Trends
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function RSQ(array $yValues, array $xValues)
+    public static function RSQ(array $yValues, array $xValues): string|float
     {
         try {
             self::checkTrendArrays($yValues, $xValues);
@@ -367,7 +368,7 @@ class Trends
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function SLOPE(array $yValues, array $xValues)
+    public static function SLOPE(array $yValues, array $xValues): string|float
     {
         try {
             self::checkTrendArrays($yValues, $xValues);

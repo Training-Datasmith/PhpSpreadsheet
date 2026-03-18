@@ -541,7 +541,7 @@ abstract class Properties
      */
     public function setShadowProperties(int $presets, ?string $colorValue = null, ?string $colorType = null, null|float|int|string $colorAlpha = null, ?float $blur = null, ?int $angle = null, ?float $distance = null): void
     {
-        $this->activateObject()->setShadowPresetsProperties((int) $presets);
+        $this->activateObject()->setShadowPresetsProperties($presets);
         if ($presets === 0) {
             $this->shadowColor->setType(ChartColor::EXCEL_COLOR_TYPE_STANDARD);
             $this->shadowColor->setValue('black');
@@ -591,7 +591,6 @@ abstract class Properties
         foreach ($propertiesMap as $property_key => $property_val) {
             if (is_array($property_val)) {
                 if (in_array($property_key, self::SHADOW_ARRAY_KEYS, true)) {
-                    /** @var null|array<mixed> */
                     $temp = &$this->shadowProperties[$property_key];
                     $reference = &$temp;
                     $this->setShadowPropertiesMapValues(

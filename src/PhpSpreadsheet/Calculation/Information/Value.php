@@ -256,7 +256,7 @@ class Value
      *        An error value      The error value
      *        Anything else       0
      */
-    public static function asNumber($value = null)
+    public static function asNumber($value = null): float|int|string
     {
         while (is_array($value)) {
             $value = array_shift($value);
@@ -293,8 +293,7 @@ class Value
     {
         $value = Functions::flattenArrayIndexed($value);
         if (count($value) > 1) {
-            end($value);
-            $a = key($value);
+            $a = array_key_last($value);
             //    Range of cells is an error
             if (Functions::isCellValue($a)) {
                 return 16;
@@ -310,16 +309,18 @@ class Value
         $value = Functions::flattenSingleValue($value);
         if (($value === null) || (is_float($value)) || (is_int($value))) {
             return 1;
-        } elseif (is_bool($value)) {
+        }
+        if (is_bool($value)) {
             return 4;
-        } elseif (is_array($value)) {
+        }
+        if (is_array($value)) {
             return 64;
-        } elseif (is_string($value)) {
+        }
+        if (is_string($value)) {
             //    Errors
             if (($value !== '') && ($value[0] == '#')) {
                 return 16;
             }
-
             return 2;
         }
 

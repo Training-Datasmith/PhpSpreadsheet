@@ -37,7 +37,7 @@ class Format
      * @return array<mixed>|string If an array of values is passed for either of the arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function DOLLAR(mixed $value = 0, mixed $decimals = 2)
+    public static function DOLLAR(mixed $value = 0, mixed $decimals = 2): array|string
     {
         if (is_array($value) || is_array($decimals)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $decimals);
@@ -137,11 +137,10 @@ class Format
         if (!is_numeric($value) && Date::isDateTimeFormatCode($format) && !Preg::isMatch('/^\s*\d+(\s+\d+)+\s*$/', $value)) {
             $value1 = DateTimeExcel\DateValue::fromString($value);
             $value2 = DateTimeExcel\TimeValue::fromString($value);
-            /** @var float|int|string */
             $value = (is_numeric($value1) && is_numeric($value2)) ? ($value1 + $value2) : (is_numeric($value1) ? $value1 : (is_numeric($value2) ? $value2 : $value));
         }
 
-        return (string) NumberFormat::toFormattedString($value, $format);
+        return NumberFormat::toFormattedString($value, $format);
     }
 
     /**
@@ -149,7 +148,7 @@ class Format
      */
     private static function convertValue(mixed $value, bool $spacesMeanZero = false): mixed
     {
-        $value = $value ?? 0;
+        $value ??= 0;
         if (is_bool($value)) {
             if (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
                 $value = (int) $value;
@@ -304,7 +303,7 @@ class Format
                 return ExcelError::VALUE();
             }
             $decimalOffset = array_pop($matches[0])[1] ?? null;
-            if ($decimalOffset === null || strpos($value, $groupSeparator, $decimalOffset) !== false) {
+            if ($decimalOffset === null || str_contains(substr($value, $decimalOffset), $groupSeparator)) {
                 return ExcelError::VALUE();
             }
 

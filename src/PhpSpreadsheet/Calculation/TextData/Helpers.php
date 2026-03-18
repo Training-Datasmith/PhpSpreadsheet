@@ -52,7 +52,7 @@ class Helpers
             throw new CalcExp(ExcelError::VALUE());
         }
 
-        return (int) $value;
+        return $value;
     }
 
     public static function extractFloat(mixed $value): float

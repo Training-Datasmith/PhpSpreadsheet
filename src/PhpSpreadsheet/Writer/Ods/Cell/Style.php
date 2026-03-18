@@ -22,18 +22,11 @@ class Style
     public const COLUMN_STYLE_PREFIX = 'co';
     public const ROW_STYLE_PREFIX = 'ro';
     public const TABLE_STYLE_PREFIX = 'ta';
-    public const INDENT_TO_INCHES = 0.1043; // undocumented, used trial and error
-
-    private XMLWriter $writer;
-
-    /** @var array<string, callable> */
-    private array $additionalNumberFormats;
+    public const INDENT_TO_INCHES = 0.1043;
 
     /** @param array<string, callable> $additionalNumberFormats */
-    public function __construct(XMLWriter $writer, array $additionalNumberFormats = [])
+    public function __construct(private readonly XMLWriter $writer, private array $additionalNumberFormats = [])
     {
-        $this->writer = $writer;
-        $this->additionalNumberFormats = $additionalNumberFormats;
     }
 
     public function getWriter(): XMLWriter

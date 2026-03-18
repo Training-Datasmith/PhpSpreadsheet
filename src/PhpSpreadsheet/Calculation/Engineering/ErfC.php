@@ -29,7 +29,7 @@ class ErfC
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function ERFC(mixed $value)
+    public static function ERFC(mixed $value): array|float|int|string
     {
         if (is_array($value)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);

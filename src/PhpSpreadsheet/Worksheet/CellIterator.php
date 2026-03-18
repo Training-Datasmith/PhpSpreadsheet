@@ -78,7 +78,7 @@ abstract class CellIterator implements NativeIterator
      */
     public function setIterateOnlyExistingCells(bool $value): void
     {
-        $this->onlyExistingCells = (bool) $value;
+        $this->onlyExistingCells = $value;
 
         $this->adjustForExistingOnlyRange();
     }

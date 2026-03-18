@@ -363,14 +363,12 @@ abstract class BestFit
 
     /**
      * @param array<float|int> $values
-     *
-     * @return float|int
      */
-    private function sumSquares(array $values)
+    private function sumSquares(array $values): float|int
     {
         return array_sum(
             array_map(
-                fn ($value): float|int => $value ** 2,
+                fn (float|int $value): float|int => $value ** 2,
                 $values
             )
         );

@@ -100,7 +100,7 @@ class Lookup
 
         // we correctly orient our results
         if ($resultRows === 1 && $resultColumns > 1) {
-            $resultVector = Matrix::transpose($resultVector);
+            return Matrix::transpose($resultVector);
         }
 
         return $resultVector;

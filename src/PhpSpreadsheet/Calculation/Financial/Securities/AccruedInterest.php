@@ -54,7 +54,7 @@ class AccruedInterest
         mixed $frequency = FinancialConstants::FREQUENCY_ANNUAL,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD,
         mixed $calcMethod = self::ACCRINT_CALCMODE_ISSUE_TO_SETTLEMENT
-    ) {
+    ): string|float {
         $issue = Functions::flattenSingleValue($issue);
         $firstInterest = Functions::flattenSingleValue($firstInterest);
         $settlement = Functions::flattenSingleValue($settlement);
@@ -117,7 +117,7 @@ class AccruedInterest
         mixed $rate,
         mixed $parValue = 1000,
         mixed $basis = FinancialConstants::BASIS_DAYS_PER_YEAR_NASD
-    ) {
+    ): string|float {
         $issue = Functions::flattenSingleValue($issue);
         $settlement = Functions::flattenSingleValue($settlement);
         $rate = Functions::flattenSingleValue($rate);

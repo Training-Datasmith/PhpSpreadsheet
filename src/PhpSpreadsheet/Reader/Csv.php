@@ -426,7 +426,7 @@ class Csv extends BaseReader
             $columnLetter = 'A';
             foreach ($rowData as $rowDatum) {
                 if ($preserveBooleanString) {
-                    $rowDatum = $rowDatum ?? '';
+                    $rowDatum ??= '';
                 } else {
                     $this->convertBoolean($rowDatum);
                 }
@@ -471,7 +471,7 @@ class Csv extends BaseReader
                 $rowDatum = false;
             }
         } else {
-            $rowDatum = $rowDatum ?? '';
+            $rowDatum ??= '';
         }
     }
 
@@ -631,7 +631,7 @@ class Csv extends BaseReader
         self::guessEncodingTestNoBom($encoding, $contents, self::UTF16BE_LF, 'UTF-16BE');
         self::guessEncodingTestNoBom($encoding, $contents, self::UTF16LE_LF, 'UTF-16LE');
         if ($encoding === '' && preg_match('//u', $contents) === 1) {
-            $encoding = 'UTF-8';
+            return 'UTF-8';
         }
 
         return $encoding;
@@ -705,7 +705,7 @@ class Csv extends BaseReader
         ?string $escape = null,
         int $version = PHP_VERSION_ID
     ): array|false {
-        $escape = $escape ?? self::getDefaultEscapeCharacter();
+        $escape ??= self::getDefaultEscapeCharacter();
         if ($version >= 80400 && $escape !== '') {
             return @fgetcsv($stream, $length, $separator, $enclosure, $escape);
         }

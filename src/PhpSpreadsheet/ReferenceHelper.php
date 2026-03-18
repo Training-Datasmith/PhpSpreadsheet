@@ -128,8 +128,8 @@ class ReferenceHelper
     {
         $aBreaks = $worksheet->getBreaks();
         ($numberOfColumns > 0 || $numberOfRows > 0)
-            ? uksort($aBreaks, [self::class, 'cellReverseSort'])
-            : uksort($aBreaks, [self::class, 'cellSort']);
+            ? uksort($aBreaks, self::cellReverseSort(...))
+            : uksort($aBreaks, self::cellSort(...));
 
         foreach ($aBreaks as $cellAddress => $value) {
             /** @var CellReferenceHelper */
@@ -185,17 +185,17 @@ class ReferenceHelper
     {
         $aHyperlinkCollection = $worksheet->getHyperlinkCollection();
         ($numberOfColumns > 0 || $numberOfRows > 0)
-            ? uksort($aHyperlinkCollection, [self::class, 'cellReverseSort'])
-            : uksort($aHyperlinkCollection, [self::class, 'cellSort']);
+            ? uksort($aHyperlinkCollection, self::cellReverseSort(...))
+            : uksort($aHyperlinkCollection, self::cellSort(...));
 
         foreach ($aHyperlinkCollection as $cellAddress => $value) {
             $newReference = $this->updateCellReference($cellAddress);
             /** @var CellReferenceHelper */
             $cellReferenceHelper = $this->cellReferenceHelper;
             if ($cellReferenceHelper->cellAddressInDeleteRange($cellAddress) === true) {
-                $worksheet->setHyperlink($cellAddress, null);
+                $worksheet->setHyperlink($cellAddress);
             } elseif ($cellAddress !== $newReference) {
-                $worksheet->setHyperlink($cellAddress, null);
+                $worksheet->setHyperlink($cellAddress);
                 if ($newReference) {
                     $worksheet->setHyperlink($newReference, $value);
                 }
@@ -214,8 +214,8 @@ class ReferenceHelper
     {
         $aStyles = $worksheet->getConditionalStylesCollection();
         ($numberOfColumns > 0 || $numberOfRows > 0)
-            ? uksort($aStyles, [self::class, 'cellReverseSort'])
-            : uksort($aStyles, [self::class, 'cellSort']);
+            ? uksort($aStyles, self::cellReverseSort(...))
+            : uksort($aStyles, self::cellSort(...));
 
         foreach ($aStyles as $cellAddress => $cfRules) {
             $worksheet->removeConditionalStyles($cellAddress);
@@ -255,8 +255,8 @@ class ReferenceHelper
     {
         $aDataValidationCollection = $worksheet->getDataValidationCollection();
         ($numberOfColumns > 0 || $numberOfRows > 0)
-            ? uksort($aDataValidationCollection, [self::class, 'cellReverseSort'])
-            : uksort($aDataValidationCollection, [self::class, 'cellSort']);
+            ? uksort($aDataValidationCollection, self::cellReverseSort(...))
+            : uksort($aDataValidationCollection, self::cellSort(...));
 
         foreach ($aDataValidationCollection as $cellAddress => $dataValidation) {
             $formula = $dataValidation->getFormula1();
@@ -285,7 +285,7 @@ class ReferenceHelper
                     )
                 );
             }
-            $addressParts = explode(' ', $cellAddress);
+            $addressParts = explode(' ', (string) $cellAddress);
             $newReference = '';
             $separator = '';
             foreach ($addressParts as $addressPart) {
@@ -294,7 +294,7 @@ class ReferenceHelper
             }
             if ($cellAddress !== $newReference) {
                 $worksheet->setDataValidation($newReference, $dataValidation);
-                $worksheet->setDataValidation($cellAddress, null);
+                $worksheet->setDataValidation($cellAddress);
                 if ($newReference) {
                     $worksheet->setDataValidation($newReference, $dataValidation);
                 }
@@ -336,7 +336,7 @@ class ReferenceHelper
             foreach ($aProtectedCells as $key2 => $value) {
                 $ranges = $value->allRanges();
                 $newKey = $separator = '';
-                foreach ($ranges as $key => $range) {
+                foreach ($ranges as $range) {
                     $oldKey = $range[0] . (array_key_exists(1, $range) ? (':' . $range[1]) : '');
                     $newKey .= $separator . $this->updateCellReference($oldKey);
                     $separator = ' ';
@@ -749,7 +749,7 @@ class ReferenceHelper
         bool $includeAbsoluteReferences = false,
         bool $onlyAbsoluteReferences = false
     ): string {
-        $callback = fn (array $matches): string => (strcasecmp(trim($matches[2], "'"), $worksheetName) === 0) ? (($matches[2][0] === "'") ? "'\u{fffc}'!" : "'\u{fffb}'!") : "'\u{fffd}'!";
+        $callback = fn (array $matches): string => (strcasecmp(trim((string) $matches[2], "'"), $worksheetName) === 0) ? (($matches[2][0] === "'") ? "'\u{fffc}'!" : "'\u{fffb}'!") : "'\u{fffd}'!";
         if (
             $this->cellReferenceHelper === null
             || $this->cellReferenceHelper->refreshRequired($beforeCellAddress, $numberOfColumns, $numberOfRows)
@@ -848,7 +848,7 @@ class ReferenceHelper
                     foreach ($matches as $match) {
                         $fromString = self::sheetnameBeforeCells($match[2], $worksheetName, "{$match[3]}");
 
-                        $modified3 = $this->updateCellReference($match[3], $includeAbsoluteReferences, $onlyAbsoluteReferences, null);
+                        $modified3 = $this->updateCellReference($match[3], $includeAbsoluteReferences, $onlyAbsoluteReferences);
                         if ($match[3] !== $modified3) {
                             if (self::matchSheetName($match[2], $worksheetName)) {
                                 $toString = self::sheetnameBeforeCells($match[2], $worksheetName, "$modified3");
@@ -897,7 +897,7 @@ class ReferenceHelper
         }
 
         if ($numberOfRows !== 0) {
-            $formula = $this->updateRowRangesAllWorksheets($formula, $numberOfRows);
+            return $this->updateRowRangesAllWorksheets($formula, $numberOfRows);
         }
 
         return $formula;
@@ -912,8 +912,8 @@ class ReferenceHelper
             PREG_OFFSET_CAPTURE
         );
 
-        $columnLengths = array_map('strlen', array_column($splitRanges[6], 0));
-        $rowLengths = array_map('strlen', array_column($splitRanges[7], 0));
+        $columnLengths = array_map(strlen(...), array_column($splitRanges[6], 0));
+        $rowLengths = array_map(strlen(...), array_column($splitRanges[7], 0));
         $columnOffsets = array_column($splitRanges[6], 1);
         $rowOffsets = array_column($splitRanges[7], 1);
 
@@ -953,9 +953,9 @@ class ReferenceHelper
             PREG_OFFSET_CAPTURE
         );
 
-        $fromColumnLengths = array_map('strlen', array_column($splitRanges[1], 0));
+        $fromColumnLengths = array_map(strlen(...), array_column($splitRanges[1], 0));
         $fromColumnOffsets = array_column($splitRanges[1], 1);
-        $toColumnLengths = array_map('strlen', array_column($splitRanges[2], 0));
+        $toColumnLengths = array_map(strlen(...), array_column($splitRanges[2], 0));
         $toColumnOffsets = array_column($splitRanges[2], 1);
 
         $fromColumns = $splitRanges[1];
@@ -992,9 +992,9 @@ class ReferenceHelper
             PREG_OFFSET_CAPTURE
         );
 
-        $fromRowLengths = array_map('strlen', array_column($splitRanges[1], 0));
+        $fromRowLengths = array_map(strlen(...), array_column($splitRanges[1], 0));
         $fromRowOffsets = array_column($splitRanges[1], 1);
-        $toRowLengths = array_map('strlen', array_column($splitRanges[2], 0));
+        $toRowLengths = array_map(strlen(...), array_column($splitRanges[2], 0));
         $toRowOffsets = array_column($splitRanges[2], 1);
 
         $fromRows = $splitRanges[1];
@@ -1147,14 +1147,14 @@ class ReferenceHelper
                 $cellReferenceHelper = $this->cellReferenceHelper;
                 if (ctype_alpha($range[$i][$j])) {
                     $range[$i][$j] = Coordinate::coordinateFromString(
-                        $cellReferenceHelper->updateCellReference($range[$i][$j] . '1', $includeAbsoluteReferences, $onlyAbsoluteReferences, null)
+                        $cellReferenceHelper->updateCellReference($range[$i][$j] . '1', $includeAbsoluteReferences, $onlyAbsoluteReferences)
                     )[0];
                 } elseif (ctype_digit($range[$i][$j])) {
                     $range[$i][$j] = Coordinate::coordinateFromString(
-                        $cellReferenceHelper->updateCellReference('A' . $range[$i][$j], $includeAbsoluteReferences, $onlyAbsoluteReferences, null)
+                        $cellReferenceHelper->updateCellReference('A' . $range[$i][$j], $includeAbsoluteReferences, $onlyAbsoluteReferences)
                     )[1];
                 } else {
-                    $range[$i][$j] = $cellReferenceHelper->updateCellReference($range[$i][$j], $includeAbsoluteReferences, $onlyAbsoluteReferences, null);
+                    $range[$i][$j] = $cellReferenceHelper->updateCellReference($range[$i][$j], $includeAbsoluteReferences, $onlyAbsoluteReferences);
                 }
             }
         }

@@ -87,13 +87,6 @@ class PPS
     public string $_data = '';
 
     /**
-     * Array of child PPS's (only used by Root and Dir PPS's).
-     *
-     * @var mixed[]
-     */
-    public array $children = [];
-
-    /**
      * Pointer to OLE container.
      */
     public OLE $ole;
@@ -112,7 +105,10 @@ class PPS
      * @param ?string $data The (usually binary) source data of the PPS
      * @param mixed[] $children Array containing children PPS for this PPS
      */
-    public function __construct(?int $No, ?string $name, ?int $type, ?int $prev, ?int $next, ?int $dir, $time_1st, $time_2nd, ?string $data, array $children)
+    public function __construct(?int $No, ?string $name, ?int $type, ?int $prev, ?int $next, ?int $dir, $time_1st, $time_2nd, ?string $data, /**
+     * Array of child PPS's (only used by Root and Dir PPS's).
+     */
+    public array $children)
     {
         $this->No = (int) $No;
         $this->Name = (string) $name;
@@ -123,7 +119,6 @@ class PPS
         $this->Time1st = $time_1st ?? 0;
         $this->Time2nd = $time_2nd ?? 0;
         $this->_data = (string) $data;
-        $this->children = $children;
         $this->Size = strlen((string) $data);
     }
 
@@ -148,26 +143,9 @@ class PPS
      */
     public function getPpsWk(): string
     {
-        $ret = str_pad($this->Name, 64, "\x00");
+        $ret = str_pad($this->Name, 64, "\x00"); // 128
 
-        $ret .= pack('v', strlen($this->Name) + 2)  // 66
-            . pack('c', $this->Type)              // 67
-            . pack('c', 0x00) //UK                // 68
-            . pack('V', $this->PrevPps) //Prev    // 72
-            . pack('V', $this->NextPps) //Next    // 76
-            . pack('V', $this->DirPps)  //Dir     // 80
-            . "\x00\x09\x02\x00"                  // 84
-            . "\x00\x00\x00\x00"                  // 88
-            . "\xc0\x00\x00\x00"                  // 92
-            . "\x00\x00\x00\x46"                  // 96 // Seems to be ok only for Root
-            . "\x00\x00\x00\x00"                  // 100
-            . OLE::localDateToOLE($this->Time1st)          // 108
-            . OLE::localDateToOLE($this->Time2nd)          // 116
-            . pack('V', $this->startBlock ?? 0)  // 120
-            . pack('V', $this->Size)               // 124
-            . pack('V', 0); // 128
-
-        return $ret;
+        return $ret . (pack('v', strlen($this->Name) + 2) . pack('c', $this->Type) . pack('c', 0x00) . pack('V', $this->PrevPps) . pack('V', $this->NextPps) . pack('V', $this->DirPps) . "\x00\x09\x02\x00" . "\x00\x00\x00\x00" . "\xc0\x00\x00\x00" . "\x00\x00\x00\x46" . "\x00\x00\x00\x00" . OLE::localDateToOLE($this->Time1st) . OLE::localDateToOLE($this->Time2nd) . pack('V', $this->startBlock ?? 0) . pack('V', $this->Size) . pack('V', 0));
     }
 
     /**

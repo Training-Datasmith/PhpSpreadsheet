@@ -8,8 +8,6 @@ use Stringable;
 
 class CellAddress implements Stringable
 {
-    protected ?Worksheet $worksheet;
-
     protected string $cellAddress;
 
     protected string $columnName = '';
@@ -18,11 +16,10 @@ class CellAddress implements Stringable
 
     protected int $rowId;
 
-    public function __construct(string $cellAddress, ?Worksheet $worksheet = null)
+    public function __construct(string $cellAddress, protected ?Worksheet $worksheet = null)
     {
         $this->cellAddress = str_replace('$', '', $cellAddress);
         [$this->columnId, $this->rowId, $this->columnName] = Coordinate::indexesFromString($this->cellAddress);
-        $this->worksheet = $worksheet;
     }
 
     public function __destruct()
@@ -119,7 +116,7 @@ class CellAddress implements Stringable
 
     public function previousRow(int $offset = 1): self
     {
-        return $this->nextRow(0 - $offset);
+        return $this->nextRow(-$offset);
     }
 
     public function nextColumn(int $offset = 1): self
@@ -134,7 +131,7 @@ class CellAddress implements Stringable
 
     public function previousColumn(int $offset = 1): self
     {
-        return $this->nextColumn(0 - $offset);
+        return $this->nextColumn(-$offset);
     }
 
     /**

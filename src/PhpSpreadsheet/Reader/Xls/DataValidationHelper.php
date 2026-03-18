@@ -150,7 +150,7 @@ class DataValidationHelper extends Xls
             if ($type == DataValidation::TYPE_LIST) {
                 $formula1 = str_replace(chr(0), ',', $formula1);
             }
-        } catch (PhpSpreadsheetException $e) {
+        } catch (PhpSpreadsheetException) {
             return;
         }
         $offset += $sz1;

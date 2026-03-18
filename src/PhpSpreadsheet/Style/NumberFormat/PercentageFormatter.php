@@ -16,7 +16,7 @@ class PercentageFormatter extends BaseFormatter
         $value *= 100;
         $format = self::stripQuotes($format);
 
-        [, $vDecimals] = explode('.', ((string) $value) . '.');
+        [, $vDecimals] = explode('.', ($value) . '.');
         $vDecimalCount = strlen(rtrim($vDecimals, '0'));
 
         $format = str_replace('%', '%%', $format);

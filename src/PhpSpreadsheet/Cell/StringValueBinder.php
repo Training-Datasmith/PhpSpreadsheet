@@ -124,7 +124,7 @@ class StringValueBinder extends DefaultValueBinder implements IValueBinder
             $cell->setValueExplicit((string) $value, DataType::TYPE_STRING);
             $ignoredErrors = is_numeric((string) $value);
         } else {
-            throw new SpreadsheetException('Unable to bind unstringable object of type ' . get_class($value));
+            throw new SpreadsheetException('Unable to bind unstringable object of type ' . $value::class);
         }
         if ($this->setIgnoredErrors) {
             $cell->getIgnoredErrors()->setNumberStoredAsText($ignoredErrors);

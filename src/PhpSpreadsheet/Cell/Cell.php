@@ -28,11 +28,6 @@ class Cell implements Stringable
     private static ?IValueBinder $valueBinder = null;
 
     /**
-     * Value of the cell.
-     */
-    private mixed $value;
-
-    /**
      *    Calculated value of the cell (used for caching)
      *    This returns the value last calculated by MS Excel or whichever spreadsheet program was used to
      *        create the original spreadsheet file.
@@ -66,7 +61,7 @@ class Cell implements Stringable
      */
     private ?array $formulaAttributes = null;
 
-    private IgnoredErrors $ignoredErrors;
+    private readonly IgnoredErrors $ignoredErrors;
 
     /**
      * Update the cell into the cell collection.
@@ -99,11 +94,11 @@ class Cell implements Stringable
      *
      * @throws SpreadsheetException
      */
-    public function __construct(mixed $value, ?string $dataType, Worksheet $worksheet)
+    public function __construct(/**
+     * Value of the cell.
+     */
+    private mixed $value, ?string $dataType, Worksheet $worksheet)
     {
-        // Initialise cell value
-        $this->value = $value;
-
         // Set worksheet cache
         $this->parent = $worksheet->getCellCollection();
 
@@ -115,7 +110,7 @@ class Cell implements Stringable
             $this->dataType = $dataType;
         } else {
             $valueBinder = $worksheet->getParent()?->getValueBinder() ?? self::getValueBinder();
-            if ($valueBinder->bindValue($this, $value) === false) {
+            if ($valueBinder->bindValue($this, $this->value) === false) {
                 throw new SpreadsheetException('Value could not be bound to cell.');
             }
         }
@@ -192,7 +187,7 @@ class Cell implements Stringable
     {
         $currentCalendar = SharedDate::getExcelCalendar();
         SharedDate::setExcelCalendar($this->getWorksheet()->getParent()?->getExcelCalendar());
-        $formattedValue = (string) NumberFormat::toFormattedString(
+        $formattedValue = NumberFormat::toFormattedString(
             $this->getCalculatedValueString(),
             (string) $this->getStyle()->getNumberFormat()->getFormatCode(true)
         );
@@ -259,7 +254,7 @@ class Cell implements Stringable
         $worksheet = $this->getWorksheetOrNull();
         if ($worksheet !== null) {
             $coordinate = $this->getCoordinate();
-            $worksheet->setHyperlink($coordinate, null);
+            $worksheet->setHyperlink($coordinate);
         }
         $this->hadHyperlink = false;
     }
@@ -447,7 +442,6 @@ class Cell implements Stringable
         $originalDataType = $this->dataType;
         $this->formulaAttributes = [];
         $spill = false;
-
         if ($this->dataType === DataType::TYPE_FORMULA) {
             try {
                 $currentCalendar = SharedDate::getExcelCalendar();
@@ -602,15 +596,15 @@ class Cell implements Stringable
                 );
             }
             SharedDate::setExcelCalendar($currentCalendar);
-
             if ($result === Functions::NOT_YET_IMPLEMENTED) {
                 $this->formulaAttributes = $oldAttributes;
 
                 return $this->calculatedValue; // Fallback if calculation engine does not support the formula.
             }
-
             return $result;
-        } elseif ($this->value instanceof RichText) {
+        }
+
+        if ($this->value instanceof RichText) {
             return $this->value->getPlainText();
         }
 
@@ -835,12 +829,10 @@ class Cell implements Stringable
     {
         $parent = $this->parent;
         if ($parent !== null) {
-            $worksheet = $parent->getParent();
-        } else {
-            $worksheet = null;
+            return $parent->getParent();
         }
 
-        return $worksheet;
+        return null;
     }
 
     /**
@@ -948,9 +940,11 @@ class Cell implements Stringable
     {
         if ($a->getRow() < $b->getRow()) {
             return -1;
-        } elseif ($a->getRow() > $b->getRow()) {
+        }
+        if ($a->getRow() > $b->getRow()) {
             return 1;
-        } elseif (Coordinate::columnIndexFromString($a->getColumn()) < Coordinate::columnIndexFromString($b->getColumn())) {
+        }
+        if (Coordinate::columnIndexFromString($a->getColumn()) < Coordinate::columnIndexFromString($b->getColumn())) {
             return -1;
         }
 

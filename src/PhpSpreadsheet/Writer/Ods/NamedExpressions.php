@@ -12,17 +12,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class NamedExpressions
 {
-    private XMLWriter $objWriter;
-
-    private Spreadsheet $spreadsheet;
-
-    private Formula $formulaConvertor;
-
-    public function __construct(XMLWriter $objWriter, Spreadsheet $spreadsheet, Formula $formulaConvertor)
+    public function __construct(private readonly XMLWriter $objWriter, private readonly Spreadsheet $spreadsheet, private readonly Formula $formulaConvertor)
     {
-        $this->objWriter = $objWriter;
-        $this->spreadsheet = $spreadsheet;
-        $this->formulaConvertor = $formulaConvertor;
     }
 
     public function write(): string
@@ -88,7 +79,7 @@ class NamedExpressions
             $splitRanges
         );
 
-        $lengths = array_map([StringHelper::class, 'strlenAllowNull'], array_column($splitRanges[0], 0));
+        $lengths = array_map(StringHelper::strlenAllowNull(...), array_column($splitRanges[0], 0));
         $offsets = array_column($splitRanges[0], 1);
 
         $worksheets = $splitRanges[2];
@@ -130,7 +121,7 @@ class NamedExpressions
         }
 
         if (str_starts_with($address, '=')) {
-            $address = substr($address, 1);
+            return substr($address, 1);
         }
 
         return $address;

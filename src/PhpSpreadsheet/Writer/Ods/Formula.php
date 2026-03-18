@@ -43,7 +43,7 @@ class Formula
             $splitRanges
         );
 
-        $lengths = array_map([StringHelper::class, 'strlenAllowNull'], array_column($splitRanges[0], 0));
+        $lengths = array_map(StringHelper::strlenAllowNull(...), array_column($splitRanges[0], 0));
         $offsets = array_column($splitRanges[0], 1);
         $values = array_column($splitRanges[0], 0);
 
@@ -69,7 +69,7 @@ class Formula
             $splitRanges
         );
 
-        $lengths = array_map([StringHelper::class, 'strlenAllowNull'], array_column($splitRanges[0], 0));
+        $lengths = array_map(StringHelper::strlenAllowNull(...), array_column($splitRanges[0], 0));
         $offsets = array_column($splitRanges[0], 1);
 
         $worksheets = $splitRanges[2];

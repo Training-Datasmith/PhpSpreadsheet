@@ -126,7 +126,7 @@ class Offset
     private static function assessCellAddress(string $cellAddress, Cell $cell): string
     {
         if (preg_match('/^' . Calculation::CALCULATION_REGEXP_DEFINEDNAME . '$/mui', $cellAddress) !== false) {
-            $cellAddress = Functions::expandDefinedName($cellAddress, $cell);
+            return Functions::expandDefinedName($cellAddress, $cell);
         }
 
         return $cellAddress;

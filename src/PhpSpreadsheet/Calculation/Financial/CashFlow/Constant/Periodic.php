@@ -118,7 +118,7 @@ class Periodic
         mixed $presentValue,
         mixed $futureValue = 0.0,
         mixed $type = FinancialConstants::PAYMENT_END_OF_PERIOD
-    ) {
+    ): string|float {
         $rate = Functions::flattenSingleValue($rate);
         $payment = Functions::flattenSingleValue($payment);
         $presentValue = Functions::flattenSingleValue($presentValue);

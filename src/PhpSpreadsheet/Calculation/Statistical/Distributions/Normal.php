@@ -56,7 +56,7 @@ class Normal
             return 0.5 * (1 + Engineering\Erf::erfValue(($value - $mean) / ($stdDev * sqrt(2))));
         }
 
-        return (1 / (self::SQRT2PI * $stdDev)) * exp(0 - (($value - $mean) ** 2 / (2 * ($stdDev * $stdDev))));
+        return (1 / (self::SQRT2PI * $stdDev)) * exp(-(($value - $mean) ** 2 / (2 * ($stdDev * $stdDev))));
     }
 
     /**
@@ -158,18 +158,16 @@ class Normal
 
         //    Define lower and upper region break-points.
         $p_low = 0.02425; //Use lower region approx. below this
-        $p_high = 1 - $p_low; //Use upper region approx. above this
-
+        $p_high = 1 - $p_low;
+        //Use upper region approx. above this
         if (0 < $p && $p < $p_low) {
             //    Rational approximation for lower region.
             $q = sqrt(-2 * log($p));
-
             return ((((($c[1] * $q + $c[2]) * $q + $c[3]) * $q + $c[4]) * $q + $c[5]) * $q + $c[6])
                 / (((($d[1] * $q + $d[2]) * $q + $d[3]) * $q + $d[4]) * $q + 1);
-        } elseif ($p_high < $p && $p < 1) {
+        } if ($p_high < $p && $p < 1) {
             //    Rational approximation for upper region.
             $q = sqrt(-2 * log(1 - $p));
-
             return -((((($c[1] * $q + $c[2]) * $q + $c[3]) * $q + $c[4]) * $q + $c[5]) * $q + $c[6])
                 / (((($d[1] * $q + $d[2]) * $q + $d[3]) * $q + $d[4]) * $q + 1);
         }

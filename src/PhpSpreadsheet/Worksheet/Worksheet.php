@@ -68,11 +68,6 @@ class Worksheet
     private const INVALID_CHARACTERS = ['*', ':', '/', '\\', '?', '[', ']'];
 
     /**
-     * Parent spreadsheet.
-     */
-    private ?Spreadsheet $parent = null;
-
-    /**
      * Collection of cells.
      */
     private Cells $cellCollection;
@@ -321,10 +316,11 @@ class Worksheet
     /**
      * Create a new worksheet.
      */
-    public function __construct(?Spreadsheet $parent = null, string $title = 'Worksheet')
+    public function __construct(/**
+     * Parent spreadsheet.
+     */
+    private ?Spreadsheet $parent = null, string $title = 'Worksheet')
     {
-        // Set parent and title
-        $this->parent = $parent;
         $this->setTitle($title, false);
         // setTitle can change $pTitle
         $this->setCodeName($this->getTitle());
@@ -499,7 +495,7 @@ class Worksheet
     public function getColumnDimensions(): array
     {
         /** @var callable $callable */
-        $callable = [self::class, 'columnDimensionCompare'];
+        $callable = self::columnDimensionCompare(...);
         uasort($this->columnDimensions, $callable);
 
         return $this->columnDimensions;
@@ -573,7 +569,7 @@ class Worksheet
      *
      * @return Chart|false
      */
-    public function getChartByIndex(?string $index)
+    public function getChartByIndex(?string $index): false|\PhpOffice\PhpSpreadsheet\Chart\Chart
     {
         $chartCount = count($this->chartCollection);
         if ($chartCount == 0) {
@@ -613,7 +609,7 @@ class Worksheet
      */
     public function getChartByName(string $chartName)
     {
-        foreach ($this->chartCollection as $index => $chart) {
+        foreach ($this->chartCollection as $chart) {
             if ($chart->getName() == $chartName) {
                 return $chart;
             }
@@ -743,14 +739,12 @@ class Worksheet
                         // Determine if we need to make an adjustment for the first row in an AutoFilter range that
                         //    has a column filter dropdown
                         $filterAdjustment = false;
-                        if (!empty($autoFilterIndentRanges)) {
-                            foreach ($autoFilterIndentRanges as $autoFilterFirstRowRange) {
-                                /** @var string $autoFilterFirstRowRange */
-                                if ($cell->isInRange($autoFilterFirstRowRange)) {
-                                    $filterAdjustment = true;
+                        foreach ($autoFilterIndentRanges as $autoFilterFirstRowRange) {
+                            /** @var string $autoFilterFirstRowRange */
+                            if ($cell->isInRange($autoFilterFirstRowRange)) {
+                                $filterAdjustment = true;
 
-                                    break;
-                                }
+                                break;
                             }
                         }
 
@@ -1535,7 +1529,7 @@ class Worksheet
                 $outArray[] = $conditional;
             }
         }
-        usort($outArray, [self::class, 'comparePriority']);
+        usort($outArray, self::comparePriority(...));
 
         return $outArray;
     }
@@ -1740,13 +1734,13 @@ class Worksheet
     {
         $breaks = [];
         /** @var callable $compareFunction */
-        $compareFunction = [self::class, 'compareRowBreaks'];
+        $compareFunction = self::compareRowBreaks(...);
         uksort($this->rowBreaks, $compareFunction);
         foreach ($this->rowBreaks as $break) {
             $breaks[$break->getCoordinate()] = self::BREAK_ROW;
         }
         /** @var callable $compareFunction */
-        $compareFunction = [self::class, 'compareColumnBreaks'];
+        $compareFunction = self::compareColumnBreaks(...);
         uksort($this->columnBreaks, $compareFunction);
         foreach ($this->columnBreaks as $break) {
             $breaks[$break->getCoordinate()] = self::BREAK_COLUMN;
@@ -1763,7 +1757,7 @@ class Worksheet
     public function getRowBreaks(): array
     {
         /** @var callable $compareFunction */
-        $compareFunction = [self::class, 'compareRowBreaks'];
+        $compareFunction = self::compareRowBreaks(...);
         uksort($this->rowBreaks, $compareFunction);
 
         return $this->rowBreaks;
@@ -1793,7 +1787,7 @@ class Worksheet
     public function getColumnBreaks(): array
     {
         /** @var callable $compareFunction */
-        $compareFunction = [self::class, 'compareColumnBreaks'];
+        $compareFunction = self::compareColumnBreaks(...);
         uksort($this->columnBreaks, $compareFunction);
 
         return $this->columnBreaks;
@@ -2782,12 +2776,14 @@ class Worksheet
     public function removeComment(CellAddress|string|array $cellCoordinate): self
     {
         $cellAddress = Functions::trimSheetFromCellReference(Validations::validateCellAddress($cellCoordinate));
-
         if (Coordinate::coordinateIsRange($cellAddress)) {
             throw new Exception('Cell coordinate string can not be a range of cells.');
-        } elseif (str_contains($cellAddress, '$')) {
+        }
+        if (str_contains($cellAddress, '$')) {
             throw new Exception('Cell coordinate string must not be absolute.');
-        } elseif ($cellAddress == '') {
+        }
+
+        if ($cellAddress == '') {
             throw new Exception('Cell coordinate can not be zero-length string.');
         }
         // Check if we have a comment for this cell and delete it
@@ -2807,12 +2803,14 @@ class Worksheet
     public function getComment(CellAddress|string|array $cellCoordinate, bool $attachNew = true): Comment
     {
         $cellAddress = Functions::trimSheetFromCellReference(Validations::validateCellAddress($cellCoordinate));
-
         if (Coordinate::coordinateIsRange($cellAddress)) {
             throw new Exception('Cell coordinate string can not be a range of cells.');
-        } elseif (str_contains($cellAddress, '$')) {
+        }
+        if (str_contains($cellAddress, '$')) {
             throw new Exception('Cell coordinate string must not be absolute.');
-        } elseif ($cellAddress == '') {
+        }
+
+        if ($cellAddress == '') {
             throw new Exception('Cell coordinate can not be zero-length string.');
         }
 
@@ -3470,7 +3468,7 @@ class Worksheet
     {
         $title ??= '';
         if (str_starts_with($title, "'") && str_ends_with($title, "'")) {
-            $title = str_replace("''", "'", substr($title, 1, -1));
+            return str_replace("''", "'", substr($title, 1, -1));
         }
 
         return $title;
@@ -3552,7 +3550,7 @@ class Worksheet
 
         // or if cell is part of a data validation range
         foreach ($this->dataValidationCollection as $key => $dataValidation) {
-            $keyParts = explode(' ', $key);
+            $keyParts = explode(' ', (string) $key);
             foreach ($keyParts as $keyPart) {
                 if ($keyPart === $cellCoordinate) {
                     return $dataValidation;
@@ -3603,7 +3601,7 @@ class Worksheet
             return true;
         }
         foreach ($this->dataValidationCollection as $key => $dataValidation) {
-            $keyParts = explode(' ', $key);
+            $keyParts = explode(' ', (string) $key);
             foreach ($keyParts as $keyPart) {
                 if ($keyPart === $coordinate) {
                     return true;
@@ -3908,7 +3906,10 @@ class Worksheet
 
     public function isRowVisible(int $row): bool
     {
-        return !$this->rowDimensionExists($row) || $this->getRowDimension($row)->getVisible();
+        if (!$this->rowDimensionExists($row)) {
+            return true;
+        }
+        return $this->getRowDimension($row)->getVisible();
     }
 
     /**
@@ -3954,7 +3955,7 @@ class Worksheet
             $xfIndex = $this->getRowDimension($row)->getXfIndex();
         }
         if ($xfIndex === null && $this->ColumnDimensionExists($column)) {
-            $xfIndex = $this->getColumnDimension($column)->getXfIndex();
+            return $this->getColumnDimension($column)->getXfIndex();
         }
 
         return $xfIndex;
@@ -4035,11 +4036,13 @@ class Worksheet
         if ($preCalculateFormulas && Calculation::getInstance($this->parent)->getInstanceArrayReturnType() === Calculation::RETURN_ARRAY_AS_ARRAY) {
             $keys = $this->cellCollection->getCoordinates();
             foreach ($keys as $key) {
-                if ($this->getCell($key)->getDataType() === DataType::TYPE_FORMULA) {
-                    if (!Preg::isMatch(self::FUNCTION_LIKE_GROUPBY, $this->getCell($key)->getValueString())) {
-                        $this->getCell($key)->getCalculatedValue();
-                    }
+                if ($this->getCell($key)->getDataType() !== DataType::TYPE_FORMULA) {
+                    continue;
                 }
+                if (Preg::isMatch(self::FUNCTION_LIKE_GROUPBY, $this->getCell($key)->getValueString())) {
+                    continue;
+                }
+                $this->getCell($key)->getCalculatedValue();
             }
         }
     }

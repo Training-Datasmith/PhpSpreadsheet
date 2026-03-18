@@ -341,7 +341,7 @@ class Functions
             $worksheet2 = $defined->getWorkSheet();
             if (!$defined->isFormula() && $worksheet2 !== null) {
                 $coordinate = "'" . $worksheet2->getTitle() . "'!"
-                    . (string) preg_replace('/^=/', '', str_replace('$', '', $defined->getValue()));
+                    . preg_replace('/^=/', '', str_replace('$', '', $defined->getValue()));
             }
         }
 
@@ -356,7 +356,7 @@ class Functions
     public static function trimSheetFromCellReference(string $coordinate): string
     {
         if (str_contains($coordinate, '!')) {
-            $coordinate = substr($coordinate, strrpos($coordinate, '!') + 1);
+            return substr($coordinate, strrpos($coordinate, '!') + 1);
         }
 
         return $coordinate;
@@ -380,7 +380,7 @@ class Functions
                 $lastRow = $rowkey;
             }
             foreach ($row as $colkey => $cellValue) {
-                if (!preg_match('/^[A-Z]{1,3}$/', $colkey)) {
+                if (!preg_match('/^[A-Z]{1,3}$/', (string) $colkey)) {
                     $firstRow = 0;
 
                     break 2;
@@ -395,7 +395,7 @@ class Functions
             }
         }
         if ($firstRow > 0 && $firstColumn > 0 && ($firstRow !== $lastRow || $firstColumn !== $lastColumn)) {
-            $retVal = Coordinate::stringFromColumnIndex($firstColumn)
+            return Coordinate::stringFromColumnIndex($firstColumn)
                 . $firstRow
                 . ':'
                 . Coordinate::stringFromColumnIndex($lastColumn)

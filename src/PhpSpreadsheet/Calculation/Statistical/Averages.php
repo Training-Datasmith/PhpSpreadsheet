@@ -30,7 +30,8 @@ class Averages extends AggregateBase
         $aMean = self::average(...$args);
         if ($aMean === ExcelError::DIV0()) {
             return ExcelError::NAN();
-        } elseif ($aMean === ExcelError::VALUE()) {
+        }
+        if ($aMean === ExcelError::VALUE()) {
             return ExcelError::VALUE();
         }
 
@@ -209,10 +210,9 @@ class Averages extends AggregateBase
     {
         return array_filter(
             $args,
-            function ($value): bool {
+            
                 // Is it a numeric value?
-                return is_numeric($value) && (!is_string($value));
-            }
+                fn($value): bool => is_numeric($value) && (!is_string($value))
         );
     }
 
@@ -235,7 +235,7 @@ class Averages extends AggregateBase
             ++$index;
             foreach ($frequencyArray as $key => $value) {
                 /** @var string[] $value */
-                if ((string) $value['value'] == (string) $datum) {
+                if ($value['value'] == (string) $datum) {
                     ++$frequencyArray[$key]['frequency'];
                     $freq = $frequencyArray[$key]['frequency'];
                     if ($freq > $maxfreq) {

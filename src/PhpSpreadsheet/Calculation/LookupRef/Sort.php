@@ -136,7 +136,7 @@ class Sort extends LookupRefValidations
 
         $temp = self::processSortBy($sortArray, $sortBy, $sortOrder);
         if ($transpose) {
-            $temp = Matrix::transpose($temp);
+            return Matrix::transpose($temp);
         }
 
         return $temp;
@@ -325,9 +325,7 @@ class Sort extends LookupRefValidations
             $sortArguments[] = $sortOrder[$index] === self::ORDER_ASCENDING ? SORT_ASC : SORT_DESC;
         }
 
-        $sortData = self::executeVectorSortQuery($sortData, $sortArguments);
-
-        return $sortData;
+        return self::executeVectorSortQuery($sortData, $sortArguments);
     }
 
     /**

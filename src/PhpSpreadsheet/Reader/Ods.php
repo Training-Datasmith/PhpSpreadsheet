@@ -1429,12 +1429,10 @@ class Ods extends BaseReader
     private static function getMultiplier(?DOMAttr $cAttr): int
     {
         if ($cAttr) {
-            $multiplier = (int) $cAttr->nodeValue;
-        } else {
-            $multiplier = 1;
+            return (int) $cAttr->nodeValue;
         }
 
-        return $multiplier;
+        return 1;
     }
 
     private function parseRichText(string $is): RichText
@@ -1594,7 +1592,7 @@ class Ods extends BaseReader
                 $temp2 -= 360;
             }
             if ($temp2 >= -90 && $temp2 <= 90) {
-                $alignment1['textRotation'] = (int) $temp2;
+                $alignment1['textRotation'] = $temp2;
             }
         }
         $temp = $tableCellProperties->getAttributeNs($styleNs, 'vertical-align');

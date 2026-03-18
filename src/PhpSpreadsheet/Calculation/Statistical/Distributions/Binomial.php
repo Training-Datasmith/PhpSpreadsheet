@@ -33,7 +33,7 @@ class Binomial
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function distribution(mixed $value, mixed $trials, mixed $probability, mixed $cumulative)
+    public static function distribution(mixed $value, mixed $trials, mixed $probability, mixed $cumulative): array|string|float|int
     {
         if (is_array($value) || is_array($trials) || is_array($probability) || is_array($cumulative)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $trials, $probability, $cumulative);
@@ -87,7 +87,7 @@ class Binomial
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $trials, $probability, $successes, $limit);
         }
 
-        $limit = $limit ?? $successes;
+        $limit ??= $successes;
 
         try {
             $trials = DistributionValidations::validateInt($trials);
@@ -197,10 +197,11 @@ class Binomial
         } catch (Exception $e) {
             return $e->getMessage();
         }
-
         if ($trials < 0) {
             return ExcelError::NAN();
-        } elseif (($alpha < 0.0) || ($alpha > 1.0)) {
+        }
+
+        if (($alpha < 0.0) || ($alpha > 1.0)) {
             return ExcelError::NAN();
         }
 

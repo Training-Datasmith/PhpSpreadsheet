@@ -21,7 +21,7 @@ class Cotangent
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function cot($angle)
+    public static function cot($angle): array|string|float
     {
         if (is_array($angle)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
@@ -47,7 +47,7 @@ class Cotangent
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function coth($angle)
+    public static function coth($angle): array|string|float
     {
         if (is_array($angle)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
@@ -99,7 +99,7 @@ class Cotangent
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function acoth($number)
+    public static function acoth($number): array|string|float
     {
         if (is_array($number)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);

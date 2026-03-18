@@ -202,30 +202,26 @@ class ContentTypes extends WriterPart
         }
         $sheetCount = $spreadsheet->getSheetCount();
         for ($i = 0; $i < $sheetCount; ++$i) {
-            if (count($spreadsheet->getSheet($i)->getHeaderFooter()->getImages()) > 0) {
-                foreach ($spreadsheet->getSheet($i)->getHeaderFooter()->getImages() as $image) {
-                    if ($image->getPath() !== '' && !isset($aMediaContentTypes[strtolower($image->getExtension())])) {
-                        $aMediaContentTypes[strtolower($image->getExtension())] = $this->getImageMimeType($image->getPath());
+            foreach ($spreadsheet->getSheet($i)->getHeaderFooter()->getImages() as $image) {
+                if ($image->getPath() !== '' && !isset($aMediaContentTypes[strtolower($image->getExtension())])) {
+                    $aMediaContentTypes[strtolower($image->getExtension())] = $this->getImageMimeType($image->getPath());
 
-                        $this->writeDefaultContentType($objWriter, strtolower($image->getExtension()), $aMediaContentTypes[strtolower($image->getExtension())]);
-                    }
+                    $this->writeDefaultContentType($objWriter, strtolower($image->getExtension()), $aMediaContentTypes[strtolower($image->getExtension())]);
                 }
             }
 
-            if (count($spreadsheet->getSheet($i)->getComments()) > 0) {
-                foreach ($spreadsheet->getSheet($i)->getComments() as $comment) {
-                    if (!$comment->hasBackgroundImage()) {
-                        continue;
-                    }
+            foreach ($spreadsheet->getSheet($i)->getComments() as $comment) {
+                if (!$comment->hasBackgroundImage()) {
+                    continue;
+                }
 
-                    $bgImage = $comment->getBackgroundImage();
-                    $bgImageExtentionKey = strtolower($bgImage->getImageFileExtensionForSave(false));
+                $bgImage = $comment->getBackgroundImage();
+                $bgImageExtentionKey = strtolower($bgImage->getImageFileExtensionForSave(false));
 
-                    if (!isset($aMediaContentTypes[$bgImageExtentionKey])) {
-                        $aMediaContentTypes[$bgImageExtentionKey] = $bgImage->getImageMimeType();
+                if (!isset($aMediaContentTypes[$bgImageExtentionKey])) {
+                    $aMediaContentTypes[$bgImageExtentionKey] = $bgImage->getImageMimeType();
 
-                        $this->writeDefaultContentType($objWriter, $bgImageExtentionKey, $aMediaContentTypes[$bgImageExtentionKey]);
-                    }
+                    $this->writeDefaultContentType($objWriter, $bgImageExtentionKey, $aMediaContentTypes[$bgImageExtentionKey]);
                 }
             }
 

@@ -12,13 +12,10 @@ class CellStyleAssessor
 
     protected StyleMerger $styleMerger;
 
-    protected Cell $cell;
-
-    public function __construct(Cell $cell, string $conditionalRange)
+    public function __construct(protected Cell $cell, string $conditionalRange)
     {
-        $this->cell = $cell;
-        $this->cellMatcher = new CellMatcher($cell, $conditionalRange);
-        $this->styleMerger = new StyleMerger($cell->getStyle());
+        $this->cellMatcher = new CellMatcher($this->cell, $conditionalRange);
+        $this->styleMerger = new StyleMerger($this->cell->getStyle());
     }
 
     /**

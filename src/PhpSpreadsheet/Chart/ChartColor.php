@@ -151,7 +151,7 @@ class ChartColor
 
     public static function alphaToXml(int $alpha): string
     {
-        return (string) (100 - $alpha) . '000';
+        return (100 - $alpha) . '000';
     }
 
     public static function alphaFromXml(float|int|string $alpha): int

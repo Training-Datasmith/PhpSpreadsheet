@@ -44,14 +44,6 @@ class Slk extends BaseReader
     private int $fontcount = 0;
 
     /**
-     * Create a new SYLK Reader instance.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Validate that the current file is a SYLK file.
      */
     public function canRead(string $filename): bool

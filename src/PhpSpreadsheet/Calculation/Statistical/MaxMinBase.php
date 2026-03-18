@@ -8,7 +8,8 @@ abstract class MaxMinBase
     {
         if (is_bool($value)) {
             return (int) $value;
-        } elseif (is_string($value)) {
+        }
+        if (is_string($value)) {
             return 0;
         }
 

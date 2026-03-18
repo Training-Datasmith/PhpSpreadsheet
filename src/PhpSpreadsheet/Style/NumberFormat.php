@@ -423,18 +423,10 @@ class NumberFormat extends Supervisor
      */
     public static function builtInFormatCode(int $index): string
     {
-        // Clean parameter
-        $index = (int) $index;
-
         // Ensure built-in format codes are available
         self::fillBuiltInFormatCodes();
 
-        // Lookup format code
-        if (isset(self::$builtInFormats[$index])) {
-            return self::$builtInFormats[$index];
-        }
-
-        return '';
+        return self::$builtInFormats[$index] ?? '';
     }
 
     /**
@@ -442,7 +434,7 @@ class NumberFormat extends Supervisor
      *
      * @return false|int
      */
-    public static function builtInFormatCodeIndex(string $formatCodeIndex)
+    public static function builtInFormatCodeIndex(string $formatCodeIndex): int|false
     {
         // Ensure built-in format codes are available
         self::fillBuiltInFormatCodes();
@@ -469,7 +461,7 @@ class NumberFormat extends Supervisor
         return md5(
             $this->formatCode
             . $this->builtInFormatCode
-            . __CLASS__
+            . self::class
         );
     }
 

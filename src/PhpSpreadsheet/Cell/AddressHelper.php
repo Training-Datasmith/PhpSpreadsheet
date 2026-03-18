@@ -58,7 +58,7 @@ class AddressHelper
             $columnReference = (string) $currentColumnNumber;
         }
         //    Bracketed C references are relative to the current column
-        if (is_string($columnReference) && $columnReference[0] === '[') { // @phpstan-ignore-line
+        if ($columnReference[0] === '[') { // @phpstan-ignore-line
             $columnReference = $currentColumnNumber + (int) trim($columnReference, '[]');
         }
         $columnReference = (int) $columnReference;
@@ -66,9 +66,8 @@ class AddressHelper
         if ($columnReference <= 0 || $rowReference <= 0) {
             throw new Exception('Invalid R1C1-format Cell Reference, Value out of range');
         }
-        $A1CellReference = Coordinate::stringFromColumnIndex($columnReference) . $rowReference;
 
-        return $A1CellReference;
+        return Coordinate::stringFromColumnIndex($columnReference) . $rowReference;
     }
 
     protected static function convertSpreadsheetMLFormula(string $formula): string
@@ -168,8 +167,6 @@ class AddressHelper
             }
         }
 
-        $R1C1Address = "R{$rowId}C{$columnId}";
-
-        return $R1C1Address;
+        return "R{$rowId}C{$columnId}";
     }
 }

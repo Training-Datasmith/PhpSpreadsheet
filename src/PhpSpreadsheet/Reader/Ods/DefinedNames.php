@@ -64,7 +64,7 @@ class DefinedNames extends BaseLoader
         $worksheet = $this->spreadsheet->getSheetByName($sheetReference);
         // Worksheet might still be null if we're only loading selected sheets rather than the full spreadsheet
         if ($worksheet !== null) {
-            $this->spreadsheet->addDefinedName(DefinedName::createInstance((string) $definedName, $worksheet, $value));
+            $this->spreadsheet->addDefinedName(DefinedName::createInstance($definedName, $worksheet, $value));
         }
     }
 }

@@ -10,11 +10,6 @@ class ColumnDimension extends Dimension
     public const EXCEL_MAX_WIDTH = 255.0;
 
     /**
-     * Column index.
-     */
-    private ?string $columnIndex;
-
-    /**
      * Column width.
      *
      * When this is set to a negative value, the column width should be ignored by IWriter
@@ -29,13 +24,10 @@ class ColumnDimension extends Dimension
     /**
      * Create a new ColumnDimension.
      *
-     * @param ?string $index Character column index
+     * @param ?string $columnIndex Character column index
      */
-    public function __construct(?string $index = 'A')
+    public function __construct(private ?string $columnIndex = 'A')
     {
-        // Initialise values
-        $this->columnIndex = $index;
-
         // set dimension as unformatted by default
         parent::__construct(0);
     }

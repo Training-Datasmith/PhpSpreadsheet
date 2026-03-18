@@ -14,7 +14,7 @@ class NumberFormat extends StyleBase
         $fromFormats = ['\-', '\ '];
         $toFormats = ['-', ' '];
 
-        foreach ($styleAttributes as $styleAttributeKey => $styleAttributeValue) {
+        foreach ($styleAttributes as $styleAttributeValue) {
             $styleAttributeValue = str_replace($fromFormats, $toFormats, (string) $styleAttributeValue);
 
             switch ($styleAttributeValue) {

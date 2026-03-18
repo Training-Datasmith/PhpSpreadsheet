@@ -176,7 +176,7 @@ class Date
         $newValue = self::dateTimeToExcel($date);
 
         if (preg_match('/^\s*\d?\d:\d\d(:\d\d([.]\d+)?)?\s*(am|pm)?\s*$/i', $value) == 1) {
-            $newValue = fmod($newValue, 1.0);
+            return fmod($newValue, 1.0);
         }
 
         return $newValue;
@@ -250,7 +250,7 @@ class Date
      *
      * @return int Unix timetamp for this date/time
      */
-    public static function excelToTimestamp($excelTimestamp, $timeZone = null): int
+    public static function excelToTimestamp(float|int $excelTimestamp, null|\DateTimeZone|string $timeZone = null): int
     {
         $dto = self::excelToDateTimeObject($excelTimestamp, $timeZone);
         self::roundMicroseconds($dto);
@@ -267,13 +267,15 @@ class Date
      * @return false|float Excel date/time value
      *                                  or boolean FALSE on failure
      */
-    public static function PHPToExcel(mixed $dateValue)
+    public static function PHPToExcel(mixed $dateValue): float|bool
     {
         if ((is_object($dateValue)) && ($dateValue instanceof DateTimeInterface)) {
             return self::dateTimeToExcel($dateValue);
-        } elseif (is_numeric($dateValue)) {
+        }
+        if (is_numeric($dateValue)) {
             return self::timestampToExcel($dateValue);
-        } elseif (is_string($dateValue)) {
+        }
+        if (is_string($dateValue)) {
             return self::stringToExcel($dateValue);
         }
 
@@ -356,7 +358,7 @@ class Date
 
         $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
 
-        return (float) $excelDate + $excelTime;
+        return $excelDate + $excelTime;
     }
 
     /**
@@ -505,7 +507,7 @@ class Date
      *
      * @return int|string Month number (1 - 12), or the original string argument if it isn't a valid month name
      */
-    public static function monthStringToNumber(string $monthName)
+    public static function monthStringToNumber(string $monthName): int|string
     {
         $monthIndex = 1;
         foreach (self::$monthNames as $shortMonthName => $longMonthName) {
@@ -525,7 +527,7 @@ class Date
      *
      * @return int|string The integer value with any ordinal stripped, or the original string argument if it isn't a valid numeric
      */
-    public static function dayStringToNumber(string $day)
+    public static function dayStringToNumber(string $day): int|string
     {
         $strippedDayValue = (str_replace(self::$numberSuffixes, '', $day));
         if (is_numeric($strippedDayValue)) {

@@ -30,11 +30,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls\Worksheet;
 class Xls extends BaseWriter
 {
     /**
-     * PhpSpreadsheet object.
-     */
-    private Spreadsheet $spreadsheet;
-
-    /**
      * Total number of shared strings in workbook.
      */
     private int $strTotal = 0;
@@ -61,7 +56,7 @@ class Xls extends BaseWriter
     /**
      * Formula parser.
      */
-    private Parser $parser;
+    private readonly Parser $parser;
 
     /**
      * Identifier clusters for drawings. Used in MSODRAWINGGROUP record.
@@ -92,11 +87,9 @@ class Xls extends BaseWriter
      *
      * @param Spreadsheet $spreadsheet PhpSpreadsheet object
      */
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(private readonly Spreadsheet $spreadsheet)
     {
-        $this->spreadsheet = $spreadsheet;
-
-        $this->parser = new Parser($spreadsheet);
+        $this->parser = new Parser($this->spreadsheet);
     }
 
     /**

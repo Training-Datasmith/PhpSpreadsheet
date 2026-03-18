@@ -48,11 +48,6 @@ class DateValue extends WizardAbstract implements WizardInterface
 
     protected string $operator;
 
-    public function __construct(string $cellRange)
-    {
-        parent::__construct($cellRange);
-    }
-
     protected function operator(string $operator): void
     {
         $this->operator = $operator;

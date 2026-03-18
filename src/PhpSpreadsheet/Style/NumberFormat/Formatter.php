@@ -212,7 +212,7 @@ class Formatter extends BaseFormatter
                 // % number format - avoid weird '-0' problem
                 /** @var float */
                 $temp = $value;
-                $value = PercentageFormatter::format(0 + (float) $temp, $format);
+                $value = PercentageFormatter::format((float) $temp, $format);
             } else {
                 /** @var float|int|numeric-string */
                 $temp = $value;

@@ -70,11 +70,11 @@ class PowerBestFit extends BestFit
     private function powerRegression(array $yValues, array $xValues, bool $const): void
     {
         $adjustedYValues = array_map(
-            fn ($value): float => ($value < 0.0) ? 0 - log(abs($value)) : log($value),
+            fn (float $value): float => ($value < 0.0) ? -log(abs($value)) : log($value),
             $yValues
         );
         $adjustedXValues = array_map(
-            fn ($value): float => ($value < 0.0) ? 0 - log(abs($value)) : log($value),
+            fn (float $value): float => ($value < 0.0) ? -log(abs($value)) : log($value),
             $xValues
         );
 
@@ -92,7 +92,7 @@ class PowerBestFit extends BestFit
         parent::__construct($yValues, $xValues);
 
         if (!$this->error) {
-            $this->powerRegression($yValues, $xValues, (bool) $const);
+            $this->powerRegression($yValues, $xValues, $const);
         }
     }
 }

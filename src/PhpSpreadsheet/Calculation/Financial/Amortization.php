@@ -178,12 +178,14 @@ class Amortization
 
         $f0Rate = $yearFrac * $rate * $cost;
         $nNumOfFullPeriods = (int) (($cost - $salvage - $f0Rate) / $fOneRate);
-
         if ($period == 0) {
             return $f0Rate;
-        } elseif ($period <= $nNumOfFullPeriods) {
+        }
+        if ($period <= $nNumOfFullPeriods) {
             return $fOneRate;
-        } elseif ($period == ($nNumOfFullPeriods + 1)) {
+        }
+
+        if ($period == ($nNumOfFullPeriods + 1)) {
             return $fCostDelta - $fOneRate * $nNumOfFullPeriods - $f0Rate;
         }
 
@@ -199,12 +201,14 @@ class Amortization
         //    Between 5 and 6 years        2
         //    More than 6 years            2.5
         $fUsePer = 1.0 / $rate;
-
         if ($fUsePer < 3.0) {
             return 1.0;
-        } elseif ($fUsePer < 4.0) {
+        }
+        if ($fUsePer < 4.0) {
             return 1.5;
-        } elseif ($fUsePer <= 6.0) {
+        }
+
+        if ($fUsePer <= 6.0) {
             return 2.0;
         }
 

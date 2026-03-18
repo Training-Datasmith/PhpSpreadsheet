@@ -32,7 +32,7 @@ class BaseDrawing implements IComparable
     /**
      * Image index.
      */
-    private int $imageIndex;
+    private readonly int $imageIndex;
 
     /**
      * Name.
@@ -447,7 +447,7 @@ class BaseDrawing implements IComparable
             . $this->height
             . $this->rotation
             . $this->shadow->getHashCode()
-            . __CLASS__
+            . self::class
         );
     }
 

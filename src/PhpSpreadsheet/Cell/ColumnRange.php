@@ -10,19 +10,16 @@ use Stringable;
  */
 class ColumnRange implements AddressRange, Stringable
 {
-    protected ?Worksheet $worksheet;
-
     protected int $from;
 
     protected int $to;
 
-    public function __construct(string $from, ?string $to = null, ?Worksheet $worksheet = null)
+    public function __construct(string $from, ?string $to = null, protected ?Worksheet $worksheet = null)
     {
         $this->validateFromTo(
             Coordinate::columnIndexFromString($from),
             Coordinate::columnIndexFromString($to ?? $from)
         );
-        $this->worksheet = $worksheet;
     }
 
     public function __destruct()
@@ -42,7 +39,7 @@ class ColumnRange implements AddressRange, Stringable
     {
         array_walk(
             $array,
-            function (&$column): void {
+            function (int|string &$column): void {
                 $column = is_numeric($column) ? Coordinate::stringFromColumnIndex((int) $column) : $column;
             }
         );
@@ -78,7 +75,7 @@ class ColumnRange implements AddressRange, Stringable
 
     public function shiftUp(int $offset = 1): self
     {
-        return $this->shiftDown(0 - $offset);
+        return $this->shiftDown(-$offset);
     }
 
     public function from(): string

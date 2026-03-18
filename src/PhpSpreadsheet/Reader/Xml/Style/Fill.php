@@ -48,7 +48,7 @@ class Fill extends StyleBase
 
                     break;
                 case 'Pattern':
-                    $lcStyleAttributeValue = strtolower((string) $styleAttributeValue);
+                    $lcStyleAttributeValue = strtolower($styleAttributeValue);
                     $style['fill']['fillType']
                         = self::FILL_MAPPINGS['fillType'][$lcStyleAttributeValue] ?? FillStyles::FILL_NONE;
 

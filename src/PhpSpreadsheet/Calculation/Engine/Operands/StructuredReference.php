@@ -32,28 +32,25 @@ final class StructuredReference implements Operand, Stringable
 
     private const TABLE_REFERENCE = '/([\p{L}_\\\][\p{L}\p{N}\._]+)?(\[(?:[^\]\[]+|(?R))*+\])/miu';
 
-    private string $value;
-
     private string $tableName;
 
     private Table $table;
 
     private string $reference;
 
-    private ?int $headersRow;
+    private ?int $headersRow = null;
 
     private int $firstDataRow;
 
     private int $lastDataRow;
 
-    private ?int $totalsRow;
+    private ?int $totalsRow = null;
 
     /** @var mixed[] */
     private array $columns;
 
-    public function __construct(string $structuredReference)
+    public function __construct(private readonly string $value)
     {
-        $this->value = $structuredReference;
     }
 
     /** @param string[] $matches */
@@ -223,7 +220,7 @@ final class StructuredReference implements Operand, Stringable
             } elseif (preg_match($pattern2, $reference) === 1) {
                 $reference = preg_replace($pattern2, $cellReference, $reference);
             }
-            /** @var string $reference */
+
         }
 
         return $reference;
@@ -236,8 +233,8 @@ final class StructuredReference implements Operand, Stringable
     private function getColumnReference(): string
     {
         $reference = str_replace("\u{a0}", ' ', $this->reference);
-        $startRow = ($this->totalsRow === null) ? $this->lastDataRow : $this->totalsRow;
-        $endRow = ($this->headersRow === null) ? $this->firstDataRow : $this->headersRow;
+        $startRow = $this->totalsRow ?? $this->lastDataRow;
+        $endRow = $this->headersRow ?? $this->firstDataRow;
 
         [$startRow, $endRow] = $this->getRowsForColumnReference($reference, $startRow, $endRow);
         $reference = $this->getColumnsForColumnReference($reference, $startRow, $endRow);
@@ -344,11 +341,11 @@ final class StructuredReference implements Operand, Stringable
             $cellTo = "{$columnId}{$endRow}";
             $cellReference = ($cellFrom === $cellTo) ? $cellFrom : "{$cellFrom}:{$cellTo}";
             $pattern = '/\[' . preg_quote($columnName, '/') . '\]/mui';
-            if (preg_match($pattern, $reference) === 1) {
+            if (preg_match($pattern, (string) $reference) === 1) {
                 $columnsSelected = true;
-                $reference = preg_replace($pattern, $cellReference, $reference);
+                $reference = preg_replace($pattern, $cellReference, (string) $reference);
             }
-            /** @var string $reference */
+
         }
         if ($columnsSelected === false) {
             return $this->fullData($startRow, $endRow);

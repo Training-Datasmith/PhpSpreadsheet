@@ -697,25 +697,27 @@ class Worksheet extends WriterPart
         }
         $minCfvo = $dataBar->getMinimumConditionalFormatValueObject();
         // Phpstan is wrong about the next statement.
-        if ($minCfvo !== null) { // @phpstan-ignore-line
-            $objWriter->startElementNs($prefix, 'cfvo', null);
-            $objWriter->writeAttribute('type', $minCfvo->getType());
-            if ($minCfvo->getCellFormula()) {
-                $objWriter->writeElement('xm:f', $minCfvo->getCellFormula());
-            }
-            $objWriter->endElement(); //end cfvo
+        // @phpstan-ignore-line
+        $objWriter->startElementNs($prefix, 'cfvo', null);
+        $objWriter->writeAttribute('type', $minCfvo->getType());
+        if ($minCfvo->getCellFormula()) {
+            $objWriter->writeElement('xm:f', $minCfvo->getCellFormula());
         }
+        $objWriter->endElement();
+        //end cfvo
+
 
         $maxCfvo = $dataBar->getMaximumConditionalFormatValueObject();
         // Phpstan is wrong about the next statement.
-        if ($maxCfvo !== null) { // @phpstan-ignore-line
-            $objWriter->startElementNs($prefix, 'cfvo', null);
-            $objWriter->writeAttribute('type', $maxCfvo->getType());
-            if ($maxCfvo->getCellFormula()) {
-                $objWriter->writeElement('xm:f', $maxCfvo->getCellFormula());
-            }
-            $objWriter->endElement(); //end cfvo
+        // @phpstan-ignore-line
+        $objWriter->startElementNs($prefix, 'cfvo', null);
+        $objWriter->writeAttribute('type', $maxCfvo->getType());
+        if ($maxCfvo->getCellFormula()) {
+            $objWriter->writeElement('xm:f', $maxCfvo->getCellFormula());
         }
+        $objWriter->endElement();
+        //end cfvo
+
 
         foreach ($dataBar->getXmlElements() as $elmKey => $elmAttr) {
             /** @var string[] $elmAttr */
@@ -966,7 +968,7 @@ class Worksheet extends WriterPart
 
                 self::writeAttributeIf($objWriter, $conditional->getStopIfTrue(), 'stopIfTrue', '1');
 
-                $cellRange = Coordinate::splitRange(str_replace('$', '', strtoupper($cellCoordinate)));
+                $cellRange = Coordinate::splitRange(str_replace('$', '', strtoupper((string) $cellCoordinate)));
                 [$topLeftCell] = $cellRange[0];
 
                 if (
@@ -1119,9 +1121,9 @@ class Worksheet extends WriterPart
                 $objWriter->writeAttribute('name', $protectedRange->getName());
                 $objWriter->writeAttribute('sqref', $protectedCell);
                 $passwordHash = $protectedRange->getPassword();
-                $this->writeAttributeIf($objWriter, $passwordHash !== '', 'password', $passwordHash);
+                self::writeAttributeIf($objWriter, $passwordHash !== '', 'password', $passwordHash);
                 $securityDescriptor = $protectedRange->getSecurityDescriptor();
-                $this->writeAttributeIf($objWriter, $securityDescriptor !== '', 'securityDescriptor', $securityDescriptor);
+                self::writeAttributeIf($objWriter, $securityDescriptor !== '', 'securityDescriptor', $securityDescriptor);
                 $objWriter->endElement();
             }
 
@@ -1848,7 +1850,7 @@ class Worksheet extends WriterPart
     private function writeExtLst(XMLWriter $objWriter, PhpspreadsheetWorksheet $worksheet): void
     {
         $conditionalFormattingRuleExtList = [];
-        foreach ($worksheet->getConditionalStylesCollection() as $cellCoordinate => $conditionalStyles) {
+        foreach ($worksheet->getConditionalStylesCollection() as $conditionalStyles) {
             /** @var Conditional $conditional */
             foreach ($conditionalStyles as $conditional) {
                 $dataBar = $conditional->getDataBar();

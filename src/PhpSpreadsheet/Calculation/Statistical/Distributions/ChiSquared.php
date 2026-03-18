@@ -116,7 +116,7 @@ class ChiSquared
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function inverseRightTail(mixed $probability, mixed $degrees)
+    public static function inverseRightTail(mixed $probability, mixed $degrees): array|string|int|float
     {
         if (is_array($probability) || is_array($degrees)) {
             return self::evaluateArrayArguments([self::class, __FUNCTION__], $probability, $degrees);
@@ -203,7 +203,8 @@ class ChiSquared
         for ($i = 0; $i < $countActuals; ++$i) {
             if ($expected[$i] == 0.0) {
                 return ExcelError::DIV0();
-            } elseif ($expected[$i] < 0.0) {
+            }
+            if ($expected[$i] < 0.0) {
                 return ExcelError::NAN();
             }
             $result += (($actual[$i] - $expected[$i]) ** 2) / $expected[$i];
@@ -221,7 +222,8 @@ class ChiSquared
     {
         if ($rows === 1) {
             return $columns - 1;
-        } elseif ($columns === 1) {
+        }
+        if ($columns === 1) {
             return $rows - 1;
         }
 

@@ -73,7 +73,7 @@ class Cosine
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function acos($number)
+    public static function acos($number): array|string|float
     {
         if (is_array($number)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
@@ -99,7 +99,7 @@ class Cosine
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function acosh($number)
+    public static function acosh($number): array|string|float
     {
         if (is_array($number)) {
             return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);

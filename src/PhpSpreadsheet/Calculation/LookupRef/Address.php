@@ -65,7 +65,7 @@ class Address
         }
 
         $relativity = ($relativity === null) ? 1 : (int) StringHelper::convertToString($relativity);
-        $referenceStyle = $referenceStyle ?? true;
+        $referenceStyle ??= true;
         $row = (int) StringHelper::convertToString($row);
         $column = (int) StringHelper::convertToString($column);
 

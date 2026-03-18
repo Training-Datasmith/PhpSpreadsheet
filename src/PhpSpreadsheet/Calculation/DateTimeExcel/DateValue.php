@@ -102,9 +102,8 @@ class DateValue
                 }
             }
         }
-        $dateValue = implode(' ', $t1);
 
-        return $dateValue;
+        return implode(' ', $t1);
     }
 
     /**

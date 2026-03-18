@@ -668,10 +668,10 @@ class Theme extends WriterPart
         $objWriter->endElement();
 
         // a:objectDefaults
-        $objWriter->writeElement('a:objectDefaults', null);
+        $objWriter->writeElement('a:objectDefaults');
 
         // a:extraClrSchemeLst
-        $objWriter->writeElement('a:extraClrSchemeLst', null);
+        $objWriter->writeElement('a:extraClrSchemeLst');
 
         $objWriter->endElement();
 

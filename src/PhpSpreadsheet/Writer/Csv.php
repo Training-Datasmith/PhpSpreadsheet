@@ -10,11 +10,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 class Csv extends BaseWriter
 {
     /**
-     * PhpSpreadsheet object.
-     */
-    private Spreadsheet $spreadsheet;
-
-    /**
      * Delimiter.
      */
     private string $delimiter = ',';
@@ -67,9 +62,13 @@ class Csv extends BaseWriter
     /**
      * Create a new CSV.
      */
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(
+        /**
+         * PhpSpreadsheet object.
+         */
+        private readonly Spreadsheet $spreadsheet
+    )
     {
-        $this->spreadsheet = $spreadsheet;
     }
 
     /**
@@ -292,10 +291,10 @@ class Csv extends BaseWriter
                 // if there are more than 15 digits precision.
                 $whole = $matches[2];
                 if ($whole !== '0') {
-                    $wholeLen = strlen($whole);
+                    $wholeLen = strlen((string) $whole);
                     $frac = $matches[3];
                     $maxFracLen = 15 - $wholeLen;
-                    if ($maxFracLen >= 0 && strlen($frac) > $maxFracLen) {
+                    if ($maxFracLen >= 0 && strlen((string) $frac) > $maxFracLen) {
                         $result = sprintf("%.{$maxFracLen}F", $element);
                         if (str_contains($result, '.')) {
                             $element = Preg::replace('/[.]?0+$/', '', $result); // strip trailing zeros
@@ -326,7 +325,7 @@ class Csv extends BaseWriter
 
         // Write to file
         if ($this->outputEncoding != '') {
-            $line = (string) mb_convert_encoding($line, $this->outputEncoding);
+            $line = mb_convert_encoding($line, $this->outputEncoding);
         }
         fwrite($fileHandle, $line);
     }

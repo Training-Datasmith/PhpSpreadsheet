@@ -105,7 +105,8 @@ abstract class Coordinate
         $cellAddress = "$cellAddress";
         if (ctype_digit($cellAddress)) {
             return $worksheet . '$' . $cellAddress;
-        } elseif (ctype_alpha($cellAddress)) {
+        }
+        if (ctype_alpha($cellAddress)) {
             return $worksheet . '$' . strtoupper($cellAddress);
         }
 
@@ -302,7 +303,7 @@ abstract class Coordinate
      *
      * @return array{type: string, firstCoordinate?: string, secondCoordinate?: string, coordinate?: string, worksheet?: string, localReference?: string} reference data
      */
-    private static function validateReferenceAndGetData($reference): array
+    private static function validateReferenceAndGetData(string $reference): array
     {
         $data = [];
         if (1 !== preg_match(self::FULL_REFERENCE_REGEX, $reference, $matches)) {
@@ -399,7 +400,7 @@ abstract class Coordinate
         //        though it's additional memory overhead
         /** @var int[] */
         static $indexCache = [];
-        $columnAddress = $columnAddress ?? '';
+        $columnAddress ??= '';
 
         if (isset($indexCache[$columnAddress])) {
             return $indexCache[$columnAddress];
@@ -525,7 +526,7 @@ abstract class Coordinate
         // Unsure how to satisfy phpstan in line above
 
         $retVal = array_map(
-            fn (string $cellAddress) => ($worksheet !== '') ? "{$quoted}{$worksheet}{$quoted}!{$cellAddress}" : $cellAddress,
+            fn (string $cellAddress): string => ($worksheet !== '') ? "{$quoted}{$worksheet}{$quoted}!{$cellAddress}" : $cellAddress,
             self::sortCellReferenceArray($cellList)
         );
 

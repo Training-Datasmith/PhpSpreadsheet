@@ -24,7 +24,7 @@ class VLookup extends LookupBase
      *
      * @return mixed The value of the found cell
      */
-    public static function lookup(mixed $lookupValue, $lookupArray, mixed $indexNumber, mixed $notExactMatch = true): mixed
+    public static function lookup(mixed $lookupValue, array $lookupArray, mixed $indexNumber, mixed $notExactMatch = true): mixed
     {
         if (is_array($lookupValue) || is_array($indexNumber)) {
             return self::evaluateArrayArgumentsIgnore([self::class, __FUNCTION__], 1, $lookupValue, $lookupArray, $indexNumber, $notExactMatch);
@@ -50,7 +50,7 @@ class VLookup extends LookupBase
 
         if (!$notExactMatch) {
             /** @var callable $callable */
-            $callable = [self::class, 'vlookupSort'];
+            $callable = self::vlookupSort(...);
             uasort($lookupArray, $callable);
         }
 
@@ -71,16 +71,10 @@ class VLookup extends LookupBase
      */
     private static function vlookupSort(array $a, array $b): int
     {
-        reset($a);
-        $firstColumn = key($a);
+        $firstColumn = array_key_first($a);
         $aLower = StringHelper::strToLower((string) $a[$firstColumn]);
         $bLower = StringHelper::strToLower((string) $b[$firstColumn]);
-
-        if ($aLower == $bLower) {
-            return 0;
-        }
-
-        return ($aLower < $bLower) ? -1 : 1;
+        return $aLower <=> $bLower;
     }
 
     /**

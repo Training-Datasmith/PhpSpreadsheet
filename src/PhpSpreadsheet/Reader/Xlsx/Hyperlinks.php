@@ -9,14 +9,11 @@ use SimpleXMLElement;
 
 class Hyperlinks
 {
-    private Worksheet $worksheet;
-
     /** @var string[] */
     private array $hyperlinks = [];
 
-    public function __construct(Worksheet $workSheet)
+    public function __construct(private readonly Worksheet $worksheet)
     {
-        $this->worksheet = $workSheet;
     }
 
     public function readHyperlinks(SimpleXMLElement $relsWorksheet): void
@@ -45,7 +42,7 @@ class Hyperlinks
         foreach (Coordinate::extractAllCellReferencesInRange($attributes->ref) as $cellReference) {
             $cell = $worksheet->getCell($cellReference);
             if (isset($attributes['location'])) {
-                $cell->getHyperlink()->setUrl('sheet://' . (string) $attributes['location']);
+                $cell->getHyperlink()->setUrl('sheet://' . $attributes['location']);
             } elseif (isset($linkRel['id'])) {
                 $hyperlinkUrl = $this->hyperlinks[(string) $linkRel['id']] ?? '';
                 $cell->getHyperlink()->setUrl($hyperlinkUrl);

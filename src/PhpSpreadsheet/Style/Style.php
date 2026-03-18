@@ -497,7 +497,7 @@ class Style extends Supervisor
              * checkBox?: bool,
              * quotePrefix?: bool} $styleArray */
             if (isset($styleArray['checkBox'])) {
-                $this->checkBox = (bool) $styleArray['checkBox'];
+                $this->checkBox = $styleArray['checkBox'];
             }
             if (isset($styleArray['fill'])) {
                 $this->getFill()
@@ -708,7 +708,7 @@ class Style extends Supervisor
                 ->getStyle($this->getSelectedCells())
                 ->applyFromArray($styleArray);
         } else {
-            $this->quotePrefix = (bool) $quotePrefix;
+            $this->quotePrefix = $quotePrefix;
         }
 
         return $this;
@@ -753,7 +753,7 @@ class Style extends Supervisor
             . $this->protection->getHashCode()
             . ($this->quotePrefix ? 't' : 'f')
             . ($this->checkBox ? 't' : 'f')
-            . __CLASS__
+            . self::class
         );
     }
 

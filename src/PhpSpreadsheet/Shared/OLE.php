@@ -233,9 +233,7 @@ class OLE
             $path .= '&blockId=' . $blockIdOrPps;
         }
 
-        $resource = fopen($path, 'rb') ?: throw new Exception("Unable to open stream $path");
-
-        return $resource;
+        return fopen($path, 'rb') ?: throw new Exception("Unable to open stream $path");
     }
 
     /**
@@ -534,7 +532,7 @@ class OLE
      *
      * @return float|int The Unix timestamp corresponding to the string
      */
-    public static function OLE2LocalDate(string $oleTimestamp)
+    public static function OLE2LocalDate(string $oleTimestamp): float|int
     {
         if (strlen($oleTimestamp) != 8) {
             throw new ReaderException('Expecting 8 byte string');

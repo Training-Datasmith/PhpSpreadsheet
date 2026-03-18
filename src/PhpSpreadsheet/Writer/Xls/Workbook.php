@@ -49,11 +49,6 @@ use PhpOffice\PhpSpreadsheet\Style\Style;
 // */
 class Workbook extends BIFFwriter
 {
-    /**
-     * Formula parser.
-     */
-    private Parser $parser;
-
     /*
      * The BIFF file size for the workbook. Not currently used.
      *
@@ -78,17 +73,12 @@ class Workbook extends BIFFwriter
     /**
      * The codepage indicates the text encoding used for strings.
      */
-    private int $codepage;
+    private readonly int $codepage;
 
     /**
      * The country code used for localization.
      */
-    private int $countryCode;
-
-    /**
-     * Workbook.
-     */
-    private Spreadsheet $spreadsheet;
+    private readonly int $countryCode;
 
     /**
      * Fonts writers.
@@ -135,19 +125,19 @@ class Workbook extends BIFFwriter
     /**
      * Total number of shared strings in workbook.
      */
-    private int $stringTotal;
+    private readonly int $stringTotal;
 
     /**
      * Number of unique shared strings in workbook.
      */
-    private int $stringUnique;
+    private readonly int $stringUnique;
 
     /**
      * Array of unique shared strings in workbook.
      *
      * @var array<string, int>
      */
-    private array $stringTable;
+    private readonly array $stringTable;
 
     /**
      * Color cache.
@@ -171,12 +161,10 @@ class Workbook extends BIFFwriter
      * @param int[] $colors Colour Table
      * @param Parser $parser The formula parser created for the Workbook
      */
-    public function __construct(Spreadsheet $spreadsheet, int &$str_total, int &$str_unique, array &$str_table, array &$colors, Parser $parser)
+    public function __construct(private readonly Spreadsheet $spreadsheet, int &$str_total, int &$str_unique, array &$str_table, array &$colors, private readonly Parser $parser)
     {
         // It needs to call its parent's constructor explicitly
         parent::__construct();
-
-        $this->parser = $parser;
         //$this->biffSize = 0;
         $this->palette = [];
         $this->countryCode = -1;
@@ -187,14 +175,12 @@ class Workbook extends BIFFwriter
         $this->colors = &$colors;
         $this->setPaletteXl97();
 
-        $this->spreadsheet = $spreadsheet;
-
         $this->codepage = 0x04B0;
 
         // Add empty sheets and Build color cache
-        $countSheets = $spreadsheet->getSheetCount();
+        $countSheets = $this->spreadsheet->getSheetCount();
         for ($i = 0; $i < $countSheets; ++$i) {
-            $phpSheet = $spreadsheet->getSheet($i);
+            $phpSheet = $this->spreadsheet->getSheet($i);
 
             $this->parser->setExtSheet($phpSheet->getTitle(), $i); // Register worksheet name with parser
 
@@ -532,7 +518,7 @@ class Workbook extends BIFFwriter
             $splitRanges
         );
 
-        $lengths = array_map([StringHelper::class, 'strlenAllowNull'], array_column($splitRanges[0], 0));
+        $lengths = array_map(StringHelper::strlenAllowNull(...), array_column($splitRanges[0], 0));
         $offsets = array_column($splitRanges[0], 1);
 
         $worksheets = $splitRanges[2];
@@ -583,33 +569,31 @@ class Workbook extends BIFFwriter
 
         // Named ranges
         $definedNames = $this->spreadsheet->getDefinedNames();
-        if (count($definedNames) > 0) {
-            // Loop named ranges
-            foreach ($definedNames as $definedName) {
-                $range = $this->parseDefinedNameValue($definedName);
+        // Loop named ranges
+        foreach ($definedNames as $definedName) {
+            $range = $this->parseDefinedNameValue($definedName);
 
-                // parse formula
-                try {
-                    $this->parser->parse($range);
-                    $formulaData = $this->parser->toReversePolish();
+            // parse formula
+            try {
+                $this->parser->parse($range);
+                $formulaData = $this->parser->toReversePolish();
 
-                    // make sure tRef3d is of type tRef3dR (0x3A)
-                    if (isset($formulaData[0]) && ($formulaData[0] == "\x7A" || $formulaData[0] == "\x5A")) {
-                        $formulaData = "\x3A" . substr($formulaData, 1);
-                    }
-
-                    if ($definedName->getLocalOnly()) {
-                        // local scope
-                        $scopeWs = $definedName->getScope();
-                        $scope = ($scopeWs === null) ? 0 : ($this->spreadsheet->getIndex($scopeWs) + 1);
-                    } else {
-                        // global scope
-                        $scope = 0;
-                    }
-                    $chunk .= $this->writeData($this->writeDefinedNameBiff8($definedName->getName(), $formulaData, $scope, false));
-                } catch (PhpSpreadsheetException) {
-                    // do nothing
+                // make sure tRef3d is of type tRef3dR (0x3A)
+                if (isset($formulaData[0]) && ($formulaData[0] == "\x7A" || $formulaData[0] == "\x5A")) {
+                    $formulaData = "\x3A" . substr($formulaData, 1);
                 }
+
+                if ($definedName->getLocalOnly()) {
+                    // local scope
+                    $scopeWs = $definedName->getScope();
+                    $scope = ($scopeWs === null) ? 0 : ($this->spreadsheet->getIndex($scopeWs) + 1);
+                } else {
+                    // global scope
+                    $scope = 0;
+                }
+                $chunk .= $this->writeData($this->writeDefinedNameBiff8($definedName->getName(), $formulaData, $scope, false));
+            } catch (PhpSpreadsheetException) {
+                // do nothing
             }
         }
 

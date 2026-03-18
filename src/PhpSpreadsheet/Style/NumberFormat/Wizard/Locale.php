@@ -15,7 +15,7 @@ final class Locale
      */
     public const STRUCTURE = '/^(?P<language>[a-z]{2})([-_](?P<script>[a-z]{4}))?([-_](?P<country>[a-z]{2}))?$/i';
 
-    private NumberFormatter $formatter;
+    private readonly NumberFormatter $formatter;
 
     public function __construct(?string $locale, int $style)
     {
