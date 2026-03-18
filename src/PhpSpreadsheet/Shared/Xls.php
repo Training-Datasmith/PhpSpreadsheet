@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Shared;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;

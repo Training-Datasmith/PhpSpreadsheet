@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Ods\Cell;
 
 use PhpOffice\PhpSpreadsheet\Helper\Dimension;
@@ -76,11 +78,11 @@ class Style
                 );
 
                 break;
-            //case Fill::FILL_GRADIENT_LINEAR:
-            //case Fill::FILL_GRADIENT_PATH:
-            // TODO :: To be implemented
-            //break;
-            //default:
+                //case Fill::FILL_GRADIENT_LINEAR:
+                //case Fill::FILL_GRADIENT_PATH:
+                // TODO :: To be implemented
+                //break;
+                //default:
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls\Style;
 
 use PhpOffice\PhpSpreadsheet\Style\Border;

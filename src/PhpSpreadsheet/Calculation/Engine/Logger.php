@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Engine;
 
 class Logger
@@ -34,8 +36,7 @@ class Logger
          * The calculation engine cell reference stack.
          */
         private readonly CyclicReferenceStack $cellStack
-    )
-    {
+    ) {
     }
 
     /**

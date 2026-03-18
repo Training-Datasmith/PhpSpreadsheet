@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Chart;
 
 use PhpOffice\PhpSpreadsheet\Settings;
@@ -86,26 +88,31 @@ class Chart
     public function __construct(/**
      * Chart Name.
      */
-    private string $name, /**
+        private string $name, /**
      * Chart Title.
      */
-    private ?Title $title = null, /**
+        private ?Title $title = null, /**
      * Chart Legend.
      */
-    private ?Legend $legend = null, /**
+        private ?Legend $legend = null, /**
      * Chart Plot Area.
      */
-    private ?PlotArea $plotArea = null, /**
+        private ?PlotArea $plotArea = null, /**
      * Plot Visible Only.
      */
-    private bool $plotVisibleOnly = true, string $displayBlanksAs = DataSeries::DEFAULT_EMPTY_AS, /**
+        private bool $plotVisibleOnly = true,
+        string $displayBlanksAs = DataSeries::DEFAULT_EMPTY_AS, /**
      * X-Axis Label.
      */
-    private ?Title $xAxisLabel = null, /**
+        private ?Title $xAxisLabel = null, /**
      * Y-Axis Label.
      */
-    private ?Title $yAxisLabel = null, private ?Axis $xAxis = new Axis(), private ?Axis $yAxis = new Axis(), ?GridLines $majorGridlines = null, ?GridLines $minorGridlines = null)
-    {
+        private ?Title $yAxisLabel = null,
+        private ?Axis $xAxis = new Axis(),
+        private ?Axis $yAxis = new Axis(),
+        ?GridLines $majorGridlines = null,
+        ?GridLines $minorGridlines = null
+    ) {
         $this->setDisplayBlanksAs($displayBlanksAs);
         if ($majorGridlines !== null) {
             $this->yAxis->setMajorGridlines($majorGridlines);

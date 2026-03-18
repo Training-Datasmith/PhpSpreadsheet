@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Exception;
@@ -7,12 +9,12 @@ use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 
 class ConvertDecimal extends ConvertBase
 {
-    const LARGEST_OCTAL_IN_DECIMAL = 536870911;
-    const SMALLEST_OCTAL_IN_DECIMAL = -536870912;
-    const LARGEST_BINARY_IN_DECIMAL = 511;
-    const SMALLEST_BINARY_IN_DECIMAL = -512;
-    const LARGEST_HEX_IN_DECIMAL = 549755813887;
-    const SMALLEST_HEX_IN_DECIMAL = -549755813888;
+    public const LARGEST_OCTAL_IN_DECIMAL = 536870911;
+    public const SMALLEST_OCTAL_IN_DECIMAL = -536870912;
+    public const LARGEST_BINARY_IN_DECIMAL = 511;
+    public const SMALLEST_BINARY_IN_DECIMAL = -512;
+    public const LARGEST_HEX_IN_DECIMAL = 549755813887;
+    public const SMALLEST_HEX_IN_DECIMAL = -549755813888;
 
     /**
      * toBinary.

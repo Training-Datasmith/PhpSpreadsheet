@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter;
 
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
@@ -7,14 +9,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter;
 
 class Column
 {
-    const AUTOFILTER_FILTERTYPE_FILTER = 'filters';
-    const AUTOFILTER_FILTERTYPE_CUSTOMFILTER = 'customFilters';
+    public const AUTOFILTER_FILTERTYPE_FILTER = 'filters';
+    public const AUTOFILTER_FILTERTYPE_CUSTOMFILTER = 'customFilters';
     //    Supports no more than 2 rules, with an And/Or join criteria
     //        if more than 1 rule is defined
-    const AUTOFILTER_FILTERTYPE_DYNAMICFILTER = 'dynamicFilter';
+    public const AUTOFILTER_FILTERTYPE_DYNAMICFILTER = 'dynamicFilter';
     //    Even though the filter rule is constant, the filtered data can vary
     //        e.g. filtered by date = TODAY
-    const AUTOFILTER_FILTERTYPE_TOPTENFILTER = 'top10';
+    public const AUTOFILTER_FILTERTYPE_TOPTENFILTER = 'top10';
 
     /**
      * Types of autofilter rules.
@@ -33,8 +35,8 @@ class Column
     ];
 
     // Multiple Rule Connections
-    const AUTOFILTER_COLUMN_JOIN_AND = 'and';
-    const AUTOFILTER_COLUMN_JOIN_OR = 'or';
+    public const AUTOFILTER_COLUMN_JOIN_AND = 'and';
+    public const AUTOFILTER_COLUMN_JOIN_OR = 'or';
 
     /**
      * Join options for autofilter rules.

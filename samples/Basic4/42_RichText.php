@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Helper\Html as HtmlHelper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 

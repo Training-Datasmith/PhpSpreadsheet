@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Exception;
@@ -375,13 +377,13 @@ class Sort extends LookupRefValidations
 
         return $sortedArray;
 
-//        uksort(
-//            $lookupArray,
-//            function (int $a, int $b) use (array $sortVector) {
-//                return $sortVector[$a] <=> $sortVector[$b];
-//            }
-//        );
-//
-//        return $lookupArray;
+        //        uksort(
+        //            $lookupArray,
+        //            function (int $a, int $b) use (array $sortVector) {
+        //                return $sortVector[$a] <=> $sortVector[$b];
+        //            }
+        //        );
+        //
+        //        return $lookupArray;
     }
 }

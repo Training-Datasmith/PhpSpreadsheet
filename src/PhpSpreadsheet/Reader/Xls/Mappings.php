@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 class Mappings
@@ -10,7 +12,7 @@ class Mappings
      * First element of array is Excel function name.
      * Second element of array is number of arguments.
      */
-    const TFUNC_MAPPINGS = [
+    public const TFUNC_MAPPINGS = [
         2 => ['ISNA', 1],
         3 => ['ISERROR', 1],
         10 => ['NA', 0],
@@ -178,7 +180,7 @@ class Mappings
      * Key is tFuncV value.
      * Value is Excel function name.
      */
-    const TFUNCV_MAPPINGS = [
+    public const TFUNCV_MAPPINGS = [
         0 => 'COUNT',
         1 => 'IF',
         4 => 'SUM',

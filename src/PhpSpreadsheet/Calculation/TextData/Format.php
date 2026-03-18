@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
 
 use Composer\Pcre\Preg;

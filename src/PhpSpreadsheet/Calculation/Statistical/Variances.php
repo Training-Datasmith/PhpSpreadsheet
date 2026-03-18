@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
@@ -75,8 +77,7 @@ class Variances extends VarianceBase
                 return ExcelError::VALUE();
             }
             if ((is_string($arg)) && (!Functions::isMatrixValue($k))) {
-            }
-            else {
+            } else {
                 // Is it a numeric value?
                 if ((is_numeric($arg)) || (is_bool($arg)) || ((is_string($arg) && ($arg != '')))) {
                     $arg = self::datatypeAdjustmentAllowStrings($arg);
@@ -166,8 +167,7 @@ class Variances extends VarianceBase
                 return ExcelError::VALUE();
             }
             if ((is_string($arg)) && (!Functions::isMatrixValue($k))) {
-            }
-            else {
+            } else {
                 // Is it a numeric value?
                 if ((is_numeric($arg)) || (is_bool($arg)) || ((is_string($arg) && ($arg != '')))) {
                     $arg = self::datatypeAdjustmentAllowStrings($arg);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\Wizard;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;

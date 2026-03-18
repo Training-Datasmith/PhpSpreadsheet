@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ErfPreciseTest extends AllSetupTeardown
 {
-    const ERF_PRECISION = 1E-14;
+    public const ERF_PRECISION = 1E-14;
 
     #[DataProvider('providerERFPRECISE')]
     public function testDirectCallToERFPRECISE(mixed $expectedResult, mixed ...$args): void

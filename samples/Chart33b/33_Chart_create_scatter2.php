@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Chart\Axis as ChartAxis;
 use PhpOffice\PhpSpreadsheet\Chart\AxisText;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;

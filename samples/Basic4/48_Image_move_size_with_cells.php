@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Create new Spreadsheet object
 use PhpOffice\PhpSpreadsheet\Helper\Dimension;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;

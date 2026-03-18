@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Engine\ArrayArgumentHelper;

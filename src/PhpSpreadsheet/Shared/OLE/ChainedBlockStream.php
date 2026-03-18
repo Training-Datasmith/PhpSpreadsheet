@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Shared\OLE;
 
-use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Shared\OLE;
 
 class ChainedBlockStream

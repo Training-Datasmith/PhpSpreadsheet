@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Shared;
 
 use PhpOffice\PhpSpreadsheet\Exception as SpException;
@@ -7,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Protection;
 
 class PasswordHasher
 {
-    const MAX_PASSWORD_LENGTH = 255;
+    public const MAX_PASSWORD_LENGTH = 255;
 
     /**
      * Get algorithm name for PHP.

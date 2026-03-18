@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ImRealTest extends AllSetupTeardown
 {
-    const COMPLEX_PRECISION = 1E-12;
+    public const COMPLEX_PRECISION = 1E-12;
 
     #[DataProvider('providerIMREAL')]
     public function testDirectCallToIMREAL(float|int|string $expectedResult, float|int|string $arg): void

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
@@ -17,8 +19,8 @@ class Font
     public function __construct(/**
      * Font.
      */
-    private readonly \PhpOffice\PhpSpreadsheet\Style\Font $font)
-    {
+        private readonly \PhpOffice\PhpSpreadsheet\Style\Font $font
+    ) {
         $this->colorIndex = 0x7FFF;
     }
 

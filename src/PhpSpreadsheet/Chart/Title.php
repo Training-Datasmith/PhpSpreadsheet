@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Chart;
 
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
@@ -30,11 +32,12 @@ class Title
     public function __construct(/**
      * Title Caption.
      */
-    private array|RichText|string $caption = '', /**
+        private array|RichText|string $caption = '', /**
      * Title Layout.
      */
-    private ?Layout $layout = null, bool $overlay = false)
-    {
+        private ?Layout $layout = null,
+        bool $overlay = false
+    ) {
         $this->setOverlay($overlay);
     }
 

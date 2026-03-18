@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use DateTime;
@@ -54,7 +56,7 @@ class AutoFilter implements Stringable
     public function __construct(AddressRange|string|array $range = '', /**
      * Autofilter Worksheet.
      */
-    private ?Worksheet $workSheet = null)
+        private ?Worksheet $workSheet = null)
     {
         if ($range !== '') {
             [, $range] = Worksheet::extractSheetTitle(Validations::validateCellRange($range), true);

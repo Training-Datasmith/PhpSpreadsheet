@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\NamedRange;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;

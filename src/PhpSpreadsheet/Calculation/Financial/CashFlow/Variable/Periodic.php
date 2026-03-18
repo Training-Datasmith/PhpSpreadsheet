@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Variable;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
@@ -7,9 +9,9 @@ use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 
 class Periodic
 {
-    const FINANCIAL_MAX_ITERATIONS = 128;
+    public const FINANCIAL_MAX_ITERATIONS = 128;
 
-    const FINANCIAL_PRECISION = 1.0e-08;
+    public const FINANCIAL_PRECISION = 1.0e-08;
 
     /**
      * IRR.

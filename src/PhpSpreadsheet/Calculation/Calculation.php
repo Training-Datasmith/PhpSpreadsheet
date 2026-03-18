@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation;
 
 use Composer\Pcre\Preg; // many pregs in this program use u modifier, which has side-effects which make it unsuitable for this
@@ -31,36 +33,36 @@ class Calculation extends CalculationLocale
     /** Constants                */
     /** Regular Expressions        */
     //    Numeric operand
-    const CALCULATION_REGEXP_NUMBER = '[-+]?\d*\.?\d+(e[-+]?\d+)?';
+    public const CALCULATION_REGEXP_NUMBER = '[-+]?\d*\.?\d+(e[-+]?\d+)?';
     //    String operand
-    const CALCULATION_REGEXP_STRING = '"(?:[^"]|"")*"';
+    public const CALCULATION_REGEXP_STRING = '"(?:[^"]|"")*"';
     //    Opening bracket
-    const CALCULATION_REGEXP_OPENBRACE = '\(';
+    public const CALCULATION_REGEXP_OPENBRACE = '\(';
     //    Function (allow for the old @ symbol that could be used to prefix a function, but we'll ignore it)
-    const CALCULATION_REGEXP_FUNCTION = '@?(?:_xlfn\.)?(?:_xlws\.)?((?:__xludf\.)?[\p{L}][\p{L}\p{N}\.]*)[\s]*\(';
+    public const CALCULATION_REGEXP_FUNCTION = '@?(?:_xlfn\.)?(?:_xlws\.)?((?:__xludf\.)?[\p{L}][\p{L}\p{N}\.]*)[\s]*\(';
     //    Cell reference, with or without a sheet reference)
-    const CALCULATION_REGEXP_CELLREF = '((([^\s,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?\$?\b([a-z]{1,3})\$?(\d{1,7})(?![\w.])';
+    public const CALCULATION_REGEXP_CELLREF = '((([^\s,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?\$?\b([a-z]{1,3})\$?(\d{1,7})(?![\w.])';
     // Used only to detect spill operator #
-    const CALCULATION_REGEXP_CELLREF_SPILL = '/' . self::CALCULATION_REGEXP_CELLREF . '#/i';
+    public const CALCULATION_REGEXP_CELLREF_SPILL = '/' . self::CALCULATION_REGEXP_CELLREF . '#/i';
     //    Cell reference (with or without a sheet reference) ensuring absolute/relative
-    const CALCULATION_REGEXP_CELLREF_RELATIVE = '((([^\s\(,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?(\$?\b[a-z]{1,3})(\$?\d{1,7})(?![\w.])';
-    const CALCULATION_REGEXP_COLUMN_RANGE = '(((([^\s\(,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\".(?:[^\"]|\"[^!])?\"))!)?(\$?[a-z]{1,3})):(?![.*])';
-    const CALCULATION_REGEXP_ROW_RANGE = '(((([^\s\(,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?(\$?[1-9][0-9]{0,6})):(?![.*])';
+    public const CALCULATION_REGEXP_CELLREF_RELATIVE = '((([^\s\(,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?(\$?\b[a-z]{1,3})(\$?\d{1,7})(?![\w.])';
+    public const CALCULATION_REGEXP_COLUMN_RANGE = '(((([^\s\(,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\".(?:[^\"]|\"[^!])?\"))!)?(\$?[a-z]{1,3})):(?![.*])';
+    public const CALCULATION_REGEXP_ROW_RANGE = '(((([^\s\(,!&%^\/\*\+<>=:`-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?(\$?[1-9][0-9]{0,6})):(?![.*])';
     //    Cell reference (with or without a sheet reference) ensuring absolute/relative
     //    Cell ranges ensuring absolute/relative
-    const CALCULATION_REGEXP_COLUMNRANGE_RELATIVE = '(\$?[a-z]{1,3}):(\$?[a-z]{1,3})';
-    const CALCULATION_REGEXP_ROWRANGE_RELATIVE = '(\$?\d{1,7}):(\$?\d{1,7})';
+    public const CALCULATION_REGEXP_COLUMNRANGE_RELATIVE = '(\$?[a-z]{1,3}):(\$?[a-z]{1,3})';
+    public const CALCULATION_REGEXP_ROWRANGE_RELATIVE = '(\$?\d{1,7}):(\$?\d{1,7})';
     //    Defined Names: Named Range of cells, or Named Formulae
-    const CALCULATION_REGEXP_DEFINEDNAME = '((([^\s,!&%^\/\*\+<>=-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?([_\p{L}][_\p{L}\p{N}\.]*)';
+    public const CALCULATION_REGEXP_DEFINEDNAME = '((([^\s,!&%^\/\*\+<>=-]*)|(\'(?:[^\']|\'[^!])+?\')|(\"(?:[^\"]|\"[^!])+?\"))!)?([_\p{L}][_\p{L}\p{N}\.]*)';
     // Structured Reference (Fully Qualified and Unqualified)
-    const CALCULATION_REGEXP_STRUCTURED_REFERENCE = '([\p{L}_\\\][\p{L}\p{N}\._]+)?(\[(?:[^\d\]+-])?)';
+    public const CALCULATION_REGEXP_STRUCTURED_REFERENCE = '([\p{L}_\\\][\p{L}\p{N}\._]+)?(\[(?:[^\d\]+-])?)';
     //    Error
-    const CALCULATION_REGEXP_ERROR = '\#[A-Z][A-Z0_\/]*[!\?]?';
+    public const CALCULATION_REGEXP_ERROR = '\#[A-Z][A-Z0_\/]*[!\?]?';
 
     /** constants */
-    const RETURN_ARRAY_AS_ERROR = 'error';
-    const RETURN_ARRAY_AS_VALUE = 'value';
-    const RETURN_ARRAY_AS_ARRAY = 'array';
+    public const RETURN_ARRAY_AS_ERROR = 'error';
+    public const RETURN_ARRAY_AS_VALUE = 'value';
+    public const RETURN_ARRAY_AS_ARRAY = 'array';
 
     /** Preferable to use instance variable instanceArrayReturnType rather than this static property. */
     private static string $returnArrayAsType = self::RETURN_ARRAY_AS_VALUE;
@@ -190,8 +192,8 @@ class Calculation extends CalculationLocale
     public function __construct(/**
      * Instance of the spreadsheet this Calculation Engine is using.
      */
-    private readonly ?Spreadsheet $spreadsheet = null)
-    {
+        private readonly ?Spreadsheet $spreadsheet = null
+    ) {
         $this->cyclicReferenceStack = new CyclicReferenceStack();
         $this->debugLog = new Logger($this->cyclicReferenceStack);
         $this->branchPruner = new BranchPruner($this->branchPruningEnabled);
@@ -962,8 +964,7 @@ class Calculation extends CalculationLocale
                 $typeString = 'a boolean';
             } elseif (is_array($value)) {
                 $typeString = 'a matrix';
-            }
-            else {
+            } else {
                 /** @var string $value */
                 if ($value == '') {
                     return 'an empty string';
@@ -1072,7 +1073,7 @@ class Calculation extends CalculationLocale
         . '(?::' . self::CALCULATION_REGEXP_CELLREF . ')?' // optional range address, non-capturing
         . '|' . self::CALCULATION_REGEXP_DEFINEDNAME
         . ')'
-        ;
+    ;
 
     public const UNIONABLE_COMMAS = '/((?:[,(]|^)\s*)' // comma or open paren or start of string, followed by optional whitespace
         . '([(]' // open paren
@@ -1784,7 +1785,7 @@ class Calculation extends CalculationLocale
                         }
 
                         break;
-                    // Binary Operators
+                        // Binary Operators
                     case ':': // Range
                         if ($operand1Data['type'] === 'Error') {
                             $stack->push($operand1Data['type'], $operand1Data['value']);
@@ -2536,17 +2537,17 @@ class Calculation extends CalculationLocale
                     $result = $operand1 + $operand2;
 
                     break;
-                //    Subtraction
+                    //    Subtraction
                 case '-':
                     $result = $operand1 - $operand2;
 
                     break;
-                //    Multiplication
+                    //    Multiplication
                 case '*':
                     $result = $operand1 * $operand2;
 
                     break;
-                //    Division
+                    //    Division
                 case '/':
                     if ($operand2 == 0) {
                         //    Trap for Divide by Zero error
@@ -2558,7 +2559,7 @@ class Calculation extends CalculationLocale
                     $result = $operand1 / $operand2;
 
                     break;
-                //    Power
+                    //    Power
                 case '^':
                     $result = $operand1 ** $operand2;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader\Xml\Style;
 
 use PhpOffice\PhpSpreadsheet\Style\Alignment as AlignmentStyles;

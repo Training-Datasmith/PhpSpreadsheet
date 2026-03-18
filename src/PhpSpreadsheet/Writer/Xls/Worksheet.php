@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 use Composer\Pcre\Preg;
@@ -773,10 +775,10 @@ class Worksheet extends BIFFwriter
         return 0;
     }
 
-    const WRITE_FORMULA_NORMAL = 0;
-    const WRITE_FORMULA_ERRORS = -1;
-    const WRITE_FORMULA_RANGE = -2;
-    const WRITE_FORMULA_EXCEPTION = -3;
+    public const WRITE_FORMULA_NORMAL = 0;
+    public const WRITE_FORMULA_ERRORS = -1;
+    public const WRITE_FORMULA_RANGE = -2;
+    public const WRITE_FORMULA_EXCEPTION = -3;
 
     private static bool $allowThrow = false;
 

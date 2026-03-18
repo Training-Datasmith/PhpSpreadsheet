@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -22,8 +24,7 @@ class Iterator implements \Iterator
          * Spreadsheet to iterate.
          */
         private readonly Spreadsheet $subject
-    )
-    {
+    ) {
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 

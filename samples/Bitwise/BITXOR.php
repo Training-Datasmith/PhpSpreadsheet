@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 require __DIR__ . '/../Header.php';

@@ -40,14 +40,14 @@ class OdsPropertiesTest extends AbstractFunctional
 
         $properties = $spreadsheet->getProperties();
         // Core Properties
-//        self::assertSame('Mark Baker', $properties->getCreator());
+        //        self::assertSame('Mark Baker', $properties->getCreator());
         self::assertSame('Property Test File', $properties->getTitle());
         self::assertSame('Testing for Properties', $properties->getSubject());
         self::assertSame('TEST ODS PHPSpreadsheet', $properties->getKeywords());
 
         // Extended Properties
-//        self::assertSame('PHPOffice', $properties->getCompany());
-//        self::assertSame('The Big Boss', $properties->getManager());
+        //        self::assertSame('PHPOffice', $properties->getCompany());
+        //        self::assertSame('The Big Boss', $properties->getManager());
 
         // Custom Properties
         $customProperties = $properties->getCustomProperties();
@@ -85,14 +85,14 @@ class OdsPropertiesTest extends AbstractFunctional
 
         $properties = $spreadsheet->getProperties();
         // Core Properties
-//        self::assertSame('Mark Baker', $properties->getCreator());
+        //        self::assertSame('Mark Baker', $properties->getCreator());
         self::assertSame('Property Test File', $properties->getTitle());
         self::assertSame('Testing for Properties', $properties->getSubject());
         self::assertSame('TEST ODS PHPSpreadsheet', $properties->getKeywords());
 
         // Extended Properties
-//        self::assertSame('PHPOffice', $properties->getCompany());
-//        self::assertSame('The Big Boss', $properties->getManager());
+        //        self::assertSame('PHPOffice', $properties->getCompany());
+        //        self::assertSame('The Big Boss', $properties->getManager());
 
         // Custom Properties
         $customProperties = $properties->getCustomProperties();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Ods;
 
 use PhpOffice\PhpSpreadsheet\Writer\Ods;
@@ -22,8 +24,7 @@ abstract class WriterPart
          * Parent Ods object.
          */
         private readonly Ods $parentWriter
-    )
-    {
+    ) {
     }
 
     abstract public function write(): string;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class Theme
@@ -22,8 +24,7 @@ class Theme
          * Colour Map.
          */
         private array $colourMap
-    )
-    {
+    ) {
     }
 
     /**

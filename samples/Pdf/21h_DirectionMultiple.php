@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Html as HtmlWriter;
 
@@ -29,7 +31,7 @@ $helper->write(
     __FILE__,
     ['Html', 'Mpdf'],
     writerCallback: function (HtmlWriter $writer): void {
-            $writer->writeAllSheets();
+        $writer->writeAllSheets();
     }
 );
 

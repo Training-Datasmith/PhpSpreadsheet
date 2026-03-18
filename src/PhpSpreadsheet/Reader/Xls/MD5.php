@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;

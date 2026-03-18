@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Chart;
 
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -40,8 +42,7 @@ class PlotArea
          * Plot Series.
          */
         private array $plotSeries = []
-    )
-    {
+    ) {
     }
 
     public function getLayout(): ?Layout

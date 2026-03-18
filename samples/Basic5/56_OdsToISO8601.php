@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require __DIR__ . '/../Header.php';
 
 use PhpOffice\PhpSpreadsheet\Helper\Sample;

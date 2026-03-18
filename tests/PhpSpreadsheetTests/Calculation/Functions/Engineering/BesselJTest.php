@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class BesselJTest extends TestCase
 {
-    const BESSEL_PRECISION = 1E-8;
+    public const BESSEL_PRECISION = 1E-8;
 
     #[DataProvider('providerBESSELJ')]
     public function testDirectCallToBESSELJ(mixed $expectedResult, mixed ...$args): void

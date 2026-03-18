@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as Reader;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx as Writer;

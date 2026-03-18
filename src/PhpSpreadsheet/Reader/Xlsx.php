@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
 use Composer\Pcre\Preg;
@@ -48,7 +50,7 @@ use ZipArchive;
 
 class Xlsx extends BaseReader
 {
-    const INITIAL_FILE = '_rels/.rels';
+    public const INITIAL_FILE = '_rels/.rels';
 
     /**
      * ReferenceHelper instance.

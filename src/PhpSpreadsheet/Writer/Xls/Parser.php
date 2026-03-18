@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 use Composer\Pcre\Preg;
@@ -41,7 +43,7 @@ class Parser
     //         *:/\?[]
     // Moreover, there are valid sheet title characters that cannot occur in unquoted form (there may be more?)
     // +-% '^&<>=,;#()"{}
-    const REGEX_SHEET_TITLE_UNQUOTED = '[^\*\:\/\\\\\?\[\]\+\-\% \\\'\^\&\<\>\=\,\;\#\(\)\"\{\}]+';
+    public const REGEX_SHEET_TITLE_UNQUOTED = '[^\*\:\/\\\\\?\[\]\+\-\% \\\'\^\&\<\>\=\,\;\#\(\)\"\{\}]+';
 
     // Sheet title in quoted form (without surrounding quotes)
     // Invalid sheet title characters cannot occur in the sheet title:
@@ -50,16 +52,16 @@ class Parser
     // Former value for this constant led to "catastrophic backtracking",
     //     unable to handle double apostrophes.
     //     (*COMMIT) should prevent this.
-    const REGEX_SHEET_TITLE_QUOTED = "([^*:/\\\\?\\[\\]']|'')+";
+    public const REGEX_SHEET_TITLE_QUOTED = "([^*:/\\\\?\\[\\]']|'')+";
 
-    const REGEX_CELL_TITLE_QUOTED = "~^'"
+    public const REGEX_CELL_TITLE_QUOTED = "~^'"
         . self::REGEX_SHEET_TITLE_QUOTED
         . '(:' . self::REGEX_SHEET_TITLE_QUOTED . ')?'
         . "'!(*COMMIT)"
         . '[$]?[A-Ia-i]?[A-Za-z][$]?(\d+)'
         . '$~u';
 
-    const REGEX_RANGE_TITLE_QUOTED = "~^'"
+    public const REGEX_RANGE_TITLE_QUOTED = "~^'"
         . self::REGEX_SHEET_TITLE_QUOTED
         . '(:' . self::REGEX_SHEET_TITLE_QUOTED . ')?'
         . "'!(*COMMIT)"

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\Securities;
 
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\YearFrac;

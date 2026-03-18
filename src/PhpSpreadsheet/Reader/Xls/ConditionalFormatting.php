@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
@@ -64,7 +66,7 @@ class ConditionalFormatting extends Xls
         }
 
         // offset: 0; size: 2; Rule Count
-//        $ruleCount = self::getUInt2d($recordData, 0);
+        //        $ruleCount = self::getUInt2d($recordData, 0);
 
         // offset: var; size: var; cell range address list with
         $cellRangeAddressList = ($xls->version == self::XLS_BIFF8)

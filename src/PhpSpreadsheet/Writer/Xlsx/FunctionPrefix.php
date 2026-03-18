@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use Composer\Pcre\Preg;
@@ -7,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
 
 class FunctionPrefix
 {
-    const XLFNREGEXP = '/(?:_xlfn\.)?((?:_xlws\.)?\b('
+    public const XLFNREGEXP = '/(?:_xlfn\.)?((?:_xlws\.)?\b('
         // functions added with Excel 2010
         . 'beta[.]dist'
         . '|beta[.]inv'
@@ -176,7 +178,7 @@ class FunctionPrefix
         . '|xmatch'
         . '))\s*\(/Umui';
 
-    const XLWSREGEXP = '/(?<!_xlws\.)('
+    public const XLWSREGEXP = '/(?<!_xlws\.)('
         // functions added with Excel 365
         . 'filter'
         . '|sort'

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;

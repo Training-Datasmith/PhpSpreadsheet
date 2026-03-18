@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ImAbsTest extends AllSetupTeardown
 {
-    const COMPLEX_PRECISION = 1E-12;
+    public const COMPLEX_PRECISION = 1E-12;
 
     #[DataProvider('providerIMABS')]
     public function testDirectCallToIMABS(float|int|string $expectedResult, string $arg): void

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
 use Closure;
@@ -39,7 +41,7 @@ use ZipArchive;
 
 class Ods extends BaseReader
 {
-    const INITIAL_FILE = 'content.xml';
+    public const INITIAL_FILE = 'content.xml';
 
     /**
      * Create a new Ods Reader instance.

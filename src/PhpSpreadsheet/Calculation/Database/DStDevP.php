@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;

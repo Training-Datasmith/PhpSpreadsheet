@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Internal;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -74,30 +76,30 @@ class ExcelArrayPseudoFunctions
         // Set the result for our target cell (with spillage)
         // But if we do write it, we get problems with #SPILL! Errors if the spreadsheet is saved
         // TODO How are we going to identify and handle a #SPILL! or a #CALC! error?
-//        IOFactory::setLoading(true);
-//        $worksheet->fromArray(
-//            $result,
-//            null,
-//            $coordinate,
-//            true
-//        );
-//        IOFactory::setLoading(true);
+        //        IOFactory::setLoading(true);
+        //        $worksheet->fromArray(
+        //            $result,
+        //            null,
+        //            $coordinate,
+        //            true
+        //        );
+        //        IOFactory::setLoading(true);
 
         // Calculate the array formula range that we should set for our target, based on our target cell coordinate
-//        [$col, $row] = Coordinate::indexesFromString($coordinate);
-//        $row += count($result) - 1;
-//        $col = Coordinate::stringFromColumnIndex($col + count($result[0]) - 1);
-//        $arrayFormulaRange = "{$coordinate}:{$col}{$row}";
-//        $formulaAttributes = ['t' => 'array', 'ref' => $arrayFormulaRange];
+        //        [$col, $row] = Coordinate::indexesFromString($coordinate);
+        //        $row += count($result) - 1;
+        //        $col = Coordinate::stringFromColumnIndex($col + count($result[0]) - 1);
+        //        $arrayFormulaRange = "{$coordinate}:{$col}{$row}";
+        //        $formulaAttributes = ['t' => 'array', 'ref' => $arrayFormulaRange];
 
         // Using fromArray() would reset the value for this cell with the calculation result
         //      as well as updating the spillage cells,
         //  so we need to restore this cell to its formula value, attributes, and datatype
-//        $cell = $worksheet->getCell($coordinate);
-//        $cell->setValueExplicit($value, DataType::TYPE_FORMULA, true, $arrayFormulaRange);
-//        $cell->setFormulaAttributes($formulaAttributes);
+        //        $cell = $worksheet->getCell($coordinate);
+        //        $cell->setValueExplicit($value, DataType::TYPE_FORMULA, true, $arrayFormulaRange);
+        //        $cell->setFormulaAttributes($formulaAttributes);
 
-//        $cell->updateInCollection();
+        //        $cell->updateInCollection();
 
         return $result;
     }

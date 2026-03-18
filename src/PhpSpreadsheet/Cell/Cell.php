@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Cell;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -97,8 +99,10 @@ class Cell implements Stringable
     public function __construct(/**
      * Value of the cell.
      */
-    private mixed $value, ?string $dataType, Worksheet $worksheet)
-    {
+        private mixed $value,
+        ?string $dataType,
+        Worksheet $worksheet
+    ) {
         // Set worksheet cache
         $this->parent = $worksheet->getCellCollection();
 

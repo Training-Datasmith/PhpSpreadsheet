@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
 use Composer\Pcre\Preg;
@@ -733,7 +735,7 @@ class Xls extends XlsBase
             } else {
                 //    Set comment for the cell
                 $this->phpSheet->getComment($cellAddress)->setText($this->parseRichText($noteText));
-//                                                    ->setAuthor($author)
+                //                                                    ->setAuthor($author)
             }
         }
     }

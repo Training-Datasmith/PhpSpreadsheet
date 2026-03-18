@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ErfCTest extends AllSetupTeardown
 {
-    const ERF_PRECISION = 1E-14;
+    public const ERF_PRECISION = 1E-14;
 
     #[DataProvider('providerERFC')]
     public function testDirectCallToERFC(mixed $expectedResult, mixed ...$args): void

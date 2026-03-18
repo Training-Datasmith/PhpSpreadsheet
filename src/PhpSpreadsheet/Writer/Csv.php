@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer;
 
 use Composer\Pcre\Preg;
@@ -67,8 +69,7 @@ class Csv extends BaseWriter
          * PhpSpreadsheet object.
          */
         private readonly Spreadsheet $spreadsheet
-    )
-    {
+    ) {
     }
 
     /**

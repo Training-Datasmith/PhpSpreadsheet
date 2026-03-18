@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ImArgumentTest extends AllSetupTeardown
 {
-    const COMPLEX_PRECISION = 1E-12;
+    public const COMPLEX_PRECISION = 1E-12;
 
     #[DataProvider('providerIMARGUMENT')]
     public function testDirectCallToIMARGUMENT(float|int|string $expectedResult, string $arg): void

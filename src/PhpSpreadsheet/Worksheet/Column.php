@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 class Column
@@ -13,8 +15,7 @@ class Column
          * Column index.
          */
         private readonly string $columnIndex = 'A'
-    )
-    {
+    ) {
     }
 
     /**

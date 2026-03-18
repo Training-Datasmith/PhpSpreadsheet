@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use PhpOffice\PhpSpreadsheet\Cell\Hyperlink;
@@ -10,9 +12,9 @@ use SimpleXMLElement;
 
 class BaseDrawing implements IComparable
 {
-    const EDIT_AS_ABSOLUTE = 'absolute';
-    const EDIT_AS_ONECELL = 'oneCell';
-    const EDIT_AS_TWOCELL = 'twoCell';
+    public const EDIT_AS_ABSOLUTE = 'absolute';
+    public const EDIT_AS_ONECELL = 'oneCell';
+    public const EDIT_AS_TWOCELL = 'twoCell';
     private const VALID_EDIT_AS = [
         self::EDIT_AS_ABSOLUTE,
         self::EDIT_AS_ONECELL,

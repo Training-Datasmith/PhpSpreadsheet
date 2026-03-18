@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Information;
 
 use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
@@ -297,7 +299,7 @@ class Value
             //    Range of cells is an error
             if (Functions::isCellValue($a)) {
                 return 16;
-            //    Test for Matrix
+                //    Test for Matrix
             } elseif (Functions::isMatrixValue($a)) {
                 return 64;
             }

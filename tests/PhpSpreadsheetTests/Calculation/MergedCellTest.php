@@ -104,7 +104,7 @@ class MergedCellTest extends TestCase
 
         $dataSheet = $spreadSheet->getActiveSheet();
         // TODO - Reinstate full validation and disallow single cell merging for version 2.0
-//        $this->setBadRange($dataSheet, 'B1');
+        //        $this->setBadRange($dataSheet, 'B1');
         $this->setBadRange($dataSheet, 'Invalid');
         $this->setBadRange($dataSheet, '1');
         $this->setBadRange($dataSheet, 'C');

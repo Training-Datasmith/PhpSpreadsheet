@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use Composer\Pcre\Preg;
@@ -706,7 +708,6 @@ class Worksheet extends WriterPart
         $objWriter->endElement();
         //end cfvo
 
-
         $maxCfvo = $dataBar->getMaximumConditionalFormatValueObject();
         // Phpstan is wrong about the next statement.
         // @phpstan-ignore-line
@@ -717,7 +718,6 @@ class Worksheet extends WriterPart
         }
         $objWriter->endElement();
         //end cfvo
-
 
         foreach ($dataBar->getXmlElements() as $elmKey => $elmAttr) {
             /** @var string[] $elmAttr */

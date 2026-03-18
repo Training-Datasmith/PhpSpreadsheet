@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
 
 use Composer\Pcre\Preg;

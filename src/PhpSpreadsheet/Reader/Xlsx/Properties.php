@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Document\Properties as DocumentProperties;

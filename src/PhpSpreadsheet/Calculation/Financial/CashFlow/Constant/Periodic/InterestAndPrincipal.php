@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Constant\Periodic;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Financial\Constants as FinancialConstants;

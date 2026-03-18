@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -41,8 +43,7 @@ class Escher
          * The object we are writing.
          */
         private readonly Blip|BSE|BstoreContainer|DgContainer|DggContainer|Escher|SpContainer|SpgrContainer|SharedEscher $object
-    )
-    {
+    ) {
     }
 
     /**

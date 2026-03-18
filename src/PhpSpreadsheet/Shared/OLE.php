@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Shared;
 
 // vim: set expandtab tabstop=4 shiftwidth=4:
@@ -42,12 +44,12 @@ $GLOBALS['_OLE_INSTANCES'] = [];
  */
 class OLE
 {
-    const OLE_PPS_TYPE_ROOT = 5;
-    const OLE_PPS_TYPE_DIR = 1;
-    const OLE_PPS_TYPE_FILE = 2;
-    const OLE_DATA_SIZE_SMALL = 0x1000;
-    const OLE_LONG_INT_SIZE = 4;
-    const OLE_PPS_SIZE = 0x80;
+    public const OLE_PPS_TYPE_ROOT = 5;
+    public const OLE_PPS_TYPE_DIR = 1;
+    public const OLE_PPS_TYPE_FILE = 2;
+    public const OLE_DATA_SIZE_SMALL = 0x1000;
+    public const OLE_LONG_INT_SIZE = 4;
+    public const OLE_PPS_SIZE = 0x80;
 
     /**
      * The file handle for reading an OLE container.

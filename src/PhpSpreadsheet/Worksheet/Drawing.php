@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
@@ -7,7 +9,7 @@ use ZipArchive;
 
 class Drawing extends BaseDrawing
 {
-    const IMAGE_TYPES_CONVERTION_MAP = [
+    public const IMAGE_TYPES_CONVERTION_MAP = [
         IMAGETYPE_GIF => IMAGETYPE_PNG,
         IMAGETYPE_JPEG => IMAGETYPE_JPEG,
         IMAGETYPE_PNG => IMAGETYPE_PNG,
@@ -112,7 +114,7 @@ class Drawing extends BaseDrawing
                     $this->setSizesAndType($path);
                 }
             }
-        // Check if a URL has been passed. https://stackoverflow.com/a/2058596/1252979
+            // Check if a URL has been passed. https://stackoverflow.com/a/2058596/1252979
         } elseif (filter_var($path, FILTER_VALIDATE_URL) || (preg_match('/^([\w\s\x00-\x1f]+):/u', $path) && !preg_match('/^([\w]+):/u', $path))) {
             if (!preg_match('/^(http|https|file|ftp|s3):/', $path)) {
                 throw new PhpSpreadsheetException('Invalid protocol for linked drawing');

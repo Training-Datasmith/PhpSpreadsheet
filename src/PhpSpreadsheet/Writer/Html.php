@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer;
 
 use Composer\Pcre\Preg;
@@ -201,8 +203,8 @@ class Html extends BaseWriter
     public function __construct(/**
      * Spreadsheet object.
      */
-    protected Spreadsheet $spreadsheet)
-    {
+        protected Spreadsheet $spreadsheet
+    ) {
         $this->defaultFont = $this->spreadsheet->getDefaultStyle()->getFont();
         $calc = Calculation::getInstance($this->spreadsheet);
         $this->getTrue = $calc->getTRUE();
@@ -324,8 +326,8 @@ class Html extends BaseWriter
         return Alignment::HORIZONTAL_ALIGNMENT_FOR_HTML[$hAlign] ?? '';
     }
 
-    const BORDER_NONE = 'none';
-    const BORDER_ARR = [
+    public const BORDER_NONE = 'none';
+    public const BORDER_ARR = [
         Border::BORDER_NONE => self::BORDER_NONE,
         Border::BORDER_DASHDOT => '1px dashed',
         Border::BORDER_DASHDOTDOT => '1px dotted',

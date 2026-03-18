@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
 use DOMAttr;
@@ -34,7 +36,7 @@ class Html extends BaseReader
     /**
      * Sample size to read to determine if it's HTML or not.
      */
-    const TEST_SAMPLE_SIZE = 2048;
+    public const TEST_SAMPLE_SIZE = 2048;
 
     private const STARTS_WITH_BOM = '/^(?:\xfe\xff|\xff\xfe|\xEF\xBB\xBF)/';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
 
 use PhpOffice\PhpSpreadsheet\Style\Conditional;
@@ -7,7 +9,7 @@ use SimpleXMLElement;
 
 class ConditionalFormattingRuleExtension
 {
-    const CONDITION_EXTENSION_DATABAR = 'dataBar';
+    public const CONDITION_EXTENSION_DATABAR = 'dataBar';
 
     private string $id;
 
@@ -20,7 +22,7 @@ class ConditionalFormattingRuleExtension
      * ConditionalFormattingRuleExtension constructor.
      */
     public function __construct(?string $id = null, /** @var string Conditional Formatting Rule */
-    private string $cfRule = self::CONDITION_EXTENSION_DATABAR)
+        private string $cfRule = self::CONDITION_EXTENSION_DATABAR)
     {
         if (null === $id) {
             $this->id = '{' . $this->generateUuid() . '}';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Cell;
 
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -23,7 +25,7 @@ abstract class Coordinate
      *
      * @var string
      */
-    const DEFAULT_RANGE = 'A1:A1';
+    public const DEFAULT_RANGE = 'A1:A1';
 
     /**
      * Convert string coordinate to [0 => int column index, 1 => int row index].

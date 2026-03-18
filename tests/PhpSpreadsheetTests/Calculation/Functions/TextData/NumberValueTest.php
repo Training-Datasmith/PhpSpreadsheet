@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class NumberValueTest extends AllSetupTeardown
 {
-    const NV_PRECISION = 1.0E-8;
+    public const NV_PRECISION = 1.0E-8;
 
     #[DataProvider('providerNUMBERVALUE')]
     public function testNUMBERVALUE(mixed $expectedResult, mixed $number = 'omitted', mixed $decimal = 'omitted', mixed $group = 'omitted'): void

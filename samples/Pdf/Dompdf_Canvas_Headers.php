@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Dompdf\Canvas;
 use Dompdf\FontMetrics;
 use PhpOffice\PhpSpreadsheet\IOFactory;

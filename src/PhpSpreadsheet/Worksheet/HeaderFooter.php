@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 /**
@@ -66,30 +68,30 @@ namespace PhpOffice\PhpSpreadsheet\Worksheet;
 class HeaderFooter
 {
     // Header/footer image location
-    const IMAGE_HEADER_LEFT = 'LH';
-    const IMAGE_HEADER_LEFT_ODD = 'LH';
-    const IMAGE_HEADER_LEFT_FIRST = 'LHFIRST';
-    const IMAGE_HEADER_LEFT_EVEN = 'LHEVEN';
-    const IMAGE_HEADER_CENTER = 'CH';
-    const IMAGE_HEADER_CENTER_ODD = 'CH';
-    const IMAGE_HEADER_CENTER_FIRST = 'CHFIRST';
-    const IMAGE_HEADER_CENTER_EVEN = 'CHEVEN';
-    const IMAGE_HEADER_RIGHT = 'RH';
-    const IMAGE_HEADER_RIGHT_ODD = 'RH';
-    const IMAGE_HEADER_RIGHT_FIRST = 'RHFIRST';
-    const IMAGE_HEADER_RIGHT_EVEN = 'RHEVEN';
-    const IMAGE_FOOTER_LEFT = 'LF';
-    const IMAGE_FOOTER_LEFT_ODD = 'LF';
-    const IMAGE_FOOTER_LEFT_FIRST = 'LFFIRST';
-    const IMAGE_FOOTER_LEFT_EVEN = 'LFEVEN';
-    const IMAGE_FOOTER_CENTER = 'CF';
-    const IMAGE_FOOTER_CENTER_ODD = 'CF';
-    const IMAGE_FOOTER_CENTER_FIRST = 'CFFIRST';
-    const IMAGE_FOOTER_CENTER_EVEN = 'CFEVEN';
-    const IMAGE_FOOTER_RIGHT = 'RF';
-    const IMAGE_FOOTER_RIGHT_ODD = 'RF';
-    const IMAGE_FOOTER_RIGHT_FIRST = 'RFFIRST';
-    const IMAGE_FOOTER_RIGHT_EVEN = 'RFEVEN';
+    public const IMAGE_HEADER_LEFT = 'LH';
+    public const IMAGE_HEADER_LEFT_ODD = 'LH';
+    public const IMAGE_HEADER_LEFT_FIRST = 'LHFIRST';
+    public const IMAGE_HEADER_LEFT_EVEN = 'LHEVEN';
+    public const IMAGE_HEADER_CENTER = 'CH';
+    public const IMAGE_HEADER_CENTER_ODD = 'CH';
+    public const IMAGE_HEADER_CENTER_FIRST = 'CHFIRST';
+    public const IMAGE_HEADER_CENTER_EVEN = 'CHEVEN';
+    public const IMAGE_HEADER_RIGHT = 'RH';
+    public const IMAGE_HEADER_RIGHT_ODD = 'RH';
+    public const IMAGE_HEADER_RIGHT_FIRST = 'RHFIRST';
+    public const IMAGE_HEADER_RIGHT_EVEN = 'RHEVEN';
+    public const IMAGE_FOOTER_LEFT = 'LF';
+    public const IMAGE_FOOTER_LEFT_ODD = 'LF';
+    public const IMAGE_FOOTER_LEFT_FIRST = 'LFFIRST';
+    public const IMAGE_FOOTER_LEFT_EVEN = 'LFEVEN';
+    public const IMAGE_FOOTER_CENTER = 'CF';
+    public const IMAGE_FOOTER_CENTER_ODD = 'CF';
+    public const IMAGE_FOOTER_CENTER_FIRST = 'CFFIRST';
+    public const IMAGE_FOOTER_CENTER_EVEN = 'CFEVEN';
+    public const IMAGE_FOOTER_RIGHT = 'RF';
+    public const IMAGE_FOOTER_RIGHT_ODD = 'RF';
+    public const IMAGE_FOOTER_RIGHT_FIRST = 'RFFIRST';
+    public const IMAGE_FOOTER_RIGHT_EVEN = 'RFEVEN';
 
     /**
      * OddHeader.

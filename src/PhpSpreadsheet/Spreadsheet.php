@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet;
 
 use Composer\Pcre\Preg;
@@ -19,9 +21,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class Spreadsheet implements JsonSerializable
 {
     // Allowable values for workbook window visibility
-    const VISIBILITY_VISIBLE = 'visible';
-    const VISIBILITY_HIDDEN = 'hidden';
-    const VISIBILITY_VERY_HIDDEN = 'veryHidden';
+    public const VISIBILITY_VISIBLE = 'visible';
+    public const VISIBILITY_HIDDEN = 'hidden';
+    public const VISIBILITY_VERY_HIDDEN = 'veryHidden';
 
     private const DEFINED_NAME_IS_RANGE = false;
     private const DEFINED_NAME_IS_FORMULA = true;

@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+declare(strict_types=1);
+
 /**
  * This will check that the "current patch" does not add or modify lines that contain types as PHPDoc when we can express
  * them with PHP native types. The "current patch" is either the file about to be committed, the non-committed file, or

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
 
 use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
@@ -10,7 +12,7 @@ class BitWise
 {
     use ArrayEnabled;
 
-    const SPLIT_DIVISOR = 2 ** 24;
+    public const SPLIT_DIVISOR = 2 ** 24;
 
     /**
      * Split a number into upper and lower portions for full 32-bit support.

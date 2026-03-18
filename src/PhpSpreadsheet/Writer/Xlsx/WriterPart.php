@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -22,7 +24,6 @@ abstract class WriterPart
          * Parent Xlsx object.
          */
         private readonly Xlsx $parentWriter
-    )
-    {
+    ) {
     }
 }

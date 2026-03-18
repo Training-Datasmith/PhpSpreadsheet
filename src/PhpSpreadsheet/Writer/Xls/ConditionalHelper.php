@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
@@ -21,8 +23,7 @@ class ConditionalHelper
          * Formula parser.
          */
         protected Parser $parser
-    )
-    {
+    ) {
     }
 
     public function processCondition(mixed $condition, string $cellRange): void

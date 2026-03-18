@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Style;
 
 class Protection extends Supervisor
 {
     /** Protection styles */
-    const PROTECTION_INHERIT = 'inherit';
-    const PROTECTION_PROTECTED = 'protected';
-    const PROTECTION_UNPROTECTED = 'unprotected';
+    public const PROTECTION_INHERIT = 'inherit';
+    public const PROTECTION_PROTECTED = 'protected';
+    public const PROTECTION_UNPROTECTED = 'unprotected';
 
     /**
      * Locked.

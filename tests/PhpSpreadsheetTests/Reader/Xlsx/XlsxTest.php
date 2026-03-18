@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class XlsxTest extends TestCase
 {
-    const XLSX_PRECISION = 1.0E-8;
+    public const XLSX_PRECISION = 1.0E-8;
 
     public function testLoadXlsxRowColumnAttributes(): void
     {

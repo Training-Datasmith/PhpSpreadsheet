@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
@@ -18,10 +20,10 @@ class ReferenceHelper
     /**    Regular Expressions      */
     private const SHEETNAME_PART = '((\w*|\'[^!]*\')!)';
     private const SHEETNAME_PART_WITH_SLASHES = '/' . self::SHEETNAME_PART . '/';
-    const REFHELPER_REGEXP_CELLREF = self::SHEETNAME_PART . '?(?<![:a-z1-9_\.\$])(\$?[a-z]{1,3}\$?\d+)(?=[^:!\d\'])';
-    const REFHELPER_REGEXP_CELLRANGE = self::SHEETNAME_PART . '?(\$?[a-z]{1,3}\$?\d+):(\$?[a-z]{1,3}\$?\d+)';
-    const REFHELPER_REGEXP_ROWRANGE = self::SHEETNAME_PART . '?(\$?\d+):(\$?\d+)';
-    const REFHELPER_REGEXP_COLRANGE = self::SHEETNAME_PART . '?(\$?[a-z]{1,3}):(\$?[a-z]{1,3})';
+    public const REFHELPER_REGEXP_CELLREF = self::SHEETNAME_PART . '?(?<![:a-z1-9_\.\$])(\$?[a-z]{1,3}\$?\d+)(?=[^:!\d\'])';
+    public const REFHELPER_REGEXP_CELLRANGE = self::SHEETNAME_PART . '?(\$?[a-z]{1,3}\$?\d+):(\$?[a-z]{1,3}\$?\d+)';
+    public const REFHELPER_REGEXP_ROWRANGE = self::SHEETNAME_PART . '?(\$?\d+):(\$?\d+)';
+    public const REFHELPER_REGEXP_COLRANGE = self::SHEETNAME_PART . '?(\$?[a-z]{1,3}):(\$?[a-z]{1,3})';
 
     /**
      * Instance of this class.

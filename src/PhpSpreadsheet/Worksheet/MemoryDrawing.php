@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use GdImage;
@@ -9,18 +11,18 @@ use PhpOffice\PhpSpreadsheet\Shared\File;
 class MemoryDrawing extends BaseDrawing
 {
     // Rendering functions
-    const RENDERING_DEFAULT = 'imagepng';
-    const RENDERING_PNG = 'imagepng';
-    const RENDERING_GIF = 'imagegif';
-    const RENDERING_JPEG = 'imagejpeg';
+    public const RENDERING_DEFAULT = 'imagepng';
+    public const RENDERING_PNG = 'imagepng';
+    public const RENDERING_GIF = 'imagegif';
+    public const RENDERING_JPEG = 'imagejpeg';
 
     // MIME types
-    const MIMETYPE_DEFAULT = 'image/png';
-    const MIMETYPE_PNG = 'image/png';
-    const MIMETYPE_GIF = 'image/gif';
-    const MIMETYPE_JPEG = 'image/jpeg';
+    public const MIMETYPE_DEFAULT = 'image/png';
+    public const MIMETYPE_PNG = 'image/png';
+    public const MIMETYPE_GIF = 'image/gif';
+    public const MIMETYPE_JPEG = 'image/jpeg';
 
-    const SUPPORTED_MIME_TYPES = [
+    public const SUPPORTED_MIME_TYPES = [
         self::MIMETYPE_GIF,
         self::MIMETYPE_JPEG,
         self::MIMETYPE_PNG,

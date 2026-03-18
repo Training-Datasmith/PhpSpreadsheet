@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
@@ -210,9 +212,9 @@ class Averages extends AggregateBase
     {
         return array_filter(
             $args,
-            
-                // Is it a numeric value?
-                fn($value): bool => is_numeric($value) && (!is_string($value))
+
+            // Is it a numeric value?
+            fn ($value): bool => is_numeric($value) && (!is_string($value))
         );
     }
 

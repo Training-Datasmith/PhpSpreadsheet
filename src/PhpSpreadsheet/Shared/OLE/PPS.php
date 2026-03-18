@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Shared\OLE;
 
 // vim: set expandtab tabstop=4 shiftwidth=4:
@@ -108,7 +110,7 @@ class PPS
     public function __construct(?int $No, ?string $name, ?int $type, ?int $prev, ?int $next, ?int $dir, $time_1st, $time_2nd, ?string $data, /**
      * Array of child PPS's (only used by Root and Dir PPS's).
      */
-    public array $children)
+        public array $children)
     {
         $this->No = (int) $No;
         $this->Name = (string) $name;

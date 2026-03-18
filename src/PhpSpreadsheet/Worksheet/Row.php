@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 class Row
@@ -13,8 +15,7 @@ class Row
          * Row index.
          */
         private readonly int $rowIndex = 1
-    )
-    {
+    ) {
     }
 
     /**

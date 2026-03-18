@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Pdf;
 
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;

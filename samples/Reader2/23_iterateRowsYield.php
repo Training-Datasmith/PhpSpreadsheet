@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Use rangeToArrayYieldRows() to efficiently iterate over all rows.
  */

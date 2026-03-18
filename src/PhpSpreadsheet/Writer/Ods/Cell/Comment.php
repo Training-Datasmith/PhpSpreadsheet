@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer\Ods\Cell;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpOffice\PhpSpreadsheet\Reader\Csv as CsvReader;
 use PhpOffice\PhpSpreadsheet\Writer\Csv as CsvWriter;
 

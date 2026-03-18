@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use Composer\Pcre\Preg;
@@ -20,9 +22,9 @@ class Validations
     {
         if (is_string($cellAddress)) {
             [$worksheet, $address] = Worksheet::extractSheetTitle($cellAddress, true);
-//            if (!empty($worksheet) && $worksheet !== $this->getTitle()) {
-//                throw new Exception('Reference is not for this worksheet');
-//            }
+            //            if (!empty($worksheet) && $worksheet !== $this->getTitle()) {
+            //                throw new Exception('Reference is not for this worksheet');
+            //            }
 
             return empty($worksheet) ? strtoupper("$address") : $worksheet . '!' . strtoupper("$address");
         }

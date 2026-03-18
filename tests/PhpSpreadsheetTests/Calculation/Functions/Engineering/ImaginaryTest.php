@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ImaginaryTest extends AllSetupTeardown
 {
-    const COMPLEX_PRECISION = 1E-12;
+    public const COMPLEX_PRECISION = 1E-12;
 
     #[DataProvider('providerIMAGINARY')]
     public function testDirectCallToIMAGINARY(float|int|string $expectedResult, float|int|string $arg): void

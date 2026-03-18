@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class ConvertUoMTest extends AllSetupTeardown
 {
-    const UOM_PRECISION = 1E-12;
+    public const UOM_PRECISION = 1E-12;
 
     public function testGetConversionGroups(): void
     {

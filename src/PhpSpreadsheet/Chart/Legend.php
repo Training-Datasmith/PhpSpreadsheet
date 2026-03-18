@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Chart;
 
 class Legend
 {
     /** Legend positions */
-    const XL_LEGEND_POSITION_BOTTOM = -4107; //    Below the chart.
-    const XL_LEGEND_POSITION_CORNER = 2; //    In the upper right-hand corner of the chart border.
-    const XL_LEGEND_POSITION_CUSTOM = -4161; //    A custom position.
-    const XL_LEGEND_POSITION_LEFT = -4131; //    Left of the chart.
-    const XL_LEGEND_POSITION_RIGHT = -4152; //    Right of the chart.
-    const XL_LEGEND_POSITION_TOP = -4160; //    Above the chart.
+    public const XL_LEGEND_POSITION_BOTTOM = -4107; //    Below the chart.
+    public const XL_LEGEND_POSITION_CORNER = 2; //    In the upper right-hand corner of the chart border.
+    public const XL_LEGEND_POSITION_CUSTOM = -4161; //    A custom position.
+    public const XL_LEGEND_POSITION_LEFT = -4131; //    Left of the chart.
+    public const XL_LEGEND_POSITION_RIGHT = -4152; //    Right of the chart.
+    public const XL_LEGEND_POSITION_TOP = -4160; //    Above the chart.
 
-    const POSITION_RIGHT = 'r';
-    const POSITION_LEFT = 'l';
-    const POSITION_BOTTOM = 'b';
-    const POSITION_TOP = 't';
-    const POSITION_TOPRIGHT = 'tr';
+    public const POSITION_RIGHT = 'r';
+    public const POSITION_LEFT = 'l';
+    public const POSITION_BOTTOM = 'b';
+    public const POSITION_TOP = 't';
+    public const POSITION_TOPRIGHT = 'tr';
 
-    const POSITION_XLREF = [
+    public const POSITION_XLREF = [
         self::XL_LEGEND_POSITION_BOTTOM => self::POSITION_BOTTOM,
         self::XL_LEGEND_POSITION_CORNER => self::POSITION_TOPRIGHT,
         self::XL_LEGEND_POSITION_CUSTOM => '??',
@@ -49,7 +51,7 @@ class Legend
     public function __construct(string $position = self::POSITION_RIGHT, /**
      * Legend Layout.
      */
-    private ?Layout $layout = null, bool $overlay = false)
+        private ?Layout $layout = null, bool $overlay = false)
     {
         $this->setPosition($position);
         $this->setOverlay($overlay);

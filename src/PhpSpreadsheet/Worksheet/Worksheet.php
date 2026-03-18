@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Worksheet;
 
 use ArrayObject;
@@ -60,7 +62,7 @@ class Worksheet
      *
      * @var int
      */
-    const SHEET_TITLE_MAXIMUM_LENGTH = 31;
+    public const SHEET_TITLE_MAXIMUM_LENGTH = 31;
 
     /**
      * Invalid characters in sheet title.
@@ -319,8 +321,9 @@ class Worksheet
     public function __construct(/**
      * Parent spreadsheet.
      */
-    private ?Spreadsheet $parent = null, string $title = 'Worksheet')
-    {
+        private ?Spreadsheet $parent = null,
+        string $title = 'Worksheet'
+    ) {
         $this->setTitle($title, false);
         // setTitle can change $pTitle
         $this->setCodeName($this->getTitle());

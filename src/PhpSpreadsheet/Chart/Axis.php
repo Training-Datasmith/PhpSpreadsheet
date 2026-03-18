@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Chart;
 
 /**
@@ -10,13 +12,13 @@ namespace PhpOffice\PhpSpreadsheet\Chart;
  */
 class Axis extends Properties
 {
-    const AXIS_TYPE_CATEGORY = 'catAx';
-    const AXIS_TYPE_DATE = 'dateAx';
-    const AXIS_TYPE_VALUE = 'valAx';
+    public const AXIS_TYPE_CATEGORY = 'catAx';
+    public const AXIS_TYPE_DATE = 'dateAx';
+    public const AXIS_TYPE_VALUE = 'valAx';
 
-    const TIME_UNIT_DAYS = 'days';
-    const TIME_UNIT_MONTHS = 'months';
-    const TIME_UNIT_YEARS = 'years';
+    public const TIME_UNIT_DAYS = 'days';
+    public const TIME_UNIT_MONTHS = 'months';
+    public const TIME_UNIT_YEARS = 'years';
 
     public function __construct()
     {

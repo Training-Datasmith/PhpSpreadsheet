@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Samples\Sample12;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;

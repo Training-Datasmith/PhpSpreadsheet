@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Shared\OLE\PPS;
 
 // vim: set expandtab tabstop=4 shiftwidth=4:

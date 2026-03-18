@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Writer;
 
 use PhpOffice\PhpSpreadsheet\Shared\File;

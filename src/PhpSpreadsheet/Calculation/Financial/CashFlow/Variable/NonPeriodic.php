@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Variable;
 
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
@@ -10,11 +12,11 @@ use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 
 class NonPeriodic
 {
-    const FINANCIAL_MAX_ITERATIONS = 128;
+    public const FINANCIAL_MAX_ITERATIONS = 128;
 
-    const FINANCIAL_PRECISION = 1.0e-08;
+    public const FINANCIAL_PRECISION = 1.0e-08;
 
-    const DEFAULT_GUESS = 0.1;
+    public const DEFAULT_GUESS = 0.1;
 
     /**
      * XIRR.
@@ -170,7 +172,8 @@ class NonPeriodic
                 //* @phpstan-ignore-line
                 return ExcelError::VALUE();
             }
-            if ($fld > 0) { $foundpos = true;
+            if ($fld > 0) {
+                $foundpos = true;
             } elseif ($fld < 0) {
                 $foundneg = true;
             }

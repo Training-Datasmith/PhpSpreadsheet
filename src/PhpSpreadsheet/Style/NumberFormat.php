@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpSpreadsheet\Style;
 
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
@@ -7,49 +9,49 @@ use PhpOffice\PhpSpreadsheet\RichText\RichText;
 class NumberFormat extends Supervisor
 {
     // Pre-defined formats
-    const FORMAT_GENERAL = 'General';
+    public const FORMAT_GENERAL = 'General';
 
-    const FORMAT_TEXT = '@';
+    public const FORMAT_TEXT = '@';
 
-    const FORMAT_NUMBER = '0';
-    const FORMAT_NUMBER_0 = '0.0';
-    const FORMAT_NUMBER_00 = '0.00';
-    const FORMAT_NUMBER_COMMA_SEPARATED1 = '#,##0.00';
-    const FORMAT_NUMBER_COMMA_SEPARATED2 = '#,##0.00_-';
+    public const FORMAT_NUMBER = '0';
+    public const FORMAT_NUMBER_0 = '0.0';
+    public const FORMAT_NUMBER_00 = '0.00';
+    public const FORMAT_NUMBER_COMMA_SEPARATED1 = '#,##0.00';
+    public const FORMAT_NUMBER_COMMA_SEPARATED2 = '#,##0.00_-';
 
-    const FORMAT_PERCENTAGE = '0%';
-    const FORMAT_PERCENTAGE_0 = '0.0%';
-    const FORMAT_PERCENTAGE_00 = '0.00%';
+    public const FORMAT_PERCENTAGE = '0%';
+    public const FORMAT_PERCENTAGE_0 = '0.0%';
+    public const FORMAT_PERCENTAGE_00 = '0.00%';
 
-    const FORMAT_DATE_YYYYMMDD = 'yyyy-mm-dd';
-    const FORMAT_DATE_DDMMYYYY = 'dd/mm/yyyy';
-    const FORMAT_DATE_DMYSLASH = 'd"/"m"/"yy';
-    const FORMAT_DATE_DMYMINUS = 'd-m-yy';
-    const FORMAT_DATE_DMMINUS = 'd-m';
-    const FORMAT_DATE_MYMINUS = 'm-yy';
-    const FORMAT_DATE_XLSX14 = 'mm-dd-yy';
-    const FORMAT_DATE_XLSX14_ACTUAL = 'm/d/yyyy';
-    const FORMAT_DATE_XLSX15 = 'd-mmm-yy';
-    const FORMAT_DATE_XLSX15_YYYY = 'd-mmm-yyyy';
-    const FORMAT_DATE_XLSX16 = 'd-mmm';
-    const FORMAT_DATE_XLSX17 = 'mmm-yy';
-    const FORMAT_DATE_XLSX22 = 'm/d/yy h:mm';
-    const FORMAT_DATE_XLSX22_ACTUAL = 'm/d/yyyy h:mm';
-    const FORMAT_DATE_DATETIME = 'd/m/yy h:mm';
-    const FORMAT_DATE_DATETIME_BETTER = 'yyyy-mm-dd hh:mm';
-    const FORMAT_DATE_TIME1 = 'h:mm AM/PM';
-    const FORMAT_DATE_TIME2 = 'h:mm:ss AM/PM';
-    const FORMAT_DATE_TIME3 = 'h:mm';
-    const FORMAT_DATE_TIME4 = 'h:mm:ss';
-    const FORMAT_DATE_TIME5 = 'mm:ss';
-    const FORMAT_DATE_TIME6 = 'h:mm:ss';
-    const FORMAT_DATE_TIME7 = 'i:s.S';
-    const FORMAT_DATE_TIME8 = 'h:mm:ss;@';
-    const FORMAT_DATE_TIME_INTERVAL_HMS = '[hh]:mm:ss';
-    const FORMAT_DATE_YYYYMMDDSLASH = 'yyyy"/"mm"/"dd;@';
-    const FORMAT_DATE_LONG_DATE = 'dddd, mmmm d, yyyy';
+    public const FORMAT_DATE_YYYYMMDD = 'yyyy-mm-dd';
+    public const FORMAT_DATE_DDMMYYYY = 'dd/mm/yyyy';
+    public const FORMAT_DATE_DMYSLASH = 'd"/"m"/"yy';
+    public const FORMAT_DATE_DMYMINUS = 'd-m-yy';
+    public const FORMAT_DATE_DMMINUS = 'd-m';
+    public const FORMAT_DATE_MYMINUS = 'm-yy';
+    public const FORMAT_DATE_XLSX14 = 'mm-dd-yy';
+    public const FORMAT_DATE_XLSX14_ACTUAL = 'm/d/yyyy';
+    public const FORMAT_DATE_XLSX15 = 'd-mmm-yy';
+    public const FORMAT_DATE_XLSX15_YYYY = 'd-mmm-yyyy';
+    public const FORMAT_DATE_XLSX16 = 'd-mmm';
+    public const FORMAT_DATE_XLSX17 = 'mmm-yy';
+    public const FORMAT_DATE_XLSX22 = 'm/d/yy h:mm';
+    public const FORMAT_DATE_XLSX22_ACTUAL = 'm/d/yyyy h:mm';
+    public const FORMAT_DATE_DATETIME = 'd/m/yy h:mm';
+    public const FORMAT_DATE_DATETIME_BETTER = 'yyyy-mm-dd hh:mm';
+    public const FORMAT_DATE_TIME1 = 'h:mm AM/PM';
+    public const FORMAT_DATE_TIME2 = 'h:mm:ss AM/PM';
+    public const FORMAT_DATE_TIME3 = 'h:mm';
+    public const FORMAT_DATE_TIME4 = 'h:mm:ss';
+    public const FORMAT_DATE_TIME5 = 'mm:ss';
+    public const FORMAT_DATE_TIME6 = 'h:mm:ss';
+    public const FORMAT_DATE_TIME7 = 'i:s.S';
+    public const FORMAT_DATE_TIME8 = 'h:mm:ss;@';
+    public const FORMAT_DATE_TIME_INTERVAL_HMS = '[hh]:mm:ss';
+    public const FORMAT_DATE_YYYYMMDDSLASH = 'yyyy"/"mm"/"dd;@';
+    public const FORMAT_DATE_LONG_DATE = 'dddd, mmmm d, yyyy';
 
-    const DATE_TIME_OR_DATETIME_ARRAY = [
+    public const DATE_TIME_OR_DATETIME_ARRAY = [
         self::FORMAT_DATE_YYYYMMDD,
         self::FORMAT_DATE_DDMMYYYY,
         self::FORMAT_DATE_DMYSLASH,
@@ -77,7 +79,7 @@ class NumberFormat extends Supervisor
         self::FORMAT_DATE_YYYYMMDDSLASH,
         self::FORMAT_DATE_LONG_DATE,
     ];
-    const TIME_OR_DATETIME_ARRAY = [
+    public const TIME_OR_DATETIME_ARRAY = [
         self::FORMAT_DATE_XLSX22,
         self::FORMAT_DATE_DATETIME,
         self::FORMAT_DATE_DATETIME_BETTER,
@@ -94,23 +96,23 @@ class NumberFormat extends Supervisor
 
     private const FORMAT_CURRENCY_AMOUNT_INTEGER = '#,##0_-';
     private const FORMAT_CURRENCY_AMOUNT_FLOAT = '#,##0.00_-';
-    const FORMAT_CURRENCY_USD_INTEGER = '$' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
-    const FORMAT_CURRENCY_USD = '$' . self::FORMAT_CURRENCY_AMOUNT_FLOAT;
-    const FORMAT_CURRENCY_GBP_INTEGER = '£' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
-    const FORMAT_CURRENCY_GBP = '£' . self::FORMAT_CURRENCY_AMOUNT_FLOAT;
-    const FORMAT_CURRENCY_YEN_YUAN_INTEGER = '￥' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
-    const FORMAT_CURRENCY_YEN_YUAN = '￥' . self::FORMAT_CURRENCY_AMOUNT_FLOAT;
-    const FORMAT_CURRENCY_EUR_INTEGER = '#,##0_-[$€]';
-    const FORMAT_CURRENCY_EUR = '#,##0.00_-[$€]';
-    const FORMAT_ACCOUNTING_USD = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
-    const FORMAT_ACCOUNTING_EUR = '_("€"* #,##0.00_);_("€"* \(#,##0.00\);_("€"* "-"??_);_(@_)';
+    public const FORMAT_CURRENCY_USD_INTEGER = '$' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
+    public const FORMAT_CURRENCY_USD = '$' . self::FORMAT_CURRENCY_AMOUNT_FLOAT;
+    public const FORMAT_CURRENCY_GBP_INTEGER = '£' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
+    public const FORMAT_CURRENCY_GBP = '£' . self::FORMAT_CURRENCY_AMOUNT_FLOAT;
+    public const FORMAT_CURRENCY_YEN_YUAN_INTEGER = '￥' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
+    public const FORMAT_CURRENCY_YEN_YUAN = '￥' . self::FORMAT_CURRENCY_AMOUNT_FLOAT;
+    public const FORMAT_CURRENCY_EUR_INTEGER = '#,##0_-[$€]';
+    public const FORMAT_CURRENCY_EUR = '#,##0.00_-[$€]';
+    public const FORMAT_ACCOUNTING_USD = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
+    public const FORMAT_ACCOUNTING_EUR = '_("€"* #,##0.00_);_("€"* \(#,##0.00\);_("€"* "-"??_);_(@_)';
 
-    const SHORT_DATE_INDEX = 14;
-    const DATE_TIME_INDEX = 22;
-    const FORMAT_SYSDATE_X = '[$-x-sysdate]';
-    const FORMAT_SYSDATE_F800 = '[$-F800]';
-    const FORMAT_SYSTIME_X = '[$-x-systime]';
-    const FORMAT_SYSTIME_F400 = '[$-F400]';
+    public const SHORT_DATE_INDEX = 14;
+    public const DATE_TIME_INDEX = 22;
+    public const FORMAT_SYSDATE_X = '[$-x-sysdate]';
+    public const FORMAT_SYSDATE_F800 = '[$-F800]';
+    public const FORMAT_SYSTIME_X = '[$-x-systime]';
+    public const FORMAT_SYSTIME_F400 = '[$-F400]';
 
     protected static string $shortDateFormat = self::FORMAT_DATE_XLSX14_ACTUAL;
 
