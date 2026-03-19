@@ -112,9 +112,9 @@ class Gnumeric extends BaseReader
         }
 
         $xml = new XMLReader();
-        $contents = $this->gzfileGetContents($filename);
-        $xml->xml($contents);
-        $xml->setParserProperty(2, true);
+        $contents = $this->getSecurityScannerOrThrow()->scan($this->gzfileGetContents($filename));
+        $xml->xml($contents, null, LIBXML_NONET);
+        $xml->setParserProperty(XMLReader::VALIDATE, false);
 
         $worksheetNames = [];
         while ($xml->read()) {
@@ -143,9 +143,9 @@ class Gnumeric extends BaseReader
         }
 
         $xml = new XMLReader();
-        $contents = $this->gzfileGetContents($filename);
-        $xml->xml($contents);
-        $xml->setParserProperty(2, true);
+        $contents = $this->getSecurityScannerOrThrow()->scan($this->gzfileGetContents($filename));
+        $xml->xml($contents, null, LIBXML_NONET);
+        $xml->setParserProperty(XMLReader::VALIDATE, false);
 
         $worksheetInfo = [];
         while ($xml->read()) {

@@ -483,7 +483,10 @@ class Html extends BaseWriter
         }
 
         if (!empty($properties->getHyperlinkBase())) {
-            $html .= '      <base href="' . htmlspecialchars($properties->getHyperlinkBase()) . '" />' . $this->lineEnding;
+            $hyperlinkBase = $properties->getHyperlinkBase();
+            if (Preg::isMatch('/^https?:\/\//i', $hyperlinkBase)) {
+                $html .= '      <base href="' . htmlspecialchars($hyperlinkBase) . '" />' . $this->lineEnding;
+            }
         }
 
         $html .= $includeStyles ? $this->generateStyles(true) : $this->generatePageDeclarations(true);
@@ -1892,7 +1895,7 @@ class Html extends BaseWriter
                 $urlDecode1 = html_entity_decode($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
                 $urlTrim = Preg::replace('/^\s+/u', '', $urlDecode1);
                 $parseScheme = Preg::isMatch('/^([\w\s\x00-\x1f]+):/u', strtolower($urlTrim), $matches);
-                if ($parseScheme && !in_array($matches[1], ['http', 'https', 'file', 'ftp', 'mailto', 's3'], true)) {
+                if ($parseScheme && !in_array($matches[1], ['http', 'https', 'mailto'], true)) {
                     $cellData = htmlspecialchars($url, Settings::htmlEntityFlags());
                     $cellData = self::replaceControlChars($cellData);
                 } else {
