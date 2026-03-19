@@ -29,10 +29,21 @@ class Hyperlink
     /**
      * Set URL.
      *
+     * Rejects URLs using dangerous schemes such as javascript: or data: to
+     * prevent XSS/code-injection when the spreadsheet is rendered as HTML.
+     *
+     * @throws \InvalidArgumentException if the URL uses a forbidden scheme
      * @return $this
      */
     public function setUrl(string $url): static
     {
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+        if (in_array($scheme, ['javascript', 'data'], true)) {
+            throw new \InvalidArgumentException(
+                "URL scheme '{$scheme}:' is not permitted in a hyperlink."
+            );
+        }
+
         $this->url = $url;
 
         return $this;

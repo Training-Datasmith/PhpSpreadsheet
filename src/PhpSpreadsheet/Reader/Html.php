@@ -803,7 +803,7 @@ class Html extends BaseReader
         try {
             $convert = $this->getSecurityScannerOrThrow()->scanFile($filename);
             $convert = static::replaceNonAsciiIfNeeded($convert);
-            $loaded = ($convert === null) ? false : $dom->loadHTML($convert);
+            $loaded = ($convert === null) ? false : $dom->loadHTML($convert, LIBXML_NONET);
         } catch (Throwable $e) {
             $loaded = false;
         } finally {
@@ -934,7 +934,7 @@ class Html extends BaseReader
         try {
             $convert = $this->getSecurityScannerOrThrow()->scan($content);
             $convert = static::replaceNonAsciiIfNeeded($convert);
-            $loaded = ($convert === null) ? false : $dom->loadHTML($convert);
+            $loaded = ($convert === null) ? false : $dom->loadHTML($convert, LIBXML_NONET);
         } catch (Throwable $e) {
             $loaded = false;
         } finally {
