@@ -16,6 +16,23 @@ use Php_Office\Php_Spreadsheet\Style\Style;
 use Php_Office\Php_Spreadsheet\Worksheet\Iterator;
 use Php_Office\Php_Spreadsheet\Worksheet\Table;
 use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+/**
+ * Represents a PhpSpreadsheet workbook.
+ *
+ * A Spreadsheet contains one or more Worksheet objects, document Properties,
+ * optional macro code (VBA), and a Calculation engine. Use IOFactory to load
+ * existing files or write a Spreadsheet to disk.
+ *
+ * Example:
+ *   $spreadsheet = new Spreadsheet();
+ *   $sheet = $spreadsheet->getActiveSheet();
+ *   $sheet->setCellValue('A1', 'Hello World');
+ *   $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+ *   $writer->save('output.xlsx');
+ *
+ * @see \PhpOffice\PhpSpreadsheet\IOFactory For loading and saving
+ * @see Worksheet For cell operations
+ */
 class Spreadsheet implements JsonSerializable
 {
     // Allowable values for workbook window visibility
@@ -169,6 +186,11 @@ class Spreadsheet implements JsonSerializable
     {
         return $this->font_charsets;
     }
+    /**
+     * Returns the workbook theme used for default styles and colour schemes.
+     *
+     * @return Theme The active theme applied to this workbook
+     */
     public function get_theme(): Theme
     {
         return $this->theme;
