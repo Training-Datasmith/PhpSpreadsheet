@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDateHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDateHelper;
 class Days360
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * DAYS360.
      *
@@ -46,75 +43,64 @@ class Days360
      *         If an array of values is passed for the $startDate or $endDays,arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function between(mixed $startDate = 0, mixed $endDate = 0, mixed $method = false): array|string|int
+    public static function between(mixed $start_date = 0, mixed $end_date = 0, mixed $method = false): array|string|int
     {
-        if (is_array($startDate) || is_array($endDate) || is_array($method)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $startDate, $endDate, $method);
+        if (is_array($start_date) || is_array($end_date) || is_array($method)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $start_date, $end_date, $method);
         }
-
         try {
-            $startDate = Helpers::getDateValue($startDate);
-            $endDate = Helpers::getDateValue($endDate);
+            $start_date = Helpers::get_date_value($start_date);
+            $end_date = Helpers::get_date_value($end_date);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if (!is_bool($method)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
         // Execute function
-        $PHPStartDateObject = SharedDateHelper::excelToDateTimeObject($startDate);
-        $startDay = $PHPStartDateObject->format('j');
-        $startMonth = $PHPStartDateObject->format('n');
-        $startYear = $PHPStartDateObject->format('Y');
-
-        $PHPEndDateObject = SharedDateHelper::excelToDateTimeObject($endDate);
-        $endDay = $PHPEndDateObject->format('j');
-        $endMonth = $PHPEndDateObject->format('n');
-        $endYear = $PHPEndDateObject->format('Y');
-
-        return self::dateDiff360((int) $startDay, (int) $startMonth, (int) $startYear, (int) $endDay, (int) $endMonth, (int) $endYear, !$method);
+        $php_start_date_object = Shared_Date_Helper::excel_to_date_time_object($start_date);
+        $start_day = $php_start_date_object->format('j');
+        $start_month = $php_start_date_object->format('n');
+        $start_year = $php_start_date_object->format('Y');
+        $php_end_date_object = Shared_Date_Helper::excel_to_date_time_object($end_date);
+        $end_day = $php_end_date_object->format('j');
+        $end_month = $php_end_date_object->format('n');
+        $end_year = $php_end_date_object->format('Y');
+        return self::date_diff360((int) $start_day, (int) $start_month, (int) $start_year, (int) $end_day, (int) $end_month, (int) $end_year, !$method);
     }
-
     /**
      * Return the number of days between two dates based on a 360-day calendar.
      */
-    private static function dateDiff360(int $startDay, int $startMonth, int $startYear, int $endDay, int $endMonth, int $endYear, bool $methodUS): int
+    private static function date_diff360(int $start_day, int $start_month, int $start_year, int $end_day, int $end_month, int $end_year, bool $method_us): int
     {
-        $startDay = self::getStartDay($startDay, $startMonth, $startYear, $methodUS);
-        $endDay = self::getEndDay($endDay, $endMonth, $endYear, $startDay, $methodUS);
-
-        return $endDay + $endMonth * 30 + $endYear * 360 - $startDay - $startMonth * 30 - $startYear * 360;
+        $start_day = self::get_start_day($start_day, $start_month, $start_year, $method_us);
+        $end_day = self::get_end_day($end_day, $end_month, $end_year, $start_day, $method_us);
+        return $end_day + $end_month * 30 + $end_year * 360 - $start_day - $start_month * 30 - $start_year * 360;
     }
-
-    private static function getStartDay(int $startDay, int $startMonth, int $startYear, bool $methodUS): int
+    private static function get_start_day(int $start_day, int $start_month, int $start_year, bool $method_us): int
     {
-        if ($startDay == 31) {
-            --$startDay;
-        } elseif ($methodUS && ($startMonth == 2 && ($startDay == 29 || ($startDay == 28 && !Helpers::isLeapYear($startYear))))) {
-            $startDay = 30;
+        if ($start_day == 31) {
+            --$start_day;
+        } elseif ($method_us && ($start_month == 2 && ($start_day == 29 || $start_day == 28 && !Helpers::is_leap_year($start_year)))) {
+            $start_day = 30;
         }
-
-        return $startDay;
+        return $start_day;
     }
-
-    private static function getEndDay(int $endDay, int &$endMonth, int &$endYear, int $startDay, bool $methodUS): int
+    private static function get_end_day(int $end_day, int &$end_month, int &$end_year, int $start_day, bool $method_us): int
     {
-        if ($endDay == 31) {
-            if ($methodUS && $startDay != 30) {
-                $endDay = 1;
-                if ($endMonth == 12) {
-                    ++$endYear;
-                    $endMonth = 1;
+        if ($end_day == 31) {
+            if ($method_us && $start_day != 30) {
+                $end_day = 1;
+                if ($end_month == 12) {
+                    ++$end_year;
+                    $end_month = 1;
                 } else {
-                    ++$endMonth;
+                    ++$end_month;
                 }
             } else {
-                $endDay = 30;
+                $end_day = 30;
             }
         }
-
-        return $endDay;
+        return $end_day;
     }
 }

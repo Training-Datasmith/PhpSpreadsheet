@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Exponential
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * EXPONDIST.
      *
@@ -32,25 +29,21 @@ class Exponential
     public static function distribution(mixed $value, mixed $lambda, mixed $cumulative): array|string|float
     {
         if (is_array($value) || is_array($lambda) || is_array($cumulative)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $lambda, $cumulative);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $lambda, $cumulative);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
-            $lambda = DistributionValidations::validateFloat($lambda);
-            $cumulative = DistributionValidations::validateBool($cumulative);
+            $value = Distribution_Validations::validate_float($value);
+            $lambda = Distribution_Validations::validate_float($lambda);
+            $cumulative = Distribution_Validations::validate_bool($cumulative);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($value < 0) || ($lambda < 0)) {
-            return ExcelError::NAN();
+        if ($value < 0 || $lambda < 0) {
+            return Excel_Error::NAN();
         }
-
         if ($cumulative === true) {
             return 1 - exp(-($value * $lambda));
         }
-
         return $lambda * exp(-($value * $lambda));
     }
 }

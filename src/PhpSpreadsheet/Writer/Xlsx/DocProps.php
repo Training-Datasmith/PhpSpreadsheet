@@ -1,252 +1,196 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Document\Properties;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-
-class DocProps extends WriterPart
+use Php_Office\Php_Spreadsheet\Document\Properties;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Shared\Date;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+class Doc_Props extends Writer_Part
 {
     /**
      * Write docProps/app.xml to XML format.
      *
      * @return string XML Output
      */
-    public function writeDocPropsApp(Spreadsheet $spreadsheet): string
+    public function write_doc_props_app(Spreadsheet $spreadsheet): string
     {
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // Properties
-        $objWriter->startElement('Properties');
-        $objWriter->writeAttribute('xmlns', Namespaces::EXTENDED_PROPERTIES);
-        $objWriter->writeAttribute('xmlns:vt', Namespaces::PROPERTIES_VTYPES);
-
+        $obj_writer->start_element('Properties');
+        $obj_writer->write_attribute('xmlns', Namespaces::EXTENDED_PROPERTIES);
+        $obj_writer->write_attribute('xmlns:vt', Namespaces::PROPERTIES_VTYPES);
         // Application
-        $objWriter->writeElement('Application', 'Microsoft Excel');
-
+        $obj_writer->write_element('Application', 'Microsoft Excel');
         // DocSecurity
-        $objWriter->writeElement('DocSecurity', '0');
-
+        $obj_writer->write_element('DocSecurity', '0');
         // ScaleCrop
-        $objWriter->writeElement('ScaleCrop', 'false');
-
+        $obj_writer->write_element('ScaleCrop', 'false');
         // HeadingPairs
-        $objWriter->startElement('HeadingPairs');
-
+        $obj_writer->start_element('HeadingPairs');
         // Vector
-        $objWriter->startElement('vt:vector');
-        $objWriter->writeAttribute('size', '2');
-        $objWriter->writeAttribute('baseType', 'variant');
-
+        $obj_writer->start_element('vt:vector');
+        $obj_writer->write_attribute('size', '2');
+        $obj_writer->write_attribute('baseType', 'variant');
         // Variant
-        $objWriter->startElement('vt:variant');
-        $objWriter->writeElement('vt:lpstr', 'Worksheets');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('vt:variant');
+        $obj_writer->write_element('vt:lpstr', 'Worksheets');
+        $obj_writer->end_element();
         // Variant
-        $objWriter->startElement('vt:variant');
-        $objWriter->writeElement('vt:i4', (string) $spreadsheet->getSheetCount());
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('vt:variant');
+        $obj_writer->write_element('vt:i4', (string) $spreadsheet->get_sheet_count());
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // TitlesOfParts
-        $objWriter->startElement('TitlesOfParts');
-
+        $obj_writer->start_element('TitlesOfParts');
         // Vector
-        $objWriter->startElement('vt:vector');
-        $objWriter->writeAttribute('size', (string) $spreadsheet->getSheetCount());
-        $objWriter->writeAttribute('baseType', 'lpstr');
-
-        $sheetCount = $spreadsheet->getSheetCount();
-        for ($i = 0; $i < $sheetCount; ++$i) {
-            $objWriter->writeElement('vt:lpstr', $spreadsheet->getSheet($i)->getTitle());
+        $obj_writer->start_element('vt:vector');
+        $obj_writer->write_attribute('size', (string) $spreadsheet->get_sheet_count());
+        $obj_writer->write_attribute('baseType', 'lpstr');
+        $sheet_count = $spreadsheet->get_sheet_count();
+        for ($i = 0; $i < $sheet_count; ++$i) {
+            $obj_writer->write_element('vt:lpstr', $spreadsheet->get_sheet($i)->get_title());
         }
-
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // Company
-        $objWriter->writeElement('Company', $spreadsheet->getProperties()->getCompany());
-
+        $obj_writer->write_element('Company', $spreadsheet->get_properties()->get_company());
         // Company
-        $objWriter->writeElement('Manager', $spreadsheet->getProperties()->getManager());
-
+        $obj_writer->write_element('Manager', $spreadsheet->get_properties()->get_manager());
         // LinksUpToDate
-        $objWriter->writeElement('LinksUpToDate', 'false');
-
+        $obj_writer->write_element('LinksUpToDate', 'false');
         // SharedDoc
-        $objWriter->writeElement('SharedDoc', 'false');
-
+        $obj_writer->write_element('SharedDoc', 'false');
         // HyperlinkBase
-        $objWriter->writeElement('HyperlinkBase', $spreadsheet->getProperties()->getHyperlinkBase());
-
+        $obj_writer->write_element('HyperlinkBase', $spreadsheet->get_properties()->get_hyperlink_base());
         // HyperlinksChanged
-        $objWriter->writeElement('HyperlinksChanged', 'false');
-
+        $obj_writer->write_element('HyperlinksChanged', 'false');
         // AppVersion
-        $objWriter->writeElement('AppVersion', '12.0000');
-
-        $objWriter->endElement();
-
+        $obj_writer->write_element('AppVersion', '12.0000');
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write docProps/core.xml to XML format.
      *
      * @return string XML Output
      */
-    public function writeDocPropsCore(Spreadsheet $spreadsheet): string
+    public function write_doc_props_core(Spreadsheet $spreadsheet): string
     {
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // cp:coreProperties
-        $objWriter->startElement('cp:coreProperties');
-        $objWriter->writeAttribute('xmlns:cp', Namespaces::CORE_PROPERTIES2);
-        $objWriter->writeAttribute('xmlns:dc', Namespaces::DC_ELEMENTS);
-        $objWriter->writeAttribute('xmlns:dcterms', Namespaces::DC_TERMS);
-        $objWriter->writeAttribute('xmlns:dcmitype', Namespaces::DC_DCMITYPE);
-        $objWriter->writeAttribute('xmlns:xsi', Namespaces::SCHEMA_INSTANCE);
-
+        $obj_writer->start_element('cp:coreProperties');
+        $obj_writer->write_attribute('xmlns:cp', Namespaces::CORE_PROPERTIES2);
+        $obj_writer->write_attribute('xmlns:dc', Namespaces::DC_ELEMENTS);
+        $obj_writer->write_attribute('xmlns:dcterms', Namespaces::DC_TERMS);
+        $obj_writer->write_attribute('xmlns:dcmitype', Namespaces::DC_DCMITYPE);
+        $obj_writer->write_attribute('xmlns:xsi', Namespaces::SCHEMA_INSTANCE);
         // dc:creator
-        $objWriter->writeElement('dc:creator', $spreadsheet->getProperties()->getCreator());
-
+        $obj_writer->write_element('dc:creator', $spreadsheet->get_properties()->get_creator());
         // cp:lastModifiedBy
-        $objWriter->writeElement('cp:lastModifiedBy', $spreadsheet->getProperties()->getLastModifiedBy());
-
+        $obj_writer->write_element('cp:lastModifiedBy', $spreadsheet->get_properties()->get_last_modified_by());
         // dcterms:created
-        $objWriter->startElement('dcterms:created');
-        $objWriter->writeAttribute('xsi:type', 'dcterms:W3CDTF');
-        $created = $spreadsheet->getProperties()->getCreated();
-        $date = Date::dateTimeFromTimestamp("$created");
-        $objWriter->writeRawData($date->format(DATE_W3C));
-        $objWriter->endElement();
-
+        $obj_writer->start_element('dcterms:created');
+        $obj_writer->write_attribute('xsi:type', 'dcterms:W3CDTF');
+        $created = $spreadsheet->get_properties()->get_created();
+        $date = Date::date_time_from_timestamp("{$created}");
+        $obj_writer->write_raw_data($date->format(DATE_W3C));
+        $obj_writer->end_element();
         // dcterms:modified
-        $objWriter->startElement('dcterms:modified');
-        $objWriter->writeAttribute('xsi:type', 'dcterms:W3CDTF');
-        $created = $spreadsheet->getProperties()->getModified();
-        $date = Date::dateTimeFromTimestamp("$created");
-        $objWriter->writeRawData($date->format(DATE_W3C));
-        $objWriter->endElement();
-
+        $obj_writer->start_element('dcterms:modified');
+        $obj_writer->write_attribute('xsi:type', 'dcterms:W3CDTF');
+        $created = $spreadsheet->get_properties()->get_modified();
+        $date = Date::date_time_from_timestamp("{$created}");
+        $obj_writer->write_raw_data($date->format(DATE_W3C));
+        $obj_writer->end_element();
         // dc:title
-        $objWriter->writeElement('dc:title', $spreadsheet->getProperties()->getTitle());
-
+        $obj_writer->write_element('dc:title', $spreadsheet->get_properties()->get_title());
         // dc:description
-        $objWriter->writeElement('dc:description', $spreadsheet->getProperties()->getDescription());
-
+        $obj_writer->write_element('dc:description', $spreadsheet->get_properties()->get_description());
         // dc:subject
-        $objWriter->writeElement('dc:subject', $spreadsheet->getProperties()->getSubject());
-
+        $obj_writer->write_element('dc:subject', $spreadsheet->get_properties()->get_subject());
         // cp:keywords
-        $objWriter->writeElement('cp:keywords', $spreadsheet->getProperties()->getKeywords());
-
+        $obj_writer->write_element('cp:keywords', $spreadsheet->get_properties()->get_keywords());
         // cp:category
-        $objWriter->writeElement('cp:category', $spreadsheet->getProperties()->getCategory());
-
-        $objWriter->endElement();
-
+        $obj_writer->write_element('cp:category', $spreadsheet->get_properties()->get_category());
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write docProps/custom.xml to XML format.
      *
      * @return null|string XML Output
      */
-    public function writeDocPropsCustom(Spreadsheet $spreadsheet): ?string
+    public function write_doc_props_custom(Spreadsheet $spreadsheet): ?string
     {
-        $customPropertyList = $spreadsheet->getProperties()->getCustomProperties();
-        if (empty($customPropertyList)) {
+        $custom_property_list = $spreadsheet->get_properties()->get_custom_properties();
+        if (empty($custom_property_list)) {
             return null;
         }
-
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // cp:coreProperties
-        $objWriter->startElement('Properties');
-        $objWriter->writeAttribute('xmlns', Namespaces::CUSTOM_PROPERTIES);
-        $objWriter->writeAttribute('xmlns:vt', Namespaces::PROPERTIES_VTYPES);
-
-        foreach ($customPropertyList as $key => $customProperty) {
-            $propertyValue = $spreadsheet->getProperties()->getCustomPropertyValue($customProperty);
-            $propertyType = $spreadsheet->getProperties()->getCustomPropertyType($customProperty);
-
-            $objWriter->startElement('property');
-            $objWriter->writeAttribute('fmtid', '{D5CDD505-2E9C-101B-9397-08002B2CF9AE}');
-            $objWriter->writeAttribute('pid', (string) ($key + 2));
-            $objWriter->writeAttribute('name', $customProperty);
-
-            switch ($propertyType) {
+        $obj_writer->start_element('Properties');
+        $obj_writer->write_attribute('xmlns', Namespaces::CUSTOM_PROPERTIES);
+        $obj_writer->write_attribute('xmlns:vt', Namespaces::PROPERTIES_VTYPES);
+        foreach ($custom_property_list as $key => $custom_property) {
+            $property_value = $spreadsheet->get_properties()->get_custom_property_value($custom_property);
+            $property_type = $spreadsheet->get_properties()->get_custom_property_type($custom_property);
+            $obj_writer->start_element('property');
+            $obj_writer->write_attribute('fmtid', '{D5CDD505-2E9C-101B-9397-08002B2CF9AE}');
+            $obj_writer->write_attribute('pid', (string) ($key + 2));
+            $obj_writer->write_attribute('name', $custom_property);
+            switch ($property_type) {
                 case Properties::PROPERTY_TYPE_INTEGER:
-                    $objWriter->writeElement('vt:i4', (string) $propertyValue);
-
+                    $obj_writer->write_element('vt:i4', (string) $property_value);
                     break;
                 case Properties::PROPERTY_TYPE_FLOAT:
-                    $objWriter->writeElement('vt:r8', sprintf('%F', $propertyValue));
-
+                    $obj_writer->write_element('vt:r8', sprintf('%F', $property_value));
                     break;
                 case Properties::PROPERTY_TYPE_BOOLEAN:
-                    $objWriter->writeElement('vt:bool', ($propertyValue) ? 'true' : 'false');
-
+                    $obj_writer->write_element('vt:bool', $property_value ? 'true' : 'false');
                     break;
                 case Properties::PROPERTY_TYPE_DATE:
-                    $objWriter->startElement('vt:filetime');
-                    $date = Date::dateTimeFromTimestamp("$propertyValue");
-                    $objWriter->writeRawData($date->format(DATE_W3C));
-                    $objWriter->endElement();
-
+                    $obj_writer->start_element('vt:filetime');
+                    $date = Date::date_time_from_timestamp("{$property_value}");
+                    $obj_writer->write_raw_data($date->format(DATE_W3C));
+                    $obj_writer->end_element();
                     break;
                 default:
-                    $objWriter->writeElement('vt:lpwstr', (string) $propertyValue);
-
+                    $obj_writer->write_element('vt:lpwstr', (string) $property_value);
                     break;
             }
-
-            $objWriter->endElement();
+            $obj_writer->end_element();
         }
-
-        $objWriter->endElement();
-
-        return $objWriter->getData();
+        $obj_writer->end_element();
+        return $obj_writer->get_data();
     }
 }

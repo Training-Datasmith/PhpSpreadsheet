@@ -1,48 +1,37 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-use PhpOffice\PhpSpreadsheet\Cell\CellAddress;
-use PhpOffice\PhpSpreadsheet\Cell\CellRange;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-
-class AutoFit
+use Php_Office\Php_Spreadsheet\Cell\Cell_Address;
+use Php_Office\Php_Spreadsheet\Cell\Cell_Range;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+class Auto_Fit
 {
     public function __construct(protected Worksheet $worksheet)
     {
     }
-
     /** @return mixed[] */
-    public function getAutoFilterIndentRanges(): array
+    public function get_auto_filter_indent_ranges(): array
     {
-        $autoFilterIndentRanges = [];
-        $autoFilterIndentRanges[] = $this->getAutoFilterIndentRange($this->worksheet->getAutoFilter());
-
-        foreach ($this->worksheet->getTableCollection() as $table) {
-            if ($table->getShowHeaderRow() === true && $table->getAllowFilter() === true) {
-                $autoFilter = $table->getAutoFilter();
-                $autoFilterIndentRanges[] = $this->getAutoFilterIndentRange($autoFilter);
+        $auto_filter_indent_ranges = [];
+        $auto_filter_indent_ranges[] = $this->get_auto_filter_indent_range($this->worksheet->get_auto_filter());
+        foreach ($this->worksheet->get_table_collection() as $table) {
+            if ($table->get_show_header_row() === true && $table->get_allow_filter() === true) {
+                $auto_filter = $table->get_auto_filter();
+                $auto_filter_indent_ranges[] = $this->get_auto_filter_indent_range($auto_filter);
             }
         }
-
-        return array_filter($autoFilterIndentRanges);
+        return array_filter($auto_filter_indent_ranges);
     }
-
-    private function getAutoFilterIndentRange(AutoFilter $autoFilter): ?string
+    private function get_auto_filter_indent_range(Auto_Filter $auto_filter): ?string
     {
-        $autoFilterRange = $autoFilter->getRange();
-        $autoFilterIndentRange = null;
-
-        if (!empty($autoFilterRange)) {
-            $autoFilterRangeBoundaries = Coordinate::rangeBoundaries($autoFilterRange);
-            $autoFilterIndentRange = (string) new CellRange(
-                CellAddress::fromColumnAndRow($autoFilterRangeBoundaries[0][0], $autoFilterRangeBoundaries[0][1]),
-                CellAddress::fromColumnAndRow($autoFilterRangeBoundaries[1][0], $autoFilterRangeBoundaries[0][1])
-            );
+        $auto_filter_range = $auto_filter->get_range();
+        $auto_filter_indent_range = null;
+        if (!empty($auto_filter_range)) {
+            $auto_filter_range_boundaries = Coordinate::range_boundaries($auto_filter_range);
+            $auto_filter_indent_range = (string) new Cell_Range(Cell_Address::from_column_and_row($auto_filter_range_boundaries[0][0], $auto_filter_range_boundaries[0][1]), Cell_Address::from_column_and_row($auto_filter_range_boundaries[1][0], $auto_filter_range_boundaries[0][1]));
         }
-
-        return $autoFilterIndentRange;
+        return $auto_filter_indent_range;
     }
 }

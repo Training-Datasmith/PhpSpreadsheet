@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial;
-
-use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\Constants as FinancialConstants;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class TreasuryBill
+use Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Constants as FinancialConstants;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Treasury_Bill
 {
     /**
      * TBILLEQ.
@@ -26,37 +24,28 @@ class TreasuryBill
      *
      * @return float|string Result, or a string containing an error
      */
-    public static function bondEquivalentYield(mixed $settlement, mixed $maturity, mixed $discount): string|float
+    public static function bond_equivalent_yield(mixed $settlement, mixed $maturity, mixed $discount): string|float
     {
-        $settlement = Functions::flattenSingleValue($settlement);
-        $maturity = Functions::flattenSingleValue($maturity);
-        $discount = Functions::flattenSingleValue($discount);
-
+        $settlement = Functions::flatten_single_value($settlement);
+        $maturity = Functions::flatten_single_value($maturity);
+        $discount = Functions::flatten_single_value($discount);
         try {
-            $settlement = FinancialValidations::validateSettlementDate($settlement);
-            $maturity = FinancialValidations::validateMaturityDate($maturity);
-            $discount = FinancialValidations::validateFloat($discount);
+            $settlement = Financial_Validations::validate_settlement_date($settlement);
+            $maturity = Financial_Validations::validate_maturity_date($maturity);
+            $discount = Financial_Validations::validate_float($discount);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if ($discount <= 0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
-        $daysBetweenSettlementAndMaturity = $maturity - $settlement;
-        $daysPerYear = Helpers::daysPerYear(
-            Functions::scalar(DateTimeExcel\DateParts::year($maturity)),
-            FinancialConstants::BASIS_DAYS_PER_YEAR_ACTUAL
-        );
-
-        if ($daysBetweenSettlementAndMaturity > $daysPerYear || $daysBetweenSettlementAndMaturity < 0) {
-            return ExcelError::NAN();
+        $days_between_settlement_and_maturity = $maturity - $settlement;
+        $days_per_year = Helpers::days_per_year(Functions::scalar(Date_Time_Excel\Date_Parts::year($maturity)), Financial_Constants::BASIS_DAYS_PER_YEAR_ACTUAL);
+        if ($days_between_settlement_and_maturity > $days_per_year || $days_between_settlement_and_maturity < 0) {
+            return Excel_Error::NAN();
         }
-
-        return (365 * $discount) / (360 - $discount * $daysBetweenSettlementAndMaturity);
+        return 365 * $discount / (360 - $discount * $days_between_settlement_and_maturity);
     }
-
     /**
      * TBILLPRICE.
      *
@@ -73,40 +62,30 @@ class TreasuryBill
      */
     public static function price(mixed $settlement, mixed $maturity, mixed $discount): string|float
     {
-        $settlement = Functions::flattenSingleValue($settlement);
-        $maturity = Functions::flattenSingleValue($maturity);
-        $discount = Functions::flattenSingleValue($discount);
-
+        $settlement = Functions::flatten_single_value($settlement);
+        $maturity = Functions::flatten_single_value($maturity);
+        $discount = Functions::flatten_single_value($discount);
         try {
-            $settlement = FinancialValidations::validateSettlementDate($settlement);
-            $maturity = FinancialValidations::validateMaturityDate($maturity);
-            $discount = FinancialValidations::validateFloat($discount);
+            $settlement = Financial_Validations::validate_settlement_date($settlement);
+            $maturity = Financial_Validations::validate_maturity_date($maturity);
+            $discount = Financial_Validations::validate_float($discount);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if ($discount <= 0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
-        $daysBetweenSettlementAndMaturity = $maturity - $settlement;
-        $daysPerYear = Helpers::daysPerYear(
-            Functions::scalar(DateTimeExcel\DateParts::year($maturity)),
-            FinancialConstants::BASIS_DAYS_PER_YEAR_ACTUAL
-        );
-
-        if ($daysBetweenSettlementAndMaturity > $daysPerYear || $daysBetweenSettlementAndMaturity < 0) {
-            return ExcelError::NAN();
+        $days_between_settlement_and_maturity = $maturity - $settlement;
+        $days_per_year = Helpers::days_per_year(Functions::scalar(Date_Time_Excel\Date_Parts::year($maturity)), Financial_Constants::BASIS_DAYS_PER_YEAR_ACTUAL);
+        if ($days_between_settlement_and_maturity > $days_per_year || $days_between_settlement_and_maturity < 0) {
+            return Excel_Error::NAN();
         }
-
-        $price = 100 * (1 - (($discount * $daysBetweenSettlementAndMaturity) / 360));
+        $price = 100 * (1 - $discount * $days_between_settlement_and_maturity / 360);
         if ($price < 0.0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
         return $price;
     }
-
     /**
      * TBILLYIELD.
      *
@@ -121,28 +100,21 @@ class TreasuryBill
      */
     public static function yield(mixed $settlement, mixed $maturity, $price): string|float
     {
-        $settlement = Functions::flattenSingleValue($settlement);
-        $maturity = Functions::flattenSingleValue($maturity);
-        $price = Functions::flattenSingleValue($price);
-
+        $settlement = Functions::flatten_single_value($settlement);
+        $maturity = Functions::flatten_single_value($maturity);
+        $price = Functions::flatten_single_value($price);
         try {
-            $settlement = FinancialValidations::validateSettlementDate($settlement);
-            $maturity = FinancialValidations::validateMaturityDate($maturity);
-            $price = FinancialValidations::validatePrice($price);
+            $settlement = Financial_Validations::validate_settlement_date($settlement);
+            $maturity = Financial_Validations::validate_maturity_date($maturity);
+            $price = Financial_Validations::validate_price($price);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $daysBetweenSettlementAndMaturity = $maturity - $settlement;
-        $daysPerYear = Helpers::daysPerYear(
-            Functions::scalar(DateTimeExcel\DateParts::year($maturity)),
-            FinancialConstants::BASIS_DAYS_PER_YEAR_ACTUAL
-        );
-
-        if ($daysBetweenSettlementAndMaturity > $daysPerYear || $daysBetweenSettlementAndMaturity < 0) {
-            return ExcelError::NAN();
+        $days_between_settlement_and_maturity = $maturity - $settlement;
+        $days_per_year = Helpers::days_per_year(Functions::scalar(Date_Time_Excel\Date_Parts::year($maturity)), Financial_Constants::BASIS_DAYS_PER_YEAR_ACTUAL);
+        if ($days_between_settlement_and_maturity > $days_per_year || $days_between_settlement_and_maturity < 0) {
+            return Excel_Error::NAN();
         }
-
-        return ((100 - $price) / $price) * (360 / $daysBetweenSettlementAndMaturity);
+        return (100 - $price) / $price * (360 / $days_between_settlement_and_maturity);
     }
 }

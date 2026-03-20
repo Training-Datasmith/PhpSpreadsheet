@@ -1,21 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Text_Data;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcExp;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
-class CharacterConvert
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception as CalcExp;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+class Character_Convert
 {
-    use ArrayEnabled;
-
-    private static string $oneByteCharacterSet = 'Windows-1252';
-
+    use Array_Enabled;
+    private static string $one_byte_character_set = 'Windows-1252';
     /**
      * CHAR.
      *
@@ -29,50 +25,42 @@ class CharacterConvert
     public static function character(mixed $character): array|string
     {
         if (is_array($character)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $character);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $character);
         }
-
-        return self::characterBoth($character, true);
+        return self::character_both($character, true);
     }
-
     /** @return array<mixed>|string */
-    public static function characterUnicode(mixed $character): array|string
+    public static function character_unicode(mixed $character): array|string
     {
         if (is_array($character)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $character);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $character);
         }
-
-        return self::characterBoth($character, false);
+        return self::character_both($character, false);
     }
-
-    private static function characterBoth(mixed $character, bool $ansi = true): string
+    private static function character_both(mixed $character, bool $ansi = true): string
     {
         try {
-            $character = Helpers::validateInt($character, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+            $character = Helpers::validate_int($character, true);
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-
-        if ($ansi && $character === 219 && self::$oneByteCharacterSet[0] === 'M') {
+        if ($ansi && $character === 219 && self::$one_byte_character_set[0] === 'M') {
             return '€';
         }
-
-        $min = Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE ? 0 : 1;
-        if ($character < $min || ($ansi && $character > 255) || $character > 0x10FFFF) {
-            return ExcelError::VALUE();
+        $min = Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE ? 0 : 1;
+        if ($character < $min || $ansi && $character > 255 || $character > 0x10ffff) {
+            return Excel_Error::VALUE();
         }
-        if ($character > 0x10FFFD) { // last assigned
-            return ExcelError::NA();
+        if ($character > 0x10fffd) {
+            // last assigned
+            return Excel_Error::NA();
         }
         if ($ansi) {
             $result = chr($character);
-
-            return (string) iconv(self::$oneByteCharacterSet, 'UTF-8//IGNORE', $result);
+            return (string) iconv(self::$one_byte_character_set, 'UTF-8//IGNORE', $result);
         }
-
         return mb_chr($character, 'UTF-8');
     }
-
     /**
      * CODE.
      *
@@ -86,65 +74,55 @@ class CharacterConvert
     public static function code(mixed $characters): array|string|int
     {
         if (is_array($characters)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $characters);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $characters);
         }
-        if (is_bool($characters) && Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
+        if (is_bool($characters) && Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE) {
             $characters = $characters ? '1' : '0';
         }
-
-        return self::codeBoth(StringHelper::convertToString($characters, convertBool: true), true);
+        return self::code_both(String_Helper::convert_to_string($characters, convertBool: true), true);
     }
-
     /** @return array<mixed>|int|string */
-    public static function codeUnicode(mixed $characters): array|string|int
+    public static function code_unicode(mixed $characters): array|string|int
     {
         if (is_array($characters)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $characters);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $characters);
         }
-        if (is_bool($characters) && Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
+        if (is_bool($characters) && Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE) {
             $characters = $characters ? '1' : '0';
         }
-
-        return self::codeBoth(StringHelper::convertToString($characters, convertBool: true), false);
+        return self::code_both(String_Helper::convert_to_string($characters, convertBool: true), false);
     }
-
-    private static function codeBoth(string $characters, bool $ansi = true): int|string
+    private static function code_both(string $characters, bool $ansi = true): int|string
     {
         try {
-            $characters = Helpers::extractString($characters, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+            $characters = Helpers::extract_string($characters, true);
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-
         if ($characters === '') {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
         $character = $characters;
         if (mb_strlen($characters, 'UTF-8') > 1) {
             $character = mb_substr($characters, 0, 1, 'UTF-8');
         }
-        if ($ansi && $character === '€' && self::$oneByteCharacterSet[0] === 'M') {
+        if ($ansi && $character === '€' && self::$one_byte_character_set[0] === 'M') {
             return 219;
         }
-
         $result = mb_ord($character, 'UTF-8');
         if ($ansi) {
-            $result = iconv('UTF-8', self::$oneByteCharacterSet . '//IGNORE', $character);
-
-            return ($result !== '') ? ord("$result") : 63; // question mark
+            $result = iconv('UTF-8', self::$one_byte_character_set . '//IGNORE', $character);
+            return $result !== '' ? ord("{$result}") : 63;
+            // question mark
         }
-
         return $result;
     }
-
-    public static function setWindowsCharacterSet(): void
+    public static function set_windows_character_set(): void
     {
-        self::$oneByteCharacterSet = 'Windows-1252';
+        self::$one_byte_character_set = 'Windows-1252';
     }
-
-    public static function setMacCharacterSet(): void
+    public static function set_mac_character_set(): void
     {
-        self::$oneByteCharacterSet = 'MAC';
+        self::$one_byte_character_set = 'MAC';
     }
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
-
-class Minimum extends MaxMinBase
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Error_Value;
+class Minimum extends Max_Min_Base
 {
     /**
      * MIN.
@@ -22,32 +20,27 @@ class Minimum extends MaxMinBase
      */
     public static function min(mixed ...$args): float|int|string
     {
-        $returnValue = null;
-
+        $return_value = null;
         // Loop through arguments
-        $aArgs = Functions::flattenArray($args);
-        foreach ($aArgs as $arg) {
-            if (ErrorValue::isError($arg, true)) {
-                $returnValue = $arg;
-
+        $a_args = Functions::flatten_array($args);
+        foreach ($a_args as $arg) {
+            if (Error_Value::is_error($arg, true)) {
+                $return_value = $arg;
                 break;
             }
             // Is it a numeric value?
-            if ((is_numeric($arg)) && (!is_string($arg))) {
-                if (($returnValue === null) || ($arg < $returnValue)) {
-                    $returnValue = $arg;
+            if (is_numeric($arg) && !is_string($arg)) {
+                if ($return_value === null || $arg < $return_value) {
+                    $return_value = $arg;
                 }
             }
         }
-
-        if ($returnValue === null) {
+        if ($return_value === null) {
             return 0;
         }
         /** @var float|int|string $returnValue */
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * MINA.
      *
@@ -58,32 +51,28 @@ class Minimum extends MaxMinBase
      *
      * @param mixed ...$args Data values
      */
-    public static function minA(mixed ...$args): float|int|string
+    public static function min_a(mixed ...$args): float|int|string
     {
-        $returnValue = null;
-
+        $return_value = null;
         // Loop through arguments
-        $aArgs = Functions::flattenArray($args);
-        foreach ($aArgs as $arg) {
-            if (ErrorValue::isError($arg, true)) {
-                $returnValue = $arg;
-
+        $a_args = Functions::flatten_array($args);
+        foreach ($a_args as $arg) {
+            if (Error_Value::is_error($arg, true)) {
+                $return_value = $arg;
                 break;
             }
             // Is it a numeric value?
-            if ((is_numeric($arg)) || (is_bool($arg)) || ((is_string($arg) && ($arg != '')))) {
-                $arg = self::datatypeAdjustmentAllowStrings($arg);
-                if (($returnValue === null) || ($arg < $returnValue)) {
-                    $returnValue = $arg;
+            if (is_numeric($arg) || is_bool($arg) || is_string($arg) && $arg != '') {
+                $arg = self::datatype_adjustment_allow_strings($arg);
+                if ($return_value === null || $arg < $return_value) {
+                    $return_value = $arg;
                 }
             }
         }
-
-        if ($returnValue === null) {
+        if ($return_value === null) {
             return 0;
         }
         /** @var float|int|string $returnValue */
-
-        return $returnValue;
+        return $return_value;
     }
 }

@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Reader\Ods;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Ods;
 
 use Composer\Pcre\Preg;
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-
-class FormulaTranslator
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+class Formula_Translator
 {
-    private static function replaceQuotedPeriod(string $value): string
+    private static function replace_quoted_period(string $value): string
     {
         $value2 = '';
         $quoted = false;
@@ -17,113 +15,66 @@ class FormulaTranslator
             if ($char === "'") {
                 $quoted = !$quoted;
             } elseif ($char === '.' && $quoted) {
-                $char = "\u{fffe}";
+                $char = "￾";
             }
             $value2 .= $char;
         }
-
         return $value2;
     }
-
-    public static function convertToExcelAddressValue(string $openOfficeAddress): string
+    public static function convert_to_excel_address_value(string $open_office_address): string
     {
         // Cell range 3-d reference
         // As we don't support 3-d ranges, we're just going to take a quick and dirty approach
         //  and assume that the second worksheet reference is the same as the first
-        $excelAddress = Preg::replace(
-            [
-                '/\$?([^\.]+)\.([^\.]+):\$?([^\.]+)\.([^\.]+)/miu',
-                '/\$?([^\.]+)\.([^\.]+):\.([^\.]+)/miu', // Cell range reference in another sheet
-                '/\$?([^\.]+)\.([^\.]+)/miu', // Cell reference in another sheet
-                '/\.([^\.]+):\.([^\.]+)/miu', // Cell range reference
-                '/\.([^\.]+)/miu', // Simple cell reference
-                '/\x{FFFE}/miu', // restore quoted periods
-            ],
-            [
-                '$1!$2:$4',
-                '$1!$2:$3',
-                '$1!$2',
-                '$1:$2',
-                '$1',
-                '.',
-            ],
-            self::replaceQuotedPeriod($openOfficeAddress)
-        );
-
-        return $excelAddress;
+        $excel_address = Preg::replace([
+            '/\$?([^\.]+)\.([^\.]+):\$?([^\.]+)\.([^\.]+)/miu',
+            '/\$?([^\.]+)\.([^\.]+):\.([^\.]+)/miu',
+            // Cell range reference in another sheet
+            '/\$?([^\.]+)\.([^\.]+)/miu',
+            // Cell reference in another sheet
+            '/\.([^\.]+):\.([^\.]+)/miu',
+            // Cell range reference
+            '/\.([^\.]+)/miu',
+            // Simple cell reference
+            '/\x{FFFE}/miu',
+        ], ['$1!$2:$4', '$1!$2:$3', '$1!$2', '$1:$2', '$1', '.'], self::replace_quoted_period($open_office_address));
+        return $excel_address;
     }
-
-    public static function convertToExcelFormulaValue(string $openOfficeFormula): string
+    public static function convert_to_excel_formula_value(string $open_office_formula): string
     {
-        $temp = explode(Calculation::FORMULA_STRING_QUOTE, $openOfficeFormula);
-        $tKey = false;
-        $inMatrixBracesLevel = 0;
-        $inFunctionBracesLevel = 0;
+        $temp = explode(Calculation::FORMULA_STRING_QUOTE, $open_office_formula);
+        $t_key = false;
+        $in_matrix_braces_level = 0;
+        $in_function_braces_level = 0;
         foreach ($temp as &$value) {
             // @var string $value
             // Only replace in alternate array entries (i.e. non-quoted blocks)
             //      so that conversion isn't done in string values
-            $tKey = $tKey === false;
-            if ($tKey) {
-                $value = Preg::replace(
-                    [
-                        '/\[\$?([^\.]+)\.([^\.]+):\.([^\.]+)\]/miu', // Cell range reference in another sheet
-                        '/\[\$?([^\.]+)\.([^\.]+)\]/miu', // Cell reference in another sheet
-                        '/\[\.([^\.]+):\.([^\.]+)\]/miu', // Cell range reference
-                        '/\[\.([^\.]+)\]/miu', // Simple cell reference
-                        '/\x{FFFE}/miu', // restore quoted periods
-                    ],
-                    [
-                        '$1!$2:$3',
-                        '$1!$2',
-                        '$1:$2',
-                        '$1',
-                        '.',
-                    ],
-                    self::replaceQuotedPeriod($value)
-                );
+            $t_key = $t_key === false;
+            if ($t_key) {
+                $value = Preg::replace([
+                    '/\[\$?([^\.]+)\.([^\.]+):\.([^\.]+)\]/miu',
+                    // Cell range reference in another sheet
+                    '/\[\$?([^\.]+)\.([^\.]+)\]/miu',
+                    // Cell reference in another sheet
+                    '/\[\.([^\.]+):\.([^\.]+)\]/miu',
+                    // Cell range reference
+                    '/\[\.([^\.]+)\]/miu',
+                    // Simple cell reference
+                    '/\x{FFFE}/miu',
+                ], ['$1!$2:$3', '$1!$2', '$1:$2', '$1', '.'], self::replace_quoted_period($value));
                 // Convert references to defined names/formulae
                 $value = str_replace('$$', '', $value);
-
                 // Convert ODS function argument separators to Excel function argument separators
-                $value = Calculation::translateSeparator(';', ',', $value, $inFunctionBracesLevel);
-
+                $value = Calculation::translate_separator(';', ',', $value, $in_function_braces_level);
                 // Convert ODS matrix separators to Excel matrix separators
-                $value = Calculation::translateSeparator(
-                    ';',
-                    ',',
-                    $value,
-                    $inMatrixBracesLevel,
-                    Calculation::FORMULA_OPEN_MATRIX_BRACE,
-                    Calculation::FORMULA_CLOSE_MATRIX_BRACE
-                );
-                $value = Calculation::translateSeparator(
-                    '|',
-                    ';',
-                    $value,
-                    $inMatrixBracesLevel,
-                    Calculation::FORMULA_OPEN_MATRIX_BRACE,
-                    Calculation::FORMULA_CLOSE_MATRIX_BRACE
-                );
-
-                $value = Preg::replace(
-                    [
-                        '/\b(?<!com[.]microsoft[.])'
-                            . '(floor|ceiling)\s*[(]/ui',
-                        '/COM\.MICROSOFT\./ui',
-                    ],
-                    [
-                        '$1.ODS(',
-                        '',
-                    ],
-                    $value
-                );
+                $value = Calculation::translate_separator(';', ',', $value, $in_matrix_braces_level, Calculation::FORMULA_OPEN_MATRIX_BRACE, Calculation::FORMULA_CLOSE_MATRIX_BRACE);
+                $value = Calculation::translate_separator('|', ';', $value, $in_matrix_braces_level, Calculation::FORMULA_OPEN_MATRIX_BRACE, Calculation::FORMULA_CLOSE_MATRIX_BRACE);
+                $value = Preg::replace(['/\b(?<!com[.]microsoft[.])' . '(floor|ceiling)\s*[(]/ui', '/COM\.MICROSOFT\./ui'], ['$1.ODS(', ''], $value);
             }
         }
-
         // Then rebuild the formula string
-        $excelFormula = implode('"', $temp);
-
-        return $excelFormula;
+        $excel_formula = implode('"', $temp);
+        return $excel_formula;
     }
 }

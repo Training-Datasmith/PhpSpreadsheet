@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Helpers;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Helpers;
 class Cotangent
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * COT.
      *
@@ -26,18 +23,15 @@ class Cotangent
     public static function cot($angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::verySmallDenominator(cos($angle), sin($angle));
+        return Helpers::very_small_denominator(cos($angle), sin($angle));
     }
-
     /**
      * COTH.
      *
@@ -52,18 +46,15 @@ class Cotangent
     public static function coth($angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::verySmallDenominator(1.0, tanh($angle));
+        return Helpers::very_small_denominator(1.0, tanh($angle));
     }
-
     /**
      * ACOT.
      *
@@ -78,18 +69,15 @@ class Cotangent
     public static function acot($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return (M_PI / 2) - atan($number);
+        return M_PI / 2 - atan($number);
     }
-
     /**
      * ACOTH.
      *
@@ -104,17 +92,14 @@ class Cotangent
     public static function acoth($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $result = ($number === 1) ? NAN : (log(($number + 1) / ($number - 1)) / 2);
-
-        return Helpers::numberOrNan($result);
+        $result = $number === 1 ? NAN : log(($number + 1) / ($number - 1)) / 2;
+        return Helpers::number_or_nan($result);
     }
 }

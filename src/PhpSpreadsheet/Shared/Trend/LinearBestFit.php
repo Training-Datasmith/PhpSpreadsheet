@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared\Trend;
 
-namespace PhpOffice\PhpSpreadsheet\Shared\Trend;
-
-class LinearBestFit extends BestFit
+class Linear_Best_Fit extends Best_Fit
 {
     /**
      * Algorithm type to use for best-fit
      * (Name of this Trend class).
      */
-    protected string $bestFitType = 'linear';
-
+    protected string $best_fit_type = 'linear';
     /**
      * Return the Y-Value for a specified value of X.
      *
@@ -19,11 +17,10 @@ class LinearBestFit extends BestFit
      *
      * @return float Y-Value
      */
-    public function getValueOfYForX(float $xValue): float
+    public function get_value_of_y_for_x(float $x_value): float
     {
-        return $this->getIntersect() + $this->getSlope() * $xValue;
+        return $this->get_intersect() + $this->get_slope() * $x_value;
     }
-
     /**
      * Return the X-Value for a specified value of Y.
      *
@@ -31,47 +28,42 @@ class LinearBestFit extends BestFit
      *
      * @return float X-Value
      */
-    public function getValueOfXForY(float $yValue): float
+    public function get_value_of_x_for_y(float $y_value): float
     {
-        return ($yValue - $this->getIntersect()) / $this->getSlope();
+        return ($y_value - $this->get_intersect()) / $this->get_slope();
     }
-
     /**
      * Return the Equation of the best-fit line.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    public function getEquation(int $dp = 0): string
+    public function get_equation(int $dp = 0): string
     {
-        $slope = $this->getSlope($dp);
-        $intersect = $this->getIntersect($dp);
-
+        $slope = $this->get_slope($dp);
+        $intersect = $this->get_intersect($dp);
         return 'Y = ' . $intersect . ' + ' . $slope . ' * X';
     }
-
     /**
      * Execute the regression and calculate the goodness of fit for a set of X and Y data values.
      *
      * @param float[] $yValues The set of Y-values for this regression
      * @param float[] $xValues The set of X-values for this regression
      */
-    private function linearRegression(array $yValues, array $xValues, bool $const): void
+    private function linear_regression(array $y_values, array $x_values, bool $const): void
     {
-        $this->leastSquareFit($yValues, $xValues, $const);
+        $this->least_square_fit($y_values, $x_values, $const);
     }
-
     /**
      * Define the regression and calculate the goodness of fit for a set of X and Y data values.
      *
      * @param float[] $yValues The set of Y-values for this regression
      * @param float[] $xValues The set of X-values for this regression
      */
-    public function __construct(array $yValues, array $xValues = [], bool $const = true)
+    public function __construct(array $y_values, array $x_values = [], bool $const = true)
     {
-        parent::__construct($yValues, $xValues);
-
+        parent::__construct($y_values, $x_values);
         if (!$this->error) {
-            $this->linearRegression($this->yValues, $this->xValues, $const);
+            $this->linear_regression($this->y_values, $this->x_values, $const);
         }
     }
 }

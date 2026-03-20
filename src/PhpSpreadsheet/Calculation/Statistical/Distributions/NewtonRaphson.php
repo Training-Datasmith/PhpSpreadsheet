@@ -1,70 +1,58 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class NewtonRaphson
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Newton_Raphson
 {
     private const MAX_ITERATIONS = 256;
-
     /** @var callable(float): mixed */
     protected $callback;
-
     /** @param callable(float): mixed $callback */
     public function __construct(callable $callback)
     {
         $this->callback = $callback;
     }
-
     public function execute(float $probability): string|int|float
     {
-        $xLo = 100;
-        $xHi = 0;
-
+        $x_lo = 100;
+        $x_hi = 0;
         $dx = 1;
-        $x = $xNew = 1;
+        $x = $x_new = 1;
         $i = 0;
-
-        while ((abs($dx) > Functions::PRECISION) && ($i++ < self::MAX_ITERATIONS)) {
+        while (abs($dx) > Functions::PRECISION && $i++ < self::MAX_ITERATIONS) {
             // Apply Newton-Raphson step
             $result = call_user_func($this->callback, $x);
             if (!is_float($result)) {
-                return ExcelError::VALUE();
+                return Excel_Error::VALUE();
             }
             $error = $result - $probability;
-
             if ($error == 0.0) {
                 $dx = 0;
             } elseif ($error < 0.0) {
-                $xLo = $x;
+                $x_lo = $x;
             } else {
-                $xHi = $x;
+                $x_hi = $x;
             }
-
             // Avoid division by zero
             if ($result != 0.0) {
                 $dx = $error / $result;
-                $xNew = $x - $dx;
+                $x_new = $x - $dx;
             }
-
             // If the NR fails to converge (which for example may be the
             // case if the initial guess is too rough) we apply a bisection
             // step to determine a more narrow interval around the root.
-            if (($xNew < $xLo) || ($xNew > $xHi) || ($result == 0.0)) {
-                $xNew = ($xLo + $xHi) / 2;
-                $dx = $xNew - $x;
+            if ($x_new < $x_lo || $x_new > $x_hi || $result == 0.0) {
+                $x_new = ($x_lo + $x_hi) / 2;
+                $dx = $x_new - $x;
             }
-            $x = $xNew;
+            $x = $x_new;
         }
-
         if ($i == self::MAX_ITERATIONS) {
-            return ExcelError::NA();
+            return Excel_Error::NA();
         }
-
         return $x;
     }
 }

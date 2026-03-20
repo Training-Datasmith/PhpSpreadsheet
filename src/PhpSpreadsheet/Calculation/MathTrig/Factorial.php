@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical;
 class Factorial
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * FACT.
      *
@@ -29,34 +26,29 @@ class Factorial
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function fact($factVal): array|string|float|int
+    public static function fact($fact_val): array|string|float|int
     {
-        if (is_array($factVal)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $factVal);
+        if (is_array($fact_val)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $fact_val);
         }
-
         try {
-            $factVal = Helpers::validateNumericNullBool($factVal);
-            Helpers::validateNotNegative($factVal);
+            $fact_val = Helpers::validate_numeric_null_bool($fact_val);
+            Helpers::validate_not_negative($fact_val);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $factLoop = floor($factVal);
-        if ($factVal > $factLoop) {
-            if (Functions::getCompatibilityMode() == Functions::COMPATIBILITY_GNUMERIC) {
-                return Statistical\Distributions\Gamma::gammaValue($factVal + 1);
+        $fact_loop = floor($fact_val);
+        if ($fact_val > $fact_loop) {
+            if (Functions::get_compatibility_mode() == Functions::COMPATIBILITY_GNUMERIC) {
+                return Statistical\Distributions\Gamma::gamma_value($fact_val + 1);
             }
         }
-
         $factorial = 1;
-        while ($factLoop > 1) {
-            $factorial *= $factLoop--;
+        while ($fact_loop > 1) {
+            $factorial *= $fact_loop--;
         }
-
         return $factorial;
     }
-
     /**
      * FACTDOUBLE.
      *
@@ -71,29 +63,25 @@ class Factorial
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function factDouble($factVal): array|string|float|int
+    public static function fact_double($fact_val): array|string|float|int
     {
-        if (is_array($factVal)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $factVal);
+        if (is_array($fact_val)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $fact_val);
         }
-
         try {
-            $factVal = Helpers::validateNumericNullSubstitution($factVal, 0);
-            Helpers::validateNotNegative($factVal);
+            $fact_val = Helpers::validate_numeric_null_substitution($fact_val, 0);
+            Helpers::validate_not_negative($fact_val);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $factLoop = floor($factVal);
+        $fact_loop = floor($fact_val);
         $factorial = 1;
-        while ($factLoop > 1) {
-            $factorial *= $factLoop;
-            $factLoop -= 2;
+        while ($fact_loop > 1) {
+            $factorial *= $fact_loop;
+            $fact_loop -= 2;
         }
-
         return $factorial;
     }
-
     /**
      * MULTINOMIAL.
      *
@@ -107,12 +95,11 @@ class Factorial
     {
         $summer = 0;
         $divisor = 1;
-
         try {
             // Loop through arguments
-            foreach (Functions::flattenArray($args) as $argx) {
-                $arg = Helpers::validateNumericNullSubstitution($argx, null);
-                Helpers::validateNotNegative($arg);
+            foreach (Functions::flatten_array($args) as $argx) {
+                $arg = Helpers::validate_numeric_null_substitution($argx, null);
+                Helpers::validate_not_negative($arg);
                 $arg = (int) $arg;
                 $summer += $arg;
                 /** @var float|int */
@@ -120,11 +107,9 @@ class Factorial
                 $divisor *= $temp;
             }
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         $summer = self::fact($summer);
-
-        return is_numeric($summer) ? ($summer / $divisor) : ExcelError::VALUE();
+        return is_numeric($summer) ? $summer / $divisor : Excel_Error::VALUE();
     }
 }

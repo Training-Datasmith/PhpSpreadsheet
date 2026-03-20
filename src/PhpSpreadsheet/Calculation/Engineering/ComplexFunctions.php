@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
 use Complex\Complex as ComplexObject;
 use Complex\Exception as ComplexException;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ComplexFunctions
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Complex_Functions
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * IMABS.
      *
@@ -27,21 +24,18 @@ class ComplexFunctions
      * @return array<mixed>|float|string         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMABS(array|string $complexNumber): array|float|string
+    public static function IMABS(array|string $complex_number): array|float|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return $complex->abs();
     }
-
     /**
      * IMARGUMENT.
      *
@@ -57,25 +51,21 @@ class ComplexFunctions
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMARGUMENT(array|string $complexNumber): array|float|string
+    public static function IMARGUMENT(array|string $complex_number): array|float|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
-            return ExcelError::DIV0();
+        if ($complex->get_real() == 0.0 && $complex->get_imaginary() == 0.0) {
+            return Excel_Error::DIV0();
         }
-
         return $complex->argument();
     }
-
     /**
      * IMCONJUGATE.
      *
@@ -90,21 +80,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMCONJUGATE(array|string $complexNumber): array|string
+    public static function IMCONJUGATE(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->conjugate();
     }
-
     /**
      * IMCOS.
      *
@@ -119,21 +106,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMCOS(array|string $complexNumber): array|string
+    public static function IMCOS(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->cos();
     }
-
     /**
      * IMCOSH.
      *
@@ -148,21 +132,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMCOSH(array|string $complexNumber): array|string
+    public static function IMCOSH(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->cosh();
     }
-
     /**
      * IMCOT.
      *
@@ -177,21 +158,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMCOT(array|string $complexNumber): array|string
+    public static function IMCOT(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->cot();
     }
-
     /**
      * IMCSC.
      *
@@ -206,21 +184,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMCSC(array|string $complexNumber): array|string
+    public static function IMCSC(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->csc();
     }
-
     /**
      * IMCSCH.
      *
@@ -235,21 +210,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMCSCH(array|string $complexNumber): array|string
+    public static function IMCSCH(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->csch();
     }
-
     /**
      * IMSIN.
      *
@@ -264,21 +236,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMSIN(array|string $complexNumber): array|string
+    public static function IMSIN(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->sin();
     }
-
     /**
      * IMSINH.
      *
@@ -293,21 +262,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMSINH(array|string $complexNumber): array|string
+    public static function IMSINH(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->sinh();
     }
-
     /**
      * IMSEC.
      *
@@ -322,21 +288,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMSEC(array|string $complexNumber): array|string
+    public static function IMSEC(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->sec();
     }
-
     /**
      * IMSECH.
      *
@@ -351,21 +314,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMSECH(array|string $complexNumber): array|string
+    public static function IMSECH(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->sech();
     }
-
     /**
      * IMTAN.
      *
@@ -380,21 +340,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMTAN(array|string $complexNumber): array|string
+    public static function IMTAN(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->tan();
     }
-
     /**
      * IMSQRT.
      *
@@ -409,26 +366,22 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMSQRT(array|string $complexNumber): array|string
+    public static function IMSQRT(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        $theta = self::IMARGUMENT($complexNumber);
-        if ($theta === ExcelError::DIV0()) {
+        $theta = self::IMARGUMENT($complex_number);
+        if ($theta === Excel_Error::DIV0()) {
             return '0';
         }
-
         return (string) $complex->sqrt();
     }
-
     /**
      * IMLN.
      *
@@ -443,25 +396,21 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMLN(array|string $complexNumber): array|string
+    public static function IMLN(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
-            return ExcelError::NAN();
+        if ($complex->get_real() == 0.0 && $complex->get_imaginary() == 0.0) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->ln();
     }
-
     /**
      * IMLOG10.
      *
@@ -476,25 +425,21 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMLOG10(array|string $complexNumber): array|string
+    public static function IMLOG10(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
-            return ExcelError::NAN();
+        if ($complex->get_real() == 0.0 && $complex->get_imaginary() == 0.0) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->log10();
     }
-
     /**
      * IMLOG2.
      *
@@ -509,25 +454,21 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMLOG2(array|string $complexNumber): array|string
+    public static function IMLOG2(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
-            return ExcelError::NAN();
+        if ($complex->get_real() == 0.0 && $complex->get_imaginary() == 0.0) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->log2();
     }
-
     /**
      * IMEXP.
      *
@@ -542,21 +483,18 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMEXP(array|string $complexNumber): array|string
+    public static function IMEXP(array|string $complex_number): array|string
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
         return (string) $complex->exp();
     }
-
     /**
      * IMPOWER.
      *
@@ -573,22 +511,19 @@ class ComplexFunctions
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMPOWER(array|string $complexNumber, array|float|int|string $realNumber): array|string
+    public static function IMPOWER(array|string $complex_number, array|float|int|string $real_number): array|string
     {
-        if (is_array($complexNumber) || is_array($realNumber)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $complexNumber, $realNumber);
+        if (is_array($complex_number) || is_array($real_number)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $complex_number, $real_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        if (!is_numeric($realNumber)) {
-            return ExcelError::VALUE();
+        if (!is_numeric($real_number)) {
+            return Excel_Error::VALUE();
         }
-
-        return (string) $complex->pow((float) $realNumber);
+        return (string) $complex->pow((float) $real_number);
     }
 }

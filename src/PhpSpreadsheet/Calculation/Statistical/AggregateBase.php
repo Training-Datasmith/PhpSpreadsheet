@@ -1,46 +1,42 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
-abstract class AggregateBase
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+abstract class Aggregate_Base
 {
     /**
      * MS Excel does not count Booleans if passed as cell values, but they are counted if passed as literals.
      * OpenOffice Calc always counts Booleans.
      * Gnumeric never counts Booleans.
      */
-    protected static function testAcceptedBoolean(mixed $arg, mixed $k): mixed
+    protected static function test_accepted_boolean(mixed $arg, mixed $k): mixed
     {
         if (!is_bool($arg)) {
             return $arg;
         }
-        if (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_GNUMERIC) {
+        if (Functions::get_compatibility_mode() === Functions::COMPATIBILITY_GNUMERIC) {
             return $arg;
         }
-        if (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
+        if (Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE) {
             return (int) $arg;
         }
-        if (!Functions::isCellValue($k)) {
+        if (!Functions::is_cell_value($k)) {
             return (int) $arg;
         }
         /*if (
-            (is_bool($arg)) &&
-            ((!Functions::isCellValue($k) && (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_EXCEL)) ||
-                (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE))
-        ) {
-            $arg = (int) $arg;
-        }*/
-
+              (is_bool($arg)) &&
+              ((!Functions::isCellValue($k) && (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_EXCEL)) ||
+                  (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE))
+          ) {
+              $arg = (int) $arg;
+          }*/
         return $arg;
     }
-
-    protected static function isAcceptedCountable(mixed $arg, mixed $k, bool $countNull = false): bool
+    protected static function is_accepted_countable(mixed $arg, mixed $k, bool $count_null = false): bool
     {
-        if ($countNull && $arg === null && !Functions::isCellValue($k) && Functions::getCompatibilityMode() !== Functions::COMPATIBILITY_GNUMERIC) {
+        if ($count_null && $arg === null && !Functions::is_cell_value($k) && Functions::get_compatibility_mode() !== Functions::COMPATIBILITY_GNUMERIC) {
             return true;
         }
         if (!is_numeric($arg)) {
@@ -49,13 +45,12 @@ abstract class AggregateBase
         if (!is_string($arg)) {
             return true;
         }
-        if (!Functions::isCellValue($k) && Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
+        if (!Functions::is_cell_value($k) && Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE) {
             return true;
         }
-        if (!Functions::isCellValue($k) && Functions::getCompatibilityMode() !== Functions::COMPATIBILITY_GNUMERIC) {
+        if (!Functions::is_cell_value($k) && Functions::get_compatibility_mode() !== Functions::COMPATIBILITY_GNUMERIC) {
             return true;
         }
-
         return false;
     }
 }

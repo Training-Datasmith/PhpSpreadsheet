@@ -1,33 +1,27 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xml\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xml\Style;
-
-use SimpleXMLElement;
-
-abstract class StyleBase
+use Simple_Xml_Element;
+abstract class Style_Base
 {
     /** @param string[] $styleList */
-    protected static function identifyFixedStyleValue(array $styleList, string &$styleAttributeValue): bool
+    protected static function identify_fixed_style_value(array $style_list, string &$style_attribute_value): bool
     {
-        $returnValue = false;
-
-        $styleAttributeValue = strtolower($styleAttributeValue);
-        foreach ($styleList as $style) {
-            if ($styleAttributeValue == strtolower($style)) {
-                $styleAttributeValue = $style;
-                $returnValue = true;
-
+        $return_value = false;
+        $style_attribute_value = strtolower($style_attribute_value);
+        foreach ($style_list as $style) {
+            if ($style_attribute_value == strtolower($style)) {
+                $style_attribute_value = $style;
+                $return_value = true;
                 break;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
-    protected static function getAttributes(?SimpleXMLElement $simple, string $node): SimpleXMLElement
+    protected static function get_attributes(?Simple_Xml_Element $simple, string $node): Simple_Xml_Element
     {
-        return ($simple === null) ? new SimpleXMLElement('<xml></xml>') : ($simple->attributes($node) ?? new SimpleXMLElement('<xml></xml>'));
+        return $simple === null ? new Simple_Xml_Element('<xml></xml>') : $simple->attributes($node) ?? new Simple_Xml_Element('<xml></xml>');
     }
 }

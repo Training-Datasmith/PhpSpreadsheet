@@ -1,79 +1,61 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Comment;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-
-class Comments extends WriterPart
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Comment;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Style\Alignment;
+class Comments extends Writer_Part
 {
-    private const VALID_HORIZONTAL_ALIGNMENT = [
-        Alignment::HORIZONTAL_CENTER,
-        Alignment::HORIZONTAL_DISTRIBUTED,
-        Alignment::HORIZONTAL_JUSTIFY,
-        Alignment::HORIZONTAL_LEFT,
-        Alignment::HORIZONTAL_RIGHT,
-    ];
-
+    private const VALID_HORIZONTAL_ALIGNMENT = [Alignment::HORIZONTAL_CENTER, Alignment::HORIZONTAL_DISTRIBUTED, Alignment::HORIZONTAL_JUSTIFY, Alignment::HORIZONTAL_LEFT, Alignment::HORIZONTAL_RIGHT];
     /**
      * Write comments to XML format.
      *
      * @return string XML Output
      */
-    public function writeComments(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet): string
+    public function write_comments(\Php_Office\Php_Spreadsheet\Worksheet\Worksheet $worksheet): string
     {
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // Comments cache
-        $comments = $worksheet->getComments();
-
+        $comments = $worksheet->get_comments();
         // Authors cache
         $authors = [];
-        $authorId = 0;
+        $author_id = 0;
         foreach ($comments as $comment) {
-            if (!isset($authors[$comment->getAuthor()])) {
-                $authors[$comment->getAuthor()] = $authorId++;
+            if (!isset($authors[$comment->get_author()])) {
+                $authors[$comment->get_author()] = $author_id++;
             }
         }
-
         // comments
-        $objWriter->startElement('comments');
-        $objWriter->writeAttribute('xmlns', Namespaces::MAIN);
-
+        $obj_writer->start_element('comments');
+        $obj_writer->write_attribute('xmlns', Namespaces::MAIN);
         // Loop through authors
-        $objWriter->startElement('authors');
+        $obj_writer->start_element('authors');
         foreach ($authors as $author => $index) {
-            $objWriter->writeElement('author', $author);
+            $obj_writer->write_element('author', $author);
         }
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
         // Loop through comments
-        $objWriter->startElement('commentList');
+        $obj_writer->start_element('commentList');
         foreach ($comments as $key => $value) {
-            $this->writeComment($objWriter, $key, $value, $authors);
+            $this->write_comment($obj_writer, $key, $value, $authors);
         }
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write comment to XML format.
      *
@@ -81,175 +63,142 @@ class Comments extends WriterPart
      * @param Comment $comment Comment
      * @param array<string, int> $authors Array of authors
      */
-    private function writeComment(XMLWriter $objWriter, string $cellReference, Comment $comment, array $authors): void
+    private function write_comment(Xml_Writer $obj_writer, string $cell_reference, Comment $comment, array $authors): void
     {
         // comment
-        $objWriter->startElement('comment');
-        $objWriter->writeAttribute('ref', $cellReference);
-        $objWriter->writeAttribute('authorId', (string) $authors[$comment->getAuthor()]);
-
+        $obj_writer->start_element('comment');
+        $obj_writer->write_attribute('ref', $cell_reference);
+        $obj_writer->write_attribute('authorId', (string) $authors[$comment->get_author()]);
         // text
-        $objWriter->startElement('text');
-        $this->getParentWriter()->getWriterPartstringtable()->writeRichText($objWriter, $comment->getText());
-        $objWriter->endElement();
-
-        $objWriter->endElement();
+        $obj_writer->start_element('text');
+        $this->get_parent_writer()->get_writer_partstringtable()->write_rich_text($obj_writer, $comment->get_text());
+        $obj_writer->end_element();
+        $obj_writer->end_element();
     }
-
     /**
      * Write VML comments to XML format.
      *
      * @return string XML Output
      */
-    public function writeVMLComments(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet): string
+    public function write_vml_comments(\Php_Office\Php_Spreadsheet\Worksheet\Worksheet $worksheet): string
     {
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // Comments cache
-        $comments = $worksheet->getComments();
-
+        $comments = $worksheet->get_comments();
         // xml
-        $objWriter->startElement('xml');
-        $objWriter->writeAttribute('xmlns:v', Namespaces::URN_VML);
-        $objWriter->writeAttribute('xmlns:o', Namespaces::URN_MSOFFICE);
-        $objWriter->writeAttribute('xmlns:x', Namespaces::URN_EXCEL);
-
+        $obj_writer->start_element('xml');
+        $obj_writer->write_attribute('xmlns:v', Namespaces::URN_VML);
+        $obj_writer->write_attribute('xmlns:o', Namespaces::URN_MSOFFICE);
+        $obj_writer->write_attribute('xmlns:x', Namespaces::URN_EXCEL);
         // o:shapelayout
-        $objWriter->startElement('o:shapelayout');
-        $objWriter->writeAttribute('v:ext', 'edit');
-
+        $obj_writer->start_element('o:shapelayout');
+        $obj_writer->write_attribute('v:ext', 'edit');
         // o:idmap
-        $objWriter->startElement('o:idmap');
-        $objWriter->writeAttribute('v:ext', 'edit');
-        $objWriter->writeAttribute('data', '1');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('o:idmap');
+        $obj_writer->write_attribute('v:ext', 'edit');
+        $obj_writer->write_attribute('data', '1');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // v:shapetype
-        $objWriter->startElement('v:shapetype');
-        $objWriter->writeAttribute('id', '_x0000_t202');
-        $objWriter->writeAttribute('coordsize', '21600,21600');
-        $objWriter->writeAttribute('o:spt', '202');
-        $objWriter->writeAttribute('path', 'm,l,21600r21600,l21600,xe');
-
+        $obj_writer->start_element('v:shapetype');
+        $obj_writer->write_attribute('id', '_x0000_t202');
+        $obj_writer->write_attribute('coordsize', '21600,21600');
+        $obj_writer->write_attribute('o:spt', '202');
+        $obj_writer->write_attribute('path', 'm,l,21600r21600,l21600,xe');
         // v:stroke
-        $objWriter->startElement('v:stroke');
-        $objWriter->writeAttribute('joinstyle', 'miter');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:stroke');
+        $obj_writer->write_attribute('joinstyle', 'miter');
+        $obj_writer->end_element();
         // v:path
-        $objWriter->startElement('v:path');
-        $objWriter->writeAttribute('gradientshapeok', 't');
-        $objWriter->writeAttribute('o:connecttype', 'rect');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:path');
+        $obj_writer->write_attribute('gradientshapeok', 't');
+        $obj_writer->write_attribute('o:connecttype', 'rect');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // Loop through comments
         foreach ($comments as $key => $value) {
-            $this->writeVMLComment($objWriter, $key, $value);
+            $this->write_vml_comment($obj_writer, $key, $value);
         }
-
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write VML comment to XML format.
      *
      * @param string $cellReference Cell reference, eg: 'A1'
      * @param Comment $comment Comment
      */
-    private function writeVMLComment(XMLWriter $objWriter, string $cellReference, Comment $comment): void
+    private function write_vml_comment(Xml_Writer $obj_writer, string $cell_reference, Comment $comment): void
     {
         // Metadata
-        [$column, $row] = Coordinate::indexesFromString($cellReference);
+        [$column, $row] = Coordinate::indexes_from_string($cell_reference);
         $id = 1024 + $column + $row;
-        $id = substr("$id", 0, 4);
-
+        $id = substr("{$id}", 0, 4);
         // v:shape
-        $objWriter->startElement('v:shape');
-        $objWriter->writeAttribute('id', '_x0000_s' . $id);
-        $objWriter->writeAttribute('type', '#_x0000_t202');
-        $objWriter->writeAttribute('style', 'position:absolute;margin-left:' . $comment->getMarginLeft() . ';margin-top:' . $comment->getMarginTop() . ';width:' . $comment->getWidth() . ';height:' . $comment->getHeight() . ';z-index:1;visibility:' . ($comment->getVisible() ? 'visible' : 'hidden'));
-        $objWriter->writeAttribute('fillcolor', '#' . $comment->getFillColor()->getRGB());
-        $objWriter->writeAttribute('o:insetmode', 'auto');
-
+        $obj_writer->start_element('v:shape');
+        $obj_writer->write_attribute('id', '_x0000_s' . $id);
+        $obj_writer->write_attribute('type', '#_x0000_t202');
+        $obj_writer->write_attribute('style', 'position:absolute;margin-left:' . $comment->get_margin_left() . ';margin-top:' . $comment->get_margin_top() . ';width:' . $comment->get_width() . ';height:' . $comment->get_height() . ';z-index:1;visibility:' . ($comment->get_visible() ? 'visible' : 'hidden'));
+        $obj_writer->write_attribute('fillcolor', '#' . $comment->get_fill_color()->get_rgb());
+        $obj_writer->write_attribute('o:insetmode', 'auto');
         // v:fill
-        $objWriter->startElement('v:fill');
-        $objWriter->writeAttribute('color2', '#' . $comment->getFillColor()->getRGB());
-        if ($comment->hasBackgroundImage()) {
-            $bgImage = $comment->getBackgroundImage();
-            $objWriter->writeAttribute('o:relid', 'rId' . $bgImage->getImageIndex());
-            $objWriter->writeAttribute('o:title', $bgImage->getName());
-            $objWriter->writeAttribute('type', 'frame');
+        $obj_writer->start_element('v:fill');
+        $obj_writer->write_attribute('color2', '#' . $comment->get_fill_color()->get_rgb());
+        if ($comment->has_background_image()) {
+            $bg_image = $comment->get_background_image();
+            $obj_writer->write_attribute('o:relid', 'rId' . $bg_image->get_image_index());
+            $obj_writer->write_attribute('o:title', $bg_image->get_name());
+            $obj_writer->write_attribute('type', 'frame');
         }
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
         // v:shadow
-        $objWriter->startElement('v:shadow');
-        $objWriter->writeAttribute('on', 't');
-        $objWriter->writeAttribute('color', 'black');
-        $objWriter->writeAttribute('obscured', 't');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:shadow');
+        $obj_writer->write_attribute('on', 't');
+        $obj_writer->write_attribute('color', 'black');
+        $obj_writer->write_attribute('obscured', 't');
+        $obj_writer->end_element();
         // v:path
-        $objWriter->startElement('v:path');
-        $objWriter->writeAttribute('o:connecttype', 'none');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:path');
+        $obj_writer->write_attribute('o:connecttype', 'none');
+        $obj_writer->end_element();
         // v:textbox
-        $textBoxArray = [Comment::TEXTBOX_DIRECTION_RTL => 'rtl', Comment::TEXTBOX_DIRECTION_LTR => 'ltr'];
-        $textboxRtl = $textBoxArray[strtolower($comment->getTextBoxDirection())] ?? 'auto';
-        $objWriter->startElement('v:textbox');
-        $objWriter->writeAttribute('style', "mso-direction-alt:$textboxRtl");
-
+        $text_box_array = [Comment::TEXTBOX_DIRECTION_RTL => 'rtl', Comment::TEXTBOX_DIRECTION_LTR => 'ltr'];
+        $textbox_rtl = $text_box_array[strtolower($comment->get_text_box_direction())] ?? 'auto';
+        $obj_writer->start_element('v:textbox');
+        $obj_writer->write_attribute('style', "mso-direction-alt:{$textbox_rtl}");
         // div
-        $objWriter->startElement('div');
-        $objWriter->writeAttribute('style', ($textboxRtl === 'rtl' ? 'text-align:right;direction:rtl' : 'text-align:left'));
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('div');
+        $obj_writer->write_attribute('style', $textbox_rtl === 'rtl' ? 'text-align:right;direction:rtl' : 'text-align:left');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // x:ClientData
-        $objWriter->startElement('x:ClientData');
-        $objWriter->writeAttribute('ObjectType', 'Note');
-
+        $obj_writer->start_element('x:ClientData');
+        $obj_writer->write_attribute('ObjectType', 'Note');
         // x:MoveWithCells
-        $objWriter->writeElement('x:MoveWithCells', '');
-
+        $obj_writer->write_element('x:MoveWithCells', '');
         // x:SizeWithCells
-        $objWriter->writeElement('x:SizeWithCells', '');
-
+        $obj_writer->write_element('x:SizeWithCells', '');
         // x:AutoFill
-        $objWriter->writeElement('x:AutoFill', 'False');
-
+        $obj_writer->write_element('x:AutoFill', 'False');
         // x:TextHAlign horizontal alignment of text
-        $alignment = strtolower($comment->getAlignment());
+        $alignment = strtolower($comment->get_alignment());
         if (in_array($alignment, self::VALID_HORIZONTAL_ALIGNMENT, true)) {
-            $objWriter->writeElement('x:TextHAlign', ucfirst($alignment));
+            $obj_writer->write_element('x:TextHAlign', ucfirst($alignment));
         }
-
         // x:Row
-        $objWriter->writeElement('x:Row', (string) ($row - 1));
-
+        $obj_writer->write_element('x:Row', (string) ($row - 1));
         // x:Column
-        $objWriter->writeElement('x:Column', (string) ($column - 1));
-
-        $objWriter->endElement();
-
-        $objWriter->endElement();
+        $obj_writer->write_element('x:Column', (string) ($column - 1));
+        $obj_writer->end_element();
+        $obj_writer->end_element();
     }
 }

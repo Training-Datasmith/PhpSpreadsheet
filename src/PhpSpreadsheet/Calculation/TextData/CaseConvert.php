@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Text_Data;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcExp;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
-class CaseConvert
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception as CalcExp;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+class Case_Convert
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * LOWERCASE.
      *
@@ -23,21 +20,18 @@ class CaseConvert
      * @return array<mixed>|string If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function lower(mixed $mixedCaseValue): array|string
+    public static function lower(mixed $mixed_case_value): array|string
     {
-        if (is_array($mixedCaseValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $mixedCaseValue);
+        if (is_array($mixed_case_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $mixed_case_value);
         }
-
         try {
-            $mixedCaseValue = Helpers::extractString($mixedCaseValue, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+            $mixed_case_value = Helpers::extract_string($mixed_case_value, true);
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-
-        return StringHelper::strToLower($mixedCaseValue);
+        return String_Helper::str_to_lower($mixed_case_value);
     }
-
     /**
      * UPPERCASE.
      *
@@ -49,21 +43,18 @@ class CaseConvert
      * @return array<mixed>|string If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function upper(mixed $mixedCaseValue): array|string
+    public static function upper(mixed $mixed_case_value): array|string
     {
-        if (is_array($mixedCaseValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $mixedCaseValue);
+        if (is_array($mixed_case_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $mixed_case_value);
         }
-
         try {
-            $mixedCaseValue = Helpers::extractString($mixedCaseValue, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+            $mixed_case_value = Helpers::extract_string($mixed_case_value, true);
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-
-        return StringHelper::strToUpper($mixedCaseValue);
+        return String_Helper::str_to_upper($mixed_case_value);
     }
-
     /**
      * PROPERCASE.
      *
@@ -75,18 +66,16 @@ class CaseConvert
      * @return array<mixed>|string If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function proper(mixed $mixedCaseValue): array|string
+    public static function proper(mixed $mixed_case_value): array|string
     {
-        if (is_array($mixedCaseValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $mixedCaseValue);
+        if (is_array($mixed_case_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $mixed_case_value);
         }
-
         try {
-            $mixedCaseValue = Helpers::extractString($mixedCaseValue, true);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+            $mixed_case_value = Helpers::extract_string($mixed_case_value, true);
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-
-        return StringHelper::strToTitle($mixedCaseValue);
+        return String_Helper::str_to_title($mixed_case_value);
     }
 }

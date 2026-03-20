@@ -1,73 +1,49 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xml\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xml\Style;
-
-use PhpOffice\PhpSpreadsheet\Style\Alignment as AlignmentStyles;
-use SimpleXMLElement;
-
-class Alignment extends StyleBase
+use Php_Office\Php_Spreadsheet\Style\Alignment as AlignmentStyles;
+use Simple_Xml_Element;
+class Alignment extends Style_Base
 {
-    protected const VERTICAL_ALIGNMENT_STYLES = [
-        AlignmentStyles::VERTICAL_BOTTOM,
-        AlignmentStyles::VERTICAL_TOP,
-        AlignmentStyles::VERTICAL_CENTER,
-        AlignmentStyles::VERTICAL_JUSTIFY,
-    ];
-
-    protected const HORIZONTAL_ALIGNMENT_STYLES = [
-        AlignmentStyles::HORIZONTAL_GENERAL,
-        AlignmentStyles::HORIZONTAL_LEFT,
-        AlignmentStyles::HORIZONTAL_RIGHT,
-        AlignmentStyles::HORIZONTAL_CENTER,
-        AlignmentStyles::HORIZONTAL_CENTER_CONTINUOUS,
-        AlignmentStyles::HORIZONTAL_JUSTIFY,
-    ];
-
+    protected const VERTICAL_ALIGNMENT_STYLES = [Alignment_Styles::VERTICAL_BOTTOM, Alignment_Styles::VERTICAL_TOP, Alignment_Styles::VERTICAL_CENTER, Alignment_Styles::VERTICAL_JUSTIFY];
+    protected const HORIZONTAL_ALIGNMENT_STYLES = [Alignment_Styles::HORIZONTAL_GENERAL, Alignment_Styles::HORIZONTAL_LEFT, Alignment_Styles::HORIZONTAL_RIGHT, Alignment_Styles::HORIZONTAL_CENTER, Alignment_Styles::HORIZONTAL_CENTER_CONTINUOUS, Alignment_Styles::HORIZONTAL_JUSTIFY];
     /** @return mixed[] */
-    public function parseStyle(SimpleXMLElement $styleAttributes): array
+    public function parse_style(Simple_Xml_Element $style_attributes): array
     {
         $style = [];
-
-        foreach ($styleAttributes as $styleAttributeKey => $styleAttributeValue) {
-            $styleAttributeValue = (string) $styleAttributeValue;
-            switch ($styleAttributeKey) {
+        foreach ($style_attributes as $style_attribute_key => $style_attribute_value) {
+            $style_attribute_value = (string) $style_attribute_value;
+            switch ($style_attribute_key) {
                 case 'Vertical':
-                    if (self::identifyFixedStyleValue(self::VERTICAL_ALIGNMENT_STYLES, $styleAttributeValue)) {
-                        $style['alignment']['vertical'] = $styleAttributeValue;
+                    if (self::identify_fixed_style_value(self::VERTICAL_ALIGNMENT_STYLES, $style_attribute_value)) {
+                        $style['alignment']['vertical'] = $style_attribute_value;
                     }
-
                     break;
                 case 'Horizontal':
-                    if (self::identifyFixedStyleValue(self::HORIZONTAL_ALIGNMENT_STYLES, $styleAttributeValue)) {
-                        $style['alignment']['horizontal'] = $styleAttributeValue;
+                    if (self::identify_fixed_style_value(self::HORIZONTAL_ALIGNMENT_STYLES, $style_attribute_value)) {
+                        $style['alignment']['horizontal'] = $style_attribute_value;
                     }
-
                     break;
                 case 'WrapText':
                     $style['alignment']['wrapText'] = true;
-
                     break;
                 case 'Rotate':
-                    $style['alignment']['textRotation'] = $styleAttributeValue;
-
+                    $style['alignment']['textRotation'] = $style_attribute_value;
                     break;
                 case 'Indent':
-                    $style['alignment']['indent'] = $styleAttributeValue;
-
+                    $style['alignment']['indent'] = $style_attribute_value;
                     break;
                 case 'ReadingOrder':
-                    if ($styleAttributeValue === 'RightToLeft') {
-                        $style['alignment']['readOrder'] = AlignmentStyles::READORDER_RTL;
-                    } elseif ($styleAttributeValue === 'LeftToRight') {
-                        $style['alignment']['readOrder'] = AlignmentStyles::READORDER_LTR;
+                    if ($style_attribute_value === 'RightToLeft') {
+                        $style['alignment']['readOrder'] = Alignment_Styles::READORDER_RTL;
+                    } elseif ($style_attribute_value === 'LeftToRight') {
+                        $style['alignment']['readOrder'] = Alignment_Styles::READORDER_LTR;
                     }
-
                     break;
             }
         }
-
         return $style;
     }
 }

@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format\Wizard;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard;
-
-use PhpOffice\PhpSpreadsheet\Exception;
-
-class Scientific extends NumberBase implements Wizard
+use Php_Office\Php_Spreadsheet\Exception;
+class Scientific extends Number_Base implements Wizard
 {
     /**
      * @param int $decimals number of decimal places to display, in the range 0-30
@@ -19,15 +17,13 @@ class Scientific extends NumberBase implements Wizard
      */
     public function __construct(int $decimals = 2, ?string $locale = null)
     {
-        $this->setDecimals($decimals);
-        $this->setLocale($locale);
+        $this->set_decimals($decimals);
+        $this->set_locale($locale);
     }
-
-    protected function getLocaleFormat(): string
+    protected function get_locale_format(): string
     {
         return $this->format();
     }
-
     public function format(): string
     {
         return sprintf('0%sE+00', $this->decimals > 0 ? '.' . str_repeat('0', $this->decimals) : null);

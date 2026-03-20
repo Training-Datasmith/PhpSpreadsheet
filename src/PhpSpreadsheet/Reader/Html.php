@@ -1,254 +1,172 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader;
 
-namespace PhpOffice\PhpSpreadsheet\Reader;
-
-use DOMAttr;
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMText;
-use LibXMLError;
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Comment;
-use PhpOffice\PhpSpreadsheet\Document\Properties;
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Helper\Dimension as CssDimension;
-use PhpOffice\PhpSpreadsheet\Helper\Html as HelperHtml;
-use PhpOffice\PhpSpreadsheet\Reader\Security\XmlScanner;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Dom_Attr;
+use Dom_Document;
+use Dom_Element;
+use Dom_Node;
+use Dom_Text;
+use Lib_Xml_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Cell\Data_Type;
+use Php_Office\Php_Spreadsheet\Comment;
+use Php_Office\Php_Spreadsheet\Document\Properties;
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+use Php_Office\Php_Spreadsheet\Helper\Dimension as CssDimension;
+use Php_Office\Php_Spreadsheet\Helper\Html as HelperHtml;
+use Php_Office\Php_Spreadsheet\Reader\Security\Xml_Scanner;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Style\Alignment;
+use Php_Office\Php_Spreadsheet\Style\Border;
+use Php_Office\Php_Spreadsheet\Style\Color;
+use Php_Office\Php_Spreadsheet\Style\Fill;
+use Php_Office\Php_Spreadsheet\Style\Font;
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Drawing;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 use Throwable;
-
-class Html extends BaseReader
+class Html extends Base_Reader
 {
     /**
      * Sample size to read to determine if it's HTML or not.
      */
     public const TEST_SAMPLE_SIZE = 2048;
-
     private const STARTS_WITH_BOM = '/^(?:\xfe\xff|\xff\xfe|\xEF\xBB\xBF)/';
-
     private const DECLARES_CHARSET = '/\bcharset=/i';
-
     /**
      * Input encoding.
      */
-    protected string $inputEncoding = 'ANSI';
-
+    protected string $input_encoding = 'ANSI';
     /**
      * Sheet index to read.
      */
-    protected int $sheetIndex = 0;
-
+    protected int $sheet_index = 0;
     /**
      * Formats.
      */
     protected const FORMATS = [
-        'h1' => [
-            'font' => [
-                'bold' => true,
-                'size' => 24,
-            ],
-        ], //    Bold, 24pt
-        'h2' => [
-            'font' => [
-                'bold' => true,
-                'size' => 18,
-            ],
-        ], //    Bold, 18pt
-        'h3' => [
-            'font' => [
-                'bold' => true,
-                'size' => 13.5,
-            ],
-        ], //    Bold, 13.5pt
-        'h4' => [
-            'font' => [
-                'bold' => true,
-                'size' => 12,
-            ],
-        ], //    Bold, 12pt
-        'h5' => [
-            'font' => [
-                'bold' => true,
-                'size' => 10,
-            ],
-        ], //    Bold, 10pt
-        'h6' => [
-            'font' => [
-                'bold' => true,
-                'size' => 7.5,
-            ],
-        ], //    Bold, 7.5pt
-        'a' => [
-            'font' => [
-                'underline' => true,
-                'color' => [
-                    'argb' => Color::COLOR_BLUE,
-                ],
-            ],
-        ], //    Blue underlined
-        'hr' => [
-            'borders' => [
-                'bottom' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => [
-                        Color::COLOR_BLACK,
-                    ],
-                ],
-            ],
-        ], //    Bottom border
-        'strong' => [
-            'font' => [
-                'bold' => true,
-            ],
-        ], //    Bold
-        'b' => [
-            'font' => [
-                'bold' => true,
-            ],
-        ], //    Bold
-        'i' => [
-            'font' => [
-                'italic' => true,
-            ],
-        ], //    Italic
-        'em' => [
-            'font' => [
-                'italic' => true,
-            ],
-        ], //    Italic
+        'h1' => ['font' => ['bold' => true, 'size' => 24]],
+        //    Bold, 24pt
+        'h2' => ['font' => ['bold' => true, 'size' => 18]],
+        //    Bold, 18pt
+        'h3' => ['font' => ['bold' => true, 'size' => 13.5]],
+        //    Bold, 13.5pt
+        'h4' => ['font' => ['bold' => true, 'size' => 12]],
+        //    Bold, 12pt
+        'h5' => ['font' => ['bold' => true, 'size' => 10]],
+        //    Bold, 10pt
+        'h6' => ['font' => ['bold' => true, 'size' => 7.5]],
+        //    Bold, 7.5pt
+        'a' => ['font' => ['underline' => true, 'color' => ['argb' => Color::COLOR_BLUE]]],
+        //    Blue underlined
+        'hr' => ['borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN, 'color' => [Color::COLOR_BLACK]]]],
+        //    Bottom border
+        'strong' => ['font' => ['bold' => true]],
+        //    Bold
+        'b' => ['font' => ['bold' => true]],
+        //    Bold
+        'i' => ['font' => ['italic' => true]],
+        //    Italic
+        'em' => ['font' => ['italic' => true]],
     ];
-
     /** @var array<string, bool> */
     protected array $rowspan = [];
-
     /**
      * Default setting uses current setting of libxml_use_internal_errors.
      * It will probably change to 'true' in a future release.
      */
-    protected ?bool $suppressLoadWarnings = null;
-
+    protected ?bool $suppress_load_warnings = null;
     /** @var LibXMLError[] */
-    protected array $libxmlMessages = [];
-
+    protected array $libxml_messages = [];
     /**
      * Suppress load warning messages, keeping them available
      * in $this->libxmlMessages().
      */
-    public function setSuppressLoadWarnings(?bool $suppressLoadWarnings): self
+    public function set_suppress_load_warnings(?bool $suppress_load_warnings): self
     {
-        $this->suppressLoadWarnings = $suppressLoadWarnings;
-
+        $this->suppress_load_warnings = $suppress_load_warnings;
         return $this;
     }
-
     /** @return LibXMLError[] */
-    public function getLibxmlMessages(): array
+    public function get_libxml_messages(): array
     {
-        return $this->libxmlMessages;
+        return $this->libxml_messages;
     }
-
     /**
      * Create a new HTML Reader instance.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->securityScanner = XmlScanner::getInstance($this);
+        $this->security_scanner = Xml_Scanner::get_instance($this);
     }
-
     /**
      * Validate that the current file is an HTML file.
      */
-    public function canRead(string $filename): bool
+    public function can_read(string $filename): bool
     {
         // Check if file exists
         try {
-            $this->openFile($filename);
+            $this->open_file($filename);
         } catch (Exception) {
             return false;
         }
-
-        $beginning = preg_replace(self::STARTS_WITH_BOM, '', $this->readBeginning()) ?? '';
-
-        $startWithTag = self::startsWithTag($beginning);
-        $containsTags = self::containsTags($beginning);
-        $endsWithTag = self::endsWithTag($this->readEnding());
-
-        fclose($this->fileHandle);
-
-        return $startWithTag && $containsTags && $endsWithTag;
+        $beginning = preg_replace(self::STARTS_WITH_BOM, '', $this->read_beginning()) ?? '';
+        $start_with_tag = self::starts_with_tag($beginning);
+        $contains_tags = self::contains_tags($beginning);
+        $ends_with_tag = self::ends_with_tag($this->read_ending());
+        fclose($this->file_handle);
+        return $start_with_tag && $contains_tags && $ends_with_tag;
     }
-
-    private function readBeginning(): string
+    private function read_beginning(): string
     {
-        fseek($this->fileHandle, 0);
-
-        return (string) fread($this->fileHandle, self::TEST_SAMPLE_SIZE);
+        fseek($this->file_handle, 0);
+        return (string) fread($this->file_handle, self::TEST_SAMPLE_SIZE);
     }
-
-    private function readEnding(): string
+    private function read_ending(): string
     {
-        $meta = stream_get_meta_data($this->fileHandle);
+        $meta = stream_get_meta_data($this->file_handle);
         // Phpstan incorrectly flags following line for Php8.2-, corrected in 8.3
-        $filename = $meta['uri']; //@phpstan-ignore-line
-
+        $filename = $meta['uri'];
+        //@phpstan-ignore-line
         clearstatcache(true, $filename);
         $size = (int) filesize($filename);
         if ($size === 0) {
             return '';
         }
-
-        $blockSize = self::TEST_SAMPLE_SIZE;
-        if ($size < $blockSize) {
-            $blockSize = $size;
+        $block_size = self::TEST_SAMPLE_SIZE;
+        if ($size < $block_size) {
+            $block_size = $size;
         }
-
-        fseek($this->fileHandle, $size - $blockSize);
-
-        return (string) fread($this->fileHandle, $blockSize);
+        fseek($this->file_handle, $size - $block_size);
+        return (string) fread($this->file_handle, $block_size);
     }
-
-    private static function startsWithTag(string $data): bool
+    private static function starts_with_tag(string $data): bool
     {
         return str_starts_with(trim($data), '<');
     }
-
-    private static function endsWithTag(string $data): bool
+    private static function ends_with_tag(string $data): bool
     {
         return str_ends_with(trim($data), '>');
     }
-
-    private static function containsTags(string $data): bool
+    private static function contains_tags(string $data): bool
     {
         return strlen($data) !== strlen(strip_tags($data));
     }
-
     /**
      * Loads Spreadsheet from file.
      */
-    public function loadSpreadsheetFromFile(string $filename): Spreadsheet
+    public function load_spreadsheet_from_file(string $filename): Spreadsheet
     {
-        $spreadsheet = $this->newSpreadsheet();
-        $spreadsheet->setValueBinder($this->valueBinder);
-
+        $spreadsheet = $this->new_spreadsheet();
+        $spreadsheet->set_value_binder($this->value_binder);
         // Load into this instance
-        return $this->loadIntoExisting($filename, $spreadsheet);
+        return $this->load_into_existing($filename, $spreadsheet);
     }
-
     /**
      * Data Array used for testing only, should write to
      * Spreadsheet object on completion of tests.
@@ -257,36 +175,28 @@ class Html extends BaseReader
      *
      * @var mixed[][]
      */
-    protected array $dataArray = [];
-
-    protected int $tableLevel = 0;
-
+    protected array $data_array = [];
+    protected int $table_level = 0;
     /** @var string[] */
-    protected array $nestedColumn = ['A'];
-
-    protected function setTableStartColumn(string $column): string
+    protected array $nested_column = ['A'];
+    protected function set_table_start_column(string $column): string
     {
-        if ($this->tableLevel == 0) {
+        if ($this->table_level == 0) {
             $column = 'A';
         }
-        ++$this->tableLevel;
-        $this->nestedColumn[$this->tableLevel] = $column;
-
-        return $this->nestedColumn[$this->tableLevel];
+        ++$this->table_level;
+        $this->nested_column[$this->table_level] = $column;
+        return $this->nested_column[$this->table_level];
     }
-
-    protected function getTableStartColumn(): string
+    protected function get_table_start_column(): string
     {
-        return $this->nestedColumn[$this->tableLevel];
+        return $this->nested_column[$this->table_level];
     }
-
-    protected function releaseTableStartColumn(): string
+    protected function release_table_start_column(): string
     {
-        --$this->tableLevel;
-
-        return array_pop($this->nestedColumn) ?? '';
+        --$this->table_level;
+        return array_pop($this->nested_column) ?? '';
     }
-
     /**
      * Flush cell.
      *
@@ -294,696 +204,608 @@ class Html extends BaseReader
      *
      * @param-out string $cellContentx
      */
-    protected function flushCell(Worksheet $sheet, string $column, int|string $row, mixed &$cellContentx, array $attributeArray): void
+    protected function flush_cell(Worksheet $sheet, string $column, int|string $row, mixed &$cell_contentx, array $attribute_array): void
     {
-        $cellContent = $cellContentx;
-        if (is_string($cellContent)) {
+        $cell_content = $cell_contentx;
+        if (is_string($cell_content)) {
             //    Simple String content
-            if (trim($cellContent) > '') {
+            if (trim($cell_content) > '') {
                 //    Only actually write it if there's content in the string
                 //    Write to worksheet to be done here...
                 //    ... we return the cell, so we can mess about with styles more easily
-
                 // Set cell value explicitly if there is data-type attribute
-                if (isset($attributeArray['data-checkbox'])) {
-                    $sheet->getStyle($column . $row)
-                        ->setCheckBox(true);
+                if (isset($attribute_array['data-checkbox'])) {
+                    $sheet->get_style($column . $row)->set_check_box(true);
                 }
-                if (isset($attributeArray['data-type'])) {
-                    $datatype = $attributeArray['data-type'];
-                    if (in_array($datatype, [DataType::TYPE_STRING, DataType::TYPE_STRING2, DataType::TYPE_INLINE])) {
+                if (isset($attribute_array['data-type'])) {
+                    $datatype = $attribute_array['data-type'];
+                    if (in_array($datatype, [Data_Type::TYPE_STRING, Data_Type::TYPE_STRING2, Data_Type::TYPE_INLINE])) {
                         //Prevent to Excel treat string with beginning equal sign or convert big numbers to scientific number
-                        if (str_starts_with($cellContent, '=')) {
-                            $sheet->getCell($column . $row)
-                                ->getStyle()
-                                ->setQuotePrefix(true);
+                        if (str_starts_with($cell_content, '=')) {
+                            $sheet->get_cell($column . $row)->get_style()->set_quote_prefix(true);
                         }
                     }
-                    if ($datatype === DataType::TYPE_BOOL) {
+                    if ($datatype === Data_Type::TYPE_BOOL) {
                         // This is the case where we can set cellContent to bool rather than string
-                        if ($cellContent === '☑') {
-                            $cellContent = true;
-                            $sheet->getStyle($column . $row)
-                                ->setCheckBox(true);
-                        } elseif ($cellContent === '☐') {
-                            $cellContent = false;
-                            $sheet->getStyle($column . $row)
-                                ->setCheckBox(true);
+                        if ($cell_content === '☑') {
+                            $cell_content = true;
+                            $sheet->get_style($column . $row)->set_check_box(true);
+                        } elseif ($cell_content === '☐') {
+                            $cell_content = false;
+                            $sheet->get_style($column . $row)->set_check_box(true);
                         } else {
-                            $cellContent = self::convertBoolean($cellContent);
-                            if (!is_bool($cellContent)) {
-                                $attributeArray['data-type'] = DataType::TYPE_STRING;
+                            $cell_content = self::convert_boolean($cell_content);
+                            if (!is_bool($cell_content)) {
+                                $attribute_array['data-type'] = Data_Type::TYPE_STRING;
                             }
                         }
                     }
-
                     //catching the Exception and ignoring the invalid data types
-                    $hyperlink = $sheet->hyperlinkExists($column . $row) ? $sheet->getHyperlink($column . $row) : null;
-
+                    $hyperlink = $sheet->hyperlink_exists($column . $row) ? $sheet->get_hyperlink($column . $row) : null;
                     try {
-                        if (isset($attributeArray['data-formula'])) {
-                            $sheet->setCellValueExplicit($column . $row, $attributeArray['data-formula'], DataType::TYPE_FORMULA);
-                            $sheet->getCell($column . $row)
-                                ->setCalculatedValue(
-                                    $cellContent
-                                );
+                        if (isset($attribute_array['data-formula'])) {
+                            $sheet->set_cell_value_explicit($column . $row, $attribute_array['data-formula'], Data_Type::TYPE_FORMULA);
+                            $sheet->get_cell($column . $row)->set_calculated_value($cell_content);
                         } else {
-                            $sheet->setCellValueExplicit($column . $row, $cellContent, $attributeArray['data-type']);
+                            $sheet->set_cell_value_explicit($column . $row, $cell_content, $attribute_array['data-type']);
                         }
-                    } catch (SpreadsheetException) {
-                        $sheet->setCellValue($column . $row, $cellContent);
+                    } catch (Spreadsheet_Exception) {
+                        $sheet->set_cell_value($column . $row, $cell_content);
                     }
-                    $sheet->setHyperlink($column . $row, $hyperlink);
+                    $sheet->set_hyperlink($column . $row, $hyperlink);
                 } else {
                     $hyperlink = null;
-                    if ($sheet->hyperlinkExists($column . $row)) {
-                        $hyperlink = $sheet->getHyperlink($column . $row);
+                    if ($sheet->hyperlink_exists($column . $row)) {
+                        $hyperlink = $sheet->get_hyperlink($column . $row);
                     }
-                    $sheet->setCellValue($column . $row, $cellContent);
-                    $sheet->setHyperlink($column . $row, $hyperlink);
+                    $sheet->set_cell_value($column . $row, $cell_content);
+                    $sheet->set_hyperlink($column . $row, $hyperlink);
                 }
-                $this->dataArray[$row][$column] = $cellContent; // @phpstan-ignore-line
+                $this->data_array[$row][$column] = $cell_content;
+                // @phpstan-ignore-line
             }
         } else {
             //    We have a Rich Text run.
             //    I don't actually see any way to reach this line.
             //    TODO
             // @phpstan-ignore-next-line
-            $this->dataArray[$row][$column] = 'RICH TEXT: ' . StringHelper::convertToString($cellContent); // @codeCoverageIgnore
+            $this->data_array[$row][$column] = 'RICH TEXT: ' . String_Helper::convert_to_string($cell_content);
+            // @codeCoverageIgnore
         }
-        $cellContentx = '';
+        $cell_contentx = '';
     }
-
     /** @var array<int, array<int, string>> */
-    private static array $falseTrueArray = [];
-
-    private static function convertBoolean(?string $cellContent): bool|string
+    private static array $false_true_array = [];
+    private static function convert_boolean(?string $cell_content): bool|string
     {
-        if ($cellContent === '1') {
+        if ($cell_content === '1') {
             return true;
         }
-        if ($cellContent === '0' || $cellContent === '' || $cellContent === null) {
+        if ($cell_content === '0' || $cell_content === '' || $cell_content === null) {
             return false;
         }
-        if (empty(self::$falseTrueArray)) {
-            $calc = Calculation::getInstance();
-            self::$falseTrueArray = $calc->getFalseTrueArray();
+        if (empty(self::$false_true_array)) {
+            $calc = Calculation::get_instance();
+            self::$false_true_array = $calc->get_false_true_array();
         }
-        if (in_array(mb_strtoupper($cellContent), self::$falseTrueArray[1], true)) {
+        if (in_array(mb_strtoupper($cell_content), self::$false_true_array[1], true)) {
             return true;
         }
-        if (in_array(mb_strtoupper($cellContent), self::$falseTrueArray[0], true)) {
+        if (in_array(mb_strtoupper($cell_content), self::$false_true_array[0], true)) {
             return false;
         }
-
-        return $cellContent;
+        return $cell_content;
     }
-
-    private function processDomElementBody(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child): void
+    private function process_dom_element_body(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child): void
     {
-        $attributeArray = [];
+        $attribute_array = [];
         /** @var DOMAttr $attribute */
-        foreach (($child->attributes ?? []) as $attribute) {
-            $attributeArray[$attribute->name] = $attribute->value;
+        foreach ($child->attributes ?? [] as $attribute) {
+            $attribute_array[$attribute->name] = $attribute->value;
         }
-
-        if ($child->nodeName === 'body') {
+        if ($child->node_name === 'body') {
             $row = 1;
             $column = 'A';
-            $cellContent = '';
-            $this->tableLevel = 0;
-            $this->processDomElement($child, $sheet, $row, $column, $cellContent);
+            $cell_content = '';
+            $this->table_level = 0;
+            $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
         } else {
-            $this->processDomElementTitle($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_title($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementTitle(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_title(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'title') {
-            $this->processDomElement($child, $sheet, $row, $column, $cellContent);
-
+        if ($child->node_name === 'title') {
+            $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
             try {
-                $sheet->setTitle($cellContent, true, true);
-                $sheet->getParent()?->getProperties()?->setTitle($cellContent);
-            } catch (SpreadsheetException) {
+                $sheet->set_title($cell_content, true, true);
+                $sheet->get_parent()?->get_properties()?->set_title($cell_content);
+            } catch (Spreadsheet_Exception) {
                 // leave default title if too long or illegal chars
             }
-            $cellContent = '';
+            $cell_content = '';
         } else {
-            $this->processDomElementSpanEtc($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_span_etc($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     private const SPAN_ETC = ['span', 'div', 'font', 'i', 'em', 'strong', 'b'];
-
     /** @param string[] $attributeArray */
-    private function processDomElementSpanEtc(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_span_etc(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if (in_array($child->nodeName, self::SPAN_ETC, true)) {
-            if (isset($attributeArray['class']) && $attributeArray['class'] === 'comment') {
-                $sheet->getComment($column . $row)
-                    ->getText()
-                    ->createTextRun($child->textContent);
-                if (isset($attributeArray['dir']) && $attributeArray['dir'] === 'rtl') {
-                    $sheet->getComment($column . $row)->setTextboxDirection(Comment::TEXTBOX_DIRECTION_RTL);
+        if (in_array($child->node_name, self::SPAN_ETC, true)) {
+            if (isset($attribute_array['class']) && $attribute_array['class'] === 'comment') {
+                $sheet->get_comment($column . $row)->get_text()->create_text_run($child->text_content);
+                if (isset($attribute_array['dir']) && $attribute_array['dir'] === 'rtl') {
+                    $sheet->get_comment($column . $row)->set_textbox_direction(Comment::TEXTBOX_DIRECTION_RTL);
                 }
-                if (isset($attributeArray['style'])) {
-                    $alignStyle = $attributeArray['style'];
-                    if (preg_match('/\btext-align:\s*(left|right|center|justify)\b/', (string) $alignStyle, $matches) === 1) {
-                        $sheet->getComment($column . $row)->setAlignment($matches[1]);
+                if (isset($attribute_array['style'])) {
+                    $align_style = $attribute_array['style'];
+                    if (preg_match('/\btext-align:\s*(left|right|center|justify)\b/', (string) $align_style, $matches) === 1) {
+                        $sheet->get_comment($column . $row)->set_alignment($matches[1]);
                     }
                 }
             } else {
-                $this->processDomElement($child, $sheet, $row, $column, $cellContent);
+                $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
             }
-
-            if (isset(self::FORMATS[$child->nodeName])) {
-                $sheet->getStyle($column . $row)->applyFromArray(self::FORMATS[$child->nodeName]);
+            if (isset(self::FORMATS[$child->node_name])) {
+                $sheet->get_style($column . $row)->apply_from_array(self::FORMATS[$child->node_name]);
             }
         } else {
-            $this->processDomElementHr($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_hr($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementHr(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_hr(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'hr') {
-            $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
+        if ($child->node_name === 'hr') {
+            $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
             ++$row;
-            $sheet->getStyle($column . $row)->applyFromArray(self::FORMATS[$child->nodeName]);
+            $sheet->get_style($column . $row)->apply_from_array(self::FORMATS[$child->node_name]);
             ++$row;
         }
         // fall through to br
-        $this->processDomElementBr($sheet, $row, $column, $cellContent, $child, $attributeArray);
+        $this->process_dom_element_br($sheet, $row, $column, $cell_content, $child, $attribute_array);
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementBr(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_br(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'br' || $child->nodeName === 'hr') {
-            if ($this->tableLevel > 0) {
+        if ($child->node_name === 'br' || $child->node_name === 'hr') {
+            if ($this->table_level > 0) {
                 //    If we're inside a table, replace with a newline and set the cell to wrap
-                $cellContent .= "\n";
-                $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true);
+                $cell_content .= "\n";
+                $sheet->get_style($column . $row)->get_alignment()->set_wrap_text(true);
             } else {
                 //    Otherwise flush our existing content and move the row cursor on
-                $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
+                $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
                 ++$row;
             }
         } else {
-            $this->processDomElementA($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_a($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementA(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_a(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'a') {
-            foreach ($attributeArray as $attributeName => $attributeValue) {
-                switch ($attributeName) {
+        if ($child->node_name === 'a') {
+            foreach ($attribute_array as $attribute_name => $attribute_value) {
+                switch ($attribute_name) {
                     case 'href':
-                        $sheet->getCell($column . $row)->getHyperlink()->setUrl($attributeValue);
-                        $sheet->getStyle($column . $row)->applyFromArray(self::FORMATS[$child->nodeName]);
-
+                        $sheet->get_cell($column . $row)->get_hyperlink()->set_url($attribute_value);
+                        $sheet->get_style($column . $row)->apply_from_array(self::FORMATS[$child->node_name]);
                         break;
                     case 'class':
-                        if ($attributeValue === 'comment-indicator') {
-                            break; // Ignore - it's just a red square.
+                        if ($attribute_value === 'comment-indicator') {
+                            break;
+                            // Ignore - it's just a red square.
                         }
                 }
             }
             // no idea why this should be needed
             //$cellContent .= ' ';
-            $this->processDomElement($child, $sheet, $row, $column, $cellContent);
+            $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
         } else {
-            $this->processDomElementH1Etc($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_h1etc($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     private const H1_ETC = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol', 'ul', 'p'];
-
     /** @param string[] $attributeArray */
-    private function processDomElementH1Etc(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_h1etc(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if (in_array($child->nodeName, self::H1_ETC, true)) {
-            if ($this->tableLevel > 0) {
+        if (in_array($child->node_name, self::H1_ETC, true)) {
+            if ($this->table_level > 0) {
                 //    If we're inside a table, replace with a newline
-                $cellContent .= $cellContent ? "\n" : '';
-                $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true);
-                $this->processDomElement($child, $sheet, $row, $column, $cellContent);
+                $cell_content .= $cell_content ? "\n" : '';
+                $sheet->get_style($column . $row)->get_alignment()->set_wrap_text(true);
+                $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
             } else {
-                if ($cellContent > '') {
-                    $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
+                if ($cell_content > '') {
+                    $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
                     ++$row;
                 }
-                $this->processDomElement($child, $sheet, $row, $column, $cellContent);
-                $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
-
-                if (isset(self::FORMATS[$child->nodeName])) {
-                    $sheet->getStyle($column . $row)->applyFromArray(self::FORMATS[$child->nodeName]);
+                $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
+                $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
+                if (isset(self::FORMATS[$child->node_name])) {
+                    $sheet->get_style($column . $row)->apply_from_array(self::FORMATS[$child->node_name]);
                 }
-
                 ++$row;
                 $column = 'A';
             }
         } else {
-            $this->processDomElementLi($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_li($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementLi(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_li(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'li') {
-            if ($this->tableLevel > 0) {
+        if ($child->node_name === 'li') {
+            if ($this->table_level > 0) {
                 //    If we're inside a table, replace with a newline
-                $cellContent .= $cellContent ? "\n" : '';
-                $this->processDomElement($child, $sheet, $row, $column, $cellContent);
+                $cell_content .= $cell_content ? "\n" : '';
+                $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
             } else {
-                if ($cellContent > '') {
-                    $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
+                if ($cell_content > '') {
+                    $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
                 }
                 ++$row;
-                $this->processDomElement($child, $sheet, $row, $column, $cellContent);
-                $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
+                $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
+                $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
                 $column = 'A';
             }
         } else {
-            $this->processDomElementImg($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_img($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementImg(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_img(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'img') {
-            $this->insertImage($sheet, $column, $row, $attributeArray);
+        if ($child->node_name === 'img') {
+            $this->insert_image($sheet, $column, $row, $attribute_array);
         } else {
-            $this->processDomElementTable($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_table($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
-    private string $currentColumn = 'A';
-
+    private string $current_column = 'A';
     /** @param string[] $attributeArray */
-    private function processDomElementTable(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_table(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'table') {
-            if (isset($attributeArray['class'])) {
-                $classes = explode(' ', $attributeArray['class']);
-                $sheet->setShowGridlines(in_array('gridlines', $classes, true));
-                $sheet->setPrintGridlines(in_array('gridlinesp', $classes, true));
+        if ($child->node_name === 'table') {
+            if (isset($attribute_array['class'])) {
+                $classes = explode(' ', $attribute_array['class']);
+                $sheet->set_show_gridlines(in_array('gridlines', $classes, true));
+                $sheet->set_print_gridlines(in_array('gridlinesp', $classes, true));
             }
-            if (isset($attributeArray['data-printarea'])) {
-                $sheet->getPageSetup()
-                    ->setPrintArea($attributeArray['data-printarea']);
+            if (isset($attribute_array['data-printarea'])) {
+                $sheet->get_page_setup()->set_print_area($attribute_array['data-printarea']);
             }
-            if ('rtl' === ($attributeArray['dir'] ?? '')) {
-                $sheet->setRightToLeft(true);
+            if ('rtl' === ($attribute_array['dir'] ?? '')) {
+                $sheet->set_right_to_left(true);
             }
-            $this->currentColumn = 'A';
-            $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
-            $column = $this->setTableStartColumn($column);
-            if ($this->tableLevel > 1 && $row > 1) {
+            $this->current_column = 'A';
+            $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
+            $column = $this->set_table_start_column($column);
+            if ($this->table_level > 1 && $row > 1) {
                 --$row;
             }
-            $this->processDomElement($child, $sheet, $row, $column, $cellContent);
-            $column = $this->releaseTableStartColumn();
-            if ($this->tableLevel > 1) {
-                StringHelper::stringIncrement($column);
+            $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
+            $column = $this->release_table_start_column();
+            if ($this->table_level > 1) {
+                String_Helper::string_increment($column);
             } else {
                 ++$row;
             }
         } else {
-            $this->processDomElementTr($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_tr($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementTr(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_tr(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName === 'col') {
-            $this->applyInlineStyle($sheet, -1, $this->currentColumn, $attributeArray);
-            StringHelper::stringIncrement($this->currentColumn);
-        } elseif ($child->nodeName === 'tr') {
-            $column = $this->getTableStartColumn();
-            $cellContent = '';
-            $this->processDomElement($child, $sheet, $row, $column, $cellContent);
-
-            if (isset($attributeArray['height'])) {
-                $sheet->getRowDimension($row)->setRowHeight((float) $attributeArray['height']);
+        if ($child->node_name === 'col') {
+            $this->apply_inline_style($sheet, -1, $this->current_column, $attribute_array);
+            String_Helper::string_increment($this->current_column);
+        } elseif ($child->node_name === 'tr') {
+            $column = $this->get_table_start_column();
+            $cell_content = '';
+            $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
+            if (isset($attribute_array['height'])) {
+                $sheet->get_row_dimension($row)->set_row_height((float) $attribute_array['height']);
             }
-
             ++$row;
         } else {
-            $this->processDomElementThTdOther($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_th_td_other($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementThTdOther(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_th_td_other(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
-        if ($child->nodeName !== 'td' && $child->nodeName !== 'th') {
-            $this->processDomElement($child, $sheet, $row, $column, $cellContent);
+        if ($child->node_name !== 'td' && $child->node_name !== 'th') {
+            $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
         } else {
-            $this->processDomElementThTd($sheet, $row, $column, $cellContent, $child, $attributeArray);
+            $this->process_dom_element_th_td($sheet, $row, $column, $cell_content, $child, $attribute_array);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementBgcolor(Worksheet $sheet, int $row, string $column, array $attributeArray): void
+    private function process_dom_element_bgcolor(Worksheet $sheet, int $row, string $column, array $attribute_array): void
     {
-        if (isset($attributeArray['bgcolor'])) {
-            $sheet->getStyle("$column$row")->applyFromArray(
-                [
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'color' => ['rgb' => $this->getStyleColor($attributeArray['bgcolor'])],
-                    ],
-                ]
-            );
+        if (isset($attribute_array['bgcolor'])) {
+            $sheet->get_style("{$column}{$row}")->apply_from_array(['fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => $this->get_style_color($attribute_array['bgcolor'])]]]);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementWidth(Worksheet $sheet, string $column, array $attributeArray): void
+    private function process_dom_element_width(Worksheet $sheet, string $column, array $attribute_array): void
     {
-        if (isset($attributeArray['width'])) {
-            $sheet->getColumnDimension($column)->setWidth((new CssDimension($attributeArray['width']))->width());
+        if (isset($attribute_array['width'])) {
+            $sheet->get_column_dimension($column)->set_width((new Css_Dimension($attribute_array['width']))->width());
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementHeight(Worksheet $sheet, int $row, array $attributeArray): void
+    private function process_dom_element_height(Worksheet $sheet, int $row, array $attribute_array): void
     {
-        if (isset($attributeArray['height'])) {
-            $sheet->getRowDimension($row)->setRowHeight((new CssDimension($attributeArray['height']))->height());
+        if (isset($attribute_array['height'])) {
+            $sheet->get_row_dimension($row)->set_row_height((new Css_Dimension($attribute_array['height']))->height());
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementAlign(Worksheet $sheet, int $row, string $column, array $attributeArray): void
+    private function process_dom_element_align(Worksheet $sheet, int $row, string $column, array $attribute_array): void
     {
-        if (isset($attributeArray['align'])) {
-            $sheet->getStyle($column . $row)->getAlignment()->setHorizontal($attributeArray['align']);
+        if (isset($attribute_array['align'])) {
+            $sheet->get_style($column . $row)->get_alignment()->set_horizontal($attribute_array['align']);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementVAlign(Worksheet $sheet, int $row, string $column, array $attributeArray): void
+    private function process_dom_element_v_align(Worksheet $sheet, int $row, string $column, array $attribute_array): void
     {
-        if (isset($attributeArray['valign'])) {
-            $sheet->getStyle($column . $row)->getAlignment()->setVertical($attributeArray['valign']);
+        if (isset($attribute_array['valign'])) {
+            $sheet->get_style($column . $row)->get_alignment()->set_vertical($attribute_array['valign']);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementDataFormat(Worksheet $sheet, int $row, string $column, array $attributeArray): void
+    private function process_dom_element_data_format(Worksheet $sheet, int $row, string $column, array $attribute_array): void
     {
-        if (isset($attributeArray['data-format'])) {
-            $sheet->getStyle($column . $row)->getNumberFormat()->setFormatCode($attributeArray['data-format']);
+        if (isset($attribute_array['data-format'])) {
+            $sheet->get_style($column . $row)->get_number_format()->set_format_code($attribute_array['data-format']);
         }
     }
-
     /** @param string[] $attributeArray */
-    private function processDomElementThTd(Worksheet $sheet, int &$row, string &$column, string &$cellContent, DOMElement $child, array &$attributeArray): void
+    private function process_dom_element_th_td(Worksheet $sheet, int &$row, string &$column, string &$cell_content, Dom_Element $child, array &$attribute_array): void
     {
         while (isset($this->rowspan[$column . $row])) {
             $temp = $column;
-            $column = StringHelper::stringIncrement($temp);
+            $column = String_Helper::string_increment($temp);
         }
-        $this->processDomElement($child, $sheet, $row, $column, $cellContent);
-
+        $this->process_dom_element($child, $sheet, $row, $column, $cell_content);
         // apply inline style
-        $this->applyInlineStyle($sheet, $row, $column, $attributeArray);
-
+        $this->apply_inline_style($sheet, $row, $column, $attribute_array);
         /** @var string $cellContent */
-        $this->flushCell($sheet, $column, $row, $cellContent, $attributeArray);
-
-        $this->processDomElementBgcolor($sheet, $row, $column, $attributeArray);
-        $this->processDomElementWidth($sheet, $column, $attributeArray);
-        $this->processDomElementHeight($sheet, $row, $attributeArray);
-        $this->processDomElementAlign($sheet, $row, $column, $attributeArray);
-        $this->processDomElementVAlign($sheet, $row, $column, $attributeArray);
-        $this->processDomElementDataFormat($sheet, $row, $column, $attributeArray);
-
-        if (isset($attributeArray['rowspan'], $attributeArray['colspan'])) {
+        $this->flush_cell($sheet, $column, $row, $cell_content, $attribute_array);
+        $this->process_dom_element_bgcolor($sheet, $row, $column, $attribute_array);
+        $this->process_dom_element_width($sheet, $column, $attribute_array);
+        $this->process_dom_element_height($sheet, $row, $attribute_array);
+        $this->process_dom_element_align($sheet, $row, $column, $attribute_array);
+        $this->process_dom_element_v_align($sheet, $row, $column, $attribute_array);
+        $this->process_dom_element_data_format($sheet, $row, $column, $attribute_array);
+        if (isset($attribute_array['rowspan'], $attribute_array['colspan'])) {
             //create merging rowspan and colspan
-            $columnTo = $column;
-            for ($i = 0; $i < (int) $attributeArray['colspan'] - 1; ++$i) {
-                StringHelper::stringIncrement($columnTo);
+            $column_to = $column;
+            for ($i = 0; $i < (int) $attribute_array['colspan'] - 1; ++$i) {
+                String_Helper::string_increment($column_to);
             }
-            $range = $column . $row . ':' . $columnTo . ($row + (int) $attributeArray['rowspan'] - 1);
-            foreach (Coordinate::extractAllCellReferencesInRange($range) as $value) {
+            $range = $column . $row . ':' . $column_to . ($row + (int) $attribute_array['rowspan'] - 1);
+            foreach (Coordinate::extract_all_cell_references_in_range($range) as $value) {
                 $this->rowspan[$value] = true;
             }
-            $sheet->mergeCells($range);
-            $column = $columnTo;
-        } elseif (isset($attributeArray['rowspan'])) {
+            $sheet->merge_cells($range);
+            $column = $column_to;
+        } elseif (isset($attribute_array['rowspan'])) {
             //create merging rowspan
-            $range = $column . $row . ':' . $column . ($row + (int) $attributeArray['rowspan'] - 1);
-            foreach (Coordinate::extractAllCellReferencesInRange($range) as $value) {
+            $range = $column . $row . ':' . $column . ($row + (int) $attribute_array['rowspan'] - 1);
+            foreach (Coordinate::extract_all_cell_references_in_range($range) as $value) {
                 $this->rowspan[$value] = true;
             }
-            $sheet->mergeCells($range);
-        } elseif (isset($attributeArray['colspan'])) {
+            $sheet->merge_cells($range);
+        } elseif (isset($attribute_array['colspan'])) {
             //create merging colspan
-            $columnTo = $column;
-            for ($i = 0; $i < (int) $attributeArray['colspan'] - 1; ++$i) {
-                StringHelper::stringIncrement($columnTo);
+            $column_to = $column;
+            for ($i = 0; $i < (int) $attribute_array['colspan'] - 1; ++$i) {
+                String_Helper::string_increment($column_to);
             }
-            $sheet->mergeCells($column . $row . ':' . $columnTo . $row);
-            $column = $columnTo;
+            $sheet->merge_cells($column . $row . ':' . $column_to . $row);
+            $column = $column_to;
         }
-
-        StringHelper::stringIncrement($column);
+        String_Helper::string_increment($column);
     }
-
-    protected function processDomElement(DOMNode $element, Worksheet $sheet, int &$row, string &$column, string &$cellContent): void
+    protected function process_dom_element(Dom_Node $element, Worksheet $sheet, int &$row, string &$column, string &$cell_content): void
     {
-        foreach ($element->childNodes as $child) {
-            if ($child instanceof DOMText) {
-                $domText = (string) preg_replace('/\s+/', ' ', trim($child->nodeValue ?? ''));
-                if ($domText === "\u{a0}") {
-                    $domText = '';
+        foreach ($element->child_nodes as $child) {
+            if ($child instanceof Dom_Text) {
+                $dom_text = (string) preg_replace('/\s+/', ' ', trim($child->node_value ?? ''));
+                if ($dom_text === " ") {
+                    $dom_text = '';
                 }
                 //    simply append the text if the cell content is a plain text string
-                $cellContent .= $domText;
+                $cell_content .= $dom_text;
                 //    but if we have a rich text run instead, we need to append it correctly
                 //    TODO
-            } elseif ($child instanceof DOMElement) {
-                $this->processDomElementBody($sheet, $row, $column, $cellContent, $child);
+            } elseif ($child instanceof Dom_Element) {
+                $this->process_dom_element_body($sheet, $row, $column, $cell_content, $child);
             }
         }
     }
-
     /**
      * Loads PhpSpreadsheet from file into PhpSpreadsheet instance.
      */
-    public function loadIntoExisting(string $filename, Spreadsheet $spreadsheet): Spreadsheet
+    public function load_into_existing(string $filename, Spreadsheet $spreadsheet): Spreadsheet
     {
         // Validate
-        if (!$this->canRead($filename)) {
+        if (!$this->can_read($filename)) {
             throw new Exception($filename . ' is an Invalid HTML file.');
         }
-
         // Create a new DOM object
-        $dom = new DOMDocument();
-
+        $dom = new Dom_Document();
         // Reload the HTML file into the DOM object
-        if (is_bool($this->suppressLoadWarnings)) {
-            $useErrors = libxml_use_internal_errors($this->suppressLoadWarnings);
+        if (is_bool($this->suppress_load_warnings)) {
+            $use_errors = libxml_use_internal_errors($this->suppress_load_warnings);
         } else {
-            $useErrors = null;
+            $use_errors = null;
         }
-
         try {
-            $convert = $this->getSecurityScannerOrThrow()->scanFile($filename);
-            $convert = static::replaceNonAsciiIfNeeded($convert);
-            $loaded = ($convert === null) ? false : $dom->loadHTML($convert, LIBXML_NONET);
+            $convert = $this->get_security_scanner_or_throw()->scan_file($filename);
+            $convert = static::replace_non_ascii_if_needed($convert);
+            $loaded = $convert === null ? false : $dom->load_html($convert, LIBXML_NONET);
         } catch (Throwable $e) {
             $loaded = false;
         } finally {
-            $this->libxmlMessages = libxml_get_errors();
-            if (is_bool($useErrors)) {
-                libxml_use_internal_errors($useErrors);
+            $this->libxml_messages = libxml_get_errors();
+            if (is_bool($use_errors)) {
+                libxml_use_internal_errors($use_errors);
             }
         }
         if ($loaded === false) {
             throw new Exception('Failed to load file ' . $filename . ' as a DOM Document', 0, $e ?? null);
         }
-        self::loadProperties($dom, $spreadsheet);
-
-        return $this->loadDocument($dom, $spreadsheet);
+        self::load_properties($dom, $spreadsheet);
+        return $this->load_document($dom, $spreadsheet);
     }
-
-    private static function loadProperties(DOMDocument $dom, Spreadsheet $spreadsheet): void
+    private static function load_properties(Dom_Document $dom, Spreadsheet $spreadsheet): void
     {
-        $properties = $spreadsheet->getProperties();
-        foreach ($dom->getElementsByTagName('meta') as $meta) {
-            $metaContent = $meta->getAttribute('content');
-            if ($metaContent !== '') {
-                $metaName = $meta->getAttribute('name');
-                switch ($metaName) {
+        $properties = $spreadsheet->get_properties();
+        foreach ($dom->get_elements_by_tag_name('meta') as $meta) {
+            $meta_content = $meta->get_attribute('content');
+            if ($meta_content !== '') {
+                $meta_name = $meta->get_attribute('name');
+                switch ($meta_name) {
                     case 'author':
-                        $properties->setCreator($metaContent);
-
+                        $properties->set_creator($meta_content);
                         break;
                     case 'category':
-                        $properties->setCategory($metaContent);
-
+                        $properties->set_category($meta_content);
                         break;
                     case 'company':
-                        $properties->setCompany($metaContent);
-
+                        $properties->set_company($meta_content);
                         break;
                     case 'created':
-                        $properties->setCreated($metaContent);
-
+                        $properties->set_created($meta_content);
                         break;
                     case 'description':
-                        $properties->setDescription($metaContent);
-
+                        $properties->set_description($meta_content);
                         break;
                     case 'keywords':
-                        $properties->setKeywords($metaContent);
-
+                        $properties->set_keywords($meta_content);
                         break;
                     case 'lastModifiedBy':
-                        $properties->setLastModifiedBy($metaContent);
-
+                        $properties->set_last_modified_by($meta_content);
                         break;
                     case 'manager':
-                        $properties->setManager($metaContent);
-
+                        $properties->set_manager($meta_content);
                         break;
                     case 'modified':
-                        $properties->setModified($metaContent);
-
+                        $properties->set_modified($meta_content);
                         break;
                     case 'subject':
-                        $properties->setSubject($metaContent);
-
+                        $properties->set_subject($meta_content);
                         break;
                     case 'title':
-                        $properties->setTitle($metaContent);
-
+                        $properties->set_title($meta_content);
                         break;
                     case 'viewport':
-                        $properties->setViewport($metaContent);
-
+                        $properties->set_viewport($meta_content);
                         break;
                     default:
-                        if (preg_match('/^custom[.](bool|date|float|int|string)[.](.+)$/', $metaName, $matches) === 1) {
+                        if (preg_match('/^custom[.](bool|date|float|int|string)[.](.+)$/', $meta_name, $matches) === 1) {
                             match ($matches[1]) {
-                                'bool' => $properties->setCustomProperty($matches[2], (bool) $metaContent, Properties::PROPERTY_TYPE_BOOLEAN),
-                                'float' => $properties->setCustomProperty($matches[2], (float) $metaContent, Properties::PROPERTY_TYPE_FLOAT),
-                                'int' => $properties->setCustomProperty($matches[2], (int) $metaContent, Properties::PROPERTY_TYPE_INTEGER),
-                                'date' => $properties->setCustomProperty($matches[2], $metaContent, Properties::PROPERTY_TYPE_DATE),
+                                'bool' => $properties->set_custom_property($matches[2], (bool) $meta_content, Properties::PROPERTY_TYPE_BOOLEAN),
+                                'float' => $properties->set_custom_property($matches[2], (float) $meta_content, Properties::PROPERTY_TYPE_FLOAT),
+                                'int' => $properties->set_custom_property($matches[2], (int) $meta_content, Properties::PROPERTY_TYPE_INTEGER),
+                                'date' => $properties->set_custom_property($matches[2], $meta_content, Properties::PROPERTY_TYPE_DATE),
                                 // string
-                                default => $properties->setCustomProperty($matches[2], $metaContent, Properties::PROPERTY_TYPE_STRING),
+                                default => $properties->set_custom_property($matches[2], $meta_content, Properties::PROPERTY_TYPE_STRING),
                             };
                         }
                 }
             }
         }
-        if (!empty($dom->baseURI)) {
-            $properties->setHyperlinkBase($dom->baseURI);
+        if (!empty($dom->base_uri)) {
+            $properties->set_hyperlink_base($dom->base_uri);
         }
     }
-
     /** @param string[] $matches */
-    private static function replaceNonAscii(array $matches): string
+    private static function replace_non_ascii(array $matches): string
     {
         return '&#' . mb_ord($matches[0], 'UTF-8') . ';';
     }
-
     /** @internal */
-    protected static function replaceNonAsciiIfNeeded(string $convert): ?string
+    protected static function replace_non_ascii_if_needed(string $convert): ?string
     {
         if (preg_match(self::STARTS_WITH_BOM, $convert) !== 1 && preg_match(self::DECLARES_CHARSET, $convert) !== 1) {
-            $lowend = "\u{80}";
-            $highend = "\u{10ffff}";
-            $regexp = "/[$lowend-$highend]/u";
+            $lowend = "";
+            $highend = "􏿿";
+            $regexp = "/[{$lowend}-{$highend}]/u";
             /** @var callable $callback */
-            $callback = self::replaceNonAscii(...);
+            $callback = self::replace_non_ascii(...);
             $convert = preg_replace_callback($regexp, $callback, $convert);
         }
-
         return $convert;
     }
-
     /**
      * Spreadsheet from content.
      */
-    public function loadFromString(string $content, ?Spreadsheet $spreadsheet = null): Spreadsheet
+    public function load_from_string(string $content, ?Spreadsheet $spreadsheet = null): Spreadsheet
     {
         //    Create a new DOM object
-        $dom = new DOMDocument();
-
+        $dom = new Dom_Document();
         //    Reload the HTML file into the DOM object
-        if (is_bool($this->suppressLoadWarnings)) {
-            $useErrors = libxml_use_internal_errors($this->suppressLoadWarnings);
+        if (is_bool($this->suppress_load_warnings)) {
+            $use_errors = libxml_use_internal_errors($this->suppress_load_warnings);
         } else {
-            $useErrors = null;
+            $use_errors = null;
         }
-
         try {
-            $convert = $this->getSecurityScannerOrThrow()->scan($content);
-            $convert = static::replaceNonAsciiIfNeeded($convert);
-            $loaded = ($convert === null) ? false : $dom->loadHTML($convert, LIBXML_NONET);
+            $convert = $this->get_security_scanner_or_throw()->scan($content);
+            $convert = static::replace_non_ascii_if_needed($convert);
+            $loaded = $convert === null ? false : $dom->load_html($convert, LIBXML_NONET);
         } catch (Throwable $e) {
             $loaded = false;
         } finally {
-            $this->libxmlMessages = libxml_get_errors();
-            if (is_bool($useErrors)) {
-                libxml_use_internal_errors($useErrors);
+            $this->libxml_messages = libxml_get_errors();
+            if (is_bool($use_errors)) {
+                libxml_use_internal_errors($use_errors);
             }
         }
         if ($loaded === false) {
             throw new Exception('Failed to load content as a DOM Document', 0, $e ?? null);
         }
-        $spreadsheet ??= $this->newSpreadsheet();
-        $spreadsheet->setValueBinder($this->valueBinder);
-        self::loadProperties($dom, $spreadsheet);
-
-        return $this->loadDocument($dom, $spreadsheet);
+        $spreadsheet ??= $this->new_spreadsheet();
+        $spreadsheet->set_value_binder($this->value_binder);
+        self::load_properties($dom, $spreadsheet);
+        return $this->load_document($dom, $spreadsheet);
     }
-
     /**
      * Loads PhpSpreadsheet from DOMDocument into PhpSpreadsheet instance.
      */
-    private function loadDocument(DOMDocument $document, Spreadsheet $spreadsheet): Spreadsheet
+    private function load_document(Dom_Document $document, Spreadsheet $spreadsheet): Spreadsheet
     {
-        while ($spreadsheet->getSheetCount() <= $this->sheetIndex) {
-            $spreadsheet->createSheet();
+        while ($spreadsheet->get_sheet_count() <= $this->sheet_index) {
+            $spreadsheet->create_sheet();
         }
-        $spreadsheet->setActiveSheetIndex($this->sheetIndex);
-
+        $spreadsheet->set_active_sheet_index($this->sheet_index);
         // Discard white space
-        $document->preserveWhiteSpace = false;
-
+        $document->preserve_white_space = false;
         $row = 0;
         $column = 'A';
         $content = '';
         $this->rowspan = [];
-        $this->processDomElement($document, $spreadsheet->getActiveSheet(), $row, $column, $content);
-
+        $this->process_dom_element($document, $spreadsheet->get_active_sheet(), $row, $column, $content);
         // Return
         return $spreadsheet;
     }
-
     /**
      * Get sheet index.
      */
-    public function getSheetIndex(): int
+    public function get_sheet_index(): int
     {
-        return $this->sheetIndex;
+        return $this->sheet_index;
     }
-
     /**
      * Set sheet index.
      *
@@ -991,13 +813,11 @@ class Html extends BaseReader
      *
      * @return $this
      */
-    public function setSheetIndex(int $sheetIndex): static
+    public function set_sheet_index(int $sheet_index): static
     {
-        $this->sheetIndex = $sheetIndex;
-
+        $this->sheet_index = $sheet_index;
         return $this;
     }
-
     /**
      * Apply inline css inline style.
      *
@@ -1010,381 +830,277 @@ class Html extends BaseReader
      *
      * @param string[] $attributeArray
      */
-    private function applyInlineStyle(Worksheet &$sheet, int $row, string $column, array $attributeArray): void
+    private function apply_inline_style(Worksheet &$sheet, int $row, string $column, array $attribute_array): void
     {
-        if (!isset($attributeArray['style'])) {
+        if (!isset($attribute_array['style'])) {
             return;
         }
-
         if ($row <= 0 || $column === '') {
-            $cellStyle = new Style();
-        } elseif (isset($attributeArray['rowspan'], $attributeArray['colspan'])) {
-            $columnTo = $column;
-            for ($i = 0; $i < (int) $attributeArray['colspan'] - 1; ++$i) {
-                StringHelper::stringIncrement($columnTo);
+            $cell_style = new Style();
+        } elseif (isset($attribute_array['rowspan'], $attribute_array['colspan'])) {
+            $column_to = $column;
+            for ($i = 0; $i < (int) $attribute_array['colspan'] - 1; ++$i) {
+                String_Helper::string_increment($column_to);
             }
-            $range = $column . $row . ':' . $columnTo . ($row + (int) $attributeArray['rowspan'] - 1);
-            $cellStyle = $sheet->getStyle($range);
-        } elseif (isset($attributeArray['rowspan'])) {
-            $range = $column . $row . ':' . $column . ($row + (int) $attributeArray['rowspan'] - 1);
-            $cellStyle = $sheet->getStyle($range);
-        } elseif (isset($attributeArray['colspan'])) {
-            $columnTo = $column;
-            for ($i = 0; $i < (int) $attributeArray['colspan'] - 1; ++$i) {
-                StringHelper::stringIncrement($columnTo);
+            $range = $column . $row . ':' . $column_to . ($row + (int) $attribute_array['rowspan'] - 1);
+            $cell_style = $sheet->get_style($range);
+        } elseif (isset($attribute_array['rowspan'])) {
+            $range = $column . $row . ':' . $column . ($row + (int) $attribute_array['rowspan'] - 1);
+            $cell_style = $sheet->get_style($range);
+        } elseif (isset($attribute_array['colspan'])) {
+            $column_to = $column;
+            for ($i = 0; $i < (int) $attribute_array['colspan'] - 1; ++$i) {
+                String_Helper::string_increment($column_to);
             }
-            $range = $column . $row . ':' . $columnTo . $row;
-            $cellStyle = $sheet->getStyle($range);
+            $range = $column . $row . ':' . $column_to . $row;
+            $cell_style = $sheet->get_style($range);
         } else {
-            $cellStyle = $sheet->getStyle($column . $row);
+            $cell_style = $sheet->get_style($column . $row);
         }
-
         // add color styles (background & text) from dom element,currently support : td & th, using ONLY inline css style with RGB color
-        $styles = explode(';', $attributeArray['style']);
+        $styles = explode(';', $attribute_array['style']);
         foreach ($styles as $st) {
             $value = explode(':', $st);
-            $styleName = trim($value[0]);
-            $styleValue = isset($value[1]) ? trim($value[1]) : null;
-            $styleValueString = (string) $styleValue;
-
-            if (!$styleName) {
+            $style_name = trim($value[0]);
+            $style_value = isset($value[1]) ? trim($value[1]) : null;
+            $style_value_string = (string) $style_value;
+            if (!$style_name) {
                 continue;
             }
-
-            switch ($styleName) {
+            switch ($style_name) {
                 case 'background':
                 case 'background-color':
-                    $styleColor = $this->getStyleColor($styleValueString);
-
-                    if (!$styleColor) {
+                    $style_color = $this->get_style_color($style_value_string);
+                    if (!$style_color) {
                         continue 2;
                     }
-
-                    $cellStyle->applyFromArray(['fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => $styleColor]]]);
-
+                    $cell_style->apply_from_array(['fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => $style_color]]]);
                     break;
                 case 'color':
-                    $styleColor = $this->getStyleColor($styleValueString);
-
-                    if (!$styleColor) {
+                    $style_color = $this->get_style_color($style_value_string);
+                    if (!$style_color) {
                         continue 2;
                     }
-
-                    $cellStyle->applyFromArray(['font' => ['color' => ['rgb' => $styleColor]]]);
-
+                    $cell_style->apply_from_array(['font' => ['color' => ['rgb' => $style_color]]]);
                     break;
-
                 case 'border':
-                    $this->setBorderStyle($cellStyle, $styleValueString, 'allBorders');
-
+                    $this->set_border_style($cell_style, $style_value_string, 'allBorders');
                     break;
-
                 case 'border-top':
-                    $this->setBorderStyle($cellStyle, $styleValueString, 'top');
-
+                    $this->set_border_style($cell_style, $style_value_string, 'top');
                     break;
-
                 case 'border-bottom':
-                    $this->setBorderStyle($cellStyle, $styleValueString, 'bottom');
-
+                    $this->set_border_style($cell_style, $style_value_string, 'bottom');
                     break;
-
                 case 'border-left':
-                    $this->setBorderStyle($cellStyle, $styleValueString, 'left');
-
+                    $this->set_border_style($cell_style, $style_value_string, 'left');
                     break;
-
                 case 'border-right':
-                    $this->setBorderStyle($cellStyle, $styleValueString, 'right');
-
+                    $this->set_border_style($cell_style, $style_value_string, 'right');
                     break;
-
                 case 'font-size':
-                    $cellStyle->getFont()->setSize(
-                        (float) $styleValue
-                    );
-
+                    $cell_style->get_font()->set_size((float) $style_value);
                     break;
-
                 case 'direction':
-                    if ($styleValue === 'rtl') {
-                        $cellStyle->getAlignment()
-                            ->setReadOrder(Alignment::READORDER_RTL);
-                    } elseif ($styleValue === 'ltr') {
-                        $cellStyle->getAlignment()
-                            ->setReadOrder(Alignment::READORDER_LTR);
+                    if ($style_value === 'rtl') {
+                        $cell_style->get_alignment()->set_read_order(Alignment::READORDER_RTL);
+                    } elseif ($style_value === 'ltr') {
+                        $cell_style->get_alignment()->set_read_order(Alignment::READORDER_LTR);
                     }
-
                     break;
-
                 case 'font-weight':
-                    if ($styleValue === 'bold' || $styleValue >= 500) {
-                        $cellStyle->getFont()->setBold(true);
+                    if ($style_value === 'bold' || $style_value >= 500) {
+                        $cell_style->get_font()->set_bold(true);
                     }
-
                     break;
-
                 case 'font-style':
-                    if ($styleValue === 'italic') {
-                        $cellStyle->getFont()->setItalic(true);
+                    if ($style_value === 'italic') {
+                        $cell_style->get_font()->set_italic(true);
                     }
-
                     break;
-
                 case 'font-family':
-                    $cellStyle->getFont()->setName(str_replace('\'', '', $styleValueString));
-
+                    $cell_style->get_font()->set_name(str_replace('\'', '', $style_value_string));
                     break;
-
                 case 'text-decoration':
-                    switch ($styleValue) {
+                    switch ($style_value) {
                         case 'underline':
-                            $cellStyle->getFont()->setUnderline(Font::UNDERLINE_SINGLE);
-
+                            $cell_style->get_font()->set_underline(Font::UNDERLINE_SINGLE);
                             break;
                         case 'line-through':
-                            $cellStyle->getFont()->setStrikethrough(true);
-
+                            $cell_style->get_font()->set_strikethrough(true);
                             break;
                     }
-
                     break;
-
                 case 'text-align':
-                    $cellStyle->getAlignment()->setHorizontal($styleValueString);
-
+                    $cell_style->get_alignment()->set_horizontal($style_value_string);
                     break;
-
                 case 'vertical-align':
-                    $cellStyle->getAlignment()->setVertical($styleValueString);
-
+                    $cell_style->get_alignment()->set_vertical($style_value_string);
                     break;
-
                 case 'width':
                     if ($column !== '') {
-                        $sheet->getColumnDimension($column)->setWidth(
-                            (new CssDimension($styleValue ?? ''))->width()
-                        );
+                        $sheet->get_column_dimension($column)->set_width((new Css_Dimension($style_value ?? ''))->width());
                     }
-
                     break;
-
                 case 'height':
                     if ($row > 0) {
-                        $sheet->getRowDimension($row)->setRowHeight(
-                            (new CssDimension($styleValue ?? ''))->height()
-                        );
+                        $sheet->get_row_dimension($row)->set_row_height((new Css_Dimension($style_value ?? ''))->height());
                     }
-
                     break;
-
                 case 'word-wrap':
-                    $cellStyle->getAlignment()->setWrapText(
-                        $styleValue === 'break-word'
-                    );
-
+                    $cell_style->get_alignment()->set_wrap_text($style_value === 'break-word');
                     break;
-
                 case 'text-indent':
-                    $indentDimension = new CssDimension($styleValueString);
-                    $indent = $indentDimension
-                        ->toUnit(CssDimension::UOM_PIXELS);
-                    $cellStyle->getAlignment()->setIndent(
-                        (int) ($indent / Alignment::INDENT_UNITS_TO_PIXELS)
-                    );
-
+                    $indent_dimension = new Css_Dimension($style_value_string);
+                    $indent = $indent_dimension->to_unit(Css_Dimension::UOM_PIXELS);
+                    $cell_style->get_alignment()->set_indent((int) ($indent / Alignment::INDENT_UNITS_TO_PIXELS));
                     break;
             }
         }
     }
-
     /**
      * Check if has #, so we can get clean hex.
      */
-    public function getStyleColor(?string $value): string
+    public function get_style_color(?string $value): string
     {
         $value = (string) $value;
         if (str_starts_with($value, '#')) {
             return substr($value, 1);
         }
-
-        return HelperHtml::colourNameLookup($value);
+        return Helper_Html::colour_name_lookup($value);
     }
-
     /** @param string[] $attributes */
-    private function insertImage(Worksheet $sheet, string $column, int $row, array $attributes): void
+    private function insert_image(Worksheet $sheet, string $column, int $row, array $attributes): void
     {
         if (!isset($attributes['src'])) {
             return;
         }
-        $styleArray = self::getStyleArray($attributes);
-
+        $style_array = self::get_style_array($attributes);
         $src = $attributes['src'];
         if (!str_starts_with($src, 'data:')) {
             $src = urldecode($src);
         }
-        $width = isset($attributes['width']) ? (float) $attributes['width'] : ($styleArray['width'] ?? null);
-        $height = isset($attributes['height']) ? (float) $attributes['height'] : ($styleArray['height'] ?? null);
+        $width = isset($attributes['width']) ? (float) $attributes['width'] : $style_array['width'] ?? null;
+        $height = isset($attributes['height']) ? (float) $attributes['height'] : $style_array['height'] ?? null;
         $name = $attributes['alt'] ?? null;
-
         $drawing = new Drawing();
-        $drawing->setPath($src, false, allowExternal: $this->allowExternalImages, isWhitelisted: $this->isWhitelisted);
-        if ($drawing->getPath() === '') {
+        $drawing->set_path($src, false, allowExternal: $this->allow_external_images, isWhitelisted: $this->is_whitelisted);
+        if ($drawing->get_path() === '') {
             return;
         }
-        $drawing->setWorksheet($sheet);
-        $drawing->setCoordinates($column . $row);
-        $drawing->setOffsetX(0);
-        $drawing->setOffsetY(10);
-        $drawing->setResizeProportional(true);
-
+        $drawing->set_worksheet($sheet);
+        $drawing->set_coordinates($column . $row);
+        $drawing->set_offset_x(0);
+        $drawing->set_offset_y(10);
+        $drawing->set_resize_proportional(true);
         if ($name) {
-            $drawing->setName($name);
+            $drawing->set_name($name);
         }
-
         /** @var null|scalar $width */
         /** @var null|scalar $height */
         if ($width) {
             if ($height) {
-                $drawing->setWidthAndHeight((int) $width, (int) $height);
+                $drawing->set_width_and_height((int) $width, (int) $height);
             } else {
-                $drawing->setWidth((int) $width);
+                $drawing->set_width((int) $width);
             }
         } elseif ($height) {
-            $drawing->setHeight((int) $height);
+            $drawing->set_height((int) $height);
         }
-
-        $sheet->getColumnDimension($column)->setWidth(
-            $drawing->getWidth() / 6
-        );
-
-        $sheet->getRowDimension($row)->setRowHeight(
-            $drawing->getHeight() * 0.9
-        );
-
-        if (isset($styleArray['opacity'])) {
-            $opacity = $styleArray['opacity'];
+        $sheet->get_column_dimension($column)->set_width($drawing->get_width() / 6);
+        $sheet->get_row_dimension($row)->set_row_height($drawing->get_height() * 0.9);
+        if (isset($style_array['opacity'])) {
+            $opacity = $style_array['opacity'];
             if (is_numeric($opacity)) {
-                $drawing->setOpacity((int) ($opacity * 100000));
+                $drawing->set_opacity((int) ($opacity * 100000));
             }
         }
     }
-
     /**
      * @param string[] $attributes
      *
      * @return mixed[]
      */
-    private static function getStyleArray(array $attributes): array
+    private static function get_style_array(array $attributes): array
     {
-        $styleArray = [];
+        $style_array = [];
         if (isset($attributes['style'])) {
             $styles = explode(';', $attributes['style']);
             foreach ($styles as $style) {
                 $value = explode(':', $style);
                 if (count($value) === 2) {
-                    $arrayKey = trim($value[0]);
-                    $arrayValue = trim($value[1]);
-                    if ($arrayKey === 'width') {
-                        if (str_ends_with($arrayValue, 'px')) {
-                            $arrayValue = (string) (((float) substr($arrayValue, 0, -2)));
+                    $array_key = trim($value[0]);
+                    $array_value = trim($value[1]);
+                    if ($array_key === 'width') {
+                        if (str_ends_with($array_value, 'px')) {
+                            $array_value = (string) (float) substr($array_value, 0, -2);
                         } else {
-                            $arrayValue = (new CssDimension($arrayValue))->toUnit(CssDimension::UOM_PIXELS);
+                            $array_value = (new Css_Dimension($array_value))->to_unit(Css_Dimension::UOM_PIXELS);
                         }
-                    } elseif ($arrayKey === 'height') {
-                        if (str_ends_with($arrayValue, 'px')) {
-                            $arrayValue = substr($arrayValue, 0, -2);
+                    } elseif ($array_key === 'height') {
+                        if (str_ends_with($array_value, 'px')) {
+                            $array_value = substr($array_value, 0, -2);
                         } else {
-                            $arrayValue = (new CssDimension($arrayValue))->toUnit(CssDimension::UOM_PIXELS);
+                            $array_value = (new Css_Dimension($array_value))->to_unit(Css_Dimension::UOM_PIXELS);
                         }
                     }
-                    $styleArray[$arrayKey] = $arrayValue;
+                    $style_array[$array_key] = $array_value;
                 }
             }
         }
-
-        return $styleArray;
+        return $style_array;
     }
-
-    private const BORDER_MAPPINGS = [
-        'dash-dot' => Border::BORDER_DASHDOT,
-        'dash-dot-dot' => Border::BORDER_DASHDOTDOT,
-        'dashed' => Border::BORDER_DASHED,
-        'dotted' => Border::BORDER_DOTTED,
-        'double' => Border::BORDER_DOUBLE,
-        'hair' => Border::BORDER_HAIR,
-        'medium' => Border::BORDER_MEDIUM,
-        'medium-dashed' => Border::BORDER_MEDIUMDASHED,
-        'medium-dash-dot' => Border::BORDER_MEDIUMDASHDOT,
-        'medium-dash-dot-dot' => Border::BORDER_MEDIUMDASHDOTDOT,
-        'none' => Border::BORDER_NONE,
-        'slant-dash-dot' => Border::BORDER_SLANTDASHDOT,
-        'solid' => Border::BORDER_THIN,
-        'thick' => Border::BORDER_THICK,
-    ];
-
+    private const BORDER_MAPPINGS = ['dash-dot' => Border::BORDER_DASHDOT, 'dash-dot-dot' => Border::BORDER_DASHDOTDOT, 'dashed' => Border::BORDER_DASHED, 'dotted' => Border::BORDER_DOTTED, 'double' => Border::BORDER_DOUBLE, 'hair' => Border::BORDER_HAIR, 'medium' => Border::BORDER_MEDIUM, 'medium-dashed' => Border::BORDER_MEDIUMDASHED, 'medium-dash-dot' => Border::BORDER_MEDIUMDASHDOT, 'medium-dash-dot-dot' => Border::BORDER_MEDIUMDASHDOTDOT, 'none' => Border::BORDER_NONE, 'slant-dash-dot' => Border::BORDER_SLANTDASHDOT, 'solid' => Border::BORDER_THIN, 'thick' => Border::BORDER_THICK];
     /** @return array<string, string> */
-    public static function getBorderMappings(): array
+    public static function get_border_mappings(): array
     {
         return self::BORDER_MAPPINGS;
     }
-
     /**
      * Map html border style to PhpSpreadsheet border style.
      */
-    public function getBorderStyle(string $style): ?string
+    public function get_border_style(string $style): ?string
     {
         return self::BORDER_MAPPINGS[$style] ?? null;
     }
-
-    private function setBorderStyle(Style $cellStyle, string $styleValue, string $type): void
+    private function set_border_style(Style $cell_style, string $style_value, string $type): void
     {
-        if (trim($styleValue) === Border::BORDER_NONE) {
-            $borderStyle = Border::BORDER_NONE;
+        if (trim($style_value) === Border::BORDER_NONE) {
+            $border_style = Border::BORDER_NONE;
             $color = null;
         } else {
-            $borderArray = explode(' ', $styleValue);
-            $borderCount = count($borderArray);
-            if ($borderCount >= 3) {
-                $borderStyle = $borderArray[1];
-                $color = $borderArray[2];
+            $border_array = explode(' ', $style_value);
+            $border_count = count($border_array);
+            if ($border_count >= 3) {
+                $border_style = $border_array[1];
+                $color = $border_array[2];
             } else {
-                $borderStyle = $borderArray[0];
-                $color = $borderArray[1] ?? null;
+                $border_style = $border_array[0];
+                $color = $border_array[1] ?? null;
             }
         }
-
-        $cellStyle->applyFromArray([
-            'borders' => [
-                $type => [
-                    'borderStyle' => $this->getBorderStyle($borderStyle),
-                    'color' => ['rgb' => $this->getStyleColor($color)],
-                ],
-            ],
-        ]);
+        $cell_style->apply_from_array(['borders' => [$type => ['borderStyle' => $this->get_border_style($border_style), 'color' => ['rgb' => $this->get_style_color($color)]]]]);
     }
-
     /**
      * Return worksheet info (Name, Last Column Letter, Last Column Index, Total Rows, Total Columns).
      *
      * @return array<int, array{worksheetName: string, lastColumnLetter: string, lastColumnIndex: int, totalRows: int, totalColumns: int, sheetState: string}>
      */
-    public function listWorksheetInfo(string $filename): array
+    public function list_worksheet_info(string $filename): array
     {
         $info = [];
-        $spreadsheet = $this->newSpreadsheet();
-        $this->loadIntoExisting($filename, $spreadsheet);
-        foreach ($spreadsheet->getAllSheets() as $sheet) {
-            $newEntry = ['worksheetName' => $sheet->getTitle()];
-            $newEntry['lastColumnLetter'] = $sheet->getHighestDataColumn();
-            $newEntry['lastColumnIndex'] = Coordinate::columnIndexFromString($sheet->getHighestDataColumn()) - 1;
-            $newEntry['totalRows'] = $sheet->getHighestDataRow();
-            $newEntry['totalColumns'] = $newEntry['lastColumnIndex'] + 1;
-            $newEntry['sheetState'] = Worksheet::SHEETSTATE_VISIBLE;
-            $info[] = $newEntry;
+        $spreadsheet = $this->new_spreadsheet();
+        $this->load_into_existing($filename, $spreadsheet);
+        foreach ($spreadsheet->get_all_sheets() as $sheet) {
+            $new_entry = ['worksheetName' => $sheet->get_title()];
+            $new_entry['lastColumnLetter'] = $sheet->get_highest_data_column();
+            $new_entry['lastColumnIndex'] = Coordinate::column_index_from_string($sheet->get_highest_data_column()) - 1;
+            $new_entry['totalRows'] = $sheet->get_highest_data_row();
+            $new_entry['totalColumns'] = $new_entry['lastColumnIndex'] + 1;
+            $new_entry['sheetState'] = Worksheet::SHEETSTATE_VISIBLE;
+            $info[] = $new_entry;
         }
-        $spreadsheet->disconnectWorksheets();
-
+        $spreadsheet->disconnect_worksheets();
         return $info;
     }
 }

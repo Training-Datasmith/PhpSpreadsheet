@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader;
 
-namespace PhpOffice\PhpSpreadsheet\Reader;
-
-interface IReadFilter
+interface I_Read_Filter
 {
     /**
      * Should this cell be read?
@@ -13,5 +12,5 @@ interface IReadFilter
      * @param int $row Row number
      * @param string $worksheetName Optional worksheet name
      */
-    public function readCell(string $columnAddress, int $row, string $worksheetName = ''): bool;
+    public function read_cell(string $column_address, int $row, string $worksheet_name = ''): bool;
 }

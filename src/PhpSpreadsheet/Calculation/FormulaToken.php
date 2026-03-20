@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation;
 
 /**
  * PARTLY BASED ON:
@@ -29,7 +28,7 @@ namespace PhpOffice\PhpSpreadsheet\Calculation;
  *
  * @deprecated 5.5.0 No replacement.
  */
-class FormulaToken
+class Formula_Token
 {
     // Token types
     public const TOKEN_TYPE_NOOP = 'Noop';
@@ -42,7 +41,6 @@ class FormulaToken
     public const TOKEN_TYPE_OPERATORPOSTFIX = 'OperatorPostfix';
     public const TOKEN_TYPE_WHITESPACE = 'Whitespace';
     public const TOKEN_TYPE_UNKNOWN = 'Unknown';
-
     // Token subtypes
     public const TOKEN_SUBTYPE_NOTHING = 'Nothing';
     public const TOKEN_SUBTYPE_START = 'Start';
@@ -56,7 +54,6 @@ class FormulaToken
     public const TOKEN_SUBTYPE_CONCATENATION = 'Concatenation';
     public const TOKEN_SUBTYPE_INTERSECTION = 'Intersection';
     public const TOKEN_SUBTYPE_UNION = 'Union';
-
     /**
      * Create a new FormulaToken.
      *
@@ -68,56 +65,51 @@ class FormulaToken
          * Value.
          */
         private string $value,
-        private string $tokenType = self::TOKEN_TYPE_UNKNOWN,
-        private string $tokenSubType = self::TOKEN_SUBTYPE_NOTHING
-    ) {
+        private string $token_type = self::TOKEN_TYPE_UNKNOWN,
+        private string $token_sub_type = self::TOKEN_SUBTYPE_NOTHING
+    )
+    {
     }
-
     /**
      * Get Value.
      */
-    public function getValue(): string
+    public function get_value(): string
     {
         return $this->value;
     }
-
     /**
      * Set Value.
      */
-    public function setValue(string $value): void
+    public function set_value(string $value): void
     {
         $this->value = $value;
     }
-
     /**
      * Get Token Type (represented by TOKEN_TYPE_*).
      */
-    public function getTokenType(): string
+    public function get_token_type(): string
     {
-        return $this->tokenType;
+        return $this->token_type;
     }
-
     /**
      * Set Token Type (represented by TOKEN_TYPE_*).
      */
-    public function setTokenType(string $value): void
+    public function set_token_type(string $value): void
     {
-        $this->tokenType = $value;
+        $this->token_type = $value;
     }
-
     /**
      * Get Token SubType (represented by TOKEN_SUBTYPE_*).
      */
-    public function getTokenSubType(): string
+    public function get_token_sub_type(): string
     {
-        return $this->tokenSubType;
+        return $this->token_sub_type;
     }
-
     /**
      * Set Token SubType (represented by TOKEN_SUBTYPE_*).
      */
-    public function setTokenSubType(string $value): void
+    public function set_token_sub_type(string $value): void
     {
-        $this->tokenSubType = $value;
+        $this->token_sub_type = $value;
     }
 }

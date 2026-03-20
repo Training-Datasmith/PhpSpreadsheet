@@ -1,59 +1,51 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared;
 
-namespace PhpOffice\PhpSpreadsheet\Shared;
-
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-
-class XMLWriter extends \XMLWriter
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+class Xml_Writer extends \Xml_Writer
 {
-    public static bool $debugEnabled = false;
-
+    public static bool $debug_enabled = false;
     /** Temporary storage method */
     public const STORAGE_MEMORY = 1;
     public const STORAGE_DISK = 2;
-
     /**
      * Temporary filename.
      */
-    private string $tempFileName = '';
-
+    private string $temp_file_name = '';
     /**
      * Create a new XMLWriter instance.
      *
      * @param int $temporaryStorage Temporary storage location
      * @param ?string $temporaryStorageFolder Temporary storage folder
      */
-    public function __construct(int $temporaryStorage = self::STORAGE_MEMORY, ?string $temporaryStorageFolder = null)
+    public function __construct(int $temporary_storage = self::STORAGE_MEMORY, ?string $temporary_storage_folder = null)
     {
         // Open temporary storage
-        if ($temporaryStorage == self::STORAGE_MEMORY) {
-            $this->openMemory();
+        if ($temporary_storage == self::STORAGE_MEMORY) {
+            $this->open_memory();
         } else {
             // Create temporary filename
-            if ($temporaryStorageFolder === null) {
-                $temporaryStorageFolder = File::sysGetTempDir();
+            if ($temporary_storage_folder === null) {
+                $temporary_storage_folder = File::sys_get_temp_dir();
             }
-            $this->tempFileName = (string) @tempnam($temporaryStorageFolder, 'xml');
-
+            $this->temp_file_name = (string) @tempnam($temporary_storage_folder, 'xml');
             // Open storage
-            if (empty($this->tempFileName) || $this->openUri($this->tempFileName) === false) {
+            if (empty($this->temp_file_name) || $this->open_uri($this->temp_file_name) === false) {
                 // Fallback to memory...
-                $this->openMemory();
-                if ($this->tempFileName != '') {
-                    @unlink($this->tempFileName);
+                $this->open_memory();
+                if ($this->temp_file_name != '') {
+                    @unlink($this->temp_file_name);
                 }
-                $this->tempFileName = '';
+                $this->temp_file_name = '';
             }
         }
-
         // Set default values
-        if (self::$debugEnabled) {
-            $this->setIndent(true);
+        if (self::$debug_enabled) {
+            $this->set_indent(true);
         }
     }
-
     /**
      * Destructor.
      */
@@ -61,43 +53,37 @@ class XMLWriter extends \XMLWriter
     {
         // Unlink temporary files
         // There is nothing reasonable to do if unlink fails.
-        if ($this->tempFileName != '') {
-            @unlink($this->tempFileName);
+        if ($this->temp_file_name != '') {
+            @unlink($this->temp_file_name);
         }
     }
-
     /** @param mixed[] $data */
     public function __unserialize(array $data): void
     {
-        $this->tempFileName = '';
-
-        throw new SpreadsheetException('Unserialize not permitted');
+        $this->temp_file_name = '';
+        throw new Spreadsheet_Exception('Unserialize not permitted');
     }
-
     /**
      * Get written data.
      */
-    public function getData(): string
+    public function get_data(): string
     {
-        if ($this->tempFileName == '') {
-            return $this->outputMemory(true);
+        if ($this->temp_file_name == '') {
+            return $this->output_memory(true);
         }
         $this->flush();
-
-        return file_get_contents($this->tempFileName) ?: '';
+        return file_get_contents($this->temp_file_name) ?: '';
     }
-
     /**
      * Wrapper method for writeRaw.
      *
      * @param null|string|string[] $rawTextData
      */
-    public function writeRawData($rawTextData): bool
+    public function write_raw_data($raw_text_data): bool
     {
-        if (is_array($rawTextData)) {
-            $rawTextData = implode("\n", $rawTextData);
+        if (is_array($raw_text_data)) {
+            $raw_text_data = implode("\n", $raw_text_data);
         }
-
-        return $this->text($rawTextData ?? '');
+        return $this->text($raw_text_data ?? '');
     }
 }

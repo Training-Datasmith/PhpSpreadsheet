@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Gcd
 {
     /**
@@ -20,11 +18,10 @@ class Gcd
      * Excel Function:
      *        GCD(number1[,number2[, ...]])
      */
-    private static function evaluateGCD(float|int $a, float|int $b): float|int
+    private static function evaluate_gcd(float|int $a, float|int $b): float|int
     {
-        return $b ? self::evaluateGCD($b, $a % $b) : $a;
+        return $b ? self::evaluate_gcd($b, $a % $b) : $a;
     }
-
     /**
      * GCD.
      *
@@ -42,26 +39,24 @@ class Gcd
     public static function evaluate(mixed ...$args): string|float|int
     {
         try {
-            $arrayArgs = [];
-            foreach (Functions::flattenArray($args) as $value1) {
+            $array_args = [];
+            foreach (Functions::flatten_array($args) as $value1) {
                 if ($value1 !== null) {
-                    $value = Helpers::validateNumericNullSubstitution($value1, 1);
-                    Helpers::validateNotNegative($value);
-                    $arrayArgs[] = (int) $value;
+                    $value = Helpers::validate_numeric_null_substitution($value1, 1);
+                    Helpers::validate_not_negative($value);
+                    $array_args[] = (int) $value;
                 }
             }
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (count($arrayArgs) <= 0) {
-            return ExcelError::VALUE();
+        if (count($array_args) <= 0) {
+            return Excel_Error::VALUE();
         }
-        $gcd = array_pop($arrayArgs);
+        $gcd = array_pop($array_args);
         do {
-            $gcd = self::evaluateGCD($gcd, (int) array_pop($arrayArgs));
-        } while (!empty($arrayArgs));
-
+            $gcd = self::evaluate_gcd($gcd, (int) array_pop($array_args));
+        } while (!empty($array_args));
         return $gcd;
     }
 }

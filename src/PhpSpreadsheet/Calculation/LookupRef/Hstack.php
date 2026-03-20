@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Hstack
 {
     /**
@@ -14,37 +12,36 @@ class Hstack
      *
      * @return mixed[]|string
      */
-    public static function hstack(mixed ...$inputData): array|string
+    public static function hstack(mixed ...$input_data): array|string
     {
-        $maxRow = 0;
-        foreach ($inputData as $matrix) {
+        $max_row = 0;
+        foreach ($input_data as $matrix) {
             if (!is_array($matrix)) {
                 $count = 1;
             } else {
                 $count = count($matrix);
             }
-            $maxRow = max($maxRow, $count);
+            $max_row = max($max_row, $count);
         }
         /** @var mixed[] $inputData */
-        foreach ($inputData as &$matrix) {
+        foreach ($input_data as &$matrix) {
             if (!is_array($matrix)) {
                 $matrix = [$matrix];
             }
             $rows = count($matrix);
             $reset = reset($matrix);
             $columns = is_array($reset) ? count($reset) : 1;
-            while ($maxRow > $rows) {
-                $matrix[] = array_pad([], $columns, ExcelError::NA());
+            while ($max_row > $rows) {
+                $matrix[] = array_pad([], $columns, Excel_Error::NA());
                 ++$rows;
             }
         }
-
-        $transpose = array_map(null, ...$inputData); //* @phpstan-ignore-line
-        $returnMatrix = [];
+        $transpose = array_map(null, ...$input_data);
+        //* @phpstan-ignore-line
+        $return_matrix = [];
         foreach ($transpose as $array) {
-            $returnMatrix[] = Functions::flattenArray($array);
+            $return_matrix[] = Functions::flatten_array($array);
         }
-
-        return $returnMatrix;
+        return $return_matrix;
     }
 }

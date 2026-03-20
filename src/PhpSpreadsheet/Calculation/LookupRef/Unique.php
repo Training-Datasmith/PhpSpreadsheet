@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Unique
 {
     /**
@@ -20,145 +18,112 @@ class Unique
      *
      * @return mixed The unique values from the search range
      */
-    public static function unique(mixed $lookupVector, mixed $byColumn = false, mixed $exactlyOnce = false): mixed
+    public static function unique(mixed $lookup_vector, mixed $by_column = false, mixed $exactly_once = false): mixed
     {
-        if (!is_array($lookupVector)) {
+        if (!is_array($lookup_vector)) {
             // Scalars are always returned "as is"
-            return $lookupVector;
+            return $lookup_vector;
         }
-
-        $byColumn = (bool) $byColumn;
-        $exactlyOnce = (bool) $exactlyOnce;
-
-        return ($byColumn === true)
-            ? self::uniqueByColumn($lookupVector, $exactlyOnce)
-            : self::uniqueByRow($lookupVector, $exactlyOnce);
+        $by_column = (bool) $by_column;
+        $exactly_once = (bool) $exactly_once;
+        return $by_column === true ? self::unique_by_column($lookup_vector, $exactly_once) : self::unique_by_row($lookup_vector, $exactly_once);
     }
-
     /** @param mixed[] $lookupVector */
-    private static function uniqueByRow(array $lookupVector, bool $exactlyOnce): mixed
+    private static function unique_by_row(array $lookup_vector, bool $exactly_once): mixed
     {
         // When not $byColumn, we count whole rows or values, not individual values
         //      so implode each row into a single string value
         array_walk(
-            $lookupVector,
+            $lookup_vector,
             //* @phpstan-ignore-next-line
             function (array &$value): void {
                 $valuex = '';
                 $separator = '';
-                $numericIndicator = "\x01";
-                foreach ($value as $cellValue) {
+                $numeric_indicator = "\x01";
+                foreach ($value as $cell_value) {
                     /** @var scalar $cellValue */
-                    $valuex .= $separator . $cellValue;
+                    $valuex .= $separator . $cell_value;
                     $separator = "\x00";
-                    if (is_int($cellValue) || is_float($cellValue)) {
-                        $valuex .= $numericIndicator;
+                    if (is_int($cell_value) || is_float($cell_value)) {
+                        $valuex .= $numeric_indicator;
                     }
                 }
                 $value = $valuex;
             }
         );
-
         /** @var string[] $lookupVector */
-        $result = self::countValuesCaseInsensitive($lookupVector);
-
-        if ($exactlyOnce === true) {
-            $result = self::exactlyOnceFilter($result);
+        $result = self::count_values_case_insensitive($lookup_vector);
+        if ($exactly_once === true) {
+            $result = self::exactly_once_filter($result);
         }
-
         if (count($result) === 0) {
-            return ExcelError::CALC();
+            return Excel_Error::CALC();
         }
-
         $result = array_keys($result);
-
         // restore rows from their strings
-        array_walk(
-            $result,
-            function (string &$value): void {
-                $value = explode("\x00", $value);
-                foreach ($value as &$stringValue) {
-                    if (str_ends_with($stringValue, "\x01")) {
-                        // x01 should only end a string which is otherwise a float or int,
-                        // so phpstan is technically correct but what it fears should not happen.
-                        $stringValue = 0 + substr($stringValue, 0, -1); //@phpstan-ignore-line
-                    }
+        array_walk($result, function (string &$value): void {
+            $value = explode("\x00", $value);
+            foreach ($value as &$string_value) {
+                if (str_ends_with($string_value, "\x01")) {
+                    // x01 should only end a string which is otherwise a float or int,
+                    // so phpstan is technically correct but what it fears should not happen.
+                    $string_value = 0 + substr($string_value, 0, -1);
+                    //@phpstan-ignore-line
                 }
             }
-        );
-
-        return (count($result) === 1) ? array_pop($result) : $result;
+        });
+        return count($result) === 1 ? array_pop($result) : $result;
     }
-
     /** @param mixed[] $lookupVector */
-    private static function uniqueByColumn(array $lookupVector, bool $exactlyOnce): mixed
+    private static function unique_by_column(array $lookup_vector, bool $exactly_once): mixed
     {
         /** @var string[] */
-        $flattenedLookupVector = Functions::flattenArray($lookupVector);
-
-        if (count($lookupVector, COUNT_RECURSIVE) > count($flattenedLookupVector, COUNT_RECURSIVE) + 1) {
+        $flattened_lookup_vector = Functions::flatten_array($lookup_vector);
+        if (count($lookup_vector, COUNT_RECURSIVE) > count($flattened_lookup_vector, COUNT_RECURSIVE) + 1) {
             // We're looking at a full column check (multiple rows)
-            $transpose = Matrix::transpose($lookupVector);
-            $result = self::uniqueByRow($transpose, $exactlyOnce);
-
-            return (is_array($result)) ? Matrix::transpose($result) : $result;
+            $transpose = Matrix::transpose($lookup_vector);
+            $result = self::unique_by_row($transpose, $exactly_once);
+            return is_array($result) ? Matrix::transpose($result) : $result;
         }
-
-        $result = self::countValuesCaseInsensitive($flattenedLookupVector);
-
-        if ($exactlyOnce === true) {
-            $result = self::exactlyOnceFilter($result);
+        $result = self::count_values_case_insensitive($flattened_lookup_vector);
+        if ($exactly_once === true) {
+            $result = self::exactly_once_filter($result);
         }
-
         if (count($result) === 0) {
-            return ExcelError::CALC();
+            return Excel_Error::CALC();
         }
-
         return array_keys($result);
     }
-
     /**
      * @param string[] $caseSensitiveLookupValues
      *
      * @return mixed[]
      */
-    private static function countValuesCaseInsensitive(array $caseSensitiveLookupValues): array
+    private static function count_values_case_insensitive(array $case_sensitive_lookup_values): array
     {
-        $caseInsensitiveCounts = array_count_values(
-            array_map(
-                StringHelper::strToUpper(...),
-                $caseSensitiveLookupValues
-            )
-        );
-
-        $caseSensitiveCounts = [];
-        foreach ($caseInsensitiveCounts as $caseInsensitiveKey => $count) {
-            if (is_numeric($caseInsensitiveKey)) {
-                $caseSensitiveCounts[$caseInsensitiveKey] = $count;
+        $case_insensitive_counts = array_count_values(array_map(String_Helper::str_to_upper(...), $case_sensitive_lookup_values));
+        $case_sensitive_counts = [];
+        foreach ($case_insensitive_counts as $case_insensitive_key => $count) {
+            if (is_numeric($case_insensitive_key)) {
+                $case_sensitive_counts[$case_insensitive_key] = $count;
             } else {
-                foreach ($caseSensitiveLookupValues as $caseSensitiveValue) {
-                    if ($caseInsensitiveKey === StringHelper::strToUpper($caseSensitiveValue)) {
-                        $caseSensitiveCounts[$caseSensitiveValue] = $count;
-
+                foreach ($case_sensitive_lookup_values as $case_sensitive_value) {
+                    if ($case_insensitive_key === String_Helper::str_to_upper($case_sensitive_value)) {
+                        $case_sensitive_counts[$case_sensitive_value] = $count;
                         break;
                     }
                 }
             }
         }
-
-        return $caseSensitiveCounts;
+        return $case_sensitive_counts;
     }
-
     /**
      * @param mixed[] $values
      *
      * @return mixed[]
      */
-    private static function exactlyOnceFilter(array $values): array
+    private static function exactly_once_filter(array $values): array
     {
-        return array_filter(
-            $values,
-            fn ($value): bool => $value === 1
-        );
+        return array_filter($values, fn($value): bool => $value === 1);
     }
 }

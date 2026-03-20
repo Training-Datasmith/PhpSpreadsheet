@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Fisher
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * FISHER.
      *
@@ -28,22 +25,18 @@ class Fisher
     public static function distribution(mixed $value): array|string|float
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
+            $value = Distribution_Validations::validate_float($value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($value <= -1) || ($value >= 1)) {
-            return ExcelError::NAN();
+        if ($value <= -1 || $value >= 1) {
+            return Excel_Error::NAN();
         }
-
         return 0.5 * log((1 + $value) / (1 - $value));
     }
-
     /**
      * FISHERINV.
      *
@@ -60,15 +53,13 @@ class Fisher
     public static function inverse(mixed $probability): array|string|float
     {
         if (is_array($probability)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $probability);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $probability);
         }
-
         try {
-            $probability = DistributionValidations::validateFloat($probability);
+            $probability = Distribution_Validations::validate_float($probability);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return (exp(2 * $probability) - 1) / (exp(2 * $probability) + 1);
     }
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial\Cash_Flow;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Single
 {
     /**
@@ -22,25 +20,21 @@ class Single
      * @param mixed $principal the present value
      * @param float[] $schedule an array of interest rates to apply
      */
-    public static function futureValue(mixed $principal, array $schedule): string|float
+    public static function future_value(mixed $principal, array $schedule): string|float
     {
-        $principal = Functions::flattenSingleValue($principal);
-        $schedule = Functions::flattenArray($schedule);
-
+        $principal = Functions::flatten_single_value($principal);
+        $schedule = Functions::flatten_array($schedule);
         try {
-            $principal = CashFlowValidations::validateFloat($principal);
-
+            $principal = Cash_Flow_Validations::validate_float($principal);
             foreach ($schedule as $rate) {
-                $rate = CashFlowValidations::validateFloat($rate);
+                $rate = Cash_Flow_Validations::validate_float($rate);
                 $principal *= 1 + $rate;
             }
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return $principal;
     }
-
     /**
      * PDURATION.
      *
@@ -52,28 +46,24 @@ class Single
      *
      * @return float|string Result, or a string containing an error
      */
-    public static function periods(mixed $rate, mixed $presentValue, mixed $futureValue): string|float
+    public static function periods(mixed $rate, mixed $present_value, mixed $future_value): string|float
     {
-        $rate = Functions::flattenSingleValue($rate);
-        $presentValue = Functions::flattenSingleValue($presentValue);
-        $futureValue = Functions::flattenSingleValue($futureValue);
-
+        $rate = Functions::flatten_single_value($rate);
+        $present_value = Functions::flatten_single_value($present_value);
+        $future_value = Functions::flatten_single_value($future_value);
         try {
-            $rate = CashFlowValidations::validateRate($rate);
-            $presentValue = CashFlowValidations::validatePresentValue($presentValue);
-            $futureValue = CashFlowValidations::validateFutureValue($futureValue);
+            $rate = Cash_Flow_Validations::validate_rate($rate);
+            $present_value = Cash_Flow_Validations::validate_present_value($present_value);
+            $future_value = Cash_Flow_Validations::validate_future_value($future_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Validate parameters
-        if ($rate <= 0.0 || $presentValue <= 0.0 || $futureValue <= 0.0) {
-            return ExcelError::NAN();
+        if ($rate <= 0.0 || $present_value <= 0.0 || $future_value <= 0.0) {
+            return Excel_Error::NAN();
         }
-
-        return (log($futureValue) - log($presentValue)) / log(1 + $rate);
+        return (log($future_value) - log($present_value)) / log(1 + $rate);
     }
-
     /**
      * RRI.
      *
@@ -85,25 +75,22 @@ class Single
      *
      * @return float|string Result, or a string containing an error
      */
-    public static function interestRate(mixed $periods = 0.0, mixed $presentValue = 0.0, mixed $futureValue = 0.0): string|float
+    public static function interest_rate(mixed $periods = 0.0, mixed $present_value = 0.0, mixed $future_value = 0.0): string|float
     {
-        $periods = Functions::flattenSingleValue($periods);
-        $presentValue = Functions::flattenSingleValue($presentValue);
-        $futureValue = Functions::flattenSingleValue($futureValue);
-
+        $periods = Functions::flatten_single_value($periods);
+        $present_value = Functions::flatten_single_value($present_value);
+        $future_value = Functions::flatten_single_value($future_value);
         try {
-            $periods = CashFlowValidations::validateFloat($periods);
-            $presentValue = CashFlowValidations::validatePresentValue($presentValue);
-            $futureValue = CashFlowValidations::validateFutureValue($futureValue);
+            $periods = Cash_Flow_Validations::validate_float($periods);
+            $present_value = Cash_Flow_Validations::validate_present_value($present_value);
+            $future_value = Cash_Flow_Validations::validate_future_value($future_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Validate parameters
-        if ($periods <= 0.0 || $presentValue <= 0.0 || $futureValue < 0.0) {
-            return ExcelError::NAN();
+        if ($periods <= 0.0 || $present_value <= 0.0 || $future_value < 0.0) {
+            return Excel_Error::NAN();
         }
-
-        return ($futureValue / $presentValue) ** (1 / $periods) - 1;
+        return ($future_value / $present_value) ** (1 / $periods) - 1;
     }
 }

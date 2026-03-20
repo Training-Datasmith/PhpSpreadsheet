@@ -1,19 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format\Wizard;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard;
-
-use PhpOffice\PhpSpreadsheet\Exception;
-
-class Number extends NumberBase implements Wizard
+use Php_Office\Php_Spreadsheet\Exception;
+class Number extends Number_Base implements Wizard
 {
     public const WITH_THOUSANDS_SEPARATOR = true;
-
     public const WITHOUT_THOUSANDS_SEPARATOR = false;
-
-    protected bool $thousandsSeparator = true;
-
+    protected bool $thousands_separator = true;
     /**
      * @param int $decimals number of decimal places to display, in the range 0-30
      * @param bool $thousandsSeparator indicator whether the thousands separator should be used, or not
@@ -24,36 +19,26 @@ class Number extends NumberBase implements Wizard
      *
      * @throws Exception If a provided locale code is not a valid format
      */
-    public function __construct(
-        int $decimals = 2,
-        bool $thousandsSeparator = self::WITH_THOUSANDS_SEPARATOR,
-        ?string $locale = null
-    ) {
-        $this->setDecimals($decimals);
-        $this->setThousandsSeparator($thousandsSeparator);
-        $this->setLocale($locale);
-    }
-
-    public function setThousandsSeparator(bool $thousandsSeparator = self::WITH_THOUSANDS_SEPARATOR): void
+    public function __construct(int $decimals = 2, bool $thousands_separator = self::WITH_THOUSANDS_SEPARATOR, ?string $locale = null)
     {
-        $this->thousandsSeparator = $thousandsSeparator;
+        $this->set_decimals($decimals);
+        $this->set_thousands_separator($thousands_separator);
+        $this->set_locale($locale);
     }
-
+    public function set_thousands_separator(bool $thousands_separator = self::WITH_THOUSANDS_SEPARATOR): void
+    {
+        $this->thousands_separator = $thousands_separator;
+    }
     /**
      * As MS Excel cannot easily handle Lakh, which is the only locale-specific Number format variant,
      *       we don't use locale with Numbers.
      */
-    protected function getLocaleFormat(): string
+    protected function get_locale_format(): string
     {
         return $this->format();
     }
-
     public function format(): string
     {
-        return sprintf(
-            '%s0%s',
-            $this->thousandsSeparator ? '#,##' : null,
-            $this->decimals > 0 ? '.' . str_repeat('0', $this->decimals) : null
-        );
+        return sprintf('%s0%s', $this->thousands_separator ? '#,##' : null, $this->decimals > 0 ? '.' . str_repeat('0', $this->decimals) : null);
     }
 }

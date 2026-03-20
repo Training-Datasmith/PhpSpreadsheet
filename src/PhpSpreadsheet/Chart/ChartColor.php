@@ -1,89 +1,66 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Chart;
 
-namespace PhpOffice\PhpSpreadsheet\Chart;
-
-class ChartColor
+class Chart_Color
 {
     public const EXCEL_COLOR_TYPE_STANDARD = 'prstClr';
     public const EXCEL_COLOR_TYPE_SCHEME = 'schemeClr';
     public const EXCEL_COLOR_TYPE_RGB = 'srgbClr';
-    public const EXCEL_COLOR_TYPES = [
-        self::EXCEL_COLOR_TYPE_RGB,
-        self::EXCEL_COLOR_TYPE_SCHEME,
-        self::EXCEL_COLOR_TYPE_STANDARD,
-    ];
-
+    public const EXCEL_COLOR_TYPES = [self::EXCEL_COLOR_TYPE_RGB, self::EXCEL_COLOR_TYPE_SCHEME, self::EXCEL_COLOR_TYPE_STANDARD];
     private string $value = '';
-
     private string $type = '';
-
     private ?int $alpha = null;
-
     private ?int $brightness = null;
-
     /**
      * @param array{value: ?string, alpha: null|int|string, brightness?: null|int|string, type: ?string}|string  $value
      */
     public function __construct($value = '', ?int $alpha = null, ?string $type = null, ?int $brightness = null)
     {
         if (is_array($value)) {
-            $this->setColorPropertiesArray($value);
+            $this->set_color_properties_array($value);
         } else {
-            $this->setColorProperties($value, $alpha, $type, $brightness);
+            $this->set_color_properties($value, $alpha, $type, $brightness);
         }
     }
-
-    public function getValue(): string
+    public function get_value(): string
     {
         return $this->value;
     }
-
-    public function setValue(string $value): self
+    public function set_value(string $value): self
     {
         $this->value = $value;
-
         return $this;
     }
-
-    public function getType(): string
+    public function get_type(): string
     {
         return $this->type;
     }
-
-    public function setType(string $type): self
+    public function set_type(string $type): self
     {
         $this->type = $type;
-
         return $this;
     }
-
-    public function getAlpha(): ?int
+    public function get_alpha(): ?int
     {
         return $this->alpha;
     }
-
-    public function setAlpha(?int $alpha): self
+    public function set_alpha(?int $alpha): self
     {
         $this->alpha = $alpha;
-
         return $this;
     }
-
-    public function getBrightness(): ?int
+    public function get_brightness(): ?int
     {
         return $this->brightness;
     }
-
-    public function setBrightness(?int $brightness): self
+    public function set_brightness(?int $brightness): self
     {
         $this->brightness = $brightness;
-
         return $this;
     }
-
-    public function setColorProperties(?string $color, null|float|int|string $alpha = null, ?string $type = null, null|float|int|string $brightness = null): self
+    public function set_color_properties(?string $color, null|float|int|string $alpha = null, ?string $type = null, null|float|int|string $brightness = null): self
     {
         if (empty($type) && !empty($color)) {
             if (str_starts_with($color, '*')) {
@@ -97,67 +74,55 @@ class ChartColor
             }
         }
         if ($color !== null) {
-            $this->setValue("$color");
+            $this->set_value("{$color}");
         }
         if ($type !== null) {
-            $this->setType($type);
+            $this->set_type($type);
         }
         if ($alpha === null) {
-            $this->setAlpha(null);
+            $this->set_alpha(null);
         } elseif (is_numeric($alpha)) {
-            $this->setAlpha((int) $alpha);
+            $this->set_alpha((int) $alpha);
         }
         if ($brightness === null) {
-            $this->setBrightness(null);
+            $this->set_brightness(null);
         } elseif (is_numeric($brightness)) {
-            $this->setBrightness((int) $brightness);
+            $this->set_brightness((int) $brightness);
         }
-
         return $this;
     }
-
     /** @param array{value: ?string, alpha: null|int|string, brightness?: null|int|string, type: ?string}  $color */
-    public function setColorPropertiesArray(array $color): self
+    public function set_color_properties_array(array $color): self
     {
-        return $this->setColorProperties(
-            $color['value'] ?? '',
-            $color['alpha'] ?? null,
-            $color['type'] ?? null,
-            $color['brightness'] ?? null
-        );
+        return $this->set_color_properties($color['value'] ?? '', $color['alpha'] ?? null, $color['type'] ?? null, $color['brightness'] ?? null);
     }
-
-    public function isUsable(): bool
+    public function is_usable(): bool
     {
         return $this->type !== '' && $this->value !== '';
     }
-
     /**
      * Get Color Property.
      */
-    public function getColorProperty(string $propertyName): null|int|string
+    public function get_color_property(string $property_name): null|int|string
     {
-        $retVal = null;
-        if ($propertyName === 'value') {
-            $retVal = $this->value;
-        } elseif ($propertyName === 'type') {
-            $retVal = $this->type;
-        } elseif ($propertyName === 'alpha') {
-            $retVal = $this->alpha;
-        } elseif ($propertyName === 'brightness') {
-            $retVal = $this->brightness;
+        $ret_val = null;
+        if ($property_name === 'value') {
+            $ret_val = $this->value;
+        } elseif ($property_name === 'type') {
+            $ret_val = $this->type;
+        } elseif ($property_name === 'alpha') {
+            $ret_val = $this->alpha;
+        } elseif ($property_name === 'brightness') {
+            $ret_val = $this->brightness;
         }
-
-        return $retVal;
+        return $ret_val;
     }
-
-    public static function alphaToXml(int $alpha): string
+    public static function alpha_to_xml(int $alpha): string
     {
-        return (100 - $alpha) . '000';
+        return 100 - $alpha . '000';
     }
-
-    public static function alphaFromXml(float|int|string $alpha): int
+    public static function alpha_from_xml(float|int|string $alpha): int
     {
-        return 100 - ((int) $alpha / 1000);
+        return 100 - (int) $alpha / 1000;
     }
 }

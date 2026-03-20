@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation;
 
 abstract class Category
 {

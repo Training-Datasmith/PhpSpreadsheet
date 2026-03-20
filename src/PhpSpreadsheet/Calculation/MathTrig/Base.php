@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Base
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * BASE.
      *
@@ -31,37 +28,33 @@ class Base
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function evaluate(mixed $number, mixed $radix, mixed $minLength = null): array|string
+    public static function evaluate(mixed $number, mixed $radix, mixed $min_length = null): array|string
     {
-        if (is_array($number) || is_array($radix) || is_array($minLength)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $radix, $minLength);
+        if (is_array($number) || is_array($radix) || is_array($min_length)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $number, $radix, $min_length);
         }
-
         try {
-            $number = floor(Helpers::validateNumericNullBool($number));
-            $radix = (int) Helpers::validateNumericNullBool($radix);
+            $number = floor(Helpers::validate_numeric_null_bool($number));
+            $radix = (int) Helpers::validate_numeric_null_bool($radix);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return self::calculate($number, $radix, $minLength);
+        return self::calculate($number, $radix, $min_length);
     }
-
-    private static function calculate(float $number, int $radix, mixed $minLength): string
+    private static function calculate(float $number, int $radix, mixed $min_length): string
     {
-        if ($minLength === null || is_numeric($minLength)) {
+        if ($min_length === null || is_numeric($min_length)) {
             if ($number < 0 || $number >= 2 ** 53 || $radix < 2 || $radix > 36) {
-                return ExcelError::NAN(); // Numeric range constraints
+                return Excel_Error::NAN();
+                // Numeric range constraints
             }
-
-            $outcome = strtoupper(base_convert("$number", 10, $radix));
-            if ($minLength !== null) {
-                $outcome = str_pad($outcome, (int) $minLength, '0', STR_PAD_LEFT); // String padding
+            $outcome = strtoupper(base_convert("{$number}", 10, $radix));
+            if ($min_length !== null) {
+                $outcome = str_pad($outcome, (int) $min_length, '0', STR_PAD_LEFT);
+                // String padding
             }
-
             return $outcome;
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
 }

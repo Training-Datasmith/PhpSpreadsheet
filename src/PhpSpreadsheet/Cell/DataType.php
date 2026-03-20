@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Cell;
-
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
-class DataType
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+class Data_Type
 {
     // Data types
     public const TYPE_STRING2 = 'str';
@@ -20,35 +18,22 @@ class DataType
     public const TYPE_ERROR = 'e';
     public const TYPE_ISO_DATE = 'd';
     public const TYPE_DRAWING_IN_CELL = 'drawingCell';
-
     /**
      * List of error codes.
      *
      * @var array<string, int>
      */
-    private static array $errorCodes = [
-        '#NULL!' => 0,
-        '#DIV/0!' => 1,
-        '#VALUE!' => 2,
-        '#REF!' => 3,
-        '#NAME?' => 4,
-        '#NUM!' => 5,
-        '#N/A' => 6,
-        '#CALC!' => 7,
-    ];
-
+    private static array $error_codes = ['#NULL!' => 0, '#DIV/0!' => 1, '#VALUE!' => 2, '#REF!' => 3, '#NAME?' => 4, '#NUM!' => 5, '#N/A' => 6, '#CALC!' => 7];
     public const MAX_STRING_LENGTH = 32767;
-
     /**
      * Get list of error codes.
      *
      * @return array<string, int>
      */
-    public static function getErrorCodes(): array
+    public static function get_error_codes(): array
     {
-        return self::$errorCodes;
+        return self::$error_codes;
     }
-
     /**
      * Check a string that it satisfies Excel requirements.
      *
@@ -56,24 +41,20 @@ class DataType
      *
      * @return RichText|string Sanitized value
      */
-    public static function checkString(null|RichText|string $textValue, bool $preserveCr = false): RichText|string
+    public static function check_string(null|Rich_Text|string $text_value, bool $preserve_cr = false): Rich_Text|string
     {
-        if ($textValue instanceof RichText) {
+        if ($text_value instanceof Rich_Text) {
             // TODO: Sanitize Rich-Text string (max. character count is 32,767)
-            return $textValue;
+            return $text_value;
         }
-
         // string must never be longer than 32,767 characters, truncate if necessary
-        $textValue = StringHelper::substring((string) $textValue, 0, self::MAX_STRING_LENGTH);
-
+        $text_value = String_Helper::substring((string) $text_value, 0, self::MAX_STRING_LENGTH);
         // we require that newline is represented as "\n" in core, not as "\r\n" or "\r"
-        if (!$preserveCr) {
-            return str_replace(["\r\n", "\r"], "\n", $textValue);
+        if (!$preserve_cr) {
+            return str_replace(["\r\n", "\r"], "\n", $text_value);
         }
-
-        return $textValue;
+        return $text_value;
     }
-
     /**
      * Check a value that it is a valid error code.
      *
@@ -81,15 +62,13 @@ class DataType
      *
      * @return string Sanitized value
      */
-    public static function checkErrorCode(mixed $value): string
+    public static function check_error_code(mixed $value): string
     {
         $default = '#NULL!';
-        $value = ($value === null) ? $default : StringHelper::convertToString($value, false, $default);
-
-        if (!isset(self::$errorCodes[$value])) {
+        $value = $value === null ? $default : String_Helper::convert_to_string($value, false, $default);
+        if (!isset(self::$error_codes[$value])) {
             return $default;
         }
-
         return $value;
     }
 }

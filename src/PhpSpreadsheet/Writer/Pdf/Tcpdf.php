@@ -1,19 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Pdf;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Setup;
+use Php_Office\Php_Spreadsheet\Writer\Pdf;
 class Tcpdf extends Pdf
 {
-    protected bool $writeHeader = false;
-
-    protected bool $writeFooter = false;
-
+    protected bool $write_header = false;
+    protected bool $write_footer = false;
     /**
      * Create a new PDF Writer instance.
      *
@@ -22,9 +18,8 @@ class Tcpdf extends Pdf
     public function __construct(Spreadsheet $spreadsheet)
     {
         parent::__construct($spreadsheet);
-        $this->setUseInlineCss(true);
+        $this->set_use_inline_css(true);
     }
-
     /**
      * Gets the implementation of external PDF library that should be used.
      *
@@ -34,17 +29,14 @@ class Tcpdf extends Pdf
      *
      * @return \TCPDF implementation
      */
-    protected function createExternalWriterInstance(string $orientation, string $unit, $paperSize): \TCPDF
+    protected function create_external_writer_instance(string $orientation, string $unit, $paper_size): \TCPDF
     {
         $this->defines();
-
-        return new \TCPDF($orientation, $unit, $paperSize);
+        return new \TCPDF($orientation, $unit, $paper_size);
     }
-
     protected function defines(): void
     {
     }
-
     /**
      * Save Spreadsheet to file.
      *
@@ -52,59 +44,41 @@ class Tcpdf extends Pdf
      */
     public function save($filename, int $flags = 0): void
     {
-        $fileHandle = parent::prepareForSave($filename);
-
+        $file_handle = parent::prepare_for_save($filename);
         //  Default PDF paper size
-        $paperSize = 'LETTER'; //    Letter    (8.5 in. by 11 in.)
-
+        $paper_size = 'LETTER';
+        //    Letter    (8.5 in. by 11 in.)
         //  Check for paper size and page orientation
-        $setup = $this->spreadsheet->getSheet($this->getSheetIndex() ?? 0)->getPageSetup();
-        $orientation = $this->getOrientation() ?? $setup->getOrientation();
-        $orientation = ($orientation === PageSetup::ORIENTATION_LANDSCAPE) ? 'L' : 'P';
-        $printPaperSize = $this->getPaperSize() ?? $setup->getPaperSize();
-        $paperSize = self::$paperSizes[$printPaperSize] ?? self::$paperSizes[PageSetup::getPaperSizeDefault()] ?? 'LETTER';
-        $printMargins = $this->spreadsheet->getSheet($this->getSheetIndex() ?? 0)->getPageMargins();
-
+        $setup = $this->spreadsheet->get_sheet($this->get_sheet_index() ?? 0)->get_page_setup();
+        $orientation = $this->get_orientation() ?? $setup->get_orientation();
+        $orientation = $orientation === Page_Setup::ORIENTATION_LANDSCAPE ? 'L' : 'P';
+        $print_paper_size = $this->get_paper_size() ?? $setup->get_paper_size();
+        $paper_size = self::$paper_sizes[$print_paper_size] ?? self::$paper_sizes[Page_Setup::get_paper_size_default()] ?? 'LETTER';
+        $print_margins = $this->spreadsheet->get_sheet($this->get_sheet_index() ?? 0)->get_page_margins();
         //  Create PDF
-        $pdf = $this->createExternalWriterInstance($orientation, 'pt', $paperSize);
-        $pdf->setFontSubsetting(false);
+        $pdf = $this->create_external_writer_instance($orientation, 'pt', $paper_size);
+        $pdf->set_font_subsetting(false);
         //    Set margins, converting inches to points (using 72 dpi)
-        $pdf->SetMargins($printMargins->getLeft() * 72, $printMargins->getTop() * 72, $printMargins->getRight() * 72);
-        $pdf->SetAutoPageBreak(true, $printMargins->getBottom() * 72);
-
-        $pdf->setPrintHeader($this->writeHeader);
-        $pdf->setPrintFooter($this->writeFooter);
-
-        $pdf->AddPage();
-
+        $pdf->set_margins($print_margins->get_left() * 72, $print_margins->get_top() * 72, $print_margins->get_right() * 72);
+        $pdf->set_auto_page_break(true, $print_margins->get_bottom() * 72);
+        $pdf->set_print_header($this->write_header);
+        $pdf->set_print_footer($this->write_footer);
+        $pdf->add_page();
         //  Set the appropriate font
-        $pdf->SetFont($this->getFont());
-        $this->checkRtlAndLtr();
-        if ($this->rtlSheets && !$this->ltrSheets) {
-            $pdf->setRTL(true);
+        $pdf->set_font($this->get_font());
+        $this->check_rtl_and_ltr();
+        if ($this->rtl_sheets && !$this->ltr_sheets) {
+            $pdf->set_rtl(true);
         }
-        $pdf->writeHTML($this->generateHTMLAll());
-
+        $pdf->write_html($this->generate_html_all());
         //  Document info
-        $pdf->SetTitle(
-            $this->spreadsheet->getProperties()->getTitle()
-        );
-        $pdf->SetAuthor(
-            $this->spreadsheet->getProperties()->getCreator()
-        );
-        $pdf->SetSubject(
-            $this->spreadsheet->getProperties()->getSubject()
-        );
-        $pdf->SetKeywords(
-            $this->spreadsheet->getProperties()->getKeywords()
-        );
-        $pdf->SetCreator(
-            $this->spreadsheet->getProperties()->getCreator()
-        );
-
+        $pdf->set_title($this->spreadsheet->get_properties()->get_title());
+        $pdf->set_author($this->spreadsheet->get_properties()->get_creator());
+        $pdf->set_subject($this->spreadsheet->get_properties()->get_subject());
+        $pdf->set_keywords($this->spreadsheet->get_properties()->get_keywords());
+        $pdf->set_creator($this->spreadsheet->get_properties()->get_creator());
         //  Write to file
-        fwrite($fileHandle, $pdf->output('', 'S'));
-
-        parent::restoreStateAfterSave();
+        fwrite($file_handle, $pdf->output('', 'S'));
+        parent::restore_state_after_save();
     }
 }

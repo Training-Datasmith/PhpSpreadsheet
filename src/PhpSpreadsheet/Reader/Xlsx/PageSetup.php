@@ -1,176 +1,142 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use SimpleXMLElement;
-
-class PageSetup extends BaseParserClass
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+use Simple_Xml_Element;
+class Page_Setup extends Base_Parser_Class
 {
-    public function __construct(private readonly Worksheet $worksheet, private readonly ?SimpleXMLElement $worksheetXml = null)
+    public function __construct(private readonly Worksheet $worksheet, private readonly ?Simple_Xml_Element $worksheet_xml = null)
     {
     }
-
     /**
      * @param mixed[] $unparsedLoadedData
      *
      * @return mixed[]
      */
-    public function load(array $unparsedLoadedData): array
+    public function load(array $unparsed_loaded_data): array
     {
-        $worksheetXml = $this->worksheetXml;
-        if ($worksheetXml === null) {
-            return $unparsedLoadedData;
+        $worksheet_xml = $this->worksheet_xml;
+        if ($worksheet_xml === null) {
+            return $unparsed_loaded_data;
         }
-
-        $this->margins($worksheetXml, $this->worksheet);
-        $unparsedLoadedData = $this->pageSetup($worksheetXml, $this->worksheet, $unparsedLoadedData);
-        $this->headerFooter($worksheetXml, $this->worksheet);
-        $this->pageBreaks($worksheetXml, $this->worksheet);
-
-        return $unparsedLoadedData;
+        $this->margins($worksheet_xml, $this->worksheet);
+        $unparsed_loaded_data = $this->page_setup($worksheet_xml, $this->worksheet, $unparsed_loaded_data);
+        $this->header_footer($worksheet_xml, $this->worksheet);
+        $this->page_breaks($worksheet_xml, $this->worksheet);
+        return $unparsed_loaded_data;
     }
-
-    private function margins(SimpleXMLElement $xmlSheet, Worksheet $worksheet): void
+    private function margins(Simple_Xml_Element $xml_sheet, Worksheet $worksheet): void
     {
-        if ($xmlSheet->pageMargins) {
-            $docPageMargins = $worksheet->getPageMargins();
-            $docPageMargins->setLeft((float) ($xmlSheet->pageMargins['left']));
-            $docPageMargins->setRight((float) ($xmlSheet->pageMargins['right']));
-            $docPageMargins->setTop((float) ($xmlSheet->pageMargins['top']));
-            $docPageMargins->setBottom((float) ($xmlSheet->pageMargins['bottom']));
-            $docPageMargins->setHeader((float) ($xmlSheet->pageMargins['header']));
-            $docPageMargins->setFooter((float) ($xmlSheet->pageMargins['footer']));
+        if ($xml_sheet->page_margins) {
+            $doc_page_margins = $worksheet->get_page_margins();
+            $doc_page_margins->set_left((float) $xml_sheet->page_margins['left']);
+            $doc_page_margins->set_right((float) $xml_sheet->page_margins['right']);
+            $doc_page_margins->set_top((float) $xml_sheet->page_margins['top']);
+            $doc_page_margins->set_bottom((float) $xml_sheet->page_margins['bottom']);
+            $doc_page_margins->set_header((float) $xml_sheet->page_margins['header']);
+            $doc_page_margins->set_footer((float) $xml_sheet->page_margins['footer']);
         }
     }
-
     /**
      * @param mixed[] $unparsedLoadedData
      *
      * @return mixed[]
      */
-    private function pageSetup(SimpleXMLElement $xmlSheet, Worksheet $worksheet, array $unparsedLoadedData): array
+    private function page_setup(Simple_Xml_Element $xml_sheet, Worksheet $worksheet, array $unparsed_loaded_data): array
     {
-        if ($xmlSheet->pageSetup) {
-            $docPageSetup = $worksheet->getPageSetup();
-
-            if (isset($xmlSheet->pageSetup['orientation'])) {
-                $docPageSetup->setOrientation((string) $xmlSheet->pageSetup['orientation']);
+        if ($xml_sheet->page_setup) {
+            $doc_page_setup = $worksheet->get_page_setup();
+            if (isset($xml_sheet->page_setup['orientation'])) {
+                $doc_page_setup->set_orientation((string) $xml_sheet->page_setup['orientation']);
             }
-            if (isset($xmlSheet->pageSetup['paperSize'])) {
-                $docPageSetup->setPaperSize((int) ($xmlSheet->pageSetup['paperSize']));
+            if (isset($xml_sheet->page_setup['paperSize'])) {
+                $doc_page_setup->set_paper_size((int) $xml_sheet->page_setup['paperSize']);
             }
-            if (isset($xmlSheet->pageSetup['scale'])) {
-                $docPageSetup->setScale((int) ($xmlSheet->pageSetup['scale']), false);
+            if (isset($xml_sheet->page_setup['scale'])) {
+                $doc_page_setup->set_scale((int) $xml_sheet->page_setup['scale'], false);
             }
-            if (isset($xmlSheet->pageSetup['fitToHeight']) && (int) ($xmlSheet->pageSetup['fitToHeight']) >= 0) {
-                $docPageSetup->setFitToHeight((int) ($xmlSheet->pageSetup['fitToHeight']), false);
+            if (isset($xml_sheet->page_setup['fitToHeight']) && (int) $xml_sheet->page_setup['fitToHeight'] >= 0) {
+                $doc_page_setup->set_fit_to_height((int) $xml_sheet->page_setup['fitToHeight'], false);
             }
-            if (isset($xmlSheet->pageSetup['fitToWidth']) && (int) ($xmlSheet->pageSetup['fitToWidth']) >= 0) {
-                $docPageSetup->setFitToWidth((int) ($xmlSheet->pageSetup['fitToWidth']), false);
+            if (isset($xml_sheet->page_setup['fitToWidth']) && (int) $xml_sheet->page_setup['fitToWidth'] >= 0) {
+                $doc_page_setup->set_fit_to_width((int) $xml_sheet->page_setup['fitToWidth'], false);
             }
-            if (
-                isset($xmlSheet->pageSetup['firstPageNumber'], $xmlSheet->pageSetup['useFirstPageNumber'])
-                && self::boolean((string) $xmlSheet->pageSetup['useFirstPageNumber'])
-            ) {
-                $docPageSetup->setFirstPageNumber((int) ($xmlSheet->pageSetup['firstPageNumber']));
+            if (isset($xml_sheet->page_setup['firstPageNumber'], $xml_sheet->page_setup['useFirstPageNumber']) && self::boolean((string) $xml_sheet->page_setup['useFirstPageNumber'])) {
+                $doc_page_setup->set_first_page_number((int) $xml_sheet->page_setup['firstPageNumber']);
             }
-            if (isset($xmlSheet->pageSetup['pageOrder'])) {
-                $docPageSetup->setPageOrder((string) $xmlSheet->pageSetup['pageOrder']);
+            if (isset($xml_sheet->page_setup['pageOrder'])) {
+                $doc_page_setup->set_page_order((string) $xml_sheet->page_setup['pageOrder']);
             }
-
-            $relAttributes = $xmlSheet->pageSetup->attributes(Namespaces::SCHEMA_OFFICE_DOCUMENT);
-            if (isset($relAttributes['id'])) {
-                $relid = (string) $relAttributes['id'];
+            $rel_attributes = $xml_sheet->page_setup->attributes(Namespaces::SCHEMA_OFFICE_DOCUMENT);
+            if (isset($rel_attributes['id'])) {
+                $relid = (string) $rel_attributes['id'];
                 if (!str_ends_with($relid, 'ps')) {
                     $relid .= 'ps';
                 }
                 /** @var mixed[][][] $unparsedLoadedData */
-                $unparsedLoadedData['sheets'][$worksheet->getCodeName()]['pageSetupRelId'] = $relid;
+                $unparsed_loaded_data['sheets'][$worksheet->get_code_name()]['pageSetupRelId'] = $relid;
             }
         }
-
-        return $unparsedLoadedData;
+        return $unparsed_loaded_data;
     }
-
-    private function headerFooter(SimpleXMLElement $xmlSheet, Worksheet $worksheet): void
+    private function header_footer(Simple_Xml_Element $xml_sheet, Worksheet $worksheet): void
     {
-        if ($xmlSheet->headerFooter) {
-            $docHeaderFooter = $worksheet->getHeaderFooter();
-
-            if (
-                isset($xmlSheet->headerFooter['differentOddEven'])
-                && self::boolean((string) $xmlSheet->headerFooter['differentOddEven'])
-            ) {
-                $docHeaderFooter->setDifferentOddEven(true);
+        if ($xml_sheet->header_footer) {
+            $doc_header_footer = $worksheet->get_header_footer();
+            if (isset($xml_sheet->header_footer['differentOddEven']) && self::boolean((string) $xml_sheet->header_footer['differentOddEven'])) {
+                $doc_header_footer->set_different_odd_even(true);
             } else {
-                $docHeaderFooter->setDifferentOddEven(false);
+                $doc_header_footer->set_different_odd_even(false);
             }
-            if (
-                isset($xmlSheet->headerFooter['differentFirst'])
-                && self::boolean((string) $xmlSheet->headerFooter['differentFirst'])
-            ) {
-                $docHeaderFooter->setDifferentFirst(true);
+            if (isset($xml_sheet->header_footer['differentFirst']) && self::boolean((string) $xml_sheet->header_footer['differentFirst'])) {
+                $doc_header_footer->set_different_first(true);
             } else {
-                $docHeaderFooter->setDifferentFirst(false);
+                $doc_header_footer->set_different_first(false);
             }
-            if (
-                isset($xmlSheet->headerFooter['scaleWithDoc'])
-                && !self::boolean((string) $xmlSheet->headerFooter['scaleWithDoc'])
-            ) {
-                $docHeaderFooter->setScaleWithDocument(false);
+            if (isset($xml_sheet->header_footer['scaleWithDoc']) && !self::boolean((string) $xml_sheet->header_footer['scaleWithDoc'])) {
+                $doc_header_footer->set_scale_with_document(false);
             } else {
-                $docHeaderFooter->setScaleWithDocument(true);
+                $doc_header_footer->set_scale_with_document(true);
             }
-            if (
-                isset($xmlSheet->headerFooter['alignWithMargins'])
-                && !self::boolean((string) $xmlSheet->headerFooter['alignWithMargins'])
-            ) {
-                $docHeaderFooter->setAlignWithMargins(false);
+            if (isset($xml_sheet->header_footer['alignWithMargins']) && !self::boolean((string) $xml_sheet->header_footer['alignWithMargins'])) {
+                $doc_header_footer->set_align_with_margins(false);
             } else {
-                $docHeaderFooter->setAlignWithMargins(true);
+                $doc_header_footer->set_align_with_margins(true);
             }
-
-            $docHeaderFooter->setOddHeader((string) $xmlSheet->headerFooter->oddHeader);
-            $docHeaderFooter->setOddFooter((string) $xmlSheet->headerFooter->oddFooter);
-            $docHeaderFooter->setEvenHeader((string) $xmlSheet->headerFooter->evenHeader);
-            $docHeaderFooter->setEvenFooter((string) $xmlSheet->headerFooter->evenFooter);
-            $docHeaderFooter->setFirstHeader((string) $xmlSheet->headerFooter->firstHeader);
-            $docHeaderFooter->setFirstFooter((string) $xmlSheet->headerFooter->firstFooter);
+            $doc_header_footer->set_odd_header((string) $xml_sheet->header_footer->odd_header);
+            $doc_header_footer->set_odd_footer((string) $xml_sheet->header_footer->odd_footer);
+            $doc_header_footer->set_even_header((string) $xml_sheet->header_footer->even_header);
+            $doc_header_footer->set_even_footer((string) $xml_sheet->header_footer->even_footer);
+            $doc_header_footer->set_first_header((string) $xml_sheet->header_footer->first_header);
+            $doc_header_footer->set_first_footer((string) $xml_sheet->header_footer->first_footer);
         }
     }
-
-    private function pageBreaks(SimpleXMLElement $xmlSheet, Worksheet $worksheet): void
+    private function page_breaks(Simple_Xml_Element $xml_sheet, Worksheet $worksheet): void
     {
-        if ($xmlSheet->rowBreaks && $xmlSheet->rowBreaks->brk) {
-            $this->rowBreaks($xmlSheet, $worksheet);
+        if ($xml_sheet->row_breaks && $xml_sheet->row_breaks->brk) {
+            $this->row_breaks($xml_sheet, $worksheet);
         }
-        if ($xmlSheet->colBreaks && $xmlSheet->colBreaks->brk) {
-            $this->columnBreaks($xmlSheet, $worksheet);
+        if ($xml_sheet->col_breaks && $xml_sheet->col_breaks->brk) {
+            $this->column_breaks($xml_sheet, $worksheet);
         }
     }
-
-    private function rowBreaks(SimpleXMLElement $xmlSheet, Worksheet $worksheet): void
+    private function row_breaks(Simple_Xml_Element $xml_sheet, Worksheet $worksheet): void
     {
-        foreach ($xmlSheet->rowBreaks->brk as $brk) {
-            $rowBreakMax = /*isset($brk['max']) ? ((int) $brk['max']) :*/ -1;
+        foreach ($xml_sheet->row_breaks->brk as $brk) {
+            $row_break_max = -1;
             if ($brk['man']) {
-                $worksheet->setBreak("A{$brk['id']}", Worksheet::BREAK_ROW, $rowBreakMax);
+                $worksheet->set_break("A{$brk['id']}", Worksheet::BREAK_ROW, $row_break_max);
             }
         }
     }
-
-    private function columnBreaks(SimpleXMLElement $xmlSheet, Worksheet $worksheet): void
+    private function column_breaks(Simple_Xml_Element $xml_sheet, Worksheet $worksheet): void
     {
-        foreach ($xmlSheet->colBreaks->brk as $brk) {
+        foreach ($xml_sheet->col_breaks->brk as $brk) {
             if ($brk['man']) {
-                $worksheet->setBreak(
-                    Coordinate::stringFromColumnIndex(((int) $brk['id']) + 1) . '1',
-                    Worksheet::BREAK_COLUMN
-                );
+                $worksheet->set_break(Coordinate::string_from_column_index((int) $brk['id'] + 1) . '1', Worksheet::BREAK_COLUMN);
             }
         }
     }

@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Helper;
 
-namespace PhpOffice\PhpSpreadsheet\Helper;
-
-enum TextGridRightAlign
+enum Text_Grid_Right_Align
 {
     case none;
     case numeric;

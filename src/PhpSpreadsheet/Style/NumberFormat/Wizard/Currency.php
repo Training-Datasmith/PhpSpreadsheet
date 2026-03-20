@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format\Wizard;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard;
-
-class Currency extends CurrencyBase
+class Currency extends Currency_Base
 {
-    protected ?bool $overrideSpacing = false;
-
-    protected ?CurrencyNegative $overrideNegative = null;
+    protected ?bool $override_spacing = false;
+    protected ?Currency_Negative $override_negative = null;
 }

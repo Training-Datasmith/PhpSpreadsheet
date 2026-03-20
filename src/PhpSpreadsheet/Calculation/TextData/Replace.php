@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Text_Data;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcExp;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception as CalcExp;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Cell\Data_Type;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Replace
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * REPLACE.
      *
@@ -30,31 +27,27 @@ class Replace
      * @return array<mixed>|string If an array of values is passed for either of the arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function replace(mixed $oldText, mixed $start, mixed $chars, mixed $newText): array|string
+    public static function replace(mixed $old_text, mixed $start, mixed $chars, mixed $new_text): array|string
     {
-        if (is_array($oldText) || is_array($start) || is_array($chars) || is_array($newText)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $oldText, $start, $chars, $newText);
+        if (is_array($old_text) || is_array($start) || is_array($chars) || is_array($new_text)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $old_text, $start, $chars, $new_text);
         }
-
         try {
-            $start = Helpers::extractInt($start, 1, 0, true);
-            $chars = Helpers::extractInt($chars, 0, 0, true);
-            $oldText = Helpers::extractString($oldText, true);
-            $newText = Helpers::extractString($newText, true);
-            $left = StringHelper::substring($oldText, 0, $start - 1);
-
-            $right = StringHelper::substring($oldText, $start + $chars - 1, null);
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+            $start = Helpers::extract_int($start, 1, 0, true);
+            $chars = Helpers::extract_int($chars, 0, 0, true);
+            $old_text = Helpers::extract_string($old_text, true);
+            $new_text = Helpers::extract_string($new_text, true);
+            $left = String_Helper::substring($old_text, 0, $start - 1);
+            $right = String_Helper::substring($old_text, $start + $chars - 1, null);
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-        $returnValue = $left . $newText . $right;
-        if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-            return ExcelError::VALUE();
+        $return_value = $left . $new_text . $right;
+        if (String_Helper::count_characters($return_value) > Data_Type::MAX_STRING_LENGTH) {
+            return Excel_Error::VALUE();
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * SUBSTITUTE.
      *
@@ -70,49 +63,45 @@ class Replace
      * @return array<mixed>|string If an array of values is passed for either of the arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function substitute(mixed $text = '', mixed $fromText = '', mixed $toText = '', mixed $instance = null): array|string
+    public static function substitute(mixed $text = '', mixed $from_text = '', mixed $to_text = '', mixed $instance = null): array|string
     {
-        if (is_array($text) || is_array($fromText) || is_array($toText) || is_array($instance)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $text, $fromText, $toText, $instance);
+        if (is_array($text) || is_array($from_text) || is_array($to_text) || is_array($instance)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $text, $from_text, $to_text, $instance);
         }
-
         try {
-            $text = Helpers::extractString($text, true);
-            $fromText = Helpers::extractString($fromText, true);
-            $toText = Helpers::extractString($toText, true);
+            $text = Helpers::extract_string($text, true);
+            $from_text = Helpers::extract_string($from_text, true);
+            $to_text = Helpers::extract_string($to_text, true);
             if ($instance === null) {
-                $returnValue = str_replace($fromText, $toText, $text);
+                $return_value = str_replace($from_text, $to_text, $text);
             } else {
                 if (is_bool($instance)) {
-                    if ($instance === false || Functions::getCompatibilityMode() !== Functions::COMPATIBILITY_OPENOFFICE) {
-                        return ExcelError::Value();
+                    if ($instance === false || Functions::get_compatibility_mode() !== Functions::COMPATIBILITY_OPENOFFICE) {
+                        return Excel_Error::Value();
                     }
                     $instance = 1;
                 }
-                $instance = Helpers::extractInt($instance, 1, 0, true);
-                $returnValue = self::executeSubstitution($text, $fromText, $toText, $instance);
+                $instance = Helpers::extract_int($instance, 1, 0, true);
+                $return_value = self::execute_substitution($text, $from_text, $to_text, $instance);
             }
-        } catch (CalcExp $e) {
-            return $e->getMessage();
+        } catch (Calc_Exp $e) {
+            return $e->get_message();
         }
-        if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-            return ExcelError::VALUE();
+        if (String_Helper::count_characters($return_value) > Data_Type::MAX_STRING_LENGTH) {
+            return Excel_Error::VALUE();
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
-    private static function executeSubstitution(string $text, string $fromText, string $toText, int $instance): string
+    private static function execute_substitution(string $text, string $from_text, string $to_text, int $instance): string
     {
         $pos = -1;
         while ($instance > 0) {
-            $pos = mb_strpos($text, $fromText, $pos + 1, 'UTF-8');
+            $pos = mb_strpos($text, $from_text, $pos + 1, 'UTF-8');
             if ($pos === false) {
                 return $text;
             }
             --$instance;
         }
-
-        return StringHelper::convertToString(Functions::scalar(self::REPLACE($text, ++$pos, StringHelper::countCharacters($fromText), $toText)));
+        return String_Helper::convert_to_string(Functions::scalar(self::REPLACE($text, ++$pos, String_Helper::count_characters($from_text), $to_text)));
     }
 }

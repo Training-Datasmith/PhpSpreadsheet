@@ -1,77 +1,71 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class TorowTocol
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Error_Value;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Torow_Tocol
 {
     /**
      * Excel function TOCOL.
      *
      * @return mixed[]|string
      */
-    public static function tocol(mixed $array, mixed $ignore = 0, mixed $byColumn = false): array|string
+    public static function tocol(mixed $array, mixed $ignore = 0, mixed $by_column = false): array|string
     {
-        $result = self::torow($array, $ignore, $byColumn);
+        $result = self::torow($array, $ignore, $by_column);
         if (is_array($result)) {
-            return array_map((fn ($x): array => [$x]), $result);
+            return array_map(fn($x): array => [$x], $result);
         }
-
         return $result;
     }
-
     /**
      * Excel function TOROW.
      *
      * @return mixed[]|string
      */
-    public static function torow(mixed $array, mixed $ignore = 0, mixed $byColumn = false): array|string
+    public static function torow(mixed $array, mixed $ignore = 0, mixed $by_column = false): array|string
     {
         if (!is_numeric($ignore)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         $ignore = (int) $ignore;
         if ($ignore < 0 || $ignore > 3) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-        if (is_int($byColumn) || is_float($byColumn)) {
-            $byColumn = (bool) $byColumn;
+        if (is_int($by_column) || is_float($by_column)) {
+            $by_column = (bool) $by_column;
         }
-        if (!is_bool($byColumn)) {
-            return ExcelError::VALUE();
+        if (!is_bool($by_column)) {
+            return Excel_Error::VALUE();
         }
         if (!is_array($array)) {
             $array = [$array];
         }
-        if ($byColumn) {
+        if ($by_column) {
             $temp = [];
             foreach ($array as $row) {
                 if (!is_array($row)) {
                     $row = [$row];
                 }
-                $temp[] = Functions::flattenArray($row);
+                $temp[] = Functions::flatten_array($row);
             }
-            $array = ChooseRowsEtc::transpose($temp);
+            $array = Choose_Rows_Etc::transpose($temp);
         } else {
-            $array = Functions::flattenArray($array);
+            $array = Functions::flatten_array($array);
         }
-
-        return self::byRow($array, $ignore);
+        return self::by_row($array, $ignore);
     }
-
     /**
      * @param mixed[] $array
      *
      * @return mixed[]
      */
-    private static function byRow(array $array, int $ignore): array
+    private static function by_row(array $array, int $ignore): array
     {
-        $returnMatrix = [];
+        $return_matrix = [];
         foreach ($array as $row) {
             if (!is_array($row)) {
                 $row = [$row];
@@ -85,7 +79,7 @@ class TorowTocol
                         continue;
                     }
                     $cell = 0;
-                } elseif (ErrorValue::isError($cell, true)) {
+                } elseif (Error_Value::is_error($cell, true)) {
                     if ($ignore === 2) {
                         continue;
                     }
@@ -93,10 +87,9 @@ class TorowTocol
                         continue;
                     }
                 }
-                $returnMatrix[] = $cell;
+                $return_matrix[] = $cell;
             }
         }
-
-        return $returnMatrix;
+        return $return_matrix;
     }
 }

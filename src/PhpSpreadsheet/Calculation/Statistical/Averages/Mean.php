@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Averages;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Averages;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Averages;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Counts;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Minimum;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Averages;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Counts;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Minimum;
 class Mean
 {
     /**
@@ -27,19 +25,16 @@ class Mean
      */
     public static function geometric(mixed ...$args): float|int|string
     {
-        $aArgs = Functions::flattenArray($args);
-
-        $aMean = MathTrig\Operations::product($aArgs);
-        if (is_numeric($aMean) && ($aMean > 0)) {
-            $aCount = Counts::COUNT($aArgs);
-            if (Minimum::min($aArgs) > 0) {
-                return $aMean ** (1 / $aCount);
+        $a_args = Functions::flatten_array($args);
+        $a_mean = Math_Trig\Operations::product($a_args);
+        if (is_numeric($a_mean) && $a_mean > 0) {
+            $a_count = Counts::COUNT($a_args);
+            if (Minimum::min($a_args) > 0) {
+                return $a_mean ** (1 / $a_count);
             }
         }
-
-        return ExcelError::NAN();
+        return Excel_Error::NAN();
     }
-
     /**
      * HARMEAN.
      *
@@ -54,32 +49,28 @@ class Mean
     public static function harmonic(mixed ...$args): string|float|int
     {
         // Loop through arguments
-        $aArgs = Functions::flattenArray($args);
-        if (Minimum::min($aArgs) < 0) {
-            return ExcelError::NAN();
+        $a_args = Functions::flatten_array($args);
+        if (Minimum::min($a_args) < 0) {
+            return Excel_Error::NAN();
         }
-
-        $returnValue = 0;
-        $aCount = 0;
-        foreach ($aArgs as $arg) {
+        $return_value = 0;
+        $a_count = 0;
+        foreach ($a_args as $arg) {
             // Is it a numeric value?
-            if ((is_numeric($arg)) && (!is_string($arg))) {
+            if (is_numeric($arg) && !is_string($arg)) {
                 if ($arg <= 0) {
-                    return ExcelError::NAN();
+                    return Excel_Error::NAN();
                 }
-                $returnValue += (1 / $arg);
-                ++$aCount;
+                $return_value += 1 / $arg;
+                ++$a_count;
             }
         }
-
         // Return
-        if ($aCount > 0) {
-            return 1 / ($returnValue / $aCount);
+        if ($a_count > 0) {
+            return 1 / ($return_value / $a_count);
         }
-
-        return ExcelError::NA();
+        return Excel_Error::NA();
     }
-
     /**
      * TRIMMEAN.
      *
@@ -94,35 +85,28 @@ class Mean
      */
     public static function trim(mixed ...$args): float|string
     {
-        $aArgs = Functions::flattenArray($args);
-
+        $a_args = Functions::flatten_array($args);
         // Calculate
-        $percent = array_pop($aArgs);
-
-        if ((is_numeric($percent)) && (!is_string($percent))) {
-            if (($percent < 0) || ($percent > 1)) {
-                return ExcelError::NAN();
+        $percent = array_pop($a_args);
+        if (is_numeric($percent) && !is_string($percent)) {
+            if ($percent < 0 || $percent > 1) {
+                return Excel_Error::NAN();
             }
-
-            $mArgs = [];
-            foreach ($aArgs as $arg) {
+            $m_args = [];
+            foreach ($a_args as $arg) {
                 // Is it a numeric value?
-                if ((is_numeric($arg)) && (!is_string($arg))) {
-                    $mArgs[] = $arg;
+                if (is_numeric($arg) && !is_string($arg)) {
+                    $m_args[] = $arg;
                 }
             }
-
-            $discard = floor(Counts::COUNT($mArgs) * $percent / 2);
-            sort($mArgs);
-
+            $discard = floor(Counts::COUNT($m_args) * $percent / 2);
+            sort($m_args);
             for ($i = 0; $i < $discard; ++$i) {
-                array_pop($mArgs);
-                array_shift($mArgs);
+                array_pop($m_args);
+                array_shift($m_args);
             }
-
-            return Averages::average($mArgs);
+            return Averages::average($m_args);
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
 }

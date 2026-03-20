@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Cell;
-
-interface IValueBinder
+interface I_Value_Binder
 {
     /**
      * Bind value to a cell.
@@ -12,5 +11,5 @@ interface IValueBinder
      * @param Cell $cell Cell to bind value to
      * @param mixed $value Value to bind in cell
      */
-    public function bindValue(Cell $cell, mixed $value): bool;
+    public function bind_value(Cell $cell, mixed $value): bool;
 }

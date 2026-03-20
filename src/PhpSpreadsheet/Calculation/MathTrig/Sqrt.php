@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
 class Sqrt
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * SQRT.
      *
@@ -25,18 +22,15 @@ class Sqrt
     public static function sqrt(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(sqrt($number));
+        return Helpers::number_or_nan(sqrt($number));
     }
-
     /**
      * SQRTPI.
      *
@@ -51,16 +45,14 @@ class Sqrt
     public static function pi($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullSubstitution($number, 0);
-            Helpers::validateNotNegative($number);
+            $number = Helpers::validate_numeric_null_substitution($number, 0);
+            Helpers::validate_not_negative($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return sqrt($number * M_PI);
     }
 }

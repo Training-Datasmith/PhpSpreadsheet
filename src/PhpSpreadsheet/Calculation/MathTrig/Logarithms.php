@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
 class Logarithms
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * LOG_BASE.
      *
@@ -28,24 +25,21 @@ class Logarithms
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function withBase(mixed $number, mixed $base = 10): array|string|float
+    public static function with_base(mixed $number, mixed $base = 10): array|string|float
     {
         if (is_array($number) || is_array($base)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $base);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $number, $base);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
-            Helpers::validatePositive($number);
-            $base = Helpers::validateNumericNullBool($base);
-            Helpers::validatePositive($base);
+            $number = Helpers::validate_numeric_null_bool($number);
+            Helpers::validate_positive($number);
+            $base = Helpers::validate_numeric_null_bool($base);
+            Helpers::validate_positive($base);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return log($number, $base);
     }
-
     /**
      * LOG10.
      *
@@ -61,19 +55,16 @@ class Logarithms
     public static function base10(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
-            Helpers::validatePositive($number);
+            $number = Helpers::validate_numeric_null_bool($number);
+            Helpers::validate_positive($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return log10($number);
     }
-
     /**
      * LN.
      *
@@ -89,16 +80,14 @@ class Logarithms
     public static function natural(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
-            Helpers::validatePositive($number);
+            $number = Helpers::validate_numeric_null_bool($number);
+            Helpers::validate_positive($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return log($number);
     }
 }

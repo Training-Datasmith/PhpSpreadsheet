@@ -1,75 +1,63 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Helper\Dimension as CssDimension;
-
-class ColumnDimension extends Dimension
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Helper\Dimension as CssDimension;
+class Column_Dimension extends Dimension
 {
     public const EXCEL_MAX_WIDTH = 255.0;
-
     /**
      * Column width.
      *
      * When this is set to a negative value, the column width should be ignored by IWriter
      */
     private float $width = -1;
-
     /**
      * Auto size?
      */
-    private bool $autoSize = false;
-
+    private bool $auto_size = false;
     /**
      * Create a new ColumnDimension.
      *
      * @param ?string $columnIndex Character column index
      */
-    public function __construct(private ?string $columnIndex = 'A')
+    public function __construct(private ?string $column_index = 'A')
     {
         // set dimension as unformatted by default
         parent::__construct(0);
     }
-
     /**
      * Get column index as string eg: 'A'.
      */
-    public function getColumnIndex(): ?string
+    public function get_column_index(): ?string
     {
-        return $this->columnIndex;
+        return $this->column_index;
     }
-
     /**
      * Set column index as string eg: 'A'.
      */
-    public function setColumnIndex(string $index): self
+    public function set_column_index(string $index): self
     {
-        $this->columnIndex = $index;
-
+        $this->column_index = $index;
         return $this;
     }
-
     /**
      * Get column index as numeric.
      */
-    public function getColumnNumeric(): int
+    public function get_column_numeric(): int
     {
-        return Coordinate::columnIndexFromString($this->columnIndex ?? '');
+        return Coordinate::column_index_from_string($this->column_index ?? '');
     }
-
     /**
      * Set column index as numeric.
      */
-    public function setColumnNumeric(int $index): self
+    public function set_column_numeric(int $index): self
     {
-        $this->columnIndex = Coordinate::stringFromColumnIndex($index);
-
+        $this->column_index = Coordinate::string_from_column_index($index);
         return $this;
     }
-
     /**
      * Get Width.
      *
@@ -78,18 +66,14 @@ class ColumnDimension extends Dimension
      * By default, this will be the return value; but this method also accepts an optional unit of measure argument
      *    and will convert the returned value to the specified UoM..
      */
-    public function getWidth(?string $unitOfMeasure = null): float
+    public function get_width(?string $unit_of_measure = null): float
     {
-        return ($unitOfMeasure === null || $this->width < 0)
-            ? $this->width
-            : (new CssDimension((string) $this->width))->toUnit($unitOfMeasure);
+        return $unit_of_measure === null || $this->width < 0 ? $this->width : (new Css_Dimension((string) $this->width))->to_unit($unit_of_measure);
     }
-
-    public function getWidthForOutput(bool $restrictMax): float
+    public function get_width_for_output(bool $restrict_max): float
     {
-        return ($restrictMax && $this->width > self::EXCEL_MAX_WIDTH) ? self::EXCEL_MAX_WIDTH : $this->width;
+        return $restrict_max && $this->width > self::EXCEL_MAX_WIDTH ? self::EXCEL_MAX_WIDTH : $this->width;
     }
-
     /**
      * Set Width.
      *
@@ -101,32 +85,26 @@ class ColumnDimension extends Dimension
      *
      * @return $this
      */
-    public function setWidth(float $width, ?string $unitOfMeasure = null): static
+    public function set_width(float $width, ?string $unit_of_measure = null): static
     {
-        $this->width = ($unitOfMeasure === null || $width < 0)
-            ? $width
-            : (new CssDimension("{$width}{$unitOfMeasure}"))->width();
-
+        $this->width = $unit_of_measure === null || $width < 0 ? $width : (new Css_Dimension("{$width}{$unit_of_measure}"))->width();
         return $this;
     }
-
     /**
      * Get Auto Size.
      */
-    public function getAutoSize(): bool
+    public function get_auto_size(): bool
     {
-        return $this->autoSize;
+        return $this->auto_size;
     }
-
     /**
      * Set Auto Size.
      *
      * @return $this
      */
-    public function setAutoSize(bool $autosizeEnabled): static
+    public function set_auto_size(bool $autosize_enabled): static
     {
-        $this->autoSize = $autosizeEnabled;
-
+        $this->auto_size = $autosize_enabled;
         return $this;
     }
 }

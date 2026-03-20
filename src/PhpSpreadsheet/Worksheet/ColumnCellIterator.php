@@ -1,38 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Exception as PhpSpreadsheetException;
 /**
  * @extends CellIterator<int>
  */
-class ColumnCellIterator extends CellIterator
+class Column_Cell_Iterator extends Cell_Iterator
 {
     /**
      * Current iterator position.
      */
-    private int $currentRow;
-
+    private int $current_row;
     /**
      * Column index.
      */
-    private readonly int $columnIndex;
-
+    private readonly int $column_index;
     /**
      * Start position.
      */
-    private int $startRow = 1;
-
+    private int $start_row = 1;
     /**
      * End position.
      */
-    private int $endRow = 1;
-
+    private int $end_row = 1;
     /**
      * Create a new row iterator.
      *
@@ -41,17 +35,16 @@ class ColumnCellIterator extends CellIterator
      * @param int $startRow The row number at which to start iterating
      * @param ?int $endRow Optionally, the row number at which to stop iterating
      */
-    public function __construct(Worksheet $worksheet, string $columnIndex = 'A', int $startRow = 1, ?int $endRow = null, bool $iterateOnlyExistingCells = false)
+    public function __construct(Worksheet $worksheet, string $column_index = 'A', int $start_row = 1, ?int $end_row = null, bool $iterate_only_existing_cells = false)
     {
         // Set subject
         $this->worksheet = $worksheet;
-        $this->cellCollection = $worksheet->getCellCollection();
-        $this->columnIndex = Coordinate::columnIndexFromString($columnIndex);
-        $this->resetEnd($endRow);
-        $this->resetStart($startRow);
-        $this->setIterateOnlyExistingCells($iterateOnlyExistingCells);
+        $this->cell_collection = $worksheet->get_cell_collection();
+        $this->column_index = Coordinate::column_index_from_string($column_index);
+        $this->reset_end($end_row);
+        $this->reset_start($start_row);
+        $this->set_iterate_only_existing_cells($iterate_only_existing_cells);
     }
-
     /**
      * (Re)Set the start row and the current row pointer.
      *
@@ -59,15 +52,13 @@ class ColumnCellIterator extends CellIterator
      *
      * @return $this
      */
-    public function resetStart(int $startRow = 1): static
+    public function reset_start(int $start_row = 1): static
     {
-        $this->startRow = $startRow;
-        $this->adjustForExistingOnlyRange();
-        $this->seek($startRow);
-
+        $this->start_row = $start_row;
+        $this->adjust_for_existing_only_range();
+        $this->seek($start_row);
         return $this;
     }
-
     /**
      * (Re)Set the end row.
      *
@@ -75,14 +66,12 @@ class ColumnCellIterator extends CellIterator
      *
      * @return $this
      */
-    public function resetEnd(?int $endRow = null): static
+    public function reset_end(?int $end_row = null): static
     {
-        $this->endRow = $endRow ?: $this->worksheet->getHighestRow();
-        $this->adjustForExistingOnlyRange();
-
+        $this->end_row = $end_row ?: $this->worksheet->get_highest_row();
+        $this->adjust_for_existing_only_range();
         return $this;
     }
-
     /**
      * Set the row pointer to the selected row.
      *
@@ -92,108 +81,76 @@ class ColumnCellIterator extends CellIterator
      */
     public function seek(int $row = 1): static
     {
-        if (
-            $this->onlyExistingCells
-            && (!$this->cellCollection->has(Coordinate::stringFromColumnIndex($this->columnIndex) . $row))
-        ) {
-            throw new PhpSpreadsheetException('In "IterateOnlyExistingCells" mode and Cell does not exist');
+        if ($this->only_existing_cells && !$this->cell_collection->has(Coordinate::string_from_column_index($this->column_index) . $row)) {
+            throw new Php_Spreadsheet_Exception('In "IterateOnlyExistingCells" mode and Cell does not exist');
         }
-        if (($row < $this->startRow) || ($row > $this->endRow)) {
-            throw new PhpSpreadsheetException("Row $row is out of range ({$this->startRow} - {$this->endRow})");
+        if ($row < $this->start_row || $row > $this->end_row) {
+            throw new Php_Spreadsheet_Exception("Row {$row} is out of range ({$this->start_row} - {$this->end_row})");
         }
-        $this->currentRow = $row;
-
+        $this->current_row = $row;
         return $this;
     }
-
     /**
      * Rewind the iterator to the starting row.
      */
     public function rewind(): void
     {
-        $this->currentRow = $this->startRow;
+        $this->current_row = $this->start_row;
     }
-
     /**
      * Return the current cell in this worksheet column.
      */
     public function current(): ?Cell
     {
-        $cellAddress = Coordinate::stringFromColumnIndex($this->columnIndex) . $this->currentRow;
-
-        return $this->cellCollection->has($cellAddress)
-            ? $this->cellCollection->get($cellAddress)
-            : (
-                $this->ifNotExists === self::IF_NOT_EXISTS_CREATE_NEW
-                ? $this->worksheet->createNewCell($cellAddress)
-                : null
-            );
+        $cell_address = Coordinate::string_from_column_index($this->column_index) . $this->current_row;
+        return $this->cell_collection->has($cell_address) ? $this->cell_collection->get($cell_address) : ($this->if_not_exists === self::IF_NOT_EXISTS_CREATE_NEW ? $this->worksheet->create_new_cell($cell_address) : null);
     }
-
     /**
      * Return the current iterator key.
      */
     public function key(): int
     {
-        return $this->currentRow;
+        return $this->current_row;
     }
-
     /**
      * Set the iterator to its next value.
      */
     public function next(): void
     {
-        $columnAddress = Coordinate::stringFromColumnIndex($this->columnIndex);
+        $column_address = Coordinate::string_from_column_index($this->column_index);
         do {
-            ++$this->currentRow;
-        } while (
-            ($this->onlyExistingCells)
-            && ($this->currentRow <= $this->endRow)
-            && (!$this->cellCollection->has($columnAddress . $this->currentRow))
-        );
+            ++$this->current_row;
+        } while ($this->only_existing_cells && $this->current_row <= $this->end_row && !$this->cell_collection->has($column_address . $this->current_row));
     }
-
     /**
      * Set the iterator to its previous value.
      */
     public function prev(): void
     {
-        $columnAddress = Coordinate::stringFromColumnIndex($this->columnIndex);
+        $column_address = Coordinate::string_from_column_index($this->column_index);
         do {
-            --$this->currentRow;
-        } while (
-            ($this->onlyExistingCells)
-            && ($this->currentRow >= $this->startRow)
-            && (!$this->cellCollection->has($columnAddress . $this->currentRow))
-        );
+            --$this->current_row;
+        } while ($this->only_existing_cells && $this->current_row >= $this->start_row && !$this->cell_collection->has($column_address . $this->current_row));
     }
-
     /**
      * Indicate if more rows exist in the worksheet range of rows that we're iterating.
      */
     public function valid(): bool
     {
-        return $this->currentRow <= $this->endRow && $this->currentRow >= $this->startRow;
+        return $this->current_row <= $this->end_row && $this->current_row >= $this->start_row;
     }
-
     /**
      * Validate start/end values for "IterateOnlyExistingCells" mode, and adjust if necessary.
      */
-    protected function adjustForExistingOnlyRange(): void
+    protected function adjust_for_existing_only_range(): void
     {
-        if ($this->onlyExistingCells) {
-            $columnAddress = Coordinate::stringFromColumnIndex($this->columnIndex);
-            while (
-                (!$this->cellCollection->has($columnAddress . $this->startRow))
-                && ($this->startRow <= $this->endRow)
-            ) {
-                ++$this->startRow;
+        if ($this->only_existing_cells) {
+            $column_address = Coordinate::string_from_column_index($this->column_index);
+            while (!$this->cell_collection->has($column_address . $this->start_row) && $this->start_row <= $this->end_row) {
+                ++$this->start_row;
             }
-            while (
-                (!$this->cellCollection->has($columnAddress . $this->endRow))
-                && ($this->endRow >= $this->startRow)
-            ) {
-                --$this->endRow;
+            while (!$this->cell_collection->has($column_address . $this->end_row) && $this->end_row >= $this->start_row) {
+                --$this->end_row;
             }
         }
     }

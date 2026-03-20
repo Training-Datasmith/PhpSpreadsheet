@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Lookup
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * LOOKUP
      * The LOOKUP function searches for value either from a one-row or one-column range or from an array.
@@ -21,105 +18,92 @@ class Lookup
      *
      * @return mixed The value of the found cell
      */
-    public static function lookup(mixed $lookupValue, mixed $lookupVector, $resultVector = null): mixed
+    public static function lookup(mixed $lookup_value, mixed $lookup_vector, $result_vector = null): mixed
     {
-        if (is_array($lookupValue)) {
-            return self::evaluateArrayArgumentsSubset([self::class, __FUNCTION__], 1, $lookupValue, $lookupVector, $resultVector);
+        if (is_array($lookup_value)) {
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 1, $lookup_value, $lookup_vector, $result_vector);
         }
-
-        if (!is_array($lookupVector)) {
-            return ExcelError::NA();
+        if (!is_array($lookup_vector)) {
+            return Excel_Error::NA();
         }
         /** @var mixed[][] $lookupVector */
-        $hasResultVector = isset($resultVector);
-        $lookupRows = self::rowCount($lookupVector);
-        $lookupColumns = self::columnCount($lookupVector);
+        $has_result_vector = isset($result_vector);
+        $lookup_rows = self::row_count($lookup_vector);
+        $lookup_columns = self::column_count($lookup_vector);
         // we correctly orient our results
-        if (($lookupRows === 1 && $lookupColumns > 1) || (!$hasResultVector && $lookupRows === 2 && $lookupColumns !== 2)) {
-            $lookupVector = Matrix::transpose($lookupVector);
-            $lookupRows = self::rowCount($lookupVector);
+        if ($lookup_rows === 1 && $lookup_columns > 1 || !$has_result_vector && $lookup_rows === 2 && $lookup_columns !== 2) {
+            $lookup_vector = Matrix::transpose($lookup_vector);
+            $lookup_rows = self::row_count($lookup_vector);
             /** @var mixed[][] $lookupVector */
-            $lookupColumns = self::columnCount($lookupVector);
+            $lookup_columns = self::column_count($lookup_vector);
         }
-
-        $resultVector = self::verifyResultVector($resultVector ?? $lookupVector); //* @phpstan-ignore-line
-
-        if ($lookupRows === 2 && !$hasResultVector) {
-            $resultVector = array_pop($lookupVector);
-            $lookupVector = array_shift($lookupVector);
+        $result_vector = self::verify_result_vector($result_vector ?? $lookup_vector);
+        //* @phpstan-ignore-line
+        if ($lookup_rows === 2 && !$has_result_vector) {
+            $result_vector = array_pop($lookup_vector);
+            $lookup_vector = array_shift($lookup_vector);
         }
-
         /** @var array<int, mixed> $lookupVector */
         /** @var array<int, mixed> $resultVector */
-        if ($lookupColumns !== 2) {
-            $lookupVector = self::verifyLookupValues($lookupVector, $resultVector);
+        if ($lookup_columns !== 2) {
+            $lookup_vector = self::verify_lookup_values($lookup_vector, $result_vector);
         }
-
-        return VLookup::lookup($lookupValue, $lookupVector, 2);
+        return V_Lookup::lookup($lookup_value, $lookup_vector, 2);
     }
-
     /**
      * @param array<int, mixed> $lookupVector
      * @param array<int, mixed> $resultVector
      *
      * @return mixed[]
      */
-    private static function verifyLookupValues(array $lookupVector, array $resultVector): array
+    private static function verify_lookup_values(array $lookup_vector, array $result_vector): array
     {
-        foreach ($lookupVector as &$value) {
+        foreach ($lookup_vector as &$value) {
             if (is_array($value)) {
                 $k = array_keys($value);
                 $key1 = $key2 = array_shift($k);
                 ++$key2;
-                $dataValue1 = $value[$key1];
+                $data_value1 = $value[$key1];
             } else {
                 $key1 = 0;
                 $key2 = 1;
-                $dataValue1 = $value;
+                $data_value1 = $value;
             }
-
-            $dataValue2 = array_shift($resultVector);
-            if (is_array($dataValue2)) {
-                $dataValue2 = array_shift($dataValue2);
+            $data_value2 = array_shift($result_vector);
+            if (is_array($data_value2)) {
+                $data_value2 = array_shift($data_value2);
             }
             /** @var int $key2 */
-            $value = [$key1 => $dataValue1, $key2 => $dataValue2];
+            $value = [$key1 => $data_value1, $key2 => $data_value2];
         }
         unset($value);
-
-        return $lookupVector;
+        return $lookup_vector;
     }
-
     /**
      * @param mixed[][] $resultVector
      *
      * @return mixed[]
      */
-    private static function verifyResultVector(array $resultVector): array
+    private static function verify_result_vector(array $result_vector): array
     {
-        $resultRows = self::rowCount($resultVector);
-        $resultColumns = self::columnCount($resultVector);
-
+        $result_rows = self::row_count($result_vector);
+        $result_columns = self::column_count($result_vector);
         // we correctly orient our results
-        if ($resultRows === 1 && $resultColumns > 1) {
-            return Matrix::transpose($resultVector);
+        if ($result_rows === 1 && $result_columns > 1) {
+            return Matrix::transpose($result_vector);
         }
-
-        return $resultVector;
+        return $result_vector;
     }
-
     /** @param mixed[] $dataArray */
-    private static function rowCount(array $dataArray): int
+    private static function row_count(array $data_array): int
     {
-        return count($dataArray);
+        return count($data_array);
     }
-
     /** @param mixed[][] $dataArray */
-    private static function columnCount(array $dataArray): int
+    private static function column_count(array $data_array): int
     {
-        $rowKeys = array_keys($dataArray);
-        $row = array_shift($rowKeys);
-
-        return count($dataArray[$row]);
+        $row_keys = array_keys($data_array);
+        $row = array_shift($row_keys);
+        return count($data_array[$row]);
     }
 }

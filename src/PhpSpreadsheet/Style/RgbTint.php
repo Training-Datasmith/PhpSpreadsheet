@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Style;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style;
 
 /**
  * Class to handle tint applied to color.
@@ -11,7 +10,7 @@ namespace PhpOffice\PhpSpreadsheet\Style;
  * @see https://docs.python.org/3/library/colorsys.html
  * @see https://gist.github.com/Mike-Honey/b36e651e9a7f1d2e1d60ce1c63b9b633
  */
-class RgbTint
+class Rgb_Tint
 {
     private const ONE_THIRD = 1.0 / 3.0;
     private const ONE_SIXTH = 1.0 / 6.0;
@@ -23,7 +22,6 @@ class RgbTint
      * @see https://social.msdn.microsoft.com/Forums/en-US/e9d8c136-6d62-4098-9b1b-dac786149f43/excel-color-tint-algorithm-incorrect?forum=os_binaryfile#d3c2ac95-52e0-476b-86f1-e2a697f24969
      */
     private const HLSMAX = 240.0;
-
     /**
      * Convert red/green/blue to hue/luminance/saturation.
      *
@@ -33,7 +31,7 @@ class RgbTint
      *
      * @return float[]
      */
-    private static function rgbToHls(float $red, float $green, float $blue): array
+    private static function rgb_to_hls(float $red, float $green, float $blue): array
     {
         $maxc = max($red, $green, $blue);
         $minc = min($red, $green, $blue);
@@ -41,15 +39,15 @@ class RgbTint
         if ($minc === $maxc) {
             return [0.0, $luminance, 0.0];
         }
-        $maxMinusMin = $maxc - $minc;
+        $max_minus_min = $maxc - $minc;
         if ($luminance <= 0.5) {
-            $s = $maxMinusMin / ($maxc + $minc);
+            $s = $max_minus_min / ($maxc + $minc);
         } else {
-            $s = $maxMinusMin / (2.0 - $maxc - $minc);
+            $s = $max_minus_min / (2.0 - $maxc - $minc);
         }
-        $rc = ($maxc - $red) / $maxMinusMin;
-        $gc = ($maxc - $green) / $maxMinusMin;
-        $bc = ($maxc - $blue) / $maxMinusMin;
+        $rc = ($maxc - $red) / $max_minus_min;
+        $gc = ($maxc - $green) / $max_minus_min;
+        $bc = ($maxc - $blue) / $max_minus_min;
         if ($red === $maxc) {
             $h = $bc - $gc;
         } elseif ($green === $maxc) {
@@ -57,11 +55,9 @@ class RgbTint
         } else {
             $h = 4.0 + $gc - $rc;
         }
-        $h = self::positiveDecimalPart($h / 6.0);
-
+        $h = self::positive_decimal_part($h / 6.0);
         return [$h, $luminance, $s];
     }
-
     /**
      * Convert hue/luminance/saturation to red/green/blue.
      *
@@ -71,7 +67,7 @@ class RgbTint
      *
      * @return float[]
      */
-    private static function hlsToRgb(float $hue, float $luminance, float $saturation): array
+    private static function hls_to_rgb(float $hue, float $luminance, float $saturation): array
     {
         if ($saturation === 0.0) {
             return [$luminance, $luminance, $luminance];
@@ -79,20 +75,14 @@ class RgbTint
         if ($luminance <= 0.5) {
             $m2 = $luminance * (1.0 + $saturation);
         } else {
-            $m2 = $luminance + $saturation - ($luminance * $saturation);
+            $m2 = $luminance + $saturation - $luminance * $saturation;
         }
         $m1 = 2.0 * $luminance - $m2;
-
-        return [
-            self::vFunction($m1, $m2, $hue + self::ONE_THIRD),
-            self::vFunction($m1, $m2, $hue),
-            self::vFunction($m1, $m2, $hue - self::ONE_THIRD),
-        ];
+        return [self::v_function($m1, $m2, $hue + self::ONE_THIRD), self::v_function($m1, $m2, $hue), self::v_function($m1, $m2, $hue - self::ONE_THIRD)];
     }
-
-    private static function vFunction(float $m1, float $m2, float $hue): float
+    private static function v_function(float $m1, float $m2, float $hue): float
     {
-        $hue = self::positiveDecimalPart($hue);
+        $hue = self::positive_decimal_part($hue);
         if ($hue < self::ONE_SIXTH) {
             return $m1 + ($m2 - $m1) * $hue * 6.0;
         }
@@ -102,73 +92,54 @@ class RgbTint
         if ($hue < self::TWO_THIRD) {
             return $m1 + ($m2 - $m1) * (self::TWO_THIRD - $hue) * 6.0;
         }
-
         return $m1;
     }
-
-    private static function positiveDecimalPart(float $hue): float
+    private static function positive_decimal_part(float $hue): float
     {
         $hue = fmod($hue, 1.0);
-
-        return ($hue >= 0.0) ? $hue : (1.0 + $hue);
+        return $hue >= 0.0 ? $hue : 1.0 + $hue;
     }
-
     /**
      * Convert red/green/blue to HLSMAX-based hue/luminance/saturation.
      *
      * @return int[]
      */
-    private static function rgbToMsHls(int $red, int $green, int $blue): array
+    private static function rgb_to_ms_hls(int $red, int $green, int $blue): array
     {
         $red01 = $red / self::RGBMAX;
         $green01 = $green / self::RGBMAX;
         $blue01 = $blue / self::RGBMAX;
-        [$hue, $luminance, $saturation] = self::rgbToHls($red01, $green01, $blue01);
-
-        return [
-            (int) round($hue * self::HLSMAX),
-            (int) round($luminance * self::HLSMAX),
-            (int) round($saturation * self::HLSMAX),
-        ];
+        [$hue, $luminance, $saturation] = self::rgb_to_hls($red01, $green01, $blue01);
+        return [(int) round($hue * self::HLSMAX), (int) round($luminance * self::HLSMAX), (int) round($saturation * self::HLSMAX)];
     }
-
     /**
      * Converts HLSMAX based HLS values to rgb values in the range (0,1).
      *
      * @return float[]
      */
-    private static function msHlsToRgb(int $hue, int $lightness, int $saturation): array
+    private static function ms_hls_to_rgb(int $hue, int $lightness, int $saturation): array
     {
-        return self::hlsToRgb($hue / self::HLSMAX, $lightness / self::HLSMAX, $saturation / self::HLSMAX);
+        return self::hls_to_rgb($hue / self::HLSMAX, $lightness / self::HLSMAX, $saturation / self::HLSMAX);
     }
-
     /**
      * Tints HLSMAX based luminance.
      *
      * @see http://ciintelligence.blogspot.co.uk/2012/02/converting-excel-theme-color-and-tint.html
      */
-    private static function tintLuminance(float $tint, float $luminance): int
+    private static function tint_luminance(float $tint, float $luminance): int
     {
         if ($tint < 0) {
             return (int) round($luminance * (1.0 + $tint));
         }
-
         return (int) round($luminance * (1.0 - $tint) + (self::HLSMAX - self::HLSMAX * (1.0 - $tint)));
     }
-
     /**
      * Return result of tinting supplied rgb as 6 hex digits.
      */
-    public static function rgbAndTintToRgb(int $red, int $green, int $blue, float $tint): string
+    public static function rgb_and_tint_to_rgb(int $red, int $green, int $blue, float $tint): string
     {
-        [$hue, $luminance, $saturation] = self::rgbToMsHls($red, $green, $blue);
-        [$red, $green, $blue] = self::msHlsToRgb($hue, self::tintLuminance($tint, $luminance), $saturation);
-
-        return sprintf(
-            '%02X%02X%02X',
-            (int) round($red * self::RGBMAX),
-            (int) round($green * self::RGBMAX),
-            (int) round($blue * self::RGBMAX)
-        );
+        [$hue, $luminance, $saturation] = self::rgb_to_ms_hls($red, $green, $blue);
+        [$red, $green, $blue] = self::ms_hls_to_rgb($hue, self::tint_luminance($tint, $luminance), $saturation);
+        return sprintf('%02X%02X%02X', (int) round($red * self::RGBMAX), (int) round($green * self::RGBMAX), (int) round($blue * self::RGBMAX));
     }
 }

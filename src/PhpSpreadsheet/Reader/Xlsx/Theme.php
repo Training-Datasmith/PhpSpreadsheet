@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xlsx;
 
 class Theme
 {
@@ -15,43 +14,41 @@ class Theme
         /**
          * Theme Name.
          */
-        private readonly string $themeName,
+        private readonly string $theme_name,
         /**
          * Colour Scheme Name.
          */
-        private readonly string $colourSchemeName,
+        private readonly string $colour_scheme_name,
         /**
          * Colour Map.
          */
-        private array $colourMap
-    ) {
+        private array $colour_map
+    )
+    {
     }
-
     /**
      * Not called by Reader, never accessible any other time.
      *
      * @codeCoverageIgnore
      */
-    public function getThemeName(): string
+    public function get_theme_name(): string
     {
-        return $this->themeName;
+        return $this->theme_name;
     }
-
     /**
      * Not called by Reader, never accessible any other time.
      *
      * @codeCoverageIgnore
      */
-    public function getColourSchemeName(): string
+    public function get_colour_scheme_name(): string
     {
-        return $this->colourSchemeName;
+        return $this->colour_scheme_name;
     }
-
     /**
      * Get colour Map Value by Position.
      */
-    public function getColourByIndex(int $index): ?string
+    public function get_colour_by_index(int $index): ?string
     {
-        return $this->colourMap[$index] ?? null;
+        return $this->colour_map[$index] ?? null;
     }
 }

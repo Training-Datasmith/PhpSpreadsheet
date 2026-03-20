@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
 class Angle
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * DEGREES.
      *
@@ -22,21 +19,18 @@ class Angle
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toDegrees(mixed $number): array|string|float
+    public static function to_degrees(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return rad2deg($number);
     }
-
     /**
      * RADIANS.
      *
@@ -48,18 +42,16 @@ class Angle
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toRadians(mixed $number): array|string|float
+    public static function to_radians(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return deg2rad($number);
     }
 }

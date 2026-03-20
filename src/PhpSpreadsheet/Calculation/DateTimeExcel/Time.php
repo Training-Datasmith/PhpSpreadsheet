@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
 use DateTime;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDateHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDateHelper;
 class Time
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * TIME.
      *
@@ -45,48 +42,42 @@ class Time
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function fromHMS(array|int|float|bool|null|string $hour, array|int|float|bool|null|string $minute, array|int|float|bool|null|string $second): array|string|float|int|DateTime
+    public static function from_hms(array|int|float|bool|null|string $hour, array|int|float|bool|null|string $minute, array|int|float|bool|null|string $second): array|string|float|int|DateTime
     {
         if (is_array($hour) || is_array($minute) || is_array($second)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $hour, $minute, $second);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $hour, $minute, $second);
         }
-
         try {
-            $hour = self::toIntWithNullBool($hour);
-            $minute = self::toIntWithNullBool($minute);
-            $second = self::toIntWithNullBool($second);
+            $hour = self::to_int_with_null_bool($hour);
+            $minute = self::to_int_with_null_bool($minute);
+            $second = self::to_int_with_null_bool($second);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        self::adjustSecond($second, $minute);
-        self::adjustMinute($minute, $hour);
-
+        self::adjust_second($second, $minute);
+        self::adjust_minute($minute, $hour);
         if ($hour > 23) {
             $hour = $hour % 24;
         } elseif ($hour < 0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
         // Execute function
-        $retType = Functions::getReturnDateType();
-        if ($retType === Functions::RETURNDATE_EXCEL) {
-            $calendar = SharedDateHelper::getExcelCalendar();
-            $date = (int) ($calendar !== SharedDateHelper::CALENDAR_WINDOWS_1900);
-
-            return SharedDateHelper::formattedPHPToExcel($calendar, 1, $date, $hour, $minute, $second);
+        $ret_type = Functions::get_return_date_type();
+        if ($ret_type === Functions::RETURNDATE_EXCEL) {
+            $calendar = Shared_Date_Helper::get_excel_calendar();
+            $date = (int) ($calendar !== Shared_Date_Helper::CALENDAR_WINDOWS_1900);
+            return Shared_Date_Helper::formatted_php_to_excel($calendar, 1, $date, $hour, $minute, $second);
         }
-        if ($retType === Functions::RETURNDATE_UNIX_TIMESTAMP) {
-            return SharedDateHelper::excelToTimestamp(SharedDateHelper::formattedPHPToExcel(1970, 1, 1, $hour, $minute, $second)); // -2147468400; //    -2147472000 + 3600
+        if ($ret_type === Functions::RETURNDATE_UNIX_TIMESTAMP) {
+            return Shared_Date_Helper::excel_to_timestamp(Shared_Date_Helper::formatted_php_to_excel(1970, 1, 1, $hour, $minute, $second));
+            // -2147468400; //    -2147472000 + 3600
         }
         // RETURNDATE_PHP_DATETIME_OBJECT
         // Hour has already been normalized (0-23) above
-        $phpDateObject = new DateTime('1900-01-01 ' . $hour . ':' . $minute . ':' . $second);
-
-        return $phpDateObject;
+        $php_date_object = new DateTime('1900-01-01 ' . $hour . ':' . $minute . ':' . $second);
+        return $php_date_object;
     }
-
-    private static function adjustSecond(int &$second, int &$minute): void
+    private static function adjust_second(int &$second, int &$minute): void
     {
         if ($second < 0) {
             $minute += (int) floor($second / 60);
@@ -99,8 +90,7 @@ class Time
             $second = $second % 60;
         }
     }
-
-    private static function adjustMinute(int &$minute, int &$hour): void
+    private static function adjust_minute(int &$minute, int &$hour): void
     {
         if ($minute < 0) {
             $hour += (int) floor($minute / 60);
@@ -113,20 +103,18 @@ class Time
             $minute = $minute % 60;
         }
     }
-
     /**
      * @param mixed $value expect int
      */
-    private static function toIntWithNullBool(mixed $value): int
+    private static function to_int_with_null_bool(mixed $value): int
     {
         $value ??= 0;
         if (is_bool($value)) {
             $value = (int) $value;
         }
         if (!is_numeric($value)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (int) $value;
     }
 }

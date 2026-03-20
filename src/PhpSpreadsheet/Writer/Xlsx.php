@@ -1,308 +1,231 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer;
 
-namespace PhpOffice\PhpSpreadsheet\Writer;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\HashTable;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Borders;
-use PhpOffice\PhpSpreadsheet\Style\Conditional;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing as WorksheetDrawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
-use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Chart;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Comments;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\ContentTypes;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\DocProps;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Drawing;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\RelsRibbon;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\RelsVBA;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\RichDataDrawing;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\StringTable;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Style;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Table;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Theme;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Workbook;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Worksheet;
-use ZipArchive;
-use ZipStream\Exception\OverflowException;
-use ZipStream\ZipStream;
-
-class Xlsx extends BaseWriter
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Hash_Table;
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Style\Borders;
+use Php_Office\Php_Spreadsheet\Style\Conditional;
+use Php_Office\Php_Spreadsheet\Style\Fill;
+use Php_Office\Php_Spreadsheet\Style\Font;
+use Php_Office\Php_Spreadsheet\Style\Number_Format;
+use Php_Office\Php_Spreadsheet\Worksheet\Base_Drawing;
+use Php_Office\Php_Spreadsheet\Worksheet\Drawing as WorksheetDrawing;
+use Php_Office\Php_Spreadsheet\Worksheet\Memory_Drawing;
+use Php_Office\Php_Spreadsheet\Writer\Exception as WriterException;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Chart;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Comments;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Content_Types;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Doc_Props;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Drawing;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Rels;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Rels_Ribbon;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Rels_Vba;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Rich_Data_Drawing;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\String_Table;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Style;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Table;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Theme;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Workbook;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Worksheet;
+use Zip_Archive;
+use Zip_Stream\Exception\OverflowException;
+use Zip_Stream\Zip_Stream;
+class Xlsx extends Base_Writer
 {
     /**
      * Office2003 compatibility.
      */
     private bool $office2003compatibility = false;
-
     /**
      * Private Spreadsheet.
      */
-    private Spreadsheet $spreadSheet;
-
+    private Spreadsheet $spread_sheet;
     /**
      * Private string table.
      *
      * @var string[]
      */
-    private array $stringTable = [];
-
+    private array $string_table = [];
     /**
      * Private unique Conditional HashTable.
      *
      * @var HashTable<Conditional>
      */
-    private readonly HashTable $stylesConditionalHashTable;
-
+    private readonly Hash_Table $styles_conditional_hash_table;
     /**
      * Private unique Style HashTable.
      *
      * @var HashTable<\PhpOffice\PhpSpreadsheet\Style\Style>
      */
-    private readonly HashTable $styleHashTable;
-
+    private readonly Hash_Table $style_hash_table;
     /**
      * Private unique Fill HashTable.
      *
      * @var HashTable<Fill>
      */
-    private readonly HashTable $fillHashTable;
-
+    private readonly Hash_Table $fill_hash_table;
     /**
      * Private unique \PhpOffice\PhpSpreadsheet\Style\Font HashTable.
      *
      * @var HashTable<Font>
      */
-    private readonly HashTable $fontHashTable;
-
+    private readonly Hash_Table $font_hash_table;
     /**
      * Private unique Borders HashTable.
      *
      * @var HashTable<Borders>
      */
-    private readonly HashTable $bordersHashTable;
-
+    private readonly Hash_Table $borders_hash_table;
     /**
      * Private unique NumberFormat HashTable.
      *
      * @var HashTable<NumberFormat>
      */
-    private readonly HashTable $numFmtHashTable;
-
+    private readonly Hash_Table $num_fmt_hash_table;
     /**
      * Private unique \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet\BaseDrawing HashTable.
      *
      * @var HashTable<BaseDrawing>
      */
-    private readonly HashTable $drawingHashTable;
-
+    private readonly Hash_Table $drawing_hash_table;
     /**
      * Private handle for zip stream.
      */
-    private ZipStream $zip;
-
-    private readonly Chart $writerPartChart;
-
-    private readonly Comments $writerPartComments;
-
-    private readonly ContentTypes $writerPartContentTypes;
-
-    private readonly DocProps $writerPartDocProps;
-
-    private readonly Drawing $writerPartDrawing;
-
-    private readonly Rels $writerPartRels;
-
-    private readonly RelsRibbon $writerPartRelsRibbon;
-
-    private readonly RelsVBA $writerPartRelsVBA;
-
-    private readonly StringTable $writerPartStringTable;
-
-    private readonly Style $writerPartStyle;
-
-    private readonly Theme $writerPartTheme;
-
-    private readonly Table $writerPartTable;
-
-    private readonly Workbook $writerPartWorkbook;
-
-    private readonly Worksheet $writerPartWorksheet;
-
-    private bool $explicitStyle0 = false;
-
-    private bool $useCSEArrays = false;
-
-    private bool $useDynamicArray = false;
-
+    private Zip_Stream $zip;
+    private readonly Chart $writer_part_chart;
+    private readonly Comments $writer_part_comments;
+    private readonly Content_Types $writer_part_content_types;
+    private readonly Doc_Props $writer_part_doc_props;
+    private readonly Drawing $writer_part_drawing;
+    private readonly Rels $writer_part_rels;
+    private readonly Rels_Ribbon $writer_part_rels_ribbon;
+    private readonly Rels_Vba $writer_part_rels_vba;
+    private readonly String_Table $writer_part_string_table;
+    private readonly Style $writer_part_style;
+    private readonly Theme $writer_part_theme;
+    private readonly Table $writer_part_table;
+    private readonly Workbook $writer_part_workbook;
+    private readonly Worksheet $writer_part_worksheet;
+    private bool $explicit_style0 = false;
+    private bool $use_cse_arrays = false;
+    private bool $use_dynamic_array = false;
     public const DEFAULT_FORCE_FULL_CALC = false;
-
     // Default changed from null in PhpSpreadsheet 4.0.0.
-    private ?bool $forceFullCalc = self::DEFAULT_FORCE_FULL_CALC;
-
-    protected bool $restrictMaxColumnWidth = false;
-
+    private ?bool $force_full_calc = self::DEFAULT_FORCE_FULL_CALC;
+    protected bool $restrict_max_column_width = false;
     /**
      * Create a new Xlsx Writer.
      */
     public function __construct(Spreadsheet $spreadsheet)
     {
         // Assign PhpSpreadsheet
-        $this->setSpreadsheet($spreadsheet);
-        $spreadsheet->setUsesCheckboxStyle();
-
-        $this->writerPartChart = new Chart($this);
-        $this->writerPartComments = new Comments($this);
-        $this->writerPartContentTypes = new ContentTypes($this);
-        $this->writerPartDocProps = new DocProps($this);
-        $this->writerPartDrawing = new Drawing($this);
-        $this->writerPartRels = new Rels($this);
-        $this->writerPartRelsRibbon = new RelsRibbon($this);
-        $this->writerPartRelsVBA = new RelsVBA($this);
-        $this->writerPartStringTable = new StringTable($this);
-        $this->writerPartStyle = new Style($this);
-        $this->writerPartTheme = new Theme($this);
-        $this->writerPartTable = new Table($this);
-        $this->writerPartWorkbook = new Workbook($this);
-        $this->writerPartWorksheet = new Worksheet($this);
-
+        $this->set_spreadsheet($spreadsheet);
+        $spreadsheet->set_uses_checkbox_style();
+        $this->writer_part_chart = new Chart($this);
+        $this->writer_part_comments = new Comments($this);
+        $this->writer_part_content_types = new Content_Types($this);
+        $this->writer_part_doc_props = new Doc_Props($this);
+        $this->writer_part_drawing = new Drawing($this);
+        $this->writer_part_rels = new Rels($this);
+        $this->writer_part_rels_ribbon = new Rels_Ribbon($this);
+        $this->writer_part_rels_vba = new Rels_Vba($this);
+        $this->writer_part_string_table = new String_Table($this);
+        $this->writer_part_style = new Style($this);
+        $this->writer_part_theme = new Theme($this);
+        $this->writer_part_table = new Table($this);
+        $this->writer_part_workbook = new Workbook($this);
+        $this->writer_part_worksheet = new Worksheet($this);
         // Set HashTable variables
-        $this->bordersHashTable = new HashTable();
-        $this->drawingHashTable = new HashTable();
-        $this->fillHashTable = new HashTable();
-        $this->fontHashTable = new HashTable();
-        $this->numFmtHashTable = new HashTable();
-        $this->styleHashTable = new HashTable();
-        $this->stylesConditionalHashTable = new HashTable();
-        $this->determineUseDynamicArrays();
+        $this->borders_hash_table = new Hash_Table();
+        $this->drawing_hash_table = new Hash_Table();
+        $this->fill_hash_table = new Hash_Table();
+        $this->font_hash_table = new Hash_Table();
+        $this->num_fmt_hash_table = new Hash_Table();
+        $this->style_hash_table = new Hash_Table();
+        $this->styles_conditional_hash_table = new Hash_Table();
+        $this->determine_use_dynamic_arrays();
     }
-
-    public function getWriterPartChart(): Chart
+    public function get_writer_part_chart(): Chart
     {
-        return $this->writerPartChart;
+        return $this->writer_part_chart;
     }
-
-    public function getWriterPartComments(): Comments
+    public function get_writer_part_comments(): Comments
     {
-        return $this->writerPartComments;
+        return $this->writer_part_comments;
     }
-
-    public function getWriterPartContentTypes(): ContentTypes
+    public function get_writer_part_content_types(): Content_Types
     {
-        return $this->writerPartContentTypes;
+        return $this->writer_part_content_types;
     }
-
-    public function getWriterPartDocProps(): DocProps
+    public function get_writer_part_doc_props(): Doc_Props
     {
-        return $this->writerPartDocProps;
+        return $this->writer_part_doc_props;
     }
-
-    public function getWriterPartDrawing(): Drawing
+    public function get_writer_part_drawing(): Drawing
     {
-        return $this->writerPartDrawing;
+        return $this->writer_part_drawing;
     }
-
-    public function getWriterPartRels(): Rels
+    public function get_writer_part_rels(): Rels
     {
-        return $this->writerPartRels;
+        return $this->writer_part_rels;
     }
-
-    public function getWriterPartRelsRibbon(): RelsRibbon
+    public function get_writer_part_rels_ribbon(): Rels_Ribbon
     {
-        return $this->writerPartRelsRibbon;
+        return $this->writer_part_rels_ribbon;
     }
-
-    public function getWriterPartRelsVBA(): RelsVBA
+    public function get_writer_part_rels_vba(): Rels_Vba
     {
-        return $this->writerPartRelsVBA;
+        return $this->writer_part_rels_vba;
     }
-
-    public function getWriterPartStringTable(): StringTable
+    public function get_writer_part_string_table(): String_Table
     {
-        return $this->writerPartStringTable;
+        return $this->writer_part_string_table;
     }
-
-    public function getWriterPartStyle(): Style
+    public function get_writer_part_style(): Style
     {
-        return $this->writerPartStyle;
+        return $this->writer_part_style;
     }
-
-    public function getWriterPartTheme(): Theme
+    public function get_writer_part_theme(): Theme
     {
-        return $this->writerPartTheme;
+        return $this->writer_part_theme;
     }
-
-    public function getWriterPartTable(): Table
+    public function get_writer_part_table(): Table
     {
-        return $this->writerPartTable;
+        return $this->writer_part_table;
     }
-
-    public function getWriterPartWorkbook(): Workbook
+    public function get_writer_part_workbook(): Workbook
     {
-        return $this->writerPartWorkbook;
+        return $this->writer_part_workbook;
     }
-
-    public function getWriterPartWorksheet(): Worksheet
+    public function get_writer_part_worksheet(): Worksheet
     {
-        return $this->writerPartWorksheet;
+        return $this->writer_part_worksheet;
     }
-
-    public function createStyleDictionaries(): void
+    public function create_style_dictionaries(): void
     {
-        $this->styleHashTable->addFromSource(
-            $this->getWriterPartStyle()->allStyles(
-                $this->spreadSheet
-            )
-        );
-        $this->stylesConditionalHashTable->addFromSource(
-            $this->getWriterPartStyle()->allConditionalStyles(
-                $this->spreadSheet
-            )
-        );
-        $this->fillHashTable->addFromSource(
-            $this->getWriterPartStyle()->allFills(
-                $this->spreadSheet
-            )
-        );
-        $this->fontHashTable->addFromSource(
-            $this->getWriterPartStyle()->allFonts(
-                $this->spreadSheet
-            )
-        );
-        $this->bordersHashTable->addFromSource(
-            $this->getWriterPartStyle()->allBorders(
-                $this->spreadSheet
-            )
-        );
-        $this->numFmtHashTable->addFromSource(
-            $this->getWriterPartStyle()->allNumberFormats(
-                $this->spreadSheet
-            )
-        );
+        $this->style_hash_table->add_from_source($this->get_writer_part_style()->all_styles($this->spread_sheet));
+        $this->styles_conditional_hash_table->add_from_source($this->get_writer_part_style()->all_conditional_styles($this->spread_sheet));
+        $this->fill_hash_table->add_from_source($this->get_writer_part_style()->all_fills($this->spread_sheet));
+        $this->font_hash_table->add_from_source($this->get_writer_part_style()->all_fonts($this->spread_sheet));
+        $this->borders_hash_table->add_from_source($this->get_writer_part_style()->all_borders($this->spread_sheet));
+        $this->num_fmt_hash_table->add_from_source($this->get_writer_part_style()->all_number_formats($this->spread_sheet));
     }
-
     /**
      * @return (RichText|string)[] $stringTable
      */
-    public function createStringTable(): array
+    public function create_string_table(): array
     {
-        $this->stringTable = [];
-        for ($i = 0; $i < $this->spreadSheet->getSheetCount(); ++$i) {
-            $this->stringTable = $this->getWriterPartStringTable()->createStringTable($this->spreadSheet->getSheet($i), $this->stringTable);
+        $this->string_table = [];
+        for ($i = 0; $i < $this->spread_sheet->get_sheet_count(); ++$i) {
+            $this->string_table = $this->get_writer_part_string_table()->create_string_table($this->spread_sheet->get_sheet($i), $this->string_table);
         }
-
-        return $this->stringTable;
+        return $this->string_table;
     }
-
     /**
      * Save PhpSpreadsheet to file.
      *
@@ -310,308 +233,263 @@ class Xlsx extends BaseWriter
      */
     public function save($filename, int $flags = 0): void
     {
-        $this->processFlags($flags);
-        $this->determineUseDynamicArrays();
-
+        $this->process_flags($flags);
+        $this->determine_use_dynamic_arrays();
         // garbage collect
-        $this->pathNames = [];
-        $this->spreadSheet->garbageCollect();
-
-        $saveDebugLog = Calculation::getInstance($this->spreadSheet)->getDebugLog()->getWriteDebugLog();
-        Calculation::getInstance($this->spreadSheet)->getDebugLog()->setWriteDebugLog(false);
-        $saveDateReturnType = Functions::getReturnDateType();
-        Functions::setReturnDateType(Functions::RETURNDATE_EXCEL);
-
+        $this->path_names = [];
+        $this->spread_sheet->garbage_collect();
+        $save_debug_log = Calculation::get_instance($this->spread_sheet)->get_debug_log()->get_write_debug_log();
+        Calculation::get_instance($this->spread_sheet)->get_debug_log()->set_write_debug_log(false);
+        $save_date_return_type = Functions::get_return_date_type();
+        Functions::set_return_date_type(Functions::RETURNDATE_EXCEL);
         // Create string lookup table
-        $this->createStringTable();
-
+        $this->create_string_table();
         // Create styles dictionaries
-        $this->createStyleDictionaries();
-
+        $this->create_style_dictionaries();
         // Create drawing dictionary
-        $this->drawingHashTable->addFromSource($this->getWriterPartDrawing()->allDrawings($this->spreadSheet));
-
+        $this->drawing_hash_table->add_from_source($this->get_writer_part_drawing()->all_drawings($this->spread_sheet));
         /** @var string[] */
-        $zipContent = [];
-        $richDataCount = 0;
-
-        if ($this->spreadSheet->hasInCellDrawings()) {
-            $richDataDrawing = new RichDataDrawing();
-            $richDataFiles = $richDataDrawing->generateFiles($this->spreadSheet);
-            $richDataCount = count($richDataDrawing->getDrawings());
-
+        $zip_content = [];
+        $rich_data_count = 0;
+        if ($this->spread_sheet->has_in_cell_drawings()) {
+            $rich_data_drawing = new Rich_Data_Drawing();
+            $rich_data_files = $rich_data_drawing->generate_files($this->spread_sheet);
+            $rich_data_count = count($rich_data_drawing->get_drawings());
             // Add all Rich Data files to ZIP
-            foreach ($richDataFiles as $path => $content) {
-                $zipContent[$path] = $content;
+            foreach ($rich_data_files as $path => $content) {
+                $zip_content[$path] = $content;
             }
         }
-
         // Add [Content_Types].xml to ZIP file
-        $zipContent['[Content_Types].xml'] = $this->getWriterPartContentTypes()->writeContentTypes($this->spreadSheet, $this->includeCharts);
-        $metadataData = (new Xlsx\Metadata($this))->writeMetadata($richDataCount);
-        if ($metadataData !== '') {
-            $zipContent['xl/metadata.xml'] = $metadataData;
+        $zip_content['[Content_Types].xml'] = $this->get_writer_part_content_types()->write_content_types($this->spread_sheet, $this->include_charts);
+        $metadata_data = (new Xlsx\Metadata($this))->write_metadata($rich_data_count);
+        if ($metadata_data !== '') {
+            $zip_content['xl/metadata.xml'] = $metadata_data;
         }
-        $propertyBagData = (new Xlsx\FeaturePropertyBag($this))->writeFeaturePropertyBag($this->spreadSheet);
-        if ($propertyBagData !== '') {
-            $zipContent['xl/featurePropertyBag/featurePropertyBag.xml'] = $propertyBagData;
+        $property_bag_data = (new Xlsx\Feature_Property_Bag($this))->write_feature_property_bag($this->spread_sheet);
+        if ($property_bag_data !== '') {
+            $zip_content['xl/featurePropertyBag/featurePropertyBag.xml'] = $property_bag_data;
         }
-
         //if hasMacros, add the vbaProject.bin file, Certificate file(if exists)
-        if ($this->spreadSheet->hasMacros()) {
-            $macrosCode = $this->spreadSheet->getMacrosCode();
-            if ($macrosCode !== null) {
+        if ($this->spread_sheet->has_macros()) {
+            $macros_code = $this->spread_sheet->get_macros_code();
+            if ($macros_code !== null) {
                 // we have the code ?
-                $zipContent['xl/vbaProject.bin'] = $macrosCode; //allways in 'xl', allways named vbaProject.bin
-                if ($this->spreadSheet->hasMacrosCertificate()) {
+                $zip_content['xl/vbaProject.bin'] = $macros_code;
+                //allways in 'xl', allways named vbaProject.bin
+                if ($this->spread_sheet->has_macros_certificate()) {
                     //signed macros ?
                     // Yes : add the certificate file and the related rels file
-                    $zipContent['xl/vbaProjectSignature.bin'] = $this->spreadSheet->getMacrosCertificate();
-                    $zipContent['xl/_rels/vbaProject.bin.rels'] = $this->getWriterPartRelsVBA()->writeVBARelationships();
+                    $zip_content['xl/vbaProjectSignature.bin'] = $this->spread_sheet->get_macros_certificate();
+                    $zip_content['xl/_rels/vbaProject.bin.rels'] = $this->get_writer_part_rels_vba()->write_vba_relationships();
                 }
             }
         }
         //a custom UI in this workbook ? add it ("base" xml and additional objects (pictures) and rels)
-        if ($this->spreadSheet->hasRibbon()) {
-            $tmpRibbonTarget = $this->spreadSheet->getRibbonXMLData('target');
-            $tmpRibbonTarget = is_string($tmpRibbonTarget) ? $tmpRibbonTarget : '';
-            $zipContent[$tmpRibbonTarget] = $this->spreadSheet->getRibbonXMLData('data');
-            if ($this->spreadSheet->hasRibbonBinObjects()) {
-                $tmpRootPath = dirname($tmpRibbonTarget) . '/';
-                $ribbonBinObjects = $this->spreadSheet->getRibbonBinObjects('data'); //the files to write
-                if (is_array($ribbonBinObjects)) {
-                    foreach ($ribbonBinObjects as $aPath => $aContent) {
-                        $zipContent[$tmpRootPath . $aPath] = $aContent;
+        if ($this->spread_sheet->has_ribbon()) {
+            $tmp_ribbon_target = $this->spread_sheet->get_ribbon_xml_data('target');
+            $tmp_ribbon_target = is_string($tmp_ribbon_target) ? $tmp_ribbon_target : '';
+            $zip_content[$tmp_ribbon_target] = $this->spread_sheet->get_ribbon_xml_data('data');
+            if ($this->spread_sheet->has_ribbon_bin_objects()) {
+                $tmp_root_path = dirname($tmp_ribbon_target) . '/';
+                $ribbon_bin_objects = $this->spread_sheet->get_ribbon_bin_objects('data');
+                //the files to write
+                if (is_array($ribbon_bin_objects)) {
+                    foreach ($ribbon_bin_objects as $a_path => $a_content) {
+                        $zip_content[$tmp_root_path . $a_path] = $a_content;
                     }
                 }
                 //the rels for files
-                $zipContent[$tmpRootPath . '_rels/' . basename($tmpRibbonTarget) . '.rels'] = $this->getWriterPartRelsRibbon()->writeRibbonRelationships($this->spreadSheet);
+                $zip_content[$tmp_root_path . '_rels/' . basename($tmp_ribbon_target) . '.rels'] = $this->get_writer_part_rels_ribbon()->write_ribbon_relationships($this->spread_sheet);
             }
         }
-
         // Add relationships to ZIP file
-        $zipContent['_rels/.rels'] = $this->getWriterPartRels()->writeRelationships($this->spreadSheet);
-        $zipContent['xl/_rels/workbook.xml.rels'] = $this->getWriterPartRels()->writeWorkbookRelationships($this->spreadSheet);
-
+        $zip_content['_rels/.rels'] = $this->get_writer_part_rels()->write_relationships($this->spread_sheet);
+        $zip_content['xl/_rels/workbook.xml.rels'] = $this->get_writer_part_rels()->write_workbook_relationships($this->spread_sheet);
         // Add document properties to ZIP file
-        $zipContent['docProps/app.xml'] = $this->getWriterPartDocProps()->writeDocPropsApp($this->spreadSheet);
-        $zipContent['docProps/core.xml'] = $this->getWriterPartDocProps()->writeDocPropsCore($this->spreadSheet);
-        $customPropertiesPart = $this->getWriterPartDocProps()->writeDocPropsCustom($this->spreadSheet);
-        if ($customPropertiesPart !== null) {
-            $zipContent['docProps/custom.xml'] = $customPropertiesPart;
+        $zip_content['docProps/app.xml'] = $this->get_writer_part_doc_props()->write_doc_props_app($this->spread_sheet);
+        $zip_content['docProps/core.xml'] = $this->get_writer_part_doc_props()->write_doc_props_core($this->spread_sheet);
+        $custom_properties_part = $this->get_writer_part_doc_props()->write_doc_props_custom($this->spread_sheet);
+        if ($custom_properties_part !== null) {
+            $zip_content['docProps/custom.xml'] = $custom_properties_part;
         }
-
         // Add theme to ZIP file
-        $zipContent['xl/theme/theme1.xml'] = $this->getWriterPartTheme()->writeTheme($this->spreadSheet);
-
+        $zip_content['xl/theme/theme1.xml'] = $this->get_writer_part_theme()->write_theme($this->spread_sheet);
         // Add string table to ZIP file
-        $zipContent['xl/sharedStrings.xml'] = $this->getWriterPartStringTable()->writeStringTable($this->stringTable);
-
+        $zip_content['xl/sharedStrings.xml'] = $this->get_writer_part_string_table()->write_string_table($this->string_table);
         // Add styles to ZIP file
-        $zipContent['xl/styles.xml'] = $this->getWriterPartStyle()->writeStyles($this->spreadSheet);
-
+        $zip_content['xl/styles.xml'] = $this->get_writer_part_style()->write_styles($this->spread_sheet);
         // Add workbook to ZIP file
-        $zipContent['xl/workbook.xml'] = $this->getWriterPartWorkbook()->writeWorkbook($this->spreadSheet, $this->preCalculateFormulas, $this->forceFullCalc);
-
-        $chartCount = 0;
+        $zip_content['xl/workbook.xml'] = $this->get_writer_part_workbook()->write_workbook($this->spread_sheet, $this->pre_calculate_formulas, $this->force_full_calc);
+        $chart_count = 0;
         // Add worksheets
-        for ($i = 0; $i < $this->spreadSheet->getSheetCount(); ++$i) {
-            $zipContent['xl/worksheets/sheet' . ($i + 1) . '.xml'] = $this->getWriterPartWorksheet()->writeWorksheet($this->spreadSheet->getSheet($i), $this->stringTable, $this->includeCharts);
-            if ($this->includeCharts) {
-                $charts = $this->spreadSheet->getSheet($i)->getChartCollection();
+        for ($i = 0; $i < $this->spread_sheet->get_sheet_count(); ++$i) {
+            $zip_content['xl/worksheets/sheet' . ($i + 1) . '.xml'] = $this->get_writer_part_worksheet()->write_worksheet($this->spread_sheet->get_sheet($i), $this->string_table, $this->include_charts);
+            if ($this->include_charts) {
+                $charts = $this->spread_sheet->get_sheet($i)->get_chart_collection();
                 if (count($charts) > 0) {
                     foreach ($charts as $chart) {
-                        $zipContent['xl/charts/chart' . ($chartCount + 1) . '.xml'] = $this->getWriterPartChart()->writeChart($chart, $this->preCalculateFormulas);
-                        ++$chartCount;
+                        $zip_content['xl/charts/chart' . ($chart_count + 1) . '.xml'] = $this->get_writer_part_chart()->write_chart($chart, $this->pre_calculate_formulas);
+                        ++$chart_count;
                     }
                 }
             }
         }
-
-        $chartRef1 = 0;
-        $tableRef1 = 1;
+        $chart_ref1 = 0;
+        $table_ref1 = 1;
         // Add worksheet relationships (drawings, ...)
-        for ($i = 0; $i < $this->spreadSheet->getSheetCount(); ++$i) {
+        for ($i = 0; $i < $this->spread_sheet->get_sheet_count(); ++$i) {
             // Add relationships
             /** @var string[] $zipContent */
-            $zipContent['xl/worksheets/_rels/sheet' . ($i + 1) . '.xml.rels'] = $this->getWriterPartRels()->writeWorksheetRelationships($this->spreadSheet->getSheet($i), ($i + 1), $this->includeCharts, $tableRef1, $zipContent);
-
+            $zip_content['xl/worksheets/_rels/sheet' . ($i + 1) . '.xml.rels'] = $this->get_writer_part_rels()->write_worksheet_relationships($this->spread_sheet->get_sheet($i), $i + 1, $this->include_charts, $table_ref1, $zip_content);
             // Add unparsedLoadedData
-            $sheetCodeName = $this->spreadSheet->getSheet($i)->getCodeName();
+            $sheet_code_name = $this->spread_sheet->get_sheet($i)->get_code_name();
             /** @var mixed[][][] */
-            $unparsedLoadedData = $this->spreadSheet->getUnparsedLoadedData();
+            $unparsed_loaded_data = $this->spread_sheet->get_unparsed_loaded_data();
             /** @var mixed[][] */
-            $unparsedSheet = $unparsedLoadedData['sheets'][$sheetCodeName] ?? [];
-            foreach (($unparsedSheet['ctrlProps'] ?? []) as $ctrlProp) {
+            $unparsed_sheet = $unparsed_loaded_data['sheets'][$sheet_code_name] ?? [];
+            foreach ($unparsed_sheet['ctrlProps'] ?? [] as $ctrl_prop) {
                 /** @var string[] $ctrlProp */
-                $zipContent[$ctrlProp['filePath']] = $ctrlProp['content'];
+                $zip_content[$ctrl_prop['filePath']] = $ctrl_prop['content'];
             }
-            foreach (($unparsedSheet['printerSettings'] ?? []) as $ctrlProp) {
+            foreach ($unparsed_sheet['printerSettings'] ?? [] as $ctrl_prop) {
                 /** @var string[] $ctrlProp */
-                $zipContent[$ctrlProp['filePath']] = $ctrlProp['content'];
+                $zip_content[$ctrl_prop['filePath']] = $ctrl_prop['content'];
             }
-
-            $drawings = $this->spreadSheet->getSheet($i)->getDrawingCollection();
-            $drawingCount = count($drawings);
-            if ($this->includeCharts) {
-                $chartCount = $this->spreadSheet->getSheet($i)->getChartCount();
+            $drawings = $this->spread_sheet->get_sheet($i)->get_drawing_collection();
+            $drawing_count = count($drawings);
+            if ($this->include_charts) {
+                $chart_count = $this->spread_sheet->get_sheet($i)->get_chart_count();
             }
-
             // Add drawing and image relationship parts
             /** @var bool $hasPassThroughDrawing */
-            $hasPassThroughDrawing = $unparsedSheet['drawingPassThroughEnabled'] ?? false;
-            if (($drawingCount > 0) || ($chartCount > 0) || $hasPassThroughDrawing) {
+            $has_pass_through_drawing = $unparsed_sheet['drawingPassThroughEnabled'] ?? false;
+            if ($drawing_count > 0 || $chart_count > 0 || $has_pass_through_drawing) {
                 // Drawing relationships
-                $zipContent['xl/drawings/_rels/drawing' . ($i + 1) . '.xml.rels'] = $this->getWriterPartRels()->writeDrawingRelationships($this->spreadSheet->getSheet($i), $chartRef1, $this->includeCharts);
-
+                $zip_content['xl/drawings/_rels/drawing' . ($i + 1) . '.xml.rels'] = $this->get_writer_part_rels()->write_drawing_relationships($this->spread_sheet->get_sheet($i), $chart_ref1, $this->include_charts);
                 // Drawings
-                $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = $this->getWriterPartDrawing()->writeDrawings($this->spreadSheet->getSheet($i), $this->includeCharts);
-            } elseif (isset($unparsedSheet['drawingAlternateContents'])) {
+                $zip_content['xl/drawings/drawing' . ($i + 1) . '.xml'] = $this->get_writer_part_drawing()->write_drawings($this->spread_sheet->get_sheet($i), $this->include_charts);
+            } elseif (isset($unparsed_sheet['drawingAlternateContents'])) {
                 // Drawings
-                $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = $this->getWriterPartDrawing()->writeDrawings($this->spreadSheet->getSheet($i), $this->includeCharts);
+                $zip_content['xl/drawings/drawing' . ($i + 1) . '.xml'] = $this->get_writer_part_drawing()->write_drawings($this->spread_sheet->get_sheet($i), $this->include_charts);
             }
-
             // Add unparsed drawings
-            if (isset($unparsedSheet['Drawings']) && !isset($zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'])) {
-                foreach ($unparsedSheet['Drawings'] as $relId => $drawingXml) {
-                    $drawingFile = array_search($relId, $unparsedSheet['drawingOriginalIds']);
-                    if ($drawingFile !== false) {
+            if (isset($unparsed_sheet['Drawings']) && !isset($zip_content['xl/drawings/drawing' . ($i + 1) . '.xml'])) {
+                foreach ($unparsed_sheet['Drawings'] as $rel_id => $drawing_xml) {
+                    $drawing_file = array_search($rel_id, $unparsed_sheet['drawingOriginalIds']);
+                    if ($drawing_file !== false) {
                         //$drawingFile = ltrim($drawingFile, '.');
                         //$zipContent['xl' . $drawingFile] = $drawingXml;
-                        $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = $drawingXml;
+                        $zip_content['xl/drawings/drawing' . ($i + 1) . '.xml'] = $drawing_xml;
                     }
                 }
             }
-            if (isset($unparsedSheet['drawingOriginalIds']) && !isset($zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'])) {
-                $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = '<xml></xml>';
+            if (isset($unparsed_sheet['drawingOriginalIds']) && !isset($zip_content['xl/drawings/drawing' . ($i + 1) . '.xml'])) {
+                $zip_content['xl/drawings/drawing' . ($i + 1) . '.xml'] = '<xml></xml>';
             }
-
             // Add comment relationship parts
             /** @var mixed[][] */
-            $legacyTemp = $unparsedLoadedData['sheets'] ?? [];
-            $legacyTemp = $legacyTemp[$this->spreadSheet->getSheet($i)->getCodeName()] ?? [];
-            $legacy = $legacyTemp['legacyDrawing'] ?? null;
-            if (count($this->spreadSheet->getSheet($i)->getComments()) > 0 || $legacy !== null) {
+            $legacy_temp = $unparsed_loaded_data['sheets'] ?? [];
+            $legacy_temp = $legacy_temp[$this->spread_sheet->get_sheet($i)->get_code_name()] ?? [];
+            $legacy = $legacy_temp['legacyDrawing'] ?? null;
+            if (count($this->spread_sheet->get_sheet($i)->get_comments()) > 0 || $legacy !== null) {
                 // VML Comments relationships
-                $zipContent['xl/drawings/_rels/vmlDrawing' . ($i + 1) . '.vml.rels'] = $this->getWriterPartRels()->writeVMLDrawingRelationships($this->spreadSheet->getSheet($i));
-
+                $zip_content['xl/drawings/_rels/vmlDrawing' . ($i + 1) . '.vml.rels'] = $this->get_writer_part_rels()->write_vml_drawing_relationships($this->spread_sheet->get_sheet($i));
                 // VML Comments
-                $zipContent['xl/drawings/vmlDrawing' . ($i + 1) . '.vml'] = $legacy ?? $this->getWriterPartComments()->writeVMLComments($this->spreadSheet->getSheet($i));
+                $zip_content['xl/drawings/vmlDrawing' . ($i + 1) . '.vml'] = $legacy ?? $this->get_writer_part_comments()->write_vml_comments($this->spread_sheet->get_sheet($i));
             }
-
             // Comments
-            if (count($this->spreadSheet->getSheet($i)->getComments()) > 0) {
-                $zipContent['xl/comments' . ($i + 1) . '.xml'] = $this->getWriterPartComments()->writeComments($this->spreadSheet->getSheet($i));
-
+            if (count($this->spread_sheet->get_sheet($i)->get_comments()) > 0) {
+                $zip_content['xl/comments' . ($i + 1) . '.xml'] = $this->get_writer_part_comments()->write_comments($this->spread_sheet->get_sheet($i));
                 // Media
-                foreach ($this->spreadSheet->getSheet($i)->getComments() as $comment) {
-                    if ($comment->hasBackgroundImage()) {
-                        $image = $comment->getBackgroundImage();
-                        $zipContent['xl/media/' . $image->getMediaFilename()] = $this->processDrawing($image);
+                foreach ($this->spread_sheet->get_sheet($i)->get_comments() as $comment) {
+                    if ($comment->has_background_image()) {
+                        $image = $comment->get_background_image();
+                        $zip_content['xl/media/' . $image->get_media_filename()] = $this->process_drawing($image);
                     }
                 }
             }
-
             // Add unparsed relationship parts
-            if (isset($unparsedSheet['vmlDrawings'])) {
-                foreach ($unparsedSheet['vmlDrawings'] as $vmlDrawing) {
+            if (isset($unparsed_sheet['vmlDrawings'])) {
+                foreach ($unparsed_sheet['vmlDrawings'] as $vml_drawing) {
                     /** @var string[] $vmlDrawing */
-                    if (!isset($zipContent[$vmlDrawing['filePath']])) {
-                        $zipContent[$vmlDrawing['filePath']] = $vmlDrawing['content'];
+                    if (!isset($zip_content[$vml_drawing['filePath']])) {
+                        $zip_content[$vml_drawing['filePath']] = $vml_drawing['content'];
                     }
                 }
             }
-
             // Add header/footer relationship parts
-            if (count($this->spreadSheet->getSheet($i)->getHeaderFooter()->getImages()) > 0) {
+            if (count($this->spread_sheet->get_sheet($i)->get_header_footer()->get_images()) > 0) {
                 // VML Drawings
-                $zipContent['xl/drawings/vmlDrawingHF' . ($i + 1) . '.vml'] = $this->getWriterPartDrawing()->writeVMLHeaderFooterImages($this->spreadSheet->getSheet($i));
-
+                $zip_content['xl/drawings/vmlDrawingHF' . ($i + 1) . '.vml'] = $this->get_writer_part_drawing()->write_vml_header_footer_images($this->spread_sheet->get_sheet($i));
                 // VML Drawing relationships
-                $zipContent['xl/drawings/_rels/vmlDrawingHF' . ($i + 1) . '.vml.rels'] = $this->getWriterPartRels()->writeHeaderFooterDrawingRelationships($this->spreadSheet->getSheet($i));
-
+                $zip_content['xl/drawings/_rels/vmlDrawingHF' . ($i + 1) . '.vml.rels'] = $this->get_writer_part_rels()->write_header_footer_drawing_relationships($this->spread_sheet->get_sheet($i));
                 // Media
-                foreach ($this->spreadSheet->getSheet($i)->getHeaderFooter()->getImages() as $image) {
-                    if ($image->getPath() !== '') {
-                        $zipContent['xl/media/' . $image->getIndexedFilename()] = file_get_contents($image->getPath());
+                foreach ($this->spread_sheet->get_sheet($i)->get_header_footer()->get_images() as $image) {
+                    if ($image->get_path() !== '') {
+                        $zip_content['xl/media/' . $image->get_indexed_filename()] = file_get_contents($image->get_path());
                     }
                 }
             }
-
             // Add Table parts
-            $tables = $this->spreadSheet->getSheet($i)->getTableCollection();
+            $tables = $this->spread_sheet->get_sheet($i)->get_table_collection();
             foreach ($tables as $table) {
-                $zipContent['xl/tables/table' . $tableRef1 . '.xml'] = $this->getWriterPartTable()->writeTable($table, $tableRef1++);
+                $zip_content['xl/tables/table' . $table_ref1 . '.xml'] = $this->get_writer_part_table()->write_table($table, $table_ref1++);
             }
         }
-
         // Add media
-        for ($i = 0; $i < $this->getDrawingHashTable()->count(); ++$i) {
-            if ($this->getDrawingHashTable()->getByIndex($i) instanceof WorksheetDrawing) {
-                $imageContents = null;
-                $imagePath = $this->getDrawingHashTable()->getByIndex($i)->getPath();
-                if ($imagePath === '') {
+        for ($i = 0; $i < $this->get_drawing_hash_table()->count(); ++$i) {
+            if ($this->get_drawing_hash_table()->get_by_index($i) instanceof Worksheet_Drawing) {
+                $image_contents = null;
+                $image_path = $this->get_drawing_hash_table()->get_by_index($i)->get_path();
+                if ($image_path === '') {
                     continue;
                 }
-                if (str_contains($imagePath, 'zip://')) {
-                    $imagePath = substr($imagePath, 6);
-                    $imagePathSplitted = explode('#', $imagePath);
-
-                    $imageZip = new ZipArchive();
-                    $imageZip->open($imagePathSplitted[0]);
-                    $imageContents = $imageZip->getFromName($imagePathSplitted[1]);
-                    $imageZip->close();
-                    unset($imageZip);
+                if (str_contains($image_path, 'zip://')) {
+                    $image_path = substr($image_path, 6);
+                    $image_path_splitted = explode('#', $image_path);
+                    $image_zip = new Zip_Archive();
+                    $image_zip->open($image_path_splitted[0]);
+                    $image_contents = $image_zip->get_from_name($image_path_splitted[1]);
+                    $image_zip->close();
+                    unset($image_zip);
                 } else {
-                    $imageContents = file_get_contents($imagePath);
+                    $image_contents = file_get_contents($image_path);
                 }
-
-                $zipContent['xl/media/' . $this->getDrawingHashTable()->getByIndex($i)->getIndexedFilename()] = $imageContents;
-            } elseif ($this->getDrawingHashTable()->getByIndex($i) instanceof MemoryDrawing) {
+                $zip_content['xl/media/' . $this->get_drawing_hash_table()->get_by_index($i)->get_indexed_filename()] = $image_contents;
+            } elseif ($this->get_drawing_hash_table()->get_by_index($i) instanceof Memory_Drawing) {
                 ob_start();
-                $callable = $this->getDrawingHashTable()->getByIndex($i)->getRenderingFunction();
-                call_user_func(
-                    $callable,
-                    $this->getDrawingHashTable()->getByIndex($i)->getImageResource()
-                );
-                $imageContents = ob_get_contents();
+                $callable = $this->get_drawing_hash_table()->get_by_index($i)->get_rendering_function();
+                call_user_func($callable, $this->get_drawing_hash_table()->get_by_index($i)->get_image_resource());
+                $image_contents = ob_get_contents();
                 ob_end_clean();
-
-                $zipContent['xl/media/' . $this->getDrawingHashTable()->getByIndex($i)->getIndexedFilename()] = $imageContents;
+                $zip_content['xl/media/' . $this->get_drawing_hash_table()->get_by_index($i)->get_indexed_filename()] = $image_contents;
             }
         }
-
         // Add pass-through media files (original media that may not be in the drawing collection)
-        $this->addPassThroughMediaFiles($zipContent); // @phpstan-ignore argument.type
-
-        Functions::setReturnDateType($saveDateReturnType);
-        Calculation::getInstance($this->spreadSheet)->getDebugLog()->setWriteDebugLog($saveDebugLog);
-
-        $this->openFileHandle($filename);
-
-        $this->zip = ZipStream0::newZipStream($this->fileHandle);
-
+        $this->add_pass_through_media_files($zip_content);
+        // @phpstan-ignore argument.type
+        Functions::set_return_date_type($save_date_return_type);
+        Calculation::get_instance($this->spread_sheet)->get_debug_log()->set_write_debug_log($save_debug_log);
+        $this->open_file_handle($filename);
+        $this->zip = Zip_Stream0::new_zip_stream($this->file_handle);
         /** @var string[] $zipContent */
-        $this->addZipFiles($zipContent);
-
+        $this->add_zip_files($zip_content);
         // Close file
         try {
             $this->zip->finish();
         } catch (OverflowException) {
-            throw new WriterException('Could not close resource.');
+            throw new Writer_Exception('Could not close resource.');
         }
-
-        $this->maybeCloseFileHandle();
+        $this->maybe_close_file_handle();
     }
-
     /**
      * Get Spreadsheet object.
      */
-    public function getSpreadsheet(): Spreadsheet
+    public function get_spreadsheet(): Spreadsheet
     {
-        return $this->spreadSheet;
+        return $this->spread_sheet;
     }
-
     /**
      * Set Spreadsheet object.
      *
@@ -619,101 +497,90 @@ class Xlsx extends BaseWriter
      *
      * @return $this
      */
-    public function setSpreadsheet(Spreadsheet $spreadsheet): static
+    public function set_spreadsheet(Spreadsheet $spreadsheet): static
     {
-        $this->spreadSheet = $spreadsheet;
-
+        $this->spread_sheet = $spreadsheet;
         return $this;
     }
-
     /**
      * Get string table.
      *
      * @return string[]
      */
-    public function getStringTable(): array
+    public function get_string_table(): array
     {
-        return $this->stringTable;
+        return $this->string_table;
     }
-
     /**
      * Get Style HashTable.
      *
      * @return HashTable<\PhpOffice\PhpSpreadsheet\Style\Style>
      */
-    public function getStyleHashTable(): HashTable
+    public function get_style_hash_table(): Hash_Table
     {
-        return $this->styleHashTable;
+        return $this->style_hash_table;
     }
-
     /**
      * Get Conditional HashTable.
      *
      * @return HashTable<Conditional>
      */
-    public function getStylesConditionalHashTable(): HashTable
+    public function get_styles_conditional_hash_table(): Hash_Table
     {
-        return $this->stylesConditionalHashTable;
+        return $this->styles_conditional_hash_table;
     }
-
     /**
      * Get Fill HashTable.
      *
      * @return HashTable<Fill>
      */
-    public function getFillHashTable(): HashTable
+    public function get_fill_hash_table(): Hash_Table
     {
-        return $this->fillHashTable;
+        return $this->fill_hash_table;
     }
-
     /**
      * Get \PhpOffice\PhpSpreadsheet\Style\Font HashTable.
      *
      * @return HashTable<Font>
      */
-    public function getFontHashTable(): HashTable
+    public function get_font_hash_table(): Hash_Table
     {
-        return $this->fontHashTable;
+        return $this->font_hash_table;
     }
-
     /**
      * Get Borders HashTable.
      *
      * @return HashTable<Borders>
      */
-    public function getBordersHashTable(): HashTable
+    public function get_borders_hash_table(): Hash_Table
     {
-        return $this->bordersHashTable;
+        return $this->borders_hash_table;
     }
-
     /**
      * Get NumberFormat HashTable.
      *
      * @return HashTable<NumberFormat>
      */
-    public function getNumFmtHashTable(): HashTable
+    public function get_num_fmt_hash_table(): Hash_Table
     {
-        return $this->numFmtHashTable;
+        return $this->num_fmt_hash_table;
     }
-
     /**
      * Get \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet\BaseDrawing HashTable.
      *
      * @return HashTable<BaseDrawing>
      */
-    public function getDrawingHashTable(): HashTable
+    public function get_drawing_hash_table(): Hash_Table
     {
-        return $this->drawingHashTable;
+        return $this->drawing_hash_table;
     }
-
     /**
      * Get Office2003 compatibility.
      */
-    public function getOffice2003Compatibility(): bool
+    public function get_office2003compatibility(): bool
     {
         return $this->office2003compatibility;
     }
-
     /**
      * Set Office2003 compatibility.
      *
@@ -721,44 +588,39 @@ class Xlsx extends BaseWriter
      *
      * @return $this
      */
-    public function setOffice2003Compatibility(bool $office2003compatibility): static
+    public function set_office2003compatibility(bool $office2003compatibility): static
     {
         $this->office2003compatibility = $office2003compatibility;
-
         return $this;
     }
-
     /** @var string[] */
-    private array $pathNames = [];
-
-    private function addZipFile(string $path, string $content): void
+    private array $path_names = [];
+    private function add_zip_file(string $path, string $content): void
     {
-        if (!in_array($path, $this->pathNames)) {
-            $this->pathNames[] = $path;
-            $this->zip->addFile($path, $content);
+        if (!in_array($path, $this->path_names)) {
+            $this->path_names[] = $path;
+            $this->zip->add_file($path, $content);
         }
     }
-
     /** @param string[] $zipContent */
-    private function addZipFiles(array $zipContent): void
+    private function add_zip_files(array $zip_content): void
     {
-        foreach ($zipContent as $path => $content) {
-            $this->addZipFile($path, $content);
+        foreach ($zip_content as $path => $content) {
+            $this->add_zip_file($path, $content);
         }
     }
-
-    private function processDrawing(WorksheetDrawing $drawing): string|null|false
+    private function process_drawing(Worksheet_Drawing $drawing): string|null|false
     {
         $data = null;
-        $filename = $drawing->getPath();
+        $filename = $drawing->get_path();
         if ($filename === '') {
             return null;
         }
-        $imageData = getimagesize($filename);
-
-        if (!empty($imageData)) {
-            switch ($imageData[2]) {
-                case 1: // GIF, not supported by BIFF8, we convert to PNG
+        $image_data = getimagesize($filename);
+        if (!empty($image_data)) {
+            switch ($image_data[2]) {
+                case 1:
+                    // GIF, not supported by BIFF8, we convert to PNG
                     $image = imagecreatefromgif($filename);
                     if ($image !== false) {
                         ob_start();
@@ -766,17 +628,14 @@ class Xlsx extends BaseWriter
                         $data = ob_get_contents();
                         ob_end_clean();
                     }
-
                     break;
-
                 case 2:
-
-                case 3: // JPEG
+                case 3:
+                    // JPEG
                     $data = file_get_contents($filename);
-
                     break;
-
-                case 6: // Windows DIB (BMP), we convert to PNG
+                case 6:
+                    // Windows DIB (BMP), we convert to PNG
                     $image = imagecreatefrombmp($filename);
                     if ($image !== false) {
                         ob_start();
@@ -784,49 +643,40 @@ class Xlsx extends BaseWriter
                         $data = ob_get_contents();
                         ob_end_clean();
                     }
-
                     break;
             }
         }
-
         return $data;
     }
-
-    public function getExplicitStyle0(): bool
+    public function get_explicit_style0(): bool
     {
-        return $this->explicitStyle0;
+        return $this->explicit_style0;
     }
-
     /**
      * This may be useful if non-default Alignment is part of default style
      * and you think you might want to open the spreadsheet
      * with LibreOffice or Gnumeric.
      */
-    public function setExplicitStyle0(bool $explicitStyle0): self
+    public function set_explicit_style0(bool $explicit_style0): self
     {
-        $this->explicitStyle0 = $explicitStyle0;
-
+        $this->explicit_style0 = $explicit_style0;
         return $this;
     }
-
-    public function setUseCSEArrays(?bool $useCSEArrays): void
+    public function set_use_cse_arrays(?bool $use_cse_arrays): void
     {
-        if ($useCSEArrays !== null) {
-            $this->useCSEArrays = $useCSEArrays;
+        if ($use_cse_arrays !== null) {
+            $this->use_cse_arrays = $use_cse_arrays;
         }
-        $this->determineUseDynamicArrays();
+        $this->determine_use_dynamic_arrays();
     }
-
-    public function useDynamicArrays(): bool
+    public function use_dynamic_arrays(): bool
     {
-        return $this->useDynamicArray;
+        return $this->use_dynamic_array;
     }
-
-    private function determineUseDynamicArrays(): void
+    private function determine_use_dynamic_arrays(): void
     {
-        $this->useDynamicArray = $this->preCalculateFormulas && Calculation::getInstance($this->spreadSheet)->getInstanceArrayReturnType() === Calculation::RETURN_ARRAY_AS_ARRAY && !$this->useCSEArrays;
+        $this->use_dynamic_array = $this->pre_calculate_formulas && Calculation::get_instance($this->spread_sheet)->get_instance_array_return_type() === Calculation::RETURN_ARRAY_AS_ARRAY && !$this->use_cse_arrays;
     }
-
     /**
      * If this is set when a spreadsheet is opened,
      * values may not be automatically re-calculated,
@@ -837,13 +687,11 @@ class Xlsx extends BaseWriter
      * cases have been reported where true is required (issue #456).
      * Nevertheless, default is set to false in PhpSpreadsheet 4.0.0.
      */
-    public function setForceFullCalc(?bool $forceFullCalc): self
+    public function set_force_full_calc(?bool $force_full_calc): self
     {
-        $this->forceFullCalc = $forceFullCalc;
-
+        $this->force_full_calc = $force_full_calc;
         return $this;
     }
-
     /**
      * Excel has a nominal width limint of 255 for a column.
      * Surprisingly, Xlsx can read and write larger values,
@@ -855,18 +703,15 @@ class Xlsx extends BaseWriter
      * column widths which it writes to the Excel limit, for formats
      * which allow it to exceed 255.
      */
-    public function setRestrictMaxColumnWidth(bool $restrictMaxColumnWidth): self
+    public function set_restrict_max_column_width(bool $restrict_max_column_width): self
     {
-        $this->restrictMaxColumnWidth = $restrictMaxColumnWidth;
-
+        $this->restrict_max_column_width = $restrict_max_column_width;
         return $this;
     }
-
-    public function getRestrictMaxColumnWidth(): bool
+    public function get_restrict_max_column_width(): bool
     {
-        return $this->restrictMaxColumnWidth;
+        return $this->restrict_max_column_width;
     }
-
     /**
      * Add pass-through media files from original spreadsheet.
      * This copies media files that are referenced in pass-through drawing XML
@@ -874,44 +719,42 @@ class Xlsx extends BaseWriter
      *
      * @param string[] $zipContent
      */
-    private function addPassThroughMediaFiles(array &$zipContent): void
+    private function add_pass_through_media_files(array &$zip_content): void
     {
         /** @var array<string, array<string, mixed>> $sheets */
-        $sheets = $this->spreadSheet->getUnparsedLoadedData()['sheets'] ?? [];
-        foreach ($sheets as $sheetData) {
+        $sheets = $this->spread_sheet->get_unparsed_loaded_data()['sheets'] ?? [];
+        foreach ($sheets as $sheet_data) {
             /** @var string[] $mediaFiles */
-            $mediaFiles = $sheetData['drawingMediaFiles'] ?? [];
+            $media_files = $sheet_data['drawingMediaFiles'] ?? [];
             /** @var ?string $sourceFile */
-            $sourceFile = $sheetData['drawingSourceFile'] ?? null;
-            if (($sheetData['drawingPassThroughEnabled'] ?? false) !== true) {
+            $source_file = $sheet_data['drawingSourceFile'] ?? null;
+            if (($sheet_data['drawingPassThroughEnabled'] ?? false) !== true) {
                 continue;
             }
-            if ($mediaFiles === []) {
+            if ($media_files === []) {
                 continue;
             }
-            if (!is_string($sourceFile)) {
+            if (!is_string($source_file)) {
                 continue;
             }
-            if (!file_exists($sourceFile)) {
+            if (!file_exists($source_file)) {
                 continue;
             }
-
-            $sourceZip = new ZipArchive();
-            if ($sourceZip->open($sourceFile) !== true) {
-                continue; // @codeCoverageIgnore
+            $source_zip = new Zip_Archive();
+            if ($source_zip->open($source_file) !== true) {
+                continue;
+                // @codeCoverageIgnore
             }
-
-            foreach ($mediaFiles as $mediaPath) {
-                $zipPath = 'xl/media/' . basename($mediaPath);
-                if (!isset($zipContent[$zipPath])) {
-                    $mediaContent = $sourceZip->getFromName($mediaPath);
-                    if ($mediaContent !== false) {
-                        $zipContent[$zipPath] = $mediaContent;
+            foreach ($media_files as $media_path) {
+                $zip_path = 'xl/media/' . basename($media_path);
+                if (!isset($zip_content[$zip_path])) {
+                    $media_content = $source_zip->get_from_name($media_path);
+                    if ($media_content !== false) {
+                        $zip_content[$zip_path] = $media_content;
                     }
                 }
             }
-
-            $sourceZip->close();
+            $source_zip->close();
         }
     }
 }

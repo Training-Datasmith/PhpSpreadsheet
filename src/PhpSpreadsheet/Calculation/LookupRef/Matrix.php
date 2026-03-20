@@ -1,38 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Matrix
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * Helper function; NOT an implementation of any Excel Function.
      *
      * @param mixed[] $values
      */
-    public static function isColumnVector(array $values): bool
+    public static function is_column_vector(array $values): bool
     {
-        return count($values, COUNT_RECURSIVE) === (count($values, COUNT_NORMAL) * 2);
+        return count($values, COUNT_RECURSIVE) === count($values, COUNT_NORMAL) * 2;
     }
-
     /**
      * Helper function; NOT an implementation of any Excel Function.
      *
      * @param mixed[] $values
      */
-    public static function isRowVector(array $values): bool
+    public static function is_row_vector(array $values): bool
     {
-        return count($values, COUNT_RECURSIVE) > 1
-            && (count($values, COUNT_NORMAL) === 1 || count($values, COUNT_RECURSIVE) === count($values, COUNT_NORMAL));
+        return count($values, COUNT_RECURSIVE) > 1 && (count($values, COUNT_NORMAL) === 1 || count($values, COUNT_RECURSIVE) === count($values, COUNT_NORMAL));
     }
-
     /**
      * TRANSPOSE.
      *
@@ -40,30 +34,27 @@ class Matrix
      *
      * @return mixed[]
      */
-    public static function transpose($matrixData): array
+    public static function transpose($matrix_data): array
     {
-        $returnMatrix = [];
-        if (!is_array($matrixData)) {
-            $matrixData = [[$matrixData]];
+        $return_matrix = [];
+        if (!is_array($matrix_data)) {
+            $matrix_data = [[$matrix_data]];
         }
-        if (!is_array(end($matrixData))) {
-            $matrixData = [$matrixData];
+        if (!is_array(end($matrix_data))) {
+            $matrix_data = [$matrix_data];
         }
-
         $column = 0;
         /** @var mixed[][] $matrixData */
-        foreach ($matrixData as $matrixRow) {
+        foreach ($matrix_data as $matrix_row) {
             $row = 0;
-            foreach ($matrixRow as $matrixCell) {
-                $returnMatrix[$row][$column] = $matrixCell;
+            foreach ($matrix_row as $matrix_cell) {
+                $return_matrix[$row][$column] = $matrix_cell;
                 ++$row;
             }
             ++$column;
         }
-
-        return $returnMatrix;
+        return $return_matrix;
     }
-
     /**
      * INDEX.
      *
@@ -86,86 +77,74 @@ class Matrix
      *         If an array of values is passed as the $rowNum and/or $columnNum arguments, then the returned result
      *            will also be an array with the same dimensions
      */
-    public static function index(mixed $matrix, mixed $rowNum = 0, mixed $columnNum = null): mixed
+    public static function index(mixed $matrix, mixed $row_num = 0, mixed $column_num = null): mixed
     {
-        if (is_array($rowNum) || is_array($columnNum)) {
-            return self::evaluateArrayArgumentsSubsetFrom([self::class, __FUNCTION__], 1, $matrix, $rowNum, $columnNum);
+        if (is_array($row_num) || is_array($column_num)) {
+            return self::evaluate_array_arguments_subset_from([self::class, __FUNCTION__], 1, $matrix, $row_num, $column_num);
         }
-
-        $rowNum ??= 0;
-        $columnNum ??= 0;
+        $row_num ??= 0;
+        $column_num ??= 0;
         if (is_scalar($matrix)) {
-            if ($rowNum === 0 || $rowNum === 1) {
-                if ($columnNum === 0 || $columnNum === 1) {
-                    if ($columnNum === 1 || $rowNum === 1) {
+            if ($row_num === 0 || $row_num === 1) {
+                if ($column_num === 0 || $column_num === 1) {
+                    if ($column_num === 1 || $row_num === 1) {
                         return $matrix;
                     }
                 }
             }
         }
-
         try {
-            $rowNum = LookupRefValidations::validatePositiveInt($rowNum);
-            $columnNum = LookupRefValidations::validatePositiveInt($columnNum);
+            $row_num = Lookup_Ref_Validations::validate_positive_int($row_num);
+            $column_num = Lookup_Ref_Validations::validate_positive_int($column_num);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (is_array($matrix) && count($matrix) === 1 && $rowNum > 1) {
-            $matrixKey = array_keys($matrix)[0];
-            if (is_array($matrix[$matrixKey])) {
-                $tempMatrix = [];
-                foreach ($matrix[$matrixKey] as $key => $value) {
-                    $tempMatrix[$key] = [$value];
+        if (is_array($matrix) && count($matrix) === 1 && $row_num > 1) {
+            $matrix_key = array_keys($matrix)[0];
+            if (is_array($matrix[$matrix_key])) {
+                $temp_matrix = [];
+                foreach ($matrix[$matrix_key] as $key => $value) {
+                    $temp_matrix[$key] = [$value];
                 }
-                $matrix = $tempMatrix;
+                $matrix = $temp_matrix;
             }
         }
-
-        if (!is_array($matrix) || ($rowNum > count($matrix))) {
-            return ExcelError::REF();
+        if (!is_array($matrix) || $row_num > count($matrix)) {
+            return Excel_Error::REF();
         }
-
-        $rowKeys = array_keys($matrix);
-        $columnKeys = @array_keys($matrix[$rowKeys[0]]); //* @phpstan-ignore-line
-
-        if ($columnNum > count($columnKeys)) {
-            return ExcelError::REF();
+        $row_keys = array_keys($matrix);
+        $column_keys = @array_keys($matrix[$row_keys[0]]);
+        //* @phpstan-ignore-line
+        if ($column_num > count($column_keys)) {
+            return Excel_Error::REF();
         }
-
-        if ($columnNum === 0) {
-            return self::extractRowValue($matrix, $rowKeys, $rowNum);
+        if ($column_num === 0) {
+            return self::extract_row_value($matrix, $row_keys, $row_num);
         }
-
-        $columnNum = $columnKeys[--$columnNum]; //* @phpstan-ignore-line
-        if ($rowNum === 0) {
-            return array_map(
-                fn ($value): array => [$value],
-                array_column($matrix, $columnNum)
-            );
+        $column_num = $column_keys[--$column_num];
+        //* @phpstan-ignore-line
+        if ($row_num === 0) {
+            return array_map(fn($value): array => [$value], array_column($matrix, $column_num));
         }
-        $rowNum = $rowKeys[--$rowNum]; //* @phpstan-ignore-line
+        $row_num = $row_keys[--$row_num];
+        //* @phpstan-ignore-line
         /** @var mixed[][] $matrix */
-
-        return $matrix[$rowNum][$columnNum];
+        return $matrix[$row_num][$column_num];
     }
-
     /**
      * @param mixed[] $matrix
      * @param array<int, int> $rowKeys
      */
-    private static function extractRowValue(array $matrix, array $rowKeys, int $rowNum): mixed
+    private static function extract_row_value(array $matrix, array $row_keys, int $row_num): mixed
     {
-        if ($rowNum === 0) {
+        if ($row_num === 0) {
             return $matrix;
         }
-
-        $rowNum = $rowKeys[--$rowNum];
-        $row = $matrix[$rowNum];
+        $row_num = $row_keys[--$row_num];
+        $row = $matrix[$row_num];
         if (is_array($row)) {
-            return [$rowNum => $row];
+            return [$row_num => $row];
         }
-
         return $row;
     }
 }

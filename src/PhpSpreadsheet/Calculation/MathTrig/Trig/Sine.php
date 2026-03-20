@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Helpers;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Helpers;
 class Sine
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * SIN.
      *
@@ -26,18 +23,15 @@ class Sine
     public static function sin(mixed $angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return sin($angle);
     }
-
     /**
      * SINH.
      *
@@ -52,18 +46,15 @@ class Sine
     public static function sinh(mixed $angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return sinh($angle);
     }
-
     /**
      * ASIN.
      *
@@ -78,18 +69,15 @@ class Sine
     public static function asin($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(asin($number));
+        return Helpers::number_or_nan(asin($number));
     }
-
     /**
      * ASINH.
      *
@@ -104,15 +92,13 @@ class Sine
     public static function asinh($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(asinh($number));
+        return Helpers::number_or_nan(asinh($number));
     }
 }

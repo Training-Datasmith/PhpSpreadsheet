@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class Standardize extends StatisticalValidations
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Standardize extends Statistical_Validations
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * STANDARDIZE.
      *
@@ -28,24 +25,21 @@ class Standardize extends StatisticalValidations
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function execute($value, $mean, $stdDev): array|string|float
+    public static function execute($value, $mean, $std_dev): array|string|float
     {
-        if (is_array($value) || is_array($mean) || is_array($stdDev)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $mean, $stdDev);
+        if (is_array($value) || is_array($mean) || is_array($std_dev)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $mean, $std_dev);
         }
-
         try {
-            $value = self::validateFloat($value);
-            $mean = self::validateFloat($mean);
-            $stdDev = self::validateFloat($stdDev);
+            $value = self::validate_float($value);
+            $mean = self::validate_float($mean);
+            $std_dev = self::validate_float($std_dev);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($stdDev <= 0) {
-            return ExcelError::NAN();
+        if ($std_dev <= 0) {
+            return Excel_Error::NAN();
         }
-
-        return ($value - $mean) / $stdDev;
+        return ($value - $mean) / $std_dev;
     }
 }

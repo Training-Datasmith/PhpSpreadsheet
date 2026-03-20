@@ -1,172 +1,128 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet;
 
-namespace PhpOffice\PhpSpreadsheet;
-
-use PhpOffice\PhpSpreadsheet\Cell\AddressRange;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-
-class CellReferenceHelper
+use Php_Office\Php_Spreadsheet\Cell\Address_Range;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+class Cell_Reference_Helper
 {
-    protected string $beforeCellAddress;
-
-    protected int $beforeColumn;
-
-    protected bool $beforeColumnAbsolute = false;
-
-    protected string $beforeColumnString;
-
-    protected int $beforeRow;
-
-    protected bool $beforeRowAbsolute = false;
-
-    public function __construct(string $beforeCellAddress = 'A1', protected int $numberOfColumns = 0, protected int $numberOfRows = 0)
+    protected string $before_cell_address;
+    protected int $before_column;
+    protected bool $before_column_absolute = false;
+    protected string $before_column_string;
+    protected int $before_row;
+    protected bool $before_row_absolute = false;
+    public function __construct(string $before_cell_address = 'A1', protected int $number_of_columns = 0, protected int $number_of_rows = 0)
     {
-        $this->beforeColumnAbsolute = $beforeCellAddress[0] === '$';
-        $this->beforeRowAbsolute = str_contains(substr($beforeCellAddress, 1), '$');
-        $this->beforeCellAddress = str_replace('$', '', $beforeCellAddress);
-
+        $this->before_column_absolute = $before_cell_address[0] === '$';
+        $this->before_row_absolute = str_contains(substr($before_cell_address, 1), '$');
+        $this->before_cell_address = str_replace('$', '', $before_cell_address);
         // Get coordinate of $beforeCellAddress
-        [$beforeColumn, $beforeRow] = Coordinate::coordinateFromString($beforeCellAddress);
-        $this->beforeColumnString = $beforeColumn;
-        $this->beforeColumn = Coordinate::columnIndexFromString($beforeColumn);
-        $this->beforeRow = (int) $beforeRow;
+        [$before_column, $before_row] = Coordinate::coordinate_from_string($before_cell_address);
+        $this->before_column_string = $before_column;
+        $this->before_column = Coordinate::column_index_from_string($before_column);
+        $this->before_row = (int) $before_row;
     }
-
-    public function beforeCellAddress(): string
+    public function before_cell_address(): string
     {
-        return $this->beforeCellAddress;
+        return $this->before_cell_address;
     }
-
-    public function refreshRequired(string $beforeCellAddress, int $numberOfColumns, int $numberOfRows): bool
+    public function refresh_required(string $before_cell_address, int $number_of_columns, int $number_of_rows): bool
     {
-        return $this->beforeCellAddress !== $beforeCellAddress
-            || $this->numberOfColumns !== $numberOfColumns
-            || $this->numberOfRows !== $numberOfRows;
+        return $this->before_cell_address !== $before_cell_address || $this->number_of_columns !== $number_of_columns || $this->number_of_rows !== $number_of_rows;
     }
-
-    public function updateCellReference(string $cellReference = 'A1', bool $includeAbsoluteReferences = false, bool $onlyAbsoluteReferences = false, ?bool $topLeft = null): string
+    public function update_cell_reference(string $cell_reference = 'A1', bool $include_absolute_references = false, bool $only_absolute_references = false, ?bool $top_left = null): string
     {
-        if (Coordinate::coordinateIsRange($cellReference)) {
+        if (Coordinate::coordinate_is_range($cell_reference)) {
             throw new Exception('Only single cell references may be passed to this method.');
         }
-
         // Get coordinate of $cellReference
-        [$newColumn, $newRow] = Coordinate::coordinateFromString($cellReference);
-        $newColumnIndex = Coordinate::columnIndexFromString(str_replace('$', '', $newColumn));
-        $newRowIndex = (int) str_replace('$', '', $newRow);
-
-        $absoluteColumn = $newColumn[0] === '$' ? '$' : '';
-        $absoluteRow = $newRow[0] === '$' ? '$' : '';
+        [$new_column, $new_row] = Coordinate::coordinate_from_string($cell_reference);
+        $new_column_index = Coordinate::column_index_from_string(str_replace('$', '', $new_column));
+        $new_row_index = (int) str_replace('$', '', $new_row);
+        $absolute_column = $new_column[0] === '$' ? '$' : '';
+        $absolute_row = $new_row[0] === '$' ? '$' : '';
         // Verify which parts should be updated
-        if ($onlyAbsoluteReferences === true) {
-            $updateColumn = (($absoluteColumn === '$') && $newColumnIndex >= $this->beforeColumn);
-            $updateRow = (($absoluteRow === '$') && $newRowIndex >= $this->beforeRow);
-        } elseif ($includeAbsoluteReferences === false) {
-            $updateColumn = (($absoluteColumn !== '$') && $newColumnIndex >= $this->beforeColumn);
-            $updateRow = (($absoluteRow !== '$') && $newRowIndex >= $this->beforeRow);
+        if ($only_absolute_references === true) {
+            $update_column = $absolute_column === '$' && $new_column_index >= $this->before_column;
+            $update_row = $absolute_row === '$' && $new_row_index >= $this->before_row;
+        } elseif ($include_absolute_references === false) {
+            $update_column = $absolute_column !== '$' && $new_column_index >= $this->before_column;
+            $update_row = $absolute_row !== '$' && $new_row_index >= $this->before_row;
         } else {
-            $newColumnIndex = $this->computeNewColumnIndex($newColumnIndex, $topLeft);
-            $newColumn = $absoluteColumn . Coordinate::stringFromColumnIndex($newColumnIndex);
-            $updateColumn = false;
-
-            $newRowIndex = $this->computeNewRowIndex($newRowIndex, $topLeft);
-            $newRow = $absoluteRow . $newRowIndex;
-            $updateRow = false;
+            $new_column_index = $this->compute_new_column_index($new_column_index, $top_left);
+            $new_column = $absolute_column . Coordinate::string_from_column_index($new_column_index);
+            $update_column = false;
+            $new_row_index = $this->compute_new_row_index($new_row_index, $top_left);
+            $new_row = $absolute_row . $new_row_index;
+            $update_row = false;
         }
-
         // Create new column reference
-        if ($updateColumn) {
-            $newColumn = $this->updateColumnReference($newColumnIndex, $absoluteColumn);
+        if ($update_column) {
+            $new_column = $this->update_column_reference($new_column_index, $absolute_column);
         }
-
         // Create new row reference
-        if ($updateRow) {
-            $newRow = $this->updateRowReference($newRowIndex, $absoluteRow);
+        if ($update_row) {
+            $new_row = $this->update_row_reference($new_row_index, $absolute_row);
         }
-
         // Return new reference
-        return "{$newColumn}{$newRow}";
+        return "{$new_column}{$new_row}";
     }
-
-    public function computeNewColumnIndex(int $newColumnIndex, ?bool $topLeft): int
+    public function compute_new_column_index(int $new_column_index, ?bool $top_left): int
     {
         // A special case is removing the left/top or bottom/right edge of a range
         // $topLeft is null if we aren't adjusting a range at all.
-        if (
-            $topLeft !== null
-            && $this->numberOfColumns < 0
-            && $newColumnIndex >= $this->beforeColumn + $this->numberOfColumns
-            && $newColumnIndex <= $this->beforeColumn - 1
-        ) {
-            if ($topLeft) {
-                $newColumnIndex = $this->beforeColumn + $this->numberOfColumns;
+        if ($top_left !== null && $this->number_of_columns < 0 && $new_column_index >= $this->before_column + $this->number_of_columns && $new_column_index <= $this->before_column - 1) {
+            if ($top_left) {
+                $new_column_index = $this->before_column + $this->number_of_columns;
             } else {
-                $newColumnIndex = $this->beforeColumn + $this->numberOfColumns - 1;
+                $new_column_index = $this->before_column + $this->number_of_columns - 1;
             }
-        } elseif ($newColumnIndex >= $this->beforeColumn) {
+        } elseif ($new_column_index >= $this->before_column) {
             // Create new column reference
-            $newColumnIndex += $this->numberOfColumns;
+            $new_column_index += $this->number_of_columns;
         }
-
-        return $newColumnIndex;
+        return $new_column_index;
     }
-
-    public function computeNewRowIndex(int $newRowIndex, ?bool $topLeft): int
+    public function compute_new_row_index(int $new_row_index, ?bool $top_left): int
     {
         // A special case is removing the left/top or bottom/right edge of a range
         // $topLeft is null if we aren't adjusting a range at all.
-        if (
-            $topLeft !== null
-            && $this->numberOfRows < 0
-            && $newRowIndex >= $this->beforeRow + $this->numberOfRows
-            && $newRowIndex <= $this->beforeRow - 1
-        ) {
-            if ($topLeft) {
-                $newRowIndex = $this->beforeRow + $this->numberOfRows;
+        if ($top_left !== null && $this->number_of_rows < 0 && $new_row_index >= $this->before_row + $this->number_of_rows && $new_row_index <= $this->before_row - 1) {
+            if ($top_left) {
+                $new_row_index = $this->before_row + $this->number_of_rows;
             } else {
-                $newRowIndex = $this->beforeRow + $this->numberOfRows - 1;
+                $new_row_index = $this->before_row + $this->number_of_rows - 1;
             }
-        } elseif ($newRowIndex >= $this->beforeRow) {
-            $newRowIndex = $newRowIndex + $this->numberOfRows;
+        } elseif ($new_row_index >= $this->before_row) {
+            $new_row_index = $new_row_index + $this->number_of_rows;
         }
-
-        return $newRowIndex;
+        return $new_row_index;
     }
-
-    public function cellAddressInDeleteRange(string $cellAddress): bool
+    public function cell_address_in_delete_range(string $cell_address): bool
     {
-        [$cellColumn, $cellRow] = Coordinate::coordinateFromString($cellAddress);
-        $cellColumnIndex = Coordinate::columnIndexFromString($cellColumn);
+        [$cell_column, $cell_row] = Coordinate::coordinate_from_string($cell_address);
+        $cell_column_index = Coordinate::column_index_from_string($cell_column);
         //    Is cell within the range of rows/columns if we're deleting
-        if ($this->numberOfRows < 0
-        && ($cellRow >= ($this->beforeRow + $this->numberOfRows))
-        && ($cellRow < $this->beforeRow)) {
+        if ($this->number_of_rows < 0 && $cell_row >= $this->before_row + $this->number_of_rows && $cell_row < $this->before_row) {
             return true;
         }
         //    Is cell within the range of rows/columns if we're deleting
-        if ($this->numberOfColumns < 0
-        && ($cellColumnIndex >= ($this->beforeColumn + $this->numberOfColumns))
-        && ($cellColumnIndex < $this->beforeColumn)) {
+        if ($this->number_of_columns < 0 && $cell_column_index >= $this->before_column + $this->number_of_columns && $cell_column_index < $this->before_column) {
             return true;
         }
-
         return false;
     }
-
-    protected function updateColumnReference(int $newColumnIndex, string $absoluteColumn): string
+    protected function update_column_reference(int $new_column_index, string $absolute_column): string
     {
-        $newColumn = Coordinate::stringFromColumnIndex(min($newColumnIndex + $this->numberOfColumns, AddressRange::MAX_COLUMN_INT));
-
-        return "{$absoluteColumn}{$newColumn}";
+        $new_column = Coordinate::string_from_column_index(min($new_column_index + $this->number_of_columns, Address_Range::MAX_COLUMN_INT));
+        return "{$absolute_column}{$new_column}";
     }
-
-    protected function updateRowReference(int $newRowIndex, string $absoluteRow): string
+    protected function update_row_reference(int $new_row_index, string $absolute_row): string
     {
-        $newRow = $newRowIndex + $this->numberOfRows;
-        $newRow = ($newRow > AddressRange::MAX_ROW) ? AddressRange::MAX_ROW : $newRow;
-
-        return "{$absoluteRow}{$newRow}";
+        $new_row = $new_row_index + $this->number_of_rows;
+        $new_row = $new_row > Address_Range::MAX_ROW ? Address_Range::MAX_ROW : $new_row;
+        return "{$absolute_row}{$new_row}";
     }
 }

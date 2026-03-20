@@ -1,39 +1,26 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format\Wizard;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard;
-
-use NumberFormatter;
-use PhpOffice\PhpSpreadsheet\Exception;
-
-class CurrencyBase extends Number
+use Number_Formatter;
+use Php_Office\Php_Spreadsheet\Exception;
+class Currency_Base extends Number
 {
     public const LEADING_SYMBOL = true;
-
     public const TRAILING_SYMBOL = false;
-
     public const SYMBOL_WITH_SPACING = true;
-
     public const SYMBOL_WITHOUT_SPACING = false;
-
-    protected string $currencyCode = '$';
-
-    protected bool $currencySymbolPosition = self::LEADING_SYMBOL;
-
-    protected bool $currencySymbolSpacing = self::SYMBOL_WITHOUT_SPACING;
-
+    protected string $currency_code = '$';
+    protected bool $currency_symbol_position = self::LEADING_SYMBOL;
+    protected bool $currency_symbol_spacing = self::SYMBOL_WITHOUT_SPACING;
     protected const DEFAULT_STRIP_LEADING_RLM = false;
-
-    public const DEFAULT_NEGATIVE = CurrencyNegative::minus;
-
-    protected ?bool $overrideSpacing = null;
-
-    protected ?CurrencyNegative $overrideNegative = null;
-
+    public const DEFAULT_NEGATIVE = Currency_Negative::minus;
+    protected ?bool $override_spacing = null;
+    protected ?Currency_Negative $override_negative = null;
     // Not sure why original code uses nbsp
-    private string $spaceOrNbsp = ' '; // or "\u{a0}"
-
+    private string $space_or_nbsp = ' ';
+    // or "\u{a0}"
     /**
      * @param string $currencyCode the currency symbol or code to display for this mask
      * @param int $decimals number of decimal places to display, in the range 0-30
@@ -55,178 +42,157 @@ class CurrencyBase extends Number
      *
      * @throws Exception If a provided locale code is not a valid format
      */
-    public function __construct(
-        string $currencyCode = '$',
-        int $decimals = 2,
-        bool $thousandsSeparator = true,
-        bool $currencySymbolPosition = self::LEADING_SYMBOL,
-        bool $currencySymbolSpacing = self::SYMBOL_WITHOUT_SPACING,
-        ?string $locale = null,
-        protected bool $stripLeadingRLM = self::DEFAULT_STRIP_LEADING_RLM,
-        protected CurrencyNegative $negative = CurrencyNegative::minus
-    ) {
-        $this->setCurrencyCode($currencyCode);
-        $this->setThousandsSeparator($thousandsSeparator);
-        $this->setDecimals($decimals);
-        $this->setCurrencySymbolPosition($currencySymbolPosition);
-        $this->setCurrencySymbolSpacing($currencySymbolSpacing);
-        $this->setLocale($locale);
-    }
-
-    public function setCurrencyCode(string $currencyCode): void
+    public function __construct(string $currency_code = '$', int $decimals = 2, bool $thousands_separator = true, bool $currency_symbol_position = self::LEADING_SYMBOL, bool $currency_symbol_spacing = self::SYMBOL_WITHOUT_SPACING, ?string $locale = null, protected bool $strip_leading_rlm = self::DEFAULT_STRIP_LEADING_RLM, protected Currency_Negative $negative = Currency_Negative::minus)
     {
-        $this->currencyCode = $currencyCode;
+        $this->set_currency_code($currency_code);
+        $this->set_thousands_separator($thousands_separator);
+        $this->set_decimals($decimals);
+        $this->set_currency_symbol_position($currency_symbol_position);
+        $this->set_currency_symbol_spacing($currency_symbol_spacing);
+        $this->set_locale($locale);
     }
-
-    public function setCurrencySymbolPosition(bool $currencySymbolPosition = self::LEADING_SYMBOL): void
+    public function set_currency_code(string $currency_code): void
     {
-        $this->currencySymbolPosition = $currencySymbolPosition;
+        $this->currency_code = $currency_code;
     }
-
-    public function setCurrencySymbolSpacing(bool $currencySymbolSpacing = self::SYMBOL_WITHOUT_SPACING): void
+    public function set_currency_symbol_position(bool $currency_symbol_position = self::LEADING_SYMBOL): void
     {
-        $this->currencySymbolSpacing = $currencySymbolSpacing;
+        $this->currency_symbol_position = $currency_symbol_position;
     }
-
-    public function setStripLeadingRLM(bool $stripLeadingRLM): void
+    public function set_currency_symbol_spacing(bool $currency_symbol_spacing = self::SYMBOL_WITHOUT_SPACING): void
     {
-        $this->stripLeadingRLM = $stripLeadingRLM;
+        $this->currency_symbol_spacing = $currency_symbol_spacing;
     }
-
-    public function setNegative(CurrencyNegative $negative): void
+    public function set_strip_leading_rlm(bool $strip_leading_rlm): void
+    {
+        $this->strip_leading_rlm = $strip_leading_rlm;
+    }
+    public function set_negative(Currency_Negative $negative): void
     {
         $this->negative = $negative;
     }
-
-    protected function getLocaleFormat(): string
+    protected function get_locale_format(): string
     {
-        $formatter = new Locale($this->fullLocale, NumberFormatter::CURRENCY);
-        $mask = $formatter->format($this->stripLeadingRLM);
+        $formatter = new Locale($this->full_locale, Number_Formatter::CURRENCY);
+        $mask = $formatter->format($this->strip_leading_rlm);
         if ($this->decimals === 0) {
             $mask = (string) preg_replace('/\.0+/miu', '', $mask);
         }
-
-        return str_replace('¤', $this->formatCurrencyCode(), $mask);
+        return str_replace('¤', $this->format_currency_code(), $mask);
     }
-
-    private function formatCurrencyCode(): string
+    private function format_currency_code(): string
     {
         if ($this->locale === null) {
-            return $this->currencyCode;
+            return $this->currency_code;
         }
-
-        return "[\${$this->currencyCode}-{$this->locale}]";
+        return "[\${$this->currency_code}-{$this->locale}]";
     }
-
     public function format(): string
     {
-        if ($this->localeFormat !== null) {
-            return $this->localeFormat;
+        if ($this->locale_format !== null) {
+            return $this->locale_format;
         }
-        $symbolWithSpacing = $this->overrideSpacing ?? ($this->currencySymbolSpacing === self::SYMBOL_WITH_SPACING);
-        $negative = $this->overrideNegative ?? $this->negative;
-
+        $symbol_with_spacing = $this->override_spacing ?? $this->currency_symbol_spacing === self::SYMBOL_WITH_SPACING;
+        $negative = $this->override_negative ?? $this->negative;
         // format if positive
         $format = '_(';
-        if ($this->currencySymbolPosition === self::LEADING_SYMBOL) {
-            $format .= '"' . $this->currencyCode . '"';
-            if (preg_match('/^[A-Z]{3}$/i', $this->currencyCode) === 1) {
-                $format .= $this->spaceOrNbsp;
+        if ($this->currency_symbol_position === self::LEADING_SYMBOL) {
+            $format .= '"' . $this->currency_code . '"';
+            if (preg_match('/^[A-Z]{3}$/i', $this->currency_code) === 1) {
+                $format .= $this->space_or_nbsp;
             }
-            if (preg_match('/^[A-Z]{3}$/i', $this->currencyCode) === 1) {
-                $format .= $this->spaceOrNbsp;
+            if (preg_match('/^[A-Z]{3}$/i', $this->currency_code) === 1) {
+                $format .= $this->space_or_nbsp;
             }
-            if ($symbolWithSpacing) {
-                $format .= '*' . $this->spaceOrNbsp;
+            if ($symbol_with_spacing) {
+                $format .= '*' . $this->space_or_nbsp;
             }
         }
-        $format .= $this->thousandsSeparator ? '#,##0' : '0';
+        $format .= $this->thousands_separator ? '#,##0' : '0';
         if ($this->decimals > 0) {
             $format .= '.' . str_repeat('0', $this->decimals);
         }
-        if ($this->currencySymbolPosition === self::TRAILING_SYMBOL) {
-            if ($symbolWithSpacing) {
-                $format .= $this->spaceOrNbsp;
-            } elseif (preg_match('/^[A-Z]{3}$/i', $this->currencyCode) === 1) {
-                $format .= $this->spaceOrNbsp;
+        if ($this->currency_symbol_position === self::TRAILING_SYMBOL) {
+            if ($symbol_with_spacing) {
+                $format .= $this->space_or_nbsp;
+            } elseif (preg_match('/^[A-Z]{3}$/i', $this->currency_code) === 1) {
+                $format .= $this->space_or_nbsp;
             }
-            $format .= '[$' . $this->currencyCode . ']';
+            $format .= '[$' . $this->currency_code . ']';
         }
         $format .= '_)';
-
         // format if negative
         $format .= ';_(';
         $format .= $negative->color();
-        $negativeStart = $negative->start();
-        if ($this->currencySymbolPosition === self::LEADING_SYMBOL) {
-            if ($negativeStart === '-' && !$symbolWithSpacing) {
-                $format .= $negativeStart;
+        $negative_start = $negative->start();
+        if ($this->currency_symbol_position === self::LEADING_SYMBOL) {
+            if ($negative_start === '-' && !$symbol_with_spacing) {
+                $format .= $negative_start;
             }
-            $format .= '"' . $this->currencyCode . '"';
-            if (preg_match('/^[A-Z]{3}$/i', $this->currencyCode) === 1) {
-                $format .= $this->spaceOrNbsp;
+            $format .= '"' . $this->currency_code . '"';
+            if (preg_match('/^[A-Z]{3}$/i', $this->currency_code) === 1) {
+                $format .= $this->space_or_nbsp;
             }
-            if ($symbolWithSpacing) {
-                $format .= '*' . $this->spaceOrNbsp;
+            if ($symbol_with_spacing) {
+                $format .= '*' . $this->space_or_nbsp;
             }
-            if ($negativeStart === '\(' || ($symbolWithSpacing && $negativeStart === '-')) {
-                $format .= $negativeStart;
+            if ($negative_start === '\(' || $symbol_with_spacing && $negative_start === '-') {
+                $format .= $negative_start;
             }
         } else {
             $format .= $negative->start();
         }
-        $format .= $this->thousandsSeparator ? '#,##0' : '0';
+        $format .= $this->thousands_separator ? '#,##0' : '0';
         if ($this->decimals > 0) {
             $format .= '.' . str_repeat('0', $this->decimals);
         }
         $format .= $negative->end();
-        if ($this->currencySymbolPosition === self::TRAILING_SYMBOL) {
-            if ($symbolWithSpacing) {
+        if ($this->currency_symbol_position === self::TRAILING_SYMBOL) {
+            if ($symbol_with_spacing) {
                 // Do nothing - I can't figure out how to get
                 // everything to align if I put any kind of space here.
                 //$format .= "\u{2009}";
-            } elseif (preg_match('/^[A-Z]{3}$/i', $this->currencyCode) === 1) {
-                $format .= $this->spaceOrNbsp;
+            } elseif (preg_match('/^[A-Z]{3}$/i', $this->currency_code) === 1) {
+                $format .= $this->space_or_nbsp;
             }
-            $format .= '[$' . $this->currencyCode . ']';
+            $format .= '[$' . $this->currency_code . ']';
         }
-        if ($this->currencySymbolPosition === self::TRAILING_SYMBOL) {
+        if ($this->currency_symbol_position === self::TRAILING_SYMBOL) {
             $format .= '_)';
-        } elseif ($symbolWithSpacing && $negativeStart === '-') {
+        } elseif ($symbol_with_spacing && $negative_start === '-') {
             $format .= ' ';
         }
         // format if zero
         $format .= ';_(';
-        if ($this->currencySymbolPosition === self::LEADING_SYMBOL) {
-            $format .= '"' . $this->currencyCode . '"';
+        if ($this->currency_symbol_position === self::LEADING_SYMBOL) {
+            $format .= '"' . $this->currency_code . '"';
         }
-        if ($symbolWithSpacing) {
-            if ($this->currencySymbolPosition === self::LEADING_SYMBOL) {
-                $format .= '*' . $this->spaceOrNbsp;
+        if ($symbol_with_spacing) {
+            if ($this->currency_symbol_position === self::LEADING_SYMBOL) {
+                $format .= '*' . $this->space_or_nbsp;
             }
             $format .= '"-"';
             if ($this->decimals > 0) {
                 $format .= str_repeat('?', $this->decimals);
             }
         } else {
-            if (preg_match('/^[A-Z]{3}$/i', $this->currencyCode) === 1) {
-                $format .= $this->spaceOrNbsp;
+            if (preg_match('/^[A-Z]{3}$/i', $this->currency_code) === 1) {
+                $format .= $this->space_or_nbsp;
             }
             $format .= '0';
             if ($this->decimals > 0) {
                 $format .= '.' . str_repeat('0', $this->decimals);
             }
         }
-        if ($this->currencySymbolPosition === self::TRAILING_SYMBOL) {
-            if ($symbolWithSpacing) {
-                $format .= $this->spaceOrNbsp;
+        if ($this->currency_symbol_position === self::TRAILING_SYMBOL) {
+            if ($symbol_with_spacing) {
+                $format .= $this->space_or_nbsp;
             }
-            $format .= '[$' . $this->currencyCode . ']';
+            $format .= '[$' . $this->currency_code . ']';
         }
         $format .= '_)';
         // format if text
         $format .= ';_(@_)';
-
         return $format;
     }
 }

@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ConvertUOM
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Convert_Uom
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     public const CATEGORY_WEIGHT_AND_MASS = 'Weight and Mass';
     public const CATEGORY_DISTANCE = 'Distance';
     public const CATEGORY_TIME = 'Time';
@@ -25,13 +22,12 @@ class ConvertUOM
     public const CATEGORY_AREA = 'Area';
     public const CATEGORY_INFORMATION = 'Information';
     public const CATEGORY_SPEED = 'Speed';
-
     /**
      * Details of the Units of measure that can be used in CONVERTUOM().
      *
      * @var array<string, array{Group: string, UnitName: string, AllowPrefix: bool}>
      */
-    private static array $conversionUnits = [
+    private static array $conversion_units = [
         // Weight and Mass
         'g' => ['Group' => self::CATEGORY_WEIGHT_AND_MASS, 'UnitName' => 'Gram', 'AllowPrefix' => true],
         'sg' => ['Group' => self::CATEGORY_WEIGHT_AND_MASS, 'UnitName' => 'Slug', 'AllowPrefix' => false],
@@ -199,257 +195,63 @@ class ConvertUOM
         'admkn' => ['Group' => self::CATEGORY_SPEED, 'UnitName' => 'Admiralty Knot', 'AllowPrefix' => false],
         'kn' => ['Group' => self::CATEGORY_SPEED, 'UnitName' => 'Knot', 'AllowPrefix' => false],
     ];
-
     /**
      * Details of the Multiplier prefixes that can be used with Units of Measure in CONVERTUOM().
      *
      * @var array<string, array{multiplier: float, name: string}>
      */
-    private static array $conversionMultipliers = [
-        'Y' => ['multiplier' => 1E24, 'name' => 'yotta'],
-        'Z' => ['multiplier' => 1E21, 'name' => 'zetta'],
-        'E' => ['multiplier' => 1E18, 'name' => 'exa'],
-        'P' => ['multiplier' => 1E15, 'name' => 'peta'],
-        'T' => ['multiplier' => 1E12, 'name' => 'tera'],
-        'G' => ['multiplier' => 1E9, 'name' => 'giga'],
-        'M' => ['multiplier' => 1E6, 'name' => 'mega'],
-        'k' => ['multiplier' => 1E3, 'name' => 'kilo'],
-        'h' => ['multiplier' => 1E2, 'name' => 'hecto'],
-        'e' => ['multiplier' => 1E1, 'name' => 'dekao'],
-        'da' => ['multiplier' => 1E1, 'name' => 'dekao'],
-        'd' => ['multiplier' => 1E-1, 'name' => 'deci'],
-        'c' => ['multiplier' => 1E-2, 'name' => 'centi'],
-        'm' => ['multiplier' => 1E-3, 'name' => 'milli'],
-        'u' => ['multiplier' => 1E-6, 'name' => 'micro'],
-        'n' => ['multiplier' => 1E-9, 'name' => 'nano'],
-        'p' => ['multiplier' => 1E-12, 'name' => 'pico'],
-        'f' => ['multiplier' => 1E-15, 'name' => 'femto'],
-        'a' => ['multiplier' => 1E-18, 'name' => 'atto'],
-        'z' => ['multiplier' => 1E-21, 'name' => 'zepto'],
-        'y' => ['multiplier' => 1E-24, 'name' => 'yocto'],
-    ];
-
+    private static array $conversion_multipliers = ['Y' => ['multiplier' => 1.0E+24, 'name' => 'yotta'], 'Z' => ['multiplier' => 1.0E+21, 'name' => 'zetta'], 'E' => ['multiplier' => 1.0E+18, 'name' => 'exa'], 'P' => ['multiplier' => 1000000000000000.0, 'name' => 'peta'], 'T' => ['multiplier' => 1000000000000.0, 'name' => 'tera'], 'G' => ['multiplier' => 1000000000.0, 'name' => 'giga'], 'M' => ['multiplier' => 1000000.0, 'name' => 'mega'], 'k' => ['multiplier' => 1000.0, 'name' => 'kilo'], 'h' => ['multiplier' => 100.0, 'name' => 'hecto'], 'e' => ['multiplier' => 10.0, 'name' => 'dekao'], 'da' => ['multiplier' => 10.0, 'name' => 'dekao'], 'd' => ['multiplier' => 0.1, 'name' => 'deci'], 'c' => ['multiplier' => 0.01, 'name' => 'centi'], 'm' => ['multiplier' => 0.001, 'name' => 'milli'], 'u' => ['multiplier' => 1.0E-6, 'name' => 'micro'], 'n' => ['multiplier' => 1.0E-9, 'name' => 'nano'], 'p' => ['multiplier' => 1.0E-12, 'name' => 'pico'], 'f' => ['multiplier' => 1.0E-15, 'name' => 'femto'], 'a' => ['multiplier' => 1.0E-18, 'name' => 'atto'], 'z' => ['multiplier' => 9.999999999999999E-22, 'name' => 'zepto'], 'y' => ['multiplier' => 9.999999999999999E-25, 'name' => 'yocto']];
     /**
      * Details of the Multiplier prefixes that can be used with Units of Measure in CONVERTUOM().
      *
      * @var array<string, array{multiplier: float|int, name: string}>
      */
-    private static array $binaryConversionMultipliers = [
-        'Yi' => ['multiplier' => 2 ** 80, 'name' => 'yobi'],
-        'Zi' => ['multiplier' => 2 ** 70, 'name' => 'zebi'],
-        'Ei' => ['multiplier' => 2 ** 60, 'name' => 'exbi'],
-        'Pi' => ['multiplier' => 2 ** 50, 'name' => 'pebi'],
-        'Ti' => ['multiplier' => 2 ** 40, 'name' => 'tebi'],
-        'Gi' => ['multiplier' => 2 ** 30, 'name' => 'gibi'],
-        'Mi' => ['multiplier' => 2 ** 20, 'name' => 'mebi'],
-        'ki' => ['multiplier' => 2 ** 10, 'name' => 'kibi'],
-    ];
-
+    private static array $binary_conversion_multipliers = ['Yi' => ['multiplier' => 2 ** 80, 'name' => 'yobi'], 'Zi' => ['multiplier' => 2 ** 70, 'name' => 'zebi'], 'Ei' => ['multiplier' => 2 ** 60, 'name' => 'exbi'], 'Pi' => ['multiplier' => 2 ** 50, 'name' => 'pebi'], 'Ti' => ['multiplier' => 2 ** 40, 'name' => 'tebi'], 'Gi' => ['multiplier' => 2 ** 30, 'name' => 'gibi'], 'Mi' => ['multiplier' => 2 ** 20, 'name' => 'mebi'], 'ki' => ['multiplier' => 2 ** 10, 'name' => 'kibi']];
     /**
      * Details of the Units of measure conversion factors, organised by group.
      *
      * @var array<string, array<string, float>>
      */
-    private static array $unitConversions = [
+    private static array $unit_conversions = [
         // Conversion uses gram (g) as an intermediate unit
-        self::CATEGORY_WEIGHT_AND_MASS => [
-            'g' => 1.0,
-            'sg' => 6.85217658567918E-05,
-            'lbm' => 2.20462262184878E-03,
-            'u' => 6.02214179421676E+23,
-            'ozm' => 3.52739619495804E-02,
-            'grain' => 1.54323583529414E+01,
-            'cwt' => 2.20462262184878E-05,
-            'shweight' => 2.20462262184878E-05,
-            'uk_cwt' => 1.96841305522212E-05,
-            'lcwt' => 1.96841305522212E-05,
-            'hweight' => 1.96841305522212E-05,
-            'stone' => 1.57473044417770E-04,
-            'ton' => 1.10231131092439E-06,
-            'uk_ton' => 9.84206527611061E-07,
-            'LTON' => 9.84206527611061E-07,
-            'brton' => 9.84206527611061E-07,
-        ],
+        self::CATEGORY_WEIGHT_AND_MASS => ['g' => 1.0, 'sg' => 6.852176585679181E-5, 'lbm' => 0.00220462262184878, 'u' => 6.02214179421676E+23, 'ozm' => 0.0352739619495804, 'grain' => 15.4323583529414, 'cwt' => 2.20462262184878E-5, 'shweight' => 2.20462262184878E-5, 'uk_cwt' => 1.96841305522212E-5, 'lcwt' => 1.96841305522212E-5, 'hweight' => 1.96841305522212E-5, 'stone' => 0.00015747304441777, 'ton' => 1.10231131092439E-6, 'uk_ton' => 9.842065276110609E-7, 'LTON' => 9.842065276110609E-7, 'brton' => 9.842065276110609E-7],
         // Conversion uses meter (m) as an intermediate unit
-        self::CATEGORY_DISTANCE => [
-            'm' => 1.0,
-            'mi' => 6.21371192237334E-04,
-            'Nmi' => 5.39956803455724E-04,
-            'in' => 3.93700787401575E+01,
-            'ft' => 3.28083989501312E+00,
-            'yd' => 1.09361329833771E+00,
-            'ang' => 1.0E+10,
-            'ell' => 8.74890638670166E-01,
-            'ly' => 1.05700083402462E-16,
-            'parsec' => 3.24077928966473E-17,
-            'pc' => 3.24077928966473E-17,
-            'Pica' => 2.83464566929134E+03,
-            'Picapt' => 2.83464566929134E+03,
-            'pica' => 2.36220472440945E+02,
-            'survey_mi' => 6.21369949494950E-04,
-        ],
+        self::CATEGORY_DISTANCE => ['m' => 1.0, 'mi' => 0.000621371192237334, 'Nmi' => 0.000539956803455724, 'in' => 39.3700787401575, 'ft' => 3.28083989501312, 'yd' => 1.09361329833771, 'ang' => 10000000000.0, 'ell' => 0.874890638670166, 'ly' => 1.05700083402462E-16, 'parsec' => 3.24077928966473E-17, 'pc' => 3.24077928966473E-17, 'Pica' => 2834.64566929134, 'Picapt' => 2834.64566929134, 'pica' => 236.220472440945, 'survey_mi' => 0.00062136994949495],
         // Conversion uses second (s) as an intermediate unit
-        self::CATEGORY_TIME => [
-            'yr' => 3.16880878140289E-08,
-            'day' => 1.15740740740741E-05,
-            'd' => 1.15740740740741E-05,
-            'hr' => 2.77777777777778E-04,
-            'mn' => 1.66666666666667E-02,
-            'min' => 1.66666666666667E-02,
-            'sec' => 1.0,
-            's' => 1.0,
-        ],
+        self::CATEGORY_TIME => ['yr' => 3.16880878140289E-8, 'day' => 1.15740740740741E-5, 'd' => 1.15740740740741E-5, 'hr' => 0.000277777777777778, 'mn' => 0.0166666666666667, 'min' => 0.0166666666666667, 'sec' => 1.0, 's' => 1.0],
         // Conversion uses Pascal (Pa) as an intermediate unit
-        self::CATEGORY_PRESSURE => [
-            'Pa' => 1.0,
-            'p' => 1.0,
-            'atm' => 9.86923266716013E-06,
-            'at' => 9.86923266716013E-06,
-            'mmHg' => 7.50063755419211E-03,
-            'psi' => 1.45037737730209E-04,
-            'Torr' => 7.50061682704170E-03,
-        ],
+        self::CATEGORY_PRESSURE => ['Pa' => 1.0, 'p' => 1.0, 'atm' => 9.86923266716013E-6, 'at' => 9.86923266716013E-6, 'mmHg' => 0.00750063755419211, 'psi' => 0.000145037737730209, 'Torr' => 0.0075006168270417],
         // Conversion uses Newton (N) as an intermediate unit
-        self::CATEGORY_FORCE => [
-            'N' => 1.0,
-            'dyn' => 1.0E+5,
-            'dy' => 1.0E+5,
-            'lbf' => 2.24808923655339E-01,
-            'pond' => 1.01971621297793E+02,
-        ],
+        self::CATEGORY_FORCE => ['N' => 1.0, 'dyn' => 100000.0, 'dy' => 100000.0, 'lbf' => 0.224808923655339, 'pond' => 101.971621297793],
         // Conversion uses Joule (J) as an intermediate unit
-        self::CATEGORY_ENERGY => [
-            'J' => 1.0,
-            'e' => 9.99999519343231E+06,
-            'c' => 2.39006249473467E-01,
-            'cal' => 2.38846190642017E-01,
-            'eV' => 6.24145700000000E+18,
-            'ev' => 6.24145700000000E+18,
-            'HPh' => 3.72506430801000E-07,
-            'hh' => 3.72506430801000E-07,
-            'Wh' => 2.77777916238711E-04,
-            'wh' => 2.77777916238711E-04,
-            'flb' => 2.37304222192651E+01,
-            'BTU' => 9.47815067349015E-04,
-            'btu' => 9.47815067349015E-04,
-        ],
+        self::CATEGORY_ENERGY => ['J' => 1.0, 'e' => 9999995.193432311, 'c' => 0.239006249473467, 'cal' => 0.238846190642017, 'eV' => 6.241457E+18, 'ev' => 6.241457E+18, 'HPh' => 3.72506430801E-7, 'hh' => 3.72506430801E-7, 'Wh' => 0.000277777916238711, 'wh' => 0.000277777916238711, 'flb' => 23.7304222192651, 'BTU' => 0.000947815067349015, 'btu' => 0.000947815067349015],
         // Conversion uses Horsepower (HP) as an intermediate unit
-        self::CATEGORY_POWER => [
-            'HP' => 1.0,
-            'h' => 1.0,
-            'W' => 7.45699871582270E+02,
-            'w' => 7.45699871582270E+02,
-            'PS' => 1.01386966542400E+00,
-        ],
+        self::CATEGORY_POWER => ['HP' => 1.0, 'h' => 1.0, 'W' => 745.69987158227, 'w' => 745.69987158227, 'PS' => 1.013869665424],
         // Conversion uses Tesla (T) as an intermediate unit
-        self::CATEGORY_MAGNETISM => [
-            'T' => 1.0,
-            'ga' => 10000.0,
-        ],
+        self::CATEGORY_MAGNETISM => ['T' => 1.0, 'ga' => 10000.0],
         // Conversion uses litre (l) as an intermediate unit
-        self::CATEGORY_VOLUME => [
-            'l' => 1.0,
-            'L' => 1.0,
-            'lt' => 1.0,
-            'tsp' => 2.02884136211058E+02,
-            'tspm' => 2.0E+02,
-            'tbs' => 6.76280454036860E+01,
-            'oz' => 3.38140227018430E+01,
-            'cup' => 4.22675283773038E+00,
-            'pt' => 2.11337641886519E+00,
-            'us_pt' => 2.11337641886519E+00,
-            'uk_pt' => 1.75975398639270E+00,
-            'qt' => 1.05668820943259E+00,
-            'uk_qt' => 8.79876993196351E-01,
-            'gal' => 2.64172052358148E-01,
-            'uk_gal' => 2.19969248299088E-01,
-            'ang3' => 1.0E+27,
-            'ang^3' => 1.0E+27,
-            'barrel' => 6.28981077043211E-03,
-            'bushel' => 2.83775932584017E-02,
-            'in3' => 6.10237440947323E+01,
-            'in^3' => 6.10237440947323E+01,
-            'ft3' => 3.53146667214886E-02,
-            'ft^3' => 3.53146667214886E-02,
-            'ly3' => 1.18093498844171E-51,
-            'ly^3' => 1.18093498844171E-51,
-            'm3' => 1.0E-03,
-            'm^3' => 1.0E-03,
-            'mi3' => 2.39912758578928E-13,
-            'mi^3' => 2.39912758578928E-13,
-            'yd3' => 1.30795061931439E-03,
-            'yd^3' => 1.30795061931439E-03,
-            'Nmi3' => 1.57426214685811E-13,
-            'Nmi^3' => 1.57426214685811E-13,
-            'Pica3' => 2.27769904358706E+07,
-            'Pica^3' => 2.27769904358706E+07,
-            'Picapt3' => 2.27769904358706E+07,
-            'Picapt^3' => 2.27769904358706E+07,
-            'GRT' => 3.53146667214886E-04,
-            'regton' => 3.53146667214886E-04,
-            'MTON' => 8.82866668037215E-04,
-        ],
+        self::CATEGORY_VOLUME => ['l' => 1.0, 'L' => 1.0, 'lt' => 1.0, 'tsp' => 202.884136211058, 'tspm' => 200.0, 'tbs' => 67.628045403686, 'oz' => 33.814022701843, 'cup' => 4.22675283773038, 'pt' => 2.11337641886519, 'us_pt' => 2.11337641886519, 'uk_pt' => 1.7597539863927, 'qt' => 1.05668820943259, 'uk_qt' => 0.879876993196351, 'gal' => 0.264172052358148, 'uk_gal' => 0.219969248299088, 'ang3' => 1.0E+27, 'ang^3' => 1.0E+27, 'barrel' => 0.00628981077043211, 'bushel' => 0.0283775932584017, 'in3' => 61.0237440947323, 'in^3' => 61.0237440947323, 'ft3' => 0.0353146667214886, 'ft^3' => 0.0353146667214886, 'ly3' => 1.18093498844171E-51, 'ly^3' => 1.18093498844171E-51, 'm3' => 0.001, 'm^3' => 0.001, 'mi3' => 2.39912758578928E-13, 'mi^3' => 2.39912758578928E-13, 'yd3' => 0.00130795061931439, 'yd^3' => 0.00130795061931439, 'Nmi3' => 1.57426214685811E-13, 'Nmi^3' => 1.57426214685811E-13, 'Pica3' => 22776990.4358706, 'Pica^3' => 22776990.4358706, 'Picapt3' => 22776990.4358706, 'Picapt^3' => 22776990.4358706, 'GRT' => 0.000353146667214886, 'regton' => 0.000353146667214886, 'MTON' => 0.000882866668037215],
         // Conversion uses hectare (ha) as an intermediate unit
-        self::CATEGORY_AREA => [
-            'ha' => 1.0,
-            'uk_acre' => 2.47105381467165E+00,
-            'us_acre' => 2.47104393046628E+00,
-            'ang2' => 1.0E+24,
-            'ang^2' => 1.0E+24,
-            'ar' => 1.0E+02,
-            'ft2' => 1.07639104167097E+05,
-            'ft^2' => 1.07639104167097E+05,
-            'in2' => 1.55000310000620E+07,
-            'in^2' => 1.55000310000620E+07,
-            'ly2' => 1.11725076312873E-28,
-            'ly^2' => 1.11725076312873E-28,
-            'm2' => 1.0E+04,
-            'm^2' => 1.0E+04,
-            'Morgen' => 4.0E+00,
-            'mi2' => 3.86102158542446E-03,
-            'mi^2' => 3.86102158542446E-03,
-            'Nmi2' => 2.91553349598123E-03,
-            'Nmi^2' => 2.91553349598123E-03,
-            'Pica2' => 8.03521607043214E+10,
-            'Pica^2' => 8.03521607043214E+10,
-            'Picapt2' => 8.03521607043214E+10,
-            'Picapt^2' => 8.03521607043214E+10,
-            'yd2' => 1.19599004630108E+04,
-            'yd^2' => 1.19599004630108E+04,
-        ],
+        self::CATEGORY_AREA => ['ha' => 1.0, 'uk_acre' => 2.47105381467165, 'us_acre' => 2.47104393046628, 'ang2' => 1.0E+24, 'ang^2' => 1.0E+24, 'ar' => 100.0, 'ft2' => 107639.104167097, 'ft^2' => 107639.104167097, 'in2' => 15500031.000062, 'in^2' => 15500031.000062, 'ly2' => 1.11725076312873E-28, 'ly^2' => 1.11725076312873E-28, 'm2' => 10000.0, 'm^2' => 10000.0, 'Morgen' => 4.0, 'mi2' => 0.00386102158542446, 'mi^2' => 0.00386102158542446, 'Nmi2' => 0.00291553349598123, 'Nmi^2' => 0.00291553349598123, 'Pica2' => 80352160704.3214, 'Pica^2' => 80352160704.3214, 'Picapt2' => 80352160704.3214, 'Picapt^2' => 80352160704.3214, 'yd2' => 11959.9004630108, 'yd^2' => 11959.9004630108],
         // Conversion uses bit (bit) as an intermediate unit
-        self::CATEGORY_INFORMATION => [
-            'bit' => 1.0,
-            'byte' => 0.125,
-        ],
+        self::CATEGORY_INFORMATION => ['bit' => 1.0, 'byte' => 0.125],
         // Conversion uses Meters per Second (m/s) as an intermediate unit
-        self::CATEGORY_SPEED => [
-            'm/s' => 1.0,
-            'm/sec' => 1.0,
-            'm/h' => 3.60E+03,
-            'm/hr' => 3.60E+03,
-            'mph' => 2.23693629205440E+00,
-            'admkn' => 1.94260256941567E+00,
-            'kn' => 1.94384449244060E+00,
-        ],
+        self::CATEGORY_SPEED => ['m/s' => 1.0, 'm/sec' => 1.0, 'm/h' => 3600.0, 'm/hr' => 3600.0, 'mph' => 2.2369362920544, 'admkn' => 1.94260256941567, 'kn' => 1.9438444924406],
     ];
-
     /**
      *    getConversionGroups
      * Returns a list of the different conversion groups for UOM conversions.
      *
      * @return string[]
      */
-    public static function getConversionCategories(): array
+    public static function get_conversion_categories(): array
     {
-        $conversionGroups = [];
-        foreach (self::$conversionUnits as $conversionUnit) {
-            $conversionGroups[] = $conversionUnit['Group'];
+        $conversion_groups = [];
+        foreach (self::$conversion_units as $conversion_unit) {
+            $conversion_groups[] = $conversion_unit['Group'];
         }
-
-        return array_merge(array_unique($conversionGroups));
+        return array_merge(array_unique($conversion_groups));
     }
-
     /**
      *    getConversionGroupUnits
      * Returns an array of units of measure, for a specified conversion group, or for all groups.
@@ -458,18 +260,16 @@ class ConvertUOM
      *
      * @return string[][]
      */
-    public static function getConversionCategoryUnits(?string $category = null): array
+    public static function get_conversion_category_units(?string $category = null): array
     {
-        $conversionGroups = [];
-        foreach (self::$conversionUnits as $conversionUnit => $conversionGroup) {
-            if (($category === null) || ($conversionGroup['Group'] == $category)) {
-                $conversionGroups[$conversionGroup['Group']][] = $conversionUnit;
+        $conversion_groups = [];
+        foreach (self::$conversion_units as $conversion_unit => $conversion_group) {
+            if ($category === null || $conversion_group['Group'] == $category) {
+                $conversion_groups[$conversion_group['Group']][] = $conversion_unit;
             }
         }
-
-        return $conversionGroups;
+        return $conversion_groups;
     }
-
     /**
      * getConversionGroupUnitDetails.
      *
@@ -477,43 +277,36 @@ class ConvertUOM
      *
      * @return array<string, list<array<string, string>>>
      */
-    public static function getConversionCategoryUnitDetails(?string $category = null): array
+    public static function get_conversion_category_unit_details(?string $category = null): array
     {
-        $conversionGroups = [];
-        foreach (self::$conversionUnits as $conversionUnit => $conversionGroup) {
-            if (($category === null) || ($conversionGroup['Group'] == $category)) {
-                $conversionGroups[$conversionGroup['Group']][] = [
-                    'unit' => $conversionUnit,
-                    'description' => $conversionGroup['UnitName'],
-                ];
+        $conversion_groups = [];
+        foreach (self::$conversion_units as $conversion_unit => $conversion_group) {
+            if ($category === null || $conversion_group['Group'] == $category) {
+                $conversion_groups[$conversion_group['Group']][] = ['unit' => $conversion_unit, 'description' => $conversion_group['UnitName']];
             }
         }
-
-        return $conversionGroups;
+        return $conversion_groups;
     }
-
     /**
      *    getConversionMultipliers
      * Returns an array of the Multiplier prefixes that can be used with Units of Measure in CONVERTUOM().
      *
      * @return array<string, array{multiplier: float, name: string}>
      */
-    public static function getConversionMultipliers(): array
+    public static function get_conversion_multipliers(): array
     {
-        return self::$conversionMultipliers;
+        return self::$conversion_multipliers;
     }
-
     /**
      *    getBinaryConversionMultipliers
      * Returns an array of the additional Multiplier prefixes that can be used with Information Units of Measure in CONVERTUOM().
      *
      * @return array<string, array{multiplier: float|int, name: string}>
      */
-    public static function getBinaryConversionMultipliers(): array
+    public static function get_binary_conversion_multipliers(): array
     {
-        return self::$binaryConversionMultipliers;
+        return self::$binary_conversion_multipliers;
     }
-
     /**
      * CONVERT.
      *
@@ -535,150 +328,119 @@ class ConvertUOM
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function CONVERT($value, $fromUOM, $toUOM): array|string|float|int
+    public static function CONVERT($value, $from_uom, $to_uom): array|string|float|int
     {
-        if (is_array($value) || is_array($fromUOM) || is_array($toUOM)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $fromUOM, $toUOM);
+        if (is_array($value) || is_array($from_uom) || is_array($to_uom)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $from_uom, $to_uom);
         }
-
         if (!is_numeric($value)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
         try {
-            [$fromUOM, $fromCategory, $fromMultiplier] = self::getUOMDetails($fromUOM);
-            [$toUOM, $toCategory, $toMultiplier] = self::getUOMDetails($toUOM);
+            [$from_uom, $from_category, $from_multiplier] = self::get_uom_details($from_uom);
+            [$to_uom, $to_category, $to_multiplier] = self::get_uom_details($to_uom);
         } catch (Exception) {
-            return ExcelError::NA();
+            return Excel_Error::NA();
         }
-
-        if ($fromCategory !== $toCategory) {
-            return ExcelError::NA();
+        if ($from_category !== $to_category) {
+            return Excel_Error::NA();
         }
-
         // @var float $value
-        $value *= $fromMultiplier;
-        if (($fromUOM === $toUOM) && ($fromMultiplier === $toMultiplier)) {
+        $value *= $from_multiplier;
+        if ($from_uom === $to_uom && $from_multiplier === $to_multiplier) {
             //    We've already factored $fromMultiplier into the value, so we need
             //        to reverse it again
-            return $value / $fromMultiplier;
+            return $value / $from_multiplier;
         }
-        if ($fromUOM === $toUOM) {
-            return $value / $toMultiplier;
+        if ($from_uom === $to_uom) {
+            return $value / $to_multiplier;
         }
-
-        if ($fromCategory === self::CATEGORY_TEMPERATURE) {
-            return self::convertTemperature($fromUOM, $toUOM, $value);
+        if ($from_category === self::CATEGORY_TEMPERATURE) {
+            return self::convert_temperature($from_uom, $to_uom, $value);
         }
-
-        $baseValue = $value * (1.0 / self::$unitConversions[$fromCategory][$fromUOM]);
-
-        return ($baseValue * self::$unitConversions[$fromCategory][$toUOM]) / $toMultiplier;
+        $base_value = $value * (1.0 / self::$unit_conversions[$from_category][$from_uom]);
+        return $base_value * self::$unit_conversions[$from_category][$to_uom] / $to_multiplier;
     }
-
     /** @return array{0: string, 1: string, 2: float} */
-    private static function getUOMDetails(string $uom): array
+    private static function get_uom_details(string $uom): array
     {
-        if (isset(self::$conversionUnits[$uom])) {
-            $unitCategory = self::$conversionUnits[$uom]['Group'];
-
-            return [$uom, $unitCategory, 1.0];
+        if (isset(self::$conversion_units[$uom])) {
+            $unit_category = self::$conversion_units[$uom]['Group'];
+            return [$uom, $unit_category, 1.0];
         }
-
         // Check 1-character standard metric multiplier prefixes
-        $multiplierType = substr($uom, 0, 1);
+        $multiplier_type = substr($uom, 0, 1);
         $uom = substr($uom, 1);
-        if (isset(self::$conversionUnits[$uom], self::$conversionMultipliers[$multiplierType])) {
-            if (self::$conversionUnits[$uom]['AllowPrefix'] === false) {
+        if (isset(self::$conversion_units[$uom], self::$conversion_multipliers[$multiplier_type])) {
+            if (self::$conversion_units[$uom]['AllowPrefix'] === false) {
                 throw new Exception('Prefix not allowed for UoM');
             }
-            $unitCategory = self::$conversionUnits[$uom]['Group'];
-
-            return [$uom, $unitCategory, self::$conversionMultipliers[$multiplierType]['multiplier']];
+            $unit_category = self::$conversion_units[$uom]['Group'];
+            return [$uom, $unit_category, self::$conversion_multipliers[$multiplier_type]['multiplier']];
         }
-
-        $multiplierType .= substr($uom, 0, 1);
+        $multiplier_type .= substr($uom, 0, 1);
         $uom = substr($uom, 1);
-
         // Check 2-character standard metric multiplier prefixes
-        if (isset(self::$conversionUnits[$uom], self::$conversionMultipliers[$multiplierType])) {
-            if (self::$conversionUnits[$uom]['AllowPrefix'] === false) {
+        if (isset(self::$conversion_units[$uom], self::$conversion_multipliers[$multiplier_type])) {
+            if (self::$conversion_units[$uom]['AllowPrefix'] === false) {
                 throw new Exception('Prefix not allowed for UoM');
             }
-            $unitCategory = self::$conversionUnits[$uom]['Group'];
-
-            return [$uom, $unitCategory, self::$conversionMultipliers[$multiplierType]['multiplier']];
+            $unit_category = self::$conversion_units[$uom]['Group'];
+            return [$uom, $unit_category, self::$conversion_multipliers[$multiplier_type]['multiplier']];
         }
-
         // Check 2-character binary multiplier prefixes
-        if (isset(self::$conversionUnits[$uom], self::$binaryConversionMultipliers[$multiplierType])) {
-            if (self::$conversionUnits[$uom]['AllowPrefix'] === false) {
+        if (isset(self::$conversion_units[$uom], self::$binary_conversion_multipliers[$multiplier_type])) {
+            if (self::$conversion_units[$uom]['AllowPrefix'] === false) {
                 throw new Exception('Prefix not allowed for UoM');
             }
-            $unitCategory = self::$conversionUnits[$uom]['Group'];
-            if ($unitCategory !== 'Information') {
+            $unit_category = self::$conversion_units[$uom]['Group'];
+            if ($unit_category !== 'Information') {
                 throw new Exception('Binary Prefix is only allowed for Information UoM');
             }
-
-            return [$uom, $unitCategory, self::$binaryConversionMultipliers[$multiplierType]['multiplier']];
+            return [$uom, $unit_category, self::$binary_conversion_multipliers[$multiplier_type]['multiplier']];
         }
-
         throw new Exception('UoM Not Found');
     }
-
-    protected static function convertTemperature(string $fromUOM, string $toUOM, float|int $value): float|int
+    protected static function convert_temperature(string $from_uom, string $to_uom, float|int $value): float|int
     {
-        $fromUOM = self::resolveTemperatureSynonyms($fromUOM);
-        $toUOM = self::resolveTemperatureSynonyms($toUOM);
-
-        if ($fromUOM === $toUOM) {
+        $from_uom = self::resolve_temperature_synonyms($from_uom);
+        $to_uom = self::resolve_temperature_synonyms($to_uom);
+        if ($from_uom === $to_uom) {
             return $value;
         }
-
         // Convert to Kelvin
-        switch ($fromUOM) {
+        switch ($from_uom) {
             case 'F':
                 $value = ($value - 32) / 1.8 + 273.15;
-
                 break;
             case 'C':
                 $value += 273.15;
-
                 break;
             case 'Rank':
                 $value /= 1.8;
-
                 break;
             case 'Reau':
                 $value = $value * 1.25 + 273.15;
-
                 break;
         }
-
         // Convert from Kelvin
-        switch ($toUOM) {
+        switch ($to_uom) {
             case 'F':
-                $value = ($value - 273.15) * 1.8 + 32.00;
-
+                $value = ($value - 273.15) * 1.8 + 32.0;
                 break;
             case 'C':
                 $value -= 273.15;
-
                 break;
             case 'Rank':
                 $value *= 1.8;
-
                 break;
             case 'Reau':
-                $value = ($value - 273.15) * 0.80000;
-
+                $value = ($value - 273.15) * 0.8;
                 break;
         }
-
         return $value;
     }
-
-    private static function resolveTemperatureSynonyms(string $uom): string
+    private static function resolve_temperature_synonyms(string $uom): string
     {
         return match ($uom) {
             'fah' => 'F',

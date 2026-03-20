@@ -1,68 +1,59 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared;
 
-namespace PhpOffice\PhpSpreadsheet\Shared;
-
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
 class Escher
 {
     /**
      * Drawing Group Container.
      */
-    private ?Escher\DggContainer $dggContainer = null;
-
+    private ?Escher\Dgg_Container $dgg_container = null;
     /**
      * Drawing Container.
      */
-    private ?Escher\DgContainer $dgContainer = null;
-
+    private ?Escher\Dg_Container $dg_container = null;
     /**
      * Get Drawing Group Container.
      */
-    public function getDggContainer(): ?Escher\DggContainer
+    public function get_dgg_container(): ?Escher\Dgg_Container
     {
-        return $this->dggContainer;
+        return $this->dgg_container;
     }
-
     /**
      * Get Drawing Group Container.
      */
-    public function getDggContainerOrThrow(): Escher\DggContainer
+    public function get_dgg_container_or_throw(): Escher\Dgg_Container
     {
-        return $this->dggContainer ?? throw new SpreadsheetException('dggContainer is unexpectedly null');
+        return $this->dgg_container ?? throw new Spreadsheet_Exception('dggContainer is unexpectedly null');
     }
-
     /**
      * Set Drawing Group Container.
      */
-    public function setDggContainer(Escher\DggContainer $dggContainer): Escher\DggContainer
+    public function set_dgg_container(Escher\Dgg_Container $dgg_container): Escher\Dgg_Container
     {
-        return $this->dggContainer = $dggContainer;
+        return $this->dgg_container = $dgg_container;
     }
-
     /**
      * Get Drawing Container.
      */
-    public function getDgContainer(): ?Escher\DgContainer
+    public function get_dg_container(): ?Escher\Dg_Container
     {
-        return $this->dgContainer;
+        return $this->dg_container;
     }
-
     /**
      * Get Drawing Container.
      */
-    public function getDgContainerOrThrow(): Escher\DgContainer
+    public function get_dg_container_or_throw(): Escher\Dg_Container
     {
-        return $this->dgContainer ?? throw new SpreadsheetException('dgContainer is unexpectedly null');
+        return $this->dg_container ?? throw new Spreadsheet_Exception('dgContainer is unexpectedly null');
     }
-
     /**
      * Set Drawing Container.
      */
-    public function setDgContainer(Escher\DgContainer $dgContainer): Escher\DgContainer
+    public function set_dg_container(Escher\Dg_Container $dg_container): Escher\Dg_Container
     {
-        return $this->dgContainer = $dgContainer;
+        return $this->dg_container = $dg_container;
     }
 }

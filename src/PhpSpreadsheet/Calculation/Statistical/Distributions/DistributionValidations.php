@@ -1,23 +1,19 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\StatisticalValidations;
-
-class DistributionValidations extends StatisticalValidations
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Statistical_Validations;
+class Distribution_Validations extends Statistical_Validations
 {
-    public static function validateProbability(mixed $probability): float
+    public static function validate_probability(mixed $probability): float
     {
-        $probability = self::validateFloat($probability);
-
+        $probability = self::validate_float($probability);
         if ($probability < 0.0 || $probability > 1.0) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $probability;
     }
 }

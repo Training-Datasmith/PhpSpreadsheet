@@ -1,26 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
-
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-class MergedCellStyle
+use Php_Office\Php_Spreadsheet\Style\Fill;
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+class Merged_Cell_Style
 {
     private bool $matched = false;
-
     /**
      * Indicate whether the last call to getMergedStyle found
      * any conditional or table styles affecting the cell in question.
      */
-    public function getMatched(): bool
+    public function get_matched(): bool
     {
         return $this->matched;
     }
-
     /**
      * Return a style that combines the base style for a cell
      * with any conditional or table styles applicable to the cell.
@@ -31,107 +27,80 @@ class MergedCellStyle
      * @param bool $conditionals True/false to indicate whether
      *        conditional styles should be considered.
      */
-    public function getMergedStyle(Worksheet $worksheet, string $coordinate, bool $tableFormats = true, bool $conditionals = true, ?bool $builtInTableStyles = null): Style
+    public function get_merged_style(Worksheet $worksheet, string $coordinate, bool $table_formats = true, bool $conditionals = true, ?bool $built_in_table_styles = null): Style
     {
-        $builtInTableStyles ??= $tableFormats;
+        $built_in_table_styles ??= $table_formats;
         $this->matched = false;
-        $styleMerger = new StyleMerger($worksheet->getStyle($coordinate));
-        if ($tableFormats) {
-            $this->assessTables($worksheet, $coordinate, $styleMerger);
+        $style_merger = new Style_Merger($worksheet->get_style($coordinate));
+        if ($table_formats) {
+            $this->assess_tables($worksheet, $coordinate, $style_merger);
         }
-        if ($builtInTableStyles) {
-            $this->assessBuiltinTables($worksheet, $coordinate, $styleMerger);
+        if ($built_in_table_styles) {
+            $this->assess_builtin_tables($worksheet, $coordinate, $style_merger);
         }
         if ($conditionals) {
-            $this->assessConditionals($worksheet, $coordinate, $styleMerger);
+            $this->assess_conditionals($worksheet, $coordinate, $style_merger);
         }
-
-        return $styleMerger->getStyle();
+        return $style_merger->get_style();
     }
-
-    private function assessTables(Worksheet $worksheet, string $coordinate, StyleMerger $styleMerger): void
+    private function assess_tables(Worksheet $worksheet, string $coordinate, Style_Merger $style_merger): void
     {
-        $tables = $worksheet->getTablesWithStylesForCell($worksheet->getCell($coordinate));
+        $tables = $worksheet->get_tables_with_styles_for_cell($worksheet->get_cell($coordinate));
         foreach ($tables as $ts) {
-            $dxfsTableStyle = $ts->getStyle()->getTableDxfsStyle();
-            if ($dxfsTableStyle !== null) {
-                $tableRow = $ts->getRowNumber($coordinate);
-                if ($tableRow === 0 && $dxfsTableStyle->getHeaderRowStyle() !== null) {
-                    $styleMerger->mergeStyle(
-                        $dxfsTableStyle->getHeaderRowStyle()
-                    );
+            $dxfs_table_style = $ts->get_style()->get_table_dxfs_style();
+            if ($dxfs_table_style !== null) {
+                $table_row = $ts->get_row_number($coordinate);
+                if ($table_row === 0 && $dxfs_table_style->get_header_row_style() !== null) {
+                    $style_merger->merge_style($dxfs_table_style->get_header_row_style());
                     $this->matched = true;
-                } elseif ($tableRow % 2 === 1 && $dxfsTableStyle->getFirstRowStripeStyle() !== null) {
-                    $styleMerger->mergeStyle(
-                        $dxfsTableStyle->getFirstRowStripeStyle()
-                    );
+                } elseif ($table_row % 2 === 1 && $dxfs_table_style->get_first_row_stripe_style() !== null) {
+                    $style_merger->merge_style($dxfs_table_style->get_first_row_stripe_style());
                     $this->matched = true;
-                } elseif ($tableRow % 2 === 0 && $dxfsTableStyle->getSecondRowStripeStyle() !== null) {
-                    $styleMerger->mergeStyle(
-                        $dxfsTableStyle->getSecondRowStripeStyle()
-                    );
+                } elseif ($table_row % 2 === 0 && $dxfs_table_style->get_second_row_stripe_style() !== null) {
+                    $style_merger->merge_style($dxfs_table_style->get_second_row_stripe_style());
                     $this->matched = true;
                 }
             }
         }
     }
-
-    private static ?Style $headerStyle = null;
-
-    private static ?Style $firstRowStyle = null;
-
-    private function assessBuiltinTables(Worksheet $worksheet, string $coordinate, StyleMerger $styleMerger): void
+    private static ?Style $header_style = null;
+    private static ?Style $first_row_style = null;
+    private function assess_builtin_tables(Worksheet $worksheet, string $coordinate, Style_Merger $style_merger): void
     {
-        if (self::$headerStyle === null) {
-            self::$headerStyle = new Style();
-            self::$headerStyle->getFill()
-                ->setFillType(Fill::FILL_SOLID)
-                ->getEndColor()
-                ->setArgb('FF000000');
-            self::$headerStyle->getFill()->getStartColor()
-                ->setArgb('FF000000');
-            self::$headerStyle->getFont()
-                ->getColor()->setRgb('FFFFFF');
+        if (self::$header_style === null) {
+            self::$header_style = new Style();
+            self::$header_style->get_fill()->set_fill_type(Fill::FILL_SOLID)->get_end_color()->set_argb('FF000000');
+            self::$header_style->get_fill()->get_start_color()->set_argb('FF000000');
+            self::$header_style->get_font()->get_color()->set_rgb('FFFFFF');
         }
-        if (self::$firstRowStyle === null) {
-            self::$firstRowStyle = new Style();
-            self::$firstRowStyle->getFill()
-                ->setFillType(Fill::FILL_SOLID)
-                ->getEndColor()
-                ->setArgb('FFD9D9D9');
-            self::$firstRowStyle->getFill()->getStartColor()
-                ->setArgb('FFD9D9D9');
+        if (self::$first_row_style === null) {
+            self::$first_row_style = new Style();
+            self::$first_row_style->get_fill()->set_fill_type(Fill::FILL_SOLID)->get_end_color()->set_argb('FFD9D9D9');
+            self::$first_row_style->get_fill()->get_start_color()->set_argb('FFD9D9D9');
         }
-        $tables = $worksheet->getTablesWithoutStylesForCell($worksheet->getCell($coordinate));
+        $tables = $worksheet->get_tables_without_styles_for_cell($worksheet->get_cell($coordinate));
         foreach ($tables as $table) {
-            $tableRow = $table->getRowNumber($coordinate);
-            if ($tableRow === 0 && $table->getShowHeaderRow()) {
-                $styleMerger->mergeStyle(self::$headerStyle);
+            $table_row = $table->get_row_number($coordinate);
+            if ($table_row === 0 && $table->get_show_header_row()) {
+                $style_merger->merge_style(self::$header_style);
                 $this->matched = true;
-            } elseif ($tableRow % 2 === 1) {
-                $styleMerger->mergeStyle(self::$firstRowStyle);
+            } elseif ($table_row % 2 === 1) {
+                $style_merger->merge_style(self::$first_row_style);
                 $this->matched = true;
             }
         }
     }
-
-    private function assessConditionals(Worksheet $worksheet, string $coordinate, StyleMerger $styleMerger): void
+    private function assess_conditionals(Worksheet $worksheet, string $coordinate, Style_Merger $style_merger): void
     {
-        if ($worksheet->getConditionalRange($coordinate) !== null) {
-            $assessor = new CellStyleAssessor($worksheet->getCell($coordinate), $worksheet->getConditionalRange($coordinate));
+        if ($worksheet->get_conditional_range($coordinate) !== null) {
+            $assessor = new Cell_Style_Assessor($worksheet->get_cell($coordinate), $worksheet->get_conditional_range($coordinate));
         } else {
-            $assessor = new CellStyleAssessor($worksheet->getCell($coordinate), $coordinate);
+            $assessor = new Cell_Style_Assessor($worksheet->get_cell($coordinate), $coordinate);
         }
-        $matchedStyle = $assessor
-            ->matchConditionsReturnNullIfNoneMatched(
-                $worksheet->getConditionalStyles($coordinate),
-                $worksheet->getCell($coordinate)
-                    ->getCalculatedValueString(),
-                true
-            );
-        if ($matchedStyle !== null) {
+        $matched_style = $assessor->match_conditions_return_null_if_none_matched($worksheet->get_conditional_styles($coordinate), $worksheet->get_cell($coordinate)->get_calculated_value_string(), true);
+        if ($matched_style !== null) {
             $this->matched = true;
-            $styleMerger->mergeStyle($matchedStyle);
+            $style_merger->merge_style($matched_style);
         }
     }
 }

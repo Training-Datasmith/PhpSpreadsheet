@@ -1,15 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet;
 
-namespace PhpOffice\PhpSpreadsheet;
-
-interface IComparable
+interface I_Comparable
 {
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string;
+    public function get_hash_code(): string;
 }

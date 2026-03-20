@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
 use DateTime;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDateHelper;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDateHelper;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Date
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * DATE.
      *
@@ -66,66 +63,57 @@ class Date
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function fromYMD(array|float|int|string $year, null|array|bool|float|int|string $month, array|float|int|string $day): float|int|DateTime|string|array
+    public static function from_ymd(array|float|int|string $year, null|array|bool|float|int|string $month, array|float|int|string $day): float|int|DateTime|string|array
     {
         if (is_array($year) || is_array($month) || is_array($day)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $year, $month, $day);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $year, $month, $day);
         }
-
-        $baseYear = SharedDateHelper::getExcelCalendar();
-
+        $base_year = Shared_Date_Helper::get_excel_calendar();
         try {
-            $year = self::getYear($year, $baseYear);
-            $month = self::getMonth($month);
-            $day = self::getDay($day);
-            self::adjustYearMonth($year, $month, $baseYear);
+            $year = self::get_year($year, $base_year);
+            $month = self::get_month($month);
+            $day = self::get_day($day);
+            self::adjust_year_month($year, $month, $base_year);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
-        $excelDateValue = SharedDateHelper::formattedPHPToExcel($year, $month, $day);
-
-        return Helpers::returnIn3FormatsFloat($excelDateValue);
+        $excel_date_value = Shared_Date_Helper::formatted_php_to_excel($year, $month, $day);
+        return Helpers::return_in3formats_float($excel_date_value);
     }
-
     /**
      * Convert year from multiple formats to int.
      */
-    private static function getYear(mixed $year, int $baseYear): int
+    private static function get_year(mixed $year, int $base_year): int
     {
         if ($year === null) {
             $year = 0;
         } elseif (is_scalar($year)) {
-            $year = StringHelper::testStringAsNumeric((string) $year);
+            $year = String_Helper::test_string_as_numeric((string) $year);
         }
         if (!is_numeric($year)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
         $year = (int) $year;
-
-        if ($year < ($baseYear - 1900)) {
-            throw new Exception(ExcelError::NAN());
+        if ($year < $base_year - 1900) {
+            throw new Exception(Excel_Error::NAN());
         }
-        if ((($baseYear - 1900) !== 0) && ($year < $baseYear) && ($year >= 1900)) {
-            throw new Exception(ExcelError::NAN());
+        if ($base_year - 1900 !== 0 && $year < $base_year && $year >= 1900) {
+            throw new Exception(Excel_Error::NAN());
         }
-
-        if (($year < $baseYear) && ($year >= ($baseYear - 1900))) {
+        if ($year < $base_year && $year >= $base_year - 1900) {
             $year += 1900;
         }
-
         return $year;
     }
-
     /**
      * Convert month from multiple formats to int.
      */
-    private static function getMonth(mixed $month): int
+    private static function get_month(mixed $month): int
     {
         if (is_string($month)) {
             if (!is_numeric($month)) {
-                $month = SharedDateHelper::monthStringToNumber($month);
+                $month = Shared_Date_Helper::month_string_to_number($month);
             }
         } elseif ($month === null) {
             $month = 0;
@@ -133,34 +121,29 @@ class Date
             $month = (int) $month;
         }
         if (!is_numeric($month)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (int) $month;
     }
-
     /**
      * Convert day from multiple formats to int.
      */
-    private static function getDay(mixed $day): int
+    private static function get_day(mixed $day): int
     {
         if (is_string($day) && !is_numeric($day)) {
-            $day = SharedDateHelper::dayStringToNumber($day);
+            $day = Shared_Date_Helper::day_string_to_number($day);
         }
-
         if ($day === null) {
             $day = 0;
         } elseif (is_scalar($day)) {
-            $day = StringHelper::testStringAsNumeric((string) $day);
+            $day = String_Helper::test_string_as_numeric((string) $day);
         }
         if (!is_numeric($day)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (int) $day;
     }
-
-    private static function adjustYearMonth(int &$year, int &$month, int $baseYear): void
+    private static function adjust_year_month(int &$year, int &$month, int $base_year): void
     {
         if ($month < 1) {
             //    Handle year/month adjustment if month < 1
@@ -170,12 +153,11 @@ class Date
         } elseif ($month > 12) {
             //    Handle year/month adjustment if month > 12
             $year += intdiv($month, 12);
-            $month = ($month % 12);
+            $month = $month % 12;
         }
-
         // Re-validate the year parameter after adjustments
-        if (($year < $baseYear) || ($year >= 10000)) {
-            throw new Exception(ExcelError::NAN());
+        if ($year < $base_year || $year >= 10000) {
+            throw new Exception(Excel_Error::NAN());
         }
     }
 }

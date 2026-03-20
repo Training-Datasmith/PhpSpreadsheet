@@ -1,34 +1,29 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial\Securities;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\Securities;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\FinancialValidations;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class SecurityValidations extends FinancialValidations
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Financial_Validations;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Security_Validations extends Financial_Validations
 {
-    public static function validateIssueDate(mixed $issue): float
+    public static function validate_issue_date(mixed $issue): float
     {
-        return self::validateDate($issue);
+        return self::validate_date($issue);
     }
-
-    public static function validateSecurityPeriod(mixed $settlement, mixed $maturity): void
+    public static function validate_security_period(mixed $settlement, mixed $maturity): void
     {
         if ($settlement >= $maturity) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
     }
-
-    public static function validateRedemption(mixed $redemption): float
+    public static function validate_redemption(mixed $redemption): float
     {
-        $redemption = self::validateFloat($redemption);
+        $redemption = self::validate_float($redemption);
         if ($redemption <= 0.0) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $redemption;
     }
 }

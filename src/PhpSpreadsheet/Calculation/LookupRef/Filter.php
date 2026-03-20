@@ -1,97 +1,72 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Filter
 {
-    public static function filter(mixed $lookupArray, mixed $matchArray, mixed $ifEmpty = null): mixed
+    public static function filter(mixed $lookup_array, mixed $match_array, mixed $if_empty = null): mixed
     {
-        if (!is_array($lookupArray)) {
-            return ExcelError::VALUE();
+        if (!is_array($lookup_array)) {
+            return Excel_Error::VALUE();
         }
         /** @var mixed[] $lookupArray */
-        if (!is_array($matchArray)) {
-            return ExcelError::VALUE();
+        if (!is_array($match_array)) {
+            return Excel_Error::VALUE();
         }
-
-        $matchArray = self::enumerateArrayKeys($matchArray);
-
-        $result = (Matrix::isColumnVector($matchArray))
-            ? self::filterByRow($lookupArray, $matchArray)
-            : self::filterByColumn($lookupArray, $matchArray);
-
+        $match_array = self::enumerate_array_keys($match_array);
+        $result = Matrix::is_column_vector($match_array) ? self::filter_by_row($lookup_array, $match_array) : self::filter_by_column($lookup_array, $match_array);
         if (empty($result)) {
-            return $ifEmpty ?? ExcelError::CALC();
+            return $if_empty ?? Excel_Error::CALC();
         }
         /** @var callable(mixed): mixed */
         $func = 'array_values';
-
         return array_values(array_map($func, $result));
     }
-
     /**
      * @param mixed[] $sortArray
      *
      * @return mixed[]
      */
-    private static function enumerateArrayKeys(array $sortArray): array
+    private static function enumerate_array_keys(array $sort_array): array
     {
-        array_walk(
-            $sortArray,
-            function (&$columns): void {
-                if (is_array($columns)) {
-                    $columns = array_values($columns);
-                }
+        array_walk($sort_array, function (&$columns): void {
+            if (is_array($columns)) {
+                $columns = array_values($columns);
             }
-        );
-
-        return array_values($sortArray);
+        });
+        return array_values($sort_array);
     }
-
     /**
      * @param mixed[] $lookupArray
      * @param mixed[] $matchArray
      *
      * @return mixed[]
      */
-    private static function filterByRow(array $lookupArray, array $matchArray): array
+    private static function filter_by_row(array $lookup_array, array $match_array): array
     {
-        $matchArray = array_values(array_column($matchArray, 0)); // @phpstan-ignore-line
-
-        return array_filter(
-            array_values($lookupArray),
-            fn ($index): bool => (bool) ($matchArray[$index] ?? null),
-            ARRAY_FILTER_USE_KEY
-        );
+        $match_array = array_values(array_column($match_array, 0));
+        // @phpstan-ignore-line
+        return array_filter(array_values($lookup_array), fn($index): bool => (bool) ($match_array[$index] ?? null), ARRAY_FILTER_USE_KEY);
     }
-
     /**
      * @param mixed[] $lookupArray
      * @param mixed[] $matchArray
      *
      * @return mixed[]
      */
-    private static function filterByColumn(array $lookupArray, array $matchArray): array
+    private static function filter_by_column(array $lookup_array, array $match_array): array
     {
-        $lookupArray = Matrix::transpose($lookupArray);
-
-        if (count($matchArray) === 1) {
-            $matchArray = array_pop($matchArray);
+        $lookup_array = Matrix::transpose($lookup_array);
+        if (count($match_array) === 1) {
+            $match_array = array_pop($match_array);
         }
         /** @var mixed[] $matchArray */
-        array_walk(
-            $matchArray,
-            function (&$value): void {
-                $value = [$value];
-            }
-        );
-
-        $result = self::filterByRow($lookupArray, $matchArray);
-
+        array_walk($match_array, function (&$value): void {
+            $value = [$value];
+        });
+        $result = self::filter_by_row($lookup_array, $match_array);
         return Matrix::transpose($result);
     }
 }

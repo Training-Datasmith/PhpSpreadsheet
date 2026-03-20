@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
-class VLookup extends LookupBase
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+class V_Lookup extends Lookup_Base
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * VLOOKUP
      * The VLOOKUP function searches for value in the left-most column of lookup_array and returns the value
@@ -26,97 +23,71 @@ class VLookup extends LookupBase
      *
      * @return mixed The value of the found cell
      */
-    public static function lookup(mixed $lookupValue, array $lookupArray, mixed $indexNumber, mixed $notExactMatch = true): mixed
+    public static function lookup(mixed $lookup_value, array $lookup_array, mixed $index_number, mixed $not_exact_match = true): mixed
     {
-        if (is_array($lookupValue) || is_array($indexNumber)) {
-            return self::evaluateArrayArgumentsIgnore([self::class, __FUNCTION__], 1, $lookupValue, $lookupArray, $indexNumber, $notExactMatch);
+        if (is_array($lookup_value) || is_array($index_number)) {
+            return self::evaluate_array_arguments_ignore([self::class, __FUNCTION__], 1, $lookup_value, $lookup_array, $index_number, $not_exact_match);
         }
-
-        $notExactMatch = (bool) ($notExactMatch ?? true);
-
+        $not_exact_match = (bool) ($not_exact_match ?? true);
         try {
-            self::validateLookupArray($lookupArray);
-            $indexNumber = self::validateIndexLookup($lookupArray, $indexNumber);
+            self::validate_lookup_array($lookup_array);
+            $index_number = self::validate_index_lookup($lookup_array, $index_number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $f = array_keys($lookupArray);
-        $firstRow = array_pop($f);
-        if ((!is_array($lookupArray[$firstRow])) || ($indexNumber > count($lookupArray[$firstRow]))) {
-            return ExcelError::REF();
+        $f = array_keys($lookup_array);
+        $first_row = array_pop($f);
+        if (!is_array($lookup_array[$first_row]) || $index_number > count($lookup_array[$first_row])) {
+            return Excel_Error::REF();
         }
-        $columnKeys = array_keys($lookupArray[$firstRow]);
-        $returnColumn = $columnKeys[--$indexNumber];
-        $firstColumn = array_shift($columnKeys) ?? 1;
-
-        if (!$notExactMatch) {
+        $column_keys = array_keys($lookup_array[$first_row]);
+        $return_column = $column_keys[--$index_number];
+        $first_column = array_shift($column_keys) ?? 1;
+        if (!$not_exact_match) {
             /** @var callable $callable */
-            $callable = self::vlookupSort(...);
-            uasort($lookupArray, $callable);
+            $callable = self::vlookup_sort(...);
+            uasort($lookup_array, $callable);
         }
-
         /** @var string[][] $lookupArray */
-        $rowNumber = self::vLookupSearch($lookupValue, $lookupArray, $firstColumn, $notExactMatch);
-
-        if ($rowNumber !== null) {
+        $row_number = self::v_lookup_search($lookup_value, $lookup_array, $first_column, $not_exact_match);
+        if ($row_number !== null) {
             // return the appropriate value
-            return $lookupArray[$rowNumber][$returnColumn];
+            return $lookup_array[$row_number][$return_column];
         }
-
-        return ExcelError::NA();
+        return Excel_Error::NA();
     }
-
     /**
      * @param scalar[] $a
      * @param scalar[] $b
      */
-    private static function vlookupSort(array $a, array $b): int
+    private static function vlookup_sort(array $a, array $b): int
     {
-        $firstColumn = array_key_first($a);
-        $aLower = StringHelper::strToLower((string) $a[$firstColumn]);
-        $bLower = StringHelper::strToLower((string) $b[$firstColumn]);
-        return $aLower <=> $bLower;
+        $first_column = array_key_first($a);
+        $a_lower = String_Helper::str_to_lower((string) $a[$first_column]);
+        $b_lower = String_Helper::str_to_lower((string) $b[$first_column]);
+        return $a_lower <=> $b_lower;
     }
-
     /**
      * @param mixed $lookupValue The value that you want to match in lookup_array
      * @param string[][] $lookupArray
      * @param  int|string $column
      */
-    private static function vLookupSearch(mixed $lookupValue, array $lookupArray, $column, bool $notExactMatch): ?int
+    private static function v_lookup_search(mixed $lookup_value, array $lookup_array, $column, bool $not_exact_match): ?int
     {
-        $lookupLower = StringHelper::strToLower(StringHelper::convertToString($lookupValue));
-
-        $rowNumber = null;
-        foreach ($lookupArray as $rowKey => $rowData) {
-            $bothNumeric = self::numeric($lookupValue) && self::numeric($rowData[$column]);
-            $bothNotNumeric = !self::numeric($lookupValue) && !self::numeric($rowData[$column]);
-            $cellDataLower = StringHelper::strToLower((string) $rowData[$column]);
-
+        $lookup_lower = String_Helper::str_to_lower(String_Helper::convert_to_string($lookup_value));
+        $row_number = null;
+        foreach ($lookup_array as $row_key => $row_data) {
+            $both_numeric = self::numeric($lookup_value) && self::numeric($row_data[$column]);
+            $both_not_numeric = !self::numeric($lookup_value) && !self::numeric($row_data[$column]);
+            $cell_data_lower = String_Helper::str_to_lower((string) $row_data[$column]);
             // break if we have passed possible keys
-            if (
-                $notExactMatch
-                && (($bothNumeric && ($rowData[$column] > $lookupValue))
-                || ($bothNotNumeric && ($cellDataLower > $lookupLower)))
-            ) {
+            if ($not_exact_match && ($both_numeric && $row_data[$column] > $lookup_value || $both_not_numeric && $cell_data_lower > $lookup_lower)) {
                 break;
             }
-
-            $rowNumber = self::checkMatch(
-                $bothNumeric,
-                $bothNotNumeric,
-                $notExactMatch,
-                $rowKey,
-                $cellDataLower,
-                $lookupLower,
-                $rowNumber
-            );
+            $row_number = self::check_match($both_numeric, $both_not_numeric, $not_exact_match, $row_key, $cell_data_lower, $lookup_lower, $row_number);
         }
-
-        return $rowNumber;
+        return $row_number;
     }
-
     private static function numeric(mixed $value): bool
     {
         return is_int($value) || is_float($value);

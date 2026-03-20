@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Helpers;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Helpers;
 class Cosine
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * COS.
      *
@@ -26,18 +23,15 @@ class Cosine
     public static function cos(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return cos($number);
     }
-
     /**
      * COSH.
      *
@@ -52,18 +46,15 @@ class Cosine
     public static function cosh(mixed $number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return cosh($number);
     }
-
     /**
      * ACOS.
      *
@@ -78,18 +69,15 @@ class Cosine
     public static function acos($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(acos($number));
+        return Helpers::number_or_nan(acos($number));
     }
-
     /**
      * ACOSH.
      *
@@ -104,15 +92,13 @@ class Cosine
     public static function acosh($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(acosh($number));
+        return Helpers::number_or_nan(acosh($number));
     }
 }

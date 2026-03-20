@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Combinations;
-
-class HyperGeometric
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Combinations;
+class Hyper_Geometric
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * HYPGEOMDIST.
      *
@@ -31,47 +28,31 @@ class HyperGeometric
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function distribution(mixed $sampleSuccesses, mixed $sampleNumber, mixed $populationSuccesses, mixed $populationNumber): array|string|float
+    public static function distribution(mixed $sample_successes, mixed $sample_number, mixed $population_successes, mixed $population_number): array|string|float
     {
-        if (
-            is_array($sampleSuccesses) || is_array($sampleNumber)
-            || is_array($populationSuccesses) || is_array($populationNumber)
-        ) {
-            return self::evaluateArrayArguments(
-                [self::class, __FUNCTION__],
-                $sampleSuccesses,
-                $sampleNumber,
-                $populationSuccesses,
-                $populationNumber
-            );
+        if (is_array($sample_successes) || is_array($sample_number) || is_array($population_successes) || is_array($population_number)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $sample_successes, $sample_number, $population_successes, $population_number);
         }
-
         try {
-            $sampleSuccesses = DistributionValidations::validateInt($sampleSuccesses);
-            $sampleNumber = DistributionValidations::validateInt($sampleNumber);
-            $populationSuccesses = DistributionValidations::validateInt($populationSuccesses);
-            $populationNumber = DistributionValidations::validateInt($populationNumber);
+            $sample_successes = Distribution_Validations::validate_int($sample_successes);
+            $sample_number = Distribution_Validations::validate_int($sample_number);
+            $population_successes = Distribution_Validations::validate_int($population_successes);
+            $population_number = Distribution_Validations::validate_int($population_number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($sampleSuccesses < 0) || ($sampleSuccesses > $sampleNumber) || ($sampleSuccesses > $populationSuccesses)) {
-            return ExcelError::NAN();
+        if ($sample_successes < 0 || $sample_successes > $sample_number || $sample_successes > $population_successes) {
+            return Excel_Error::NAN();
         }
-        if (($sampleNumber <= 0) || ($sampleNumber > $populationNumber)) {
-            return ExcelError::NAN();
+        if ($sample_number <= 0 || $sample_number > $population_number) {
+            return Excel_Error::NAN();
         }
-        if (($populationSuccesses <= 0) || ($populationSuccesses > $populationNumber)) {
-            return ExcelError::NAN();
+        if ($population_successes <= 0 || $population_successes > $population_number) {
+            return Excel_Error::NAN();
         }
-
-        $successesPopulationAndSample = (float) Combinations::withoutRepetition($populationSuccesses, $sampleSuccesses);
-        $numbersPopulationAndSample = (float) Combinations::withoutRepetition($populationNumber, $sampleNumber);
-        $adjustedPopulationAndSample = (float) Combinations::withoutRepetition(
-            $populationNumber - $populationSuccesses,
-            $sampleNumber - $sampleSuccesses
-        );
-
-        return $successesPopulationAndSample * $adjustedPopulationAndSample / $numbersPopulationAndSample;
+        $successes_population_and_sample = (float) Combinations::without_repetition($population_successes, $sample_successes);
+        $numbers_population_and_sample = (float) Combinations::without_repetition($population_number, $sample_number);
+        $adjusted_population_and_sample = (float) Combinations::without_repetition($population_number - $population_successes, $sample_number - $sample_successes);
+        return $successes_population_and_sample * $adjusted_population_and_sample / $numbers_population_and_sample;
     }
 }

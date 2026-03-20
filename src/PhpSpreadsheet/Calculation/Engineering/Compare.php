@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
 class Compare
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * DELTA.
      *
@@ -34,19 +31,16 @@ class Compare
     public static function DELTA(array|float|bool|string|int $a, array|float|bool|string|int $b = 0.0): array|string|int
     {
         if (is_array($a) || is_array($b)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $a, $b);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $a, $b);
         }
-
         try {
-            $a = EngineeringValidations::validateFloat($a);
-            $b = EngineeringValidations::validateFloat($b);
+            $a = Engineering_Validations::validate_float($a);
+            $b = Engineering_Validations::validate_float($b);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return (int) (abs($a - $b) < 1.0e-15);
+        return (int) (abs($a - $b) < 1.0E-15);
     }
-
     /**
      * GESTEP.
      *
@@ -69,16 +63,14 @@ class Compare
     public static function GESTEP(array|float|bool|string|int $number, $step = 0.0): array|string|int
     {
         if (is_array($number) || is_array($step)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $number, $step);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $number, $step);
         }
-
         try {
-            $number = EngineeringValidations::validateFloat($number);
-            $step = EngineeringValidations::validateFloat($step ?? 0.0);
+            $number = Engineering_Validations::validate_float($number);
+            $step = Engineering_Validations::validate_float($step ?? 0.0);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return (int) ($number >= $step);
     }
 }

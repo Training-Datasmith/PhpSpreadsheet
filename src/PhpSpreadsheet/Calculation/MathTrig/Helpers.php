@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Helpers
 {
     /**
@@ -15,17 +13,16 @@ class Helpers
      *
      * @return float|string quotient or DIV0 if denominator is too small
      */
-    public static function verySmallDenominator(float $numerator, float $denominator): string|float
+    public static function very_small_denominator(float $numerator, float $denominator): string|float
     {
-        return (abs($denominator) < 1.0E-12) ? ExcelError::DIV0() : ($numerator / $denominator);
+        return abs($denominator) < 1.0E-12 ? Excel_Error::DIV0() : $numerator / $denominator;
     }
-
     /**
      * Many functions accept null/false/true argument treated as 0/0/1.
      */
-    public static function validateNumericNullBool(mixed $number): int|float
+    public static function validate_numeric_null_bool(mixed $number): int|float
     {
-        $number = Functions::flattenSingleValue($number);
+        $number = Functions::flatten_single_value($number);
         if ($number === null) {
             return 0;
         }
@@ -35,79 +32,66 @@ class Helpers
         if (is_numeric($number)) {
             return 0 + $number;
         }
-
-        throw new Exception(ExcelError::throwError($number));
+        throw new Exception(Excel_Error::throw_error($number));
     }
-
     /**
      * Validate numeric, but allow substitute for null.
      */
-    public static function validateNumericNullSubstitution(mixed $number, null|float|int $substitute): float|int
+    public static function validate_numeric_null_substitution(mixed $number, null|float|int $substitute): float|int
     {
-        $number = Functions::flattenSingleValue($number);
+        $number = Functions::flatten_single_value($number);
         if ($number === null && $substitute !== null) {
             return $substitute;
         }
         if (is_numeric($number)) {
             return 0 + $number;
         }
-
-        throw new Exception(ExcelError::throwError($number));
+        throw new Exception(Excel_Error::throw_error($number));
     }
-
     /**
      * Confirm number >= 0.
      */
-    public static function validateNotNegative(float|int $number, ?string $except = null): void
+    public static function validate_not_negative(float|int $number, ?string $except = null): void
     {
         if ($number >= 0) {
             return;
         }
-
-        throw new Exception($except ?? ExcelError::NAN());
+        throw new Exception($except ?? Excel_Error::NAN());
     }
-
     /**
      * Confirm number > 0.
      */
-    public static function validatePositive(float|int $number, ?string $except = null): void
+    public static function validate_positive(float|int $number, ?string $except = null): void
     {
         if ($number > 0) {
             return;
         }
-
-        throw new Exception($except ?? ExcelError::NAN());
+        throw new Exception($except ?? Excel_Error::NAN());
     }
-
     /**
      * Confirm number != 0.
      */
-    public static function validateNotZero(float|int $number): void
+    public static function validate_not_zero(float|int $number): void
     {
         if ($number) {
             return;
         }
-
-        throw new Exception(ExcelError::DIV0());
+        throw new Exception(Excel_Error::DIV0());
     }
-
-    public static function returnSign(float $number): int
+    public static function return_sign(float $number): int
     {
-        return $number ? (($number > 0) ? 1 : -1) : 0;
+        return $number ? $number > 0 ? 1 : -1 : 0;
     }
-
-    public static function getEven(float $number): float
+    public static function get_even(float $number): float
     {
-        $significance = 2 * self::returnSign($number);
-
-        return $significance ? (ceil($number / $significance) * $significance) : 0;
+        $significance = 2 * self::return_sign($number);
+        return $significance ? ceil($number / $significance) * $significance : 0;
     }
-
     /**
      * Return NAN or value depending on argument.
      */
-    public static function numberOrNan(float $result): float|string
+    public static function number_or_nan(float $result): float|string
     {
-        return is_nan($result) ? ExcelError::NAN() : $result;
+        return is_nan($result) ? Excel_Error::NAN() : $result;
     }
 }

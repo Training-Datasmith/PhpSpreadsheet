@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Database;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Counts;
-
-class DCount extends DatabaseAbstract
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Counts;
+class D_Count extends Database_Abstract
 {
     /**
      * DCOUNT.
@@ -33,15 +31,12 @@ class DCount extends DatabaseAbstract
      *                                        the column label in which you specify a condition for the
      *                                        column.
      */
-    public static function evaluate(array $database, array|null|int|string $field, array $criteria, bool $returnError = true): string|int
+    public static function evaluate(array $database, array|null|int|string $field, array $criteria, bool $return_error = true): string|int
     {
-        $field = self::fieldExtract($database, $field);
-        if ($returnError && $field === null) {
-            return ExcelError::VALUE();
+        $field = self::field_extract($database, $field);
+        if ($return_error && $field === null) {
+            return Excel_Error::VALUE();
         }
-
-        return Counts::COUNT(
-            self::getFilteredColumn($database, $field, $criteria)
-        );
+        return Counts::COUNT(self::get_filtered_column($database, $field, $criteria));
     }
 }

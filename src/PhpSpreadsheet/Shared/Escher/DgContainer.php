@@ -1,62 +1,50 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared\Escher;
 
-namespace PhpOffice\PhpSpreadsheet\Shared\Escher;
-
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DgContainer\SpgrContainer;
-
-class DgContainer
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dg_Container\Spgr_Container;
+class Dg_Container
 {
     /**
      * Drawing index, 1-based.
      */
-    private ?int $dgId = null;
-
+    private ?int $dg_id = null;
     /**
      * Last shape index in this drawing.
      */
-    private ?int $lastSpId = null;
-
-    private ?SpgrContainer $spgrContainer = null;
-
-    public function getDgId(): ?int
+    private ?int $last_sp_id = null;
+    private ?Spgr_Container $spgr_container = null;
+    public function get_dg_id(): ?int
     {
-        return $this->dgId;
+        return $this->dg_id;
     }
-
-    public function setDgId(int $value): void
+    public function set_dg_id(int $value): void
     {
-        $this->dgId = $value;
+        $this->dg_id = $value;
     }
-
-    public function getLastSpId(): ?int
+    public function get_last_sp_id(): ?int
     {
-        return $this->lastSpId;
+        return $this->last_sp_id;
     }
-
-    public function setLastSpId(int $value): void
+    public function set_last_sp_id(int $value): void
     {
-        $this->lastSpId = $value;
+        $this->last_sp_id = $value;
     }
-
-    public function getSpgrContainer(): ?SpgrContainer
+    public function get_spgr_container(): ?Spgr_Container
     {
-        return $this->spgrContainer;
+        return $this->spgr_container;
     }
-
-    public function getSpgrContainerOrThrow(): SpgrContainer
+    public function get_spgr_container_or_throw(): Spgr_Container
     {
-        if ($this->spgrContainer !== null) {
-            return $this->spgrContainer;
+        if ($this->spgr_container !== null) {
+            return $this->spgr_container;
         }
-
-        throw new SpreadsheetException('spgrContainer is unexpectedly null');
+        throw new Spreadsheet_Exception('spgrContainer is unexpectedly null');
     }
-
-    public function setSpgrContainer(SpgrContainer $spgrContainer): SpgrContainer
+    public function set_spgr_container(Spgr_Container $spgr_container): Spgr_Container
     {
-        return $this->spgrContainer = $spgrContainer;
+        return $this->spgr_container = $spgr_container;
     }
 }

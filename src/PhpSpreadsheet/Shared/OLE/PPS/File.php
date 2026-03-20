@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Shared\OLE\PPS;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared\OLE\PPS;
 
 // vim: set expandtab tabstop=4 shiftwidth=4:
 // +----------------------------------------------------------------------+
@@ -22,9 +21,8 @@ namespace PhpOffice\PhpSpreadsheet\Shared\OLE\PPS;
 // | Based on OLE::Storage_Lite by Kawai, Takanori                        |
 // +----------------------------------------------------------------------+
 //
-use PhpOffice\PhpSpreadsheet\Shared\OLE;
-use PhpOffice\PhpSpreadsheet\Shared\OLE\PPS;
-
+use Php_Office\Php_Spreadsheet\Shared\OLE;
+use Php_Office\Php_Spreadsheet\Shared\OLE\PPS;
 /**
  * Class for creating File PPS's for OLE containers.
  *
@@ -43,7 +41,6 @@ class File extends PPS
     {
         parent::__construct(null, $name, OLE::OLE_PPS_TYPE_FILE, null, null, null, null, null, '', []);
     }
-
     /**
      * Initialization method. Has to be called right after OLE_PPS_File().
      */
@@ -51,7 +48,6 @@ class File extends PPS
     {
         return true;
     }
-
     /**
      * Append data to PPS.
      *

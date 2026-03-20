@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Information;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Information;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
-class ErrorValue
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+class Error_Value
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * IS_ERR.
      *
@@ -20,15 +17,13 @@ class ErrorValue
      * @return array<mixed>|bool If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function isErr(mixed $value = ''): array|bool
+    public static function is_err(mixed $value = ''): array|bool
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
-        return self::isError($value) && (!self::isNa(($value)));
+        return self::is_error($value) && !self::is_na($value);
     }
-
     /**
      * IS_ERROR.
      *
@@ -38,22 +33,19 @@ class ErrorValue
      * @return array<mixed>|bool If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function isError(mixed $value = '', bool $tryNotImplemented = false): array|bool
+    public static function is_error(mixed $value = '', bool $try_not_implemented = false): array|bool
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         if (!is_string($value)) {
             return false;
         }
-        if ($tryNotImplemented && $value === Functions::NOT_YET_IMPLEMENTED) {
+        if ($try_not_implemented && $value === Functions::NOT_YET_IMPLEMENTED) {
             return true;
         }
-
-        return in_array($value, ExcelError::ERROR_CODES, true);
+        return in_array($value, Excel_Error::ERROR_CODES, true);
     }
-
     /**
      * IS_NA.
      *
@@ -63,12 +55,11 @@ class ErrorValue
      * @return array<mixed>|bool If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function isNa(mixed $value = ''): array|bool
+    public static function is_na(mixed $value = ''): array|bool
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
-        return $value === ExcelError::NA();
+        return $value === Excel_Error::NA();
     }
 }

@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Pdf;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
-class TcpdfNoDie extends Tcpdf
+class Tcpdf_No_Die extends Tcpdf
 {
     /**
      * By default, Tcpdf will die sometimes rather than throwing exception.

@@ -1,35 +1,28 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet;
 
-namespace PhpOffice\PhpSpreadsheet;
-
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-abstract class DefinedName
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+abstract class Defined_Name
 {
     protected const REGEXP_IDENTIFY_FORMULA = '[^_\p{N}\p{L}:, \$\'!]';
-
     /**
      * Worksheet on which the defined name can be resolved.
      */
     protected ?Worksheet $worksheet;
-
     /**
      * Value of the named object.
      */
     protected string $value;
-
     /**
      * Scope.
      */
     protected ?Worksheet $scope;
-
     /**
      * Whether this is a named range or a named formula.
      */
-    protected bool $isFormula;
-
+    protected bool $is_formula;
     /**
      * Create a new Defined Name.
      */
@@ -43,209 +36,173 @@ abstract class DefinedName
         /**
          * Is the defined named local? (i.e. can only be used on $this->worksheet).
          */
-        protected bool $localOnly = false,
+        protected bool $local_only = false,
         ?Worksheet $scope = null
-    ) {
+    )
+    {
         if ($worksheet === null) {
             $worksheet = $scope;
         }
         $this->worksheet = $worksheet;
         $this->value = (string) $value;
         // If local only, then the scope will be set to worksheet unless a scope is explicitly set
-        $this->scope = ($this->localOnly === true) ? ($scope ?? $worksheet) : null;
+        $this->scope = $this->local_only === true ? $scope ?? $worksheet : null;
         // If the range string contains characters that aren't associated with the range definition (A-Z,1-9
         //      for cell references, and $, or the range operators (colon comma or space), quotes and ! for
         //      worksheet names
         //  then this is treated as a named formula, and not a named range
-        $this->isFormula = self::testIfFormula($this->value);
+        $this->is_formula = self::test_if_formula($this->value);
     }
-
     public function __destruct()
     {
         $this->worksheet = null;
         $this->scope = null;
     }
-
     /**
      * Create a new defined name, either a range or a formula.
      */
-    public static function createInstance(
-        string $name,
-        ?Worksheet $worksheet = null,
-        ?string $value = null,
-        bool $localOnly = false,
-        ?Worksheet $scope = null
-    ): self {
+    public static function create_instance(string $name, ?Worksheet $worksheet = null, ?string $value = null, bool $local_only = false, ?Worksheet $scope = null): self
+    {
         $value = (string) $value;
-        $isFormula = self::testIfFormula($value);
-        if ($isFormula) {
-            return new NamedFormula($name, $worksheet, $value, $localOnly, $scope);
+        $is_formula = self::test_if_formula($value);
+        if ($is_formula) {
+            return new Named_Formula($name, $worksheet, $value, $local_only, $scope);
         }
-
-        return new NamedRange($name, $worksheet, $value, $localOnly, $scope);
+        return new Named_Range($name, $worksheet, $value, $local_only, $scope);
     }
-
-    public static function testIfFormula(string $value): bool
+    public static function test_if_formula(string $value): bool
     {
         if (str_starts_with($value, '=')) {
             $value = substr($value, 1);
         }
-
         if (is_numeric($value)) {
             return true;
         }
-
-        $segMatcher = false;
-        foreach (explode("'", $value) as $subVal) {
+        $seg_matcher = false;
+        foreach (explode("'", $value) as $sub_val) {
             //    Only test in alternate array entries (the non-quoted blocks)
-            $segMatcher = $segMatcher === false;
-            if (
-                $segMatcher
-                && (preg_match('/' . self::REGEXP_IDENTIFY_FORMULA . '/miu', $subVal))
-            ) {
+            $seg_matcher = $seg_matcher === false;
+            if ($seg_matcher && preg_match('/' . self::REGEXP_IDENTIFY_FORMULA . '/miu', $sub_val)) {
                 return true;
             }
         }
-
         return false;
     }
-
     /**
      * Get name.
      */
-    public function getName(): string
+    public function get_name(): string
     {
         return $this->name;
     }
-
     /**
      * Set name.
      */
-    public function setName(string $name): self
+    public function set_name(string $name): self
     {
         if (!empty($name)) {
             // Old title
-            $oldTitle = $this->name;
-
+            $old_title = $this->name;
             // Re-attach
             if ($this->worksheet !== null) {
-                $this->worksheet->getParentOrThrow()->removeNamedRange($this->name, $this->worksheet);
+                $this->worksheet->get_parent_or_throw()->remove_named_range($this->name, $this->worksheet);
             }
             $this->name = $name;
-
             if ($this->worksheet !== null) {
-                $this->worksheet->getParentOrThrow()->addDefinedName($this);
+                $this->worksheet->get_parent_or_throw()->add_defined_name($this);
             }
-
             if ($this->worksheet !== null) {
                 // New title
-                $newTitle = $this->name;
-                ReferenceHelper::getInstance()->updateNamedFormulae($this->worksheet->getParentOrThrow(), $oldTitle, $newTitle);
+                $new_title = $this->name;
+                Reference_Helper::get_instance()->update_named_formulae($this->worksheet->get_parent_or_throw(), $old_title, $new_title);
             }
         }
-
         return $this;
     }
-
     /**
      * Get worksheet.
      */
-    public function getWorksheet(): ?Worksheet
+    public function get_worksheet(): ?Worksheet
     {
         return $this->worksheet;
     }
-
     /**
      * Set worksheet.
      */
-    public function setWorksheet(?Worksheet $worksheet): self
+    public function set_worksheet(?Worksheet $worksheet): self
     {
         $this->worksheet = $worksheet;
-
         return $this;
     }
-
     /**
      * Get range or formula value.
      */
-    public function getValue(): string
+    public function get_value(): string
     {
         return $this->value;
     }
-
     /**
      * Set range or formula  value.
      */
-    public function setValue(string $value): self
+    public function set_value(string $value): self
     {
         $this->value = $value;
-
         return $this;
     }
-
     /**
      * Get localOnly.
      */
-    public function getLocalOnly(): bool
+    public function get_local_only(): bool
     {
-        return $this->localOnly;
+        return $this->local_only;
     }
-
     /**
      * Set localOnly.
      */
-    public function setLocalOnly(bool $localScope): self
+    public function set_local_only(bool $local_scope): self
     {
-        $this->localOnly = $localScope;
-        $this->scope = $localScope ? $this->worksheet : null;
-
+        $this->local_only = $local_scope;
+        $this->scope = $local_scope ? $this->worksheet : null;
         return $this;
     }
-
     /**
      * Get scope.
      */
-    public function getScope(): ?Worksheet
+    public function get_scope(): ?Worksheet
     {
         return $this->scope;
     }
-
     /**
      * Set scope.
      */
-    public function setScope(?Worksheet $worksheet): self
+    public function set_scope(?Worksheet $worksheet): self
     {
         $this->scope = $worksheet;
-        $this->localOnly = $worksheet !== null;
-
+        $this->local_only = $worksheet !== null;
         return $this;
     }
-
     /**
      * Identify whether this is a named range or a named formula.
      */
-    public function isFormula(): bool
+    public function is_formula(): bool
     {
-        return $this->isFormula;
+        return $this->is_formula;
     }
-
     /**
      * Resolve a named range to a regular cell range or formula.
      */
-    public static function resolveName(string $definedName, Worksheet $worksheet, string $sheetName = ''): ?self
+    public static function resolve_name(string $defined_name, Worksheet $worksheet, string $sheet_name = ''): ?self
     {
-        if ($sheetName === '') {
+        if ($sheet_name === '') {
             $worksheet2 = $worksheet;
         } else {
-            $worksheet2 = $worksheet->getParentOrThrow()->getSheetByName($sheetName);
+            $worksheet2 = $worksheet->get_parent_or_throw()->get_sheet_by_name($sheet_name);
             if ($worksheet2 === null) {
                 return null;
             }
         }
-
-        return $worksheet->getParentOrThrow()->getDefinedName($definedName, $worksheet2);
+        return $worksheet->get_parent_or_throw()->get_defined_name($defined_name, $worksheet2);
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
@@ -254,9 +211,9 @@ abstract class DefinedName
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
             if (is_object($value)) {
-                $this->$key = clone $value;
+                $this->{$key} = clone $value;
             } else {
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

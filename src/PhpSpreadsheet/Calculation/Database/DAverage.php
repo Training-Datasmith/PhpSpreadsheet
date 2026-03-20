@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Database;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Averages;
-
-class DAverage extends DatabaseAbstract
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Averages;
+class D_Average extends Database_Abstract
 {
     /**
      * DAVERAGE.
@@ -34,13 +32,10 @@ class DAverage extends DatabaseAbstract
      */
     public static function evaluate(array $database, array|null|int|string $field, array $criteria): string|int|float
     {
-        $field = self::fieldExtract($database, $field);
+        $field = self::field_extract($database, $field);
         if ($field === null) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
-        return Averages::average(
-            self::getFilteredColumn($database, $field, $criteria)
-        );
+        return Averages::average(self::get_filtered_column($database, $field, $criteria));
     }
 }

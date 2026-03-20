@@ -1,42 +1,50 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Information;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Information;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-
-class ExcelError
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+class Excel_Error
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * List of error codes.
      *
      * @var array<string, string>
      */
     public const ERROR_CODES = [
-        'null' => '#NULL!', // 1
-        'divisionbyzero' => '#DIV/0!', // 2
-        'value' => '#VALUE!', // 3
-        'reference' => '#REF!', // 4
-        'name' => '#NAME?', // 5
-        'num' => '#NUM!', // 6
-        'na' => '#N/A', // 7
-        'gettingdata' => '#GETTING_DATA', // 8
-        'spill' => '#SPILL!', // 9
-        'connect' => '#CONNECT!', //10
-        'blocked' => '#BLOCKED!', //11
-        'unknown' => '#UNKNOWN!', //12
-        'field' => '#FIELD!', //13
-        'calculation' => '#CALC!', //14
+        'null' => '#NULL!',
+        // 1
+        'divisionbyzero' => '#DIV/0!',
+        // 2
+        'value' => '#VALUE!',
+        // 3
+        'reference' => '#REF!',
+        // 4
+        'name' => '#NAME?',
+        // 5
+        'num' => '#NUM!',
+        // 6
+        'na' => '#N/A',
+        // 7
+        'gettingdata' => '#GETTING_DATA',
+        // 8
+        'spill' => '#SPILL!',
+        // 9
+        'connect' => '#CONNECT!',
+        //10
+        'blocked' => '#BLOCKED!',
+        //11
+        'unknown' => '#UNKNOWN!',
+        //12
+        'field' => '#FIELD!',
+        //13
+        'calculation' => '#CALC!',
     ];
-
-    public static function throwError(mixed $value): string
+    public static function throw_error(mixed $value): string
     {
         return in_array($value, self::ERROR_CODES, true) ? $value : self::ERROR_CODES['value'];
     }
-
     /**
      * ERROR_TYPE.
      *
@@ -47,20 +55,17 @@ class ExcelError
     public static function type(mixed $value = ''): array|int|string
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         $i = 1;
-        foreach (self::ERROR_CODES as $errorCode) {
-            if ($value === $errorCode) {
+        foreach (self::ERROR_CODES as $error_code) {
+            if ($value === $error_code) {
                 return $i;
             }
             ++$i;
         }
-
         return self::NA();
     }
-
     /**
      * NULL.
      *
@@ -72,7 +77,6 @@ class ExcelError
     {
         return self::ERROR_CODES['null'];
     }
-
     /**
      * NaN.
      *
@@ -84,7 +88,6 @@ class ExcelError
     {
         return self::ERROR_CODES['num'];
     }
-
     /**
      * REF.
      *
@@ -96,7 +99,6 @@ class ExcelError
     {
         return self::ERROR_CODES['reference'];
     }
-
     /**
      * NA.
      *
@@ -112,7 +114,6 @@ class ExcelError
     {
         return self::ERROR_CODES['na'];
     }
-
     /**
      * VALUE.
      *
@@ -124,7 +125,6 @@ class ExcelError
     {
         return self::ERROR_CODES['value'];
     }
-
     /**
      * NAME.
      *
@@ -136,7 +136,6 @@ class ExcelError
     {
         return self::ERROR_CODES['name'];
     }
-
     /**
      * DIV0.
      *
@@ -146,7 +145,6 @@ class ExcelError
     {
         return self::ERROR_CODES['divisionbyzero'];
     }
-
     /**
      * CALC.
      *
@@ -156,7 +154,6 @@ class ExcelError
     {
         return self::ERROR_CODES['calculation'];
     }
-
     /**
      * SPILL.
      *

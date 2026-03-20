@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\Logical;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Logical;
 
 class Boolean
 {
@@ -20,7 +19,6 @@ class Boolean
     {
         return true;
     }
-
     /**
      * FALSE.
      *

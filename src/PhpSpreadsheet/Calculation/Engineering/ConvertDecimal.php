@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ConvertDecimal extends ConvertBase
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Convert_Decimal extends Convert_Base
 {
     public const LARGEST_OCTAL_IN_DECIMAL = 536870911;
     public const SMALLEST_OCTAL_IN_DECIMAL = -536870912;
@@ -15,7 +13,6 @@ class ConvertDecimal extends ConvertBase
     public const SMALLEST_BINARY_IN_DECIMAL = -512;
     public const LARGEST_HEX_IN_DECIMAL = 549755813887;
     public const SMALLEST_HEX_IN_DECIMAL = -549755813888;
-
     /**
      * toBinary.
      *
@@ -47,32 +44,27 @@ class ConvertDecimal extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toBinary($value, $places = null): array|string
+    public static function to_binary($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateDecimal($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_decimal($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         $value = (int) floor((float) $value);
         if ($value > self::LARGEST_BINARY_IN_DECIMAL || $value < self::SMALLEST_BINARY_IN_DECIMAL) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
         $r = decbin($value);
         // Two's Complement
         $r = substr($r, -10);
-
-        return self::nbrConversionFormat($r, $places);
+        return self::nbr_conversion_format($r, $places);
     }
-
     /**
      * toHex.
      *
@@ -104,51 +96,43 @@ class ConvertDecimal extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toHex($value, $places = null): array|string
+    public static function to_hex($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateDecimal($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_decimal($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         $value = floor((float) $value);
         if ($value > self::LARGEST_HEX_IN_DECIMAL || $value < self::SMALLEST_HEX_IN_DECIMAL) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
         $r = strtoupper(dechex((int) $value));
         $r = self::hex32bit($value, $r);
-
-        return self::nbrConversionFormat($r, $places);
+        return self::nbr_conversion_format($r, $places);
     }
-
     public static function hex32bit(float $value, string $hexstr, bool $force = false): string
     {
         if (PHP_INT_SIZE === 4 || $force) {
             if ($value >= 2 ** 32) {
-                $quotient = (int) ($value / (2 ** 32));
-
+                $quotient = (int) ($value / 2 ** 32);
                 return strtoupper(substr('0' . dechex($quotient), -2) . $hexstr);
             }
-            if ($value < -(2 ** 32)) {
-                $quotient = 256 - (int) ceil((-$value) / (2 ** 32));
-
-                return strtoupper(substr('0' . dechex($quotient), -2) . substr("00000000$hexstr", -8));
+            if ($value < -2 ** 32) {
+                $quotient = 256 - (int) ceil(-$value / 2 ** 32);
+                return strtoupper(substr('0' . dechex($quotient), -2) . substr("00000000{$hexstr}", -8));
             }
             if ($value < 0) {
-                return "FF$hexstr";
+                return "FF{$hexstr}";
             }
         }
-
         return $hexstr;
     }
-
     /**
      * toOctal.
      *
@@ -180,36 +164,31 @@ class ConvertDecimal extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toOctal($value, $places = null): array|string
+    public static function to_octal($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateDecimal($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_decimal($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         $value = (int) floor((float) $value);
         if ($value > self::LARGEST_OCTAL_IN_DECIMAL || $value < self::SMALLEST_OCTAL_IN_DECIMAL) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
         $r = decoct($value);
         $r = substr($r, -10);
-
-        return self::nbrConversionFormat($r, $places);
+        return self::nbr_conversion_format($r, $places);
     }
-
-    protected static function validateDecimal(string $value): string
+    protected static function validate_decimal(string $value): string
     {
         if (strlen($value) > preg_match_all('/[-0123456789.]/', $value)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return $value;
     }
 }

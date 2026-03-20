@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Database;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Variances;
-
-class DVar extends DatabaseAbstract
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Variances;
+class D_Var extends Database_Abstract
 {
     /**
      * DVAR.
@@ -37,13 +35,10 @@ class DVar extends DatabaseAbstract
      */
     public static function evaluate(array $database, array|null|int|string $field, array $criteria): string|float
     {
-        $field = self::fieldExtract($database, $field);
+        $field = self::field_extract($database, $field);
         if ($field === null) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
-        return Variances::VAR(
-            self::getFilteredColumn($database, $field, $criteria)
-        );
+        return Variances::VAR(self::get_filtered_column($database, $field, $criteria));
     }
 }

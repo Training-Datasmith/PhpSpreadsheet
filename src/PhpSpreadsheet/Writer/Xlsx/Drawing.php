@@ -1,20 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
 use Composer\Pcre\Preg;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Shared\Drawing as SharedDrawing;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing;
-use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
-
-class Drawing extends WriterPart
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Shared\Drawing as SharedDrawing;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Base_Drawing;
+use Php_Office\Php_Spreadsheet\Worksheet\Header_Footer_Drawing;
+use Php_Office\Php_Spreadsheet\Writer\Exception as WriterException;
+class Drawing extends Writer_Part
 {
     /**
      * Write drawings to XML format.
@@ -23,589 +21,495 @@ class Drawing extends WriterPart
      *
      * @return string XML Output
      */
-    public function writeDrawings(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet, bool $includeCharts = false): string
+    public function write_drawings(\Php_Office\Php_Spreadsheet\Worksheet\Worksheet $worksheet, bool $include_charts = false): string
     {
         // Try to use pass-through drawing XML if available
-        if ($passThroughXml = $this->getPassThroughDrawingXml($worksheet)) {
-            return $passThroughXml;
+        if ($pass_through_xml = $this->get_pass_through_drawing_xml($worksheet)) {
+            return $pass_through_xml;
         }
-
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // xdr:wsDr
-        $objWriter->startElement('xdr:wsDr');
-        $objWriter->writeAttribute('xmlns:xdr', Namespaces::SPREADSHEET_DRAWING);
-        $objWriter->writeAttribute('xmlns:a', Namespaces::DRAWINGML);
-
+        $obj_writer->start_element('xdr:wsDr');
+        $obj_writer->write_attribute('xmlns:xdr', Namespaces::SPREADSHEET_DRAWING);
+        $obj_writer->write_attribute('xmlns:a', Namespaces::DRAWINGML);
         // Loop through images and write drawings
         $i = 1;
-        $iterator = $worksheet->getDrawingCollection()->getIterator();
+        $iterator = $worksheet->get_drawing_collection()->getIterator();
         while ($iterator->valid()) {
             /** @var BaseDrawing $pDrawing */
-            $pDrawing = $iterator->current();
-            $pRelationId = $i;
-            $hlinkClickId = $pDrawing->getHyperlink() === null ? null : ++$i;
-
-            $this->writeDrawing($objWriter, $pDrawing, $pRelationId, $hlinkClickId);
-
+            $p_drawing = $iterator->current();
+            $p_relation_id = $i;
+            $hlink_click_id = $p_drawing->get_hyperlink() === null ? null : ++$i;
+            $this->write_drawing($obj_writer, $p_drawing, $p_relation_id, $hlink_click_id);
             $iterator->next();
             ++$i;
         }
-
-        if ($includeCharts) {
-            $chartCount = $worksheet->getChartCount();
+        if ($include_charts) {
+            $chart_count = $worksheet->get_chart_count();
             // Loop through charts and write the chart position
-            if ($chartCount > 0) {
-                for ($c = 0; $c < $chartCount; ++$c) {
-                    $chart = $worksheet->getChartByIndex((string) $c);
+            if ($chart_count > 0) {
+                for ($c = 0; $c < $chart_count; ++$c) {
+                    $chart = $worksheet->get_chart_by_index((string) $c);
                     if ($chart !== false) {
-                        $this->writeChart($objWriter, $chart, $c + $i);
+                        $this->write_chart($obj_writer, $chart, $c + $i);
                     }
                 }
             }
         }
-
         // unparsed AlternateContent
         /** @var string[][][][] */
-        $unparsedLoadedData = $worksheet->getParentOrThrow()->getUnparsedLoadedData();
-        if (isset($unparsedLoadedData['sheets'][$worksheet->getCodeName()]['drawingAlternateContents'])) {
-            foreach ($unparsedLoadedData['sheets'][$worksheet->getCodeName()]['drawingAlternateContents'] as $drawingAlternateContent) {
-                $objWriter->writeRaw($drawingAlternateContent);
+        $unparsed_loaded_data = $worksheet->get_parent_or_throw()->get_unparsed_loaded_data();
+        if (isset($unparsed_loaded_data['sheets'][$worksheet->get_code_name()]['drawingAlternateContents'])) {
+            foreach ($unparsed_loaded_data['sheets'][$worksheet->get_code_name()]['drawingAlternateContents'] as $drawing_alternate_content) {
+                $obj_writer->write_raw($drawing_alternate_content);
             }
         }
-
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write drawings to XML format.
      */
-    public function writeChart(XMLWriter $objWriter, \PhpOffice\PhpSpreadsheet\Chart\Chart $chart, int $relationId = -1): void
+    public function write_chart(Xml_Writer $obj_writer, \Php_Office\Php_Spreadsheet\Chart\Chart $chart, int $relation_id = -1): void
     {
-        $tl = $chart->getTopLeftPosition();
-        $tlColRow = Coordinate::indexesFromString($tl['cell']);
-        $br = $chart->getBottomRightPosition();
-
-        $isTwoCellAnchor = $br['cell'] !== '';
-        if ($isTwoCellAnchor) {
-            $brColRow = Coordinate::indexesFromString($br['cell']);
-
-            $objWriter->startElement('xdr:twoCellAnchor');
-
-            $objWriter->startElement('xdr:from');
-            $objWriter->writeElement('xdr:col', (string) ($tlColRow[0] - 1));
-            $objWriter->writeElement('xdr:colOff', self::stringEmu($tl['xOffset']));
-            $objWriter->writeElement('xdr:row', (string) ($tlColRow[1] - 1));
-            $objWriter->writeElement('xdr:rowOff', self::stringEmu($tl['yOffset']));
-            $objWriter->endElement();
-            $objWriter->startElement('xdr:to');
-            $objWriter->writeElement('xdr:col', (string) ($brColRow[0] - 1));
-            $objWriter->writeElement('xdr:colOff', self::stringEmu($br['xOffset']));
-            $objWriter->writeElement('xdr:row', (string) ($brColRow[1] - 1));
-            $objWriter->writeElement('xdr:rowOff', self::stringEmu($br['yOffset']));
-            $objWriter->endElement();
-        } elseif ($chart->getOneCellAnchor()) {
-            $objWriter->startElement('xdr:oneCellAnchor');
-
-            $objWriter->startElement('xdr:from');
-            $objWriter->writeElement('xdr:col', (string) ($tlColRow[0] - 1));
-            $objWriter->writeElement('xdr:colOff', self::stringEmu($tl['xOffset']));
-            $objWriter->writeElement('xdr:row', (string) ($tlColRow[1] - 1));
-            $objWriter->writeElement('xdr:rowOff', self::stringEmu($tl['yOffset']));
-            $objWriter->endElement();
-            $objWriter->startElement('xdr:ext');
-            $objWriter->writeAttribute('cx', self::stringEmu($br['xOffset']));
-            $objWriter->writeAttribute('cy', self::stringEmu($br['yOffset']));
-            $objWriter->endElement();
+        $tl = $chart->get_top_left_position();
+        $tl_col_row = Coordinate::indexes_from_string($tl['cell']);
+        $br = $chart->get_bottom_right_position();
+        $is_two_cell_anchor = $br['cell'] !== '';
+        if ($is_two_cell_anchor) {
+            $br_col_row = Coordinate::indexes_from_string($br['cell']);
+            $obj_writer->start_element('xdr:twoCellAnchor');
+            $obj_writer->start_element('xdr:from');
+            $obj_writer->write_element('xdr:col', (string) ($tl_col_row[0] - 1));
+            $obj_writer->write_element('xdr:colOff', self::string_emu($tl['xOffset']));
+            $obj_writer->write_element('xdr:row', (string) ($tl_col_row[1] - 1));
+            $obj_writer->write_element('xdr:rowOff', self::string_emu($tl['yOffset']));
+            $obj_writer->end_element();
+            $obj_writer->start_element('xdr:to');
+            $obj_writer->write_element('xdr:col', (string) ($br_col_row[0] - 1));
+            $obj_writer->write_element('xdr:colOff', self::string_emu($br['xOffset']));
+            $obj_writer->write_element('xdr:row', (string) ($br_col_row[1] - 1));
+            $obj_writer->write_element('xdr:rowOff', self::string_emu($br['yOffset']));
+            $obj_writer->end_element();
+        } elseif ($chart->get_one_cell_anchor()) {
+            $obj_writer->start_element('xdr:oneCellAnchor');
+            $obj_writer->start_element('xdr:from');
+            $obj_writer->write_element('xdr:col', (string) ($tl_col_row[0] - 1));
+            $obj_writer->write_element('xdr:colOff', self::string_emu($tl['xOffset']));
+            $obj_writer->write_element('xdr:row', (string) ($tl_col_row[1] - 1));
+            $obj_writer->write_element('xdr:rowOff', self::string_emu($tl['yOffset']));
+            $obj_writer->end_element();
+            $obj_writer->start_element('xdr:ext');
+            $obj_writer->write_attribute('cx', self::string_emu($br['xOffset']));
+            $obj_writer->write_attribute('cy', self::string_emu($br['yOffset']));
+            $obj_writer->end_element();
         } else {
-            $objWriter->startElement('xdr:absoluteAnchor');
-            $objWriter->startElement('xdr:pos');
-            $objWriter->writeAttribute('x', '0');
-            $objWriter->writeAttribute('y', '0');
-            $objWriter->endElement();
-            $objWriter->startElement('xdr:ext');
-            $objWriter->writeAttribute('cx', self::stringEmu($br['xOffset']));
-            $objWriter->writeAttribute('cy', self::stringEmu($br['yOffset']));
-            $objWriter->endElement();
+            $obj_writer->start_element('xdr:absoluteAnchor');
+            $obj_writer->start_element('xdr:pos');
+            $obj_writer->write_attribute('x', '0');
+            $obj_writer->write_attribute('y', '0');
+            $obj_writer->end_element();
+            $obj_writer->start_element('xdr:ext');
+            $obj_writer->write_attribute('cx', self::string_emu($br['xOffset']));
+            $obj_writer->write_attribute('cy', self::string_emu($br['yOffset']));
+            $obj_writer->end_element();
         }
-
-        $objWriter->startElement('xdr:graphicFrame');
-        $objWriter->writeAttribute('macro', '');
-        $objWriter->startElement('xdr:nvGraphicFramePr');
-        $objWriter->startElement('xdr:cNvPr');
-        $objWriter->writeAttribute('name', 'Chart ' . $relationId);
-        $objWriter->writeAttribute('id', (string) (1025 * $relationId));
-        $objWriter->endElement();
-        $objWriter->startElement('xdr:cNvGraphicFramePr');
-        $objWriter->startElement('a:graphicFrameLocks');
-        $objWriter->endElement();
-        $objWriter->endElement();
-        $objWriter->endElement();
-
-        $objWriter->startElement('xdr:xfrm');
-        $objWriter->startElement('a:off');
-        $objWriter->writeAttribute('x', '0');
-        $objWriter->writeAttribute('y', '0');
-        $objWriter->endElement();
-        $objWriter->startElement('a:ext');
-        $objWriter->writeAttribute('cx', '0');
-        $objWriter->writeAttribute('cy', '0');
-        $objWriter->endElement();
-        $objWriter->endElement();
-
-        $objWriter->startElement('a:graphic');
-        $objWriter->startElement('a:graphicData');
-        $objWriter->writeAttribute('uri', Namespaces::CHART);
-        $objWriter->startElement('c:chart');
-        $objWriter->writeAttribute('xmlns:c', Namespaces::CHART);
-        $objWriter->writeAttribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
-        $objWriter->writeAttribute('r:id', 'rId' . $relationId);
-        $objWriter->endElement();
-        $objWriter->endElement();
-        $objWriter->endElement();
-        $objWriter->endElement();
-
-        $objWriter->startElement('xdr:clientData');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
+        $obj_writer->start_element('xdr:graphicFrame');
+        $obj_writer->write_attribute('macro', '');
+        $obj_writer->start_element('xdr:nvGraphicFramePr');
+        $obj_writer->start_element('xdr:cNvPr');
+        $obj_writer->write_attribute('name', 'Chart ' . $relation_id);
+        $obj_writer->write_attribute('id', (string) (1025 * $relation_id));
+        $obj_writer->end_element();
+        $obj_writer->start_element('xdr:cNvGraphicFramePr');
+        $obj_writer->start_element('a:graphicFrameLocks');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->start_element('xdr:xfrm');
+        $obj_writer->start_element('a:off');
+        $obj_writer->write_attribute('x', '0');
+        $obj_writer->write_attribute('y', '0');
+        $obj_writer->end_element();
+        $obj_writer->start_element('a:ext');
+        $obj_writer->write_attribute('cx', '0');
+        $obj_writer->write_attribute('cy', '0');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->start_element('a:graphic');
+        $obj_writer->start_element('a:graphicData');
+        $obj_writer->write_attribute('uri', Namespaces::CHART);
+        $obj_writer->start_element('c:chart');
+        $obj_writer->write_attribute('xmlns:c', Namespaces::CHART);
+        $obj_writer->write_attribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
+        $obj_writer->write_attribute('r:id', 'rId' . $relation_id);
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->end_element();
+        $obj_writer->start_element('xdr:clientData');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
     }
-
     /**
      * Write drawings to XML format.
      */
-    public function writeDrawing(XMLWriter $objWriter, BaseDrawing $drawing, int $relationId = -1, ?int $hlinkClickId = null): void
+    public function write_drawing(Xml_Writer $obj_writer, Base_Drawing $drawing, int $relation_id = -1, ?int $hlink_click_id = null): void
     {
-        if ($relationId >= 0) {
-            $isTwoCellAnchor = $drawing->getCoordinates2() !== '';
-            if ($isTwoCellAnchor) {
+        if ($relation_id >= 0) {
+            $is_two_cell_anchor = $drawing->get_coordinates2() !== '';
+            if ($is_two_cell_anchor) {
                 // xdr:twoCellAnchor
-                $objWriter->startElement('xdr:twoCellAnchor');
-                if ($drawing->validEditAs()) {
-                    $objWriter->writeAttribute('editAs', $drawing->getEditAs());
+                $obj_writer->start_element('xdr:twoCellAnchor');
+                if ($drawing->valid_edit_as()) {
+                    $obj_writer->write_attribute('editAs', $drawing->get_edit_as());
                 }
                 // Image location
-                $aCoordinates = Coordinate::indexesFromString($drawing->getCoordinates());
-                $aCoordinates2 = Coordinate::indexesFromString($drawing->getCoordinates2());
-
+                $a_coordinates = Coordinate::indexes_from_string($drawing->get_coordinates());
+                $a_coordinates2 = Coordinate::indexes_from_string($drawing->get_coordinates2());
                 // xdr:from
-                $objWriter->startElement('xdr:from');
-                $objWriter->writeElement('xdr:col', (string) ($aCoordinates[0] - 1));
-                $objWriter->writeElement('xdr:colOff', self::stringEmu($drawing->getOffsetX()));
-                $objWriter->writeElement('xdr:row', (string) ($aCoordinates[1] - 1));
-                $objWriter->writeElement('xdr:rowOff', self::stringEmu($drawing->getOffsetY()));
-                $objWriter->endElement();
-
+                $obj_writer->start_element('xdr:from');
+                $obj_writer->write_element('xdr:col', (string) ($a_coordinates[0] - 1));
+                $obj_writer->write_element('xdr:colOff', self::string_emu($drawing->get_offset_x()));
+                $obj_writer->write_element('xdr:row', (string) ($a_coordinates[1] - 1));
+                $obj_writer->write_element('xdr:rowOff', self::string_emu($drawing->get_offset_y()));
+                $obj_writer->end_element();
                 // xdr:to
-                $objWriter->startElement('xdr:to');
-                $objWriter->writeElement('xdr:col', (string) ($aCoordinates2[0] - 1));
-                $objWriter->writeElement('xdr:colOff', self::stringEmu($drawing->getOffsetX2()));
-                $objWriter->writeElement('xdr:row', (string) ($aCoordinates2[1] - 1));
-                $objWriter->writeElement('xdr:rowOff', self::stringEmu($drawing->getOffsetY2()));
-                $objWriter->endElement();
+                $obj_writer->start_element('xdr:to');
+                $obj_writer->write_element('xdr:col', (string) ($a_coordinates2[0] - 1));
+                $obj_writer->write_element('xdr:colOff', self::string_emu($drawing->get_offset_x2()));
+                $obj_writer->write_element('xdr:row', (string) ($a_coordinates2[1] - 1));
+                $obj_writer->write_element('xdr:rowOff', self::string_emu($drawing->get_offset_y2()));
+                $obj_writer->end_element();
             } else {
                 // xdr:oneCellAnchor
-                $objWriter->startElement('xdr:oneCellAnchor');
+                $obj_writer->start_element('xdr:oneCellAnchor');
                 // Image location
-                $aCoordinates = Coordinate::indexesFromString($drawing->getCoordinates());
-
+                $a_coordinates = Coordinate::indexes_from_string($drawing->get_coordinates());
                 // xdr:from
-                $objWriter->startElement('xdr:from');
-                $objWriter->writeElement('xdr:col', (string) ($aCoordinates[0] - 1));
-                $objWriter->writeElement('xdr:colOff', self::stringEmu($drawing->getOffsetX()));
-                $objWriter->writeElement('xdr:row', (string) ($aCoordinates[1] - 1));
-                $objWriter->writeElement('xdr:rowOff', self::stringEmu($drawing->getOffsetY()));
-                $objWriter->endElement();
-
+                $obj_writer->start_element('xdr:from');
+                $obj_writer->write_element('xdr:col', (string) ($a_coordinates[0] - 1));
+                $obj_writer->write_element('xdr:colOff', self::string_emu($drawing->get_offset_x()));
+                $obj_writer->write_element('xdr:row', (string) ($a_coordinates[1] - 1));
+                $obj_writer->write_element('xdr:rowOff', self::string_emu($drawing->get_offset_y()));
+                $obj_writer->end_element();
                 // xdr:ext
-                $objWriter->startElement('xdr:ext');
-                $objWriter->writeAttribute('cx', self::stringEmu($drawing->getWidth()));
-                $objWriter->writeAttribute('cy', self::stringEmu($drawing->getHeight()));
-                $objWriter->endElement();
+                $obj_writer->start_element('xdr:ext');
+                $obj_writer->write_attribute('cx', self::string_emu($drawing->get_width()));
+                $obj_writer->write_attribute('cy', self::string_emu($drawing->get_height()));
+                $obj_writer->end_element();
             }
-
             // xdr:pic
-            $objWriter->startElement('xdr:pic');
-
+            $obj_writer->start_element('xdr:pic');
             // xdr:nvPicPr
-            $objWriter->startElement('xdr:nvPicPr');
-
+            $obj_writer->start_element('xdr:nvPicPr');
             // xdr:cNvPr
-            $objWriter->startElement('xdr:cNvPr');
-            $objWriter->writeAttribute('id', (string) $relationId);
-            $objWriter->writeAttribute('name', $drawing->getName());
-            $objWriter->writeAttribute('descr', $drawing->getDescription());
-
+            $obj_writer->start_element('xdr:cNvPr');
+            $obj_writer->write_attribute('id', (string) $relation_id);
+            $obj_writer->write_attribute('name', $drawing->get_name());
+            $obj_writer->write_attribute('descr', $drawing->get_description());
             //a:hlinkClick
-            $this->writeHyperLinkDrawing($objWriter, $hlinkClickId);
-
-            $objWriter->endElement();
-
+            $this->write_hyper_link_drawing($obj_writer, $hlink_click_id);
+            $obj_writer->end_element();
             // xdr:cNvPicPr
-            $objWriter->startElement('xdr:cNvPicPr');
-
+            $obj_writer->start_element('xdr:cNvPicPr');
             // a:picLocks
-            $objWriter->startElement('a:picLocks');
-            $objWriter->writeAttribute('noChangeAspect', '1');
-            $objWriter->endElement();
-
-            $objWriter->endElement();
-
-            $objWriter->endElement();
-
+            $obj_writer->start_element('a:picLocks');
+            $obj_writer->write_attribute('noChangeAspect', '1');
+            $obj_writer->end_element();
+            $obj_writer->end_element();
+            $obj_writer->end_element();
             // xdr:blipFill
-            $objWriter->startElement('xdr:blipFill');
-
+            $obj_writer->start_element('xdr:blipFill');
             // a:blip
-            $objWriter->startElement('a:blip');
-            $objWriter->writeAttribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
-            $objWriter->writeAttribute('r:embed', 'rId' . $relationId);
-            $temp = $drawing->getOpacity();
+            $obj_writer->start_element('a:blip');
+            $obj_writer->write_attribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
+            $obj_writer->write_attribute('r:embed', 'rId' . $relation_id);
+            $temp = $drawing->get_opacity();
             if (is_int($temp) && $temp >= 0 && $temp <= 100000) {
-                $objWriter->startElement('a:alphaModFix');
-                $objWriter->writeAttribute('amt', "$temp");
-                $objWriter->endElement(); // a:alphaModFix
+                $obj_writer->start_element('a:alphaModFix');
+                $obj_writer->write_attribute('amt', "{$temp}");
+                $obj_writer->end_element();
+                // a:alphaModFix
             }
-            $objWriter->endElement(); // a:blip
-
-            $srcRect = $drawing->getSrcRect();
-            if (!empty($srcRect)) {
-                $objWriter->startElement('a:srcRect');
-                foreach ($srcRect as $key => $value) {
-                    $objWriter->writeAttribute($key, (string) $value);
+            $obj_writer->end_element();
+            // a:blip
+            $src_rect = $drawing->get_src_rect();
+            if (!empty($src_rect)) {
+                $obj_writer->start_element('a:srcRect');
+                foreach ($src_rect as $key => $value) {
+                    $obj_writer->write_attribute($key, (string) $value);
                 }
-                $objWriter->endElement(); // a:srcRect
-                $objWriter->startElement('a:stretch');
-                $objWriter->endElement(); // a:stretch
+                $obj_writer->end_element();
+                // a:srcRect
+                $obj_writer->start_element('a:stretch');
+                $obj_writer->end_element();
+                // a:stretch
             } else {
                 // a:stretch
-                $objWriter->startElement('a:stretch');
-                $objWriter->writeElement('a:fillRect');
-                $objWriter->endElement();
+                $obj_writer->start_element('a:stretch');
+                $obj_writer->write_element('a:fillRect');
+                $obj_writer->end_element();
             }
-
-            $objWriter->endElement();
-
+            $obj_writer->end_element();
             // xdr:spPr
-            $objWriter->startElement('xdr:spPr');
-
+            $obj_writer->start_element('xdr:spPr');
             // a:xfrm
-            $objWriter->startElement('a:xfrm');
-            $objWriter->writeAttribute('rot', (string) SharedDrawing::degreesToAngle($drawing->getRotation()));
-            self::writeAttributeIf($objWriter, $drawing->getFlipVertical(), 'flipV', '1');
-            self::writeAttributeIf($objWriter, $drawing->getFlipHorizontal(), 'flipH', '1');
-            if ($isTwoCellAnchor) {
-                $objWriter->startElement('a:ext');
-                $objWriter->writeAttribute('cx', self::stringEmu($drawing->getWidth()));
-                $objWriter->writeAttribute('cy', self::stringEmu($drawing->getHeight()));
-                $objWriter->endElement();
+            $obj_writer->start_element('a:xfrm');
+            $obj_writer->write_attribute('rot', (string) Shared_Drawing::degrees_to_angle($drawing->get_rotation()));
+            self::write_attribute_if($obj_writer, $drawing->get_flip_vertical(), 'flipV', '1');
+            self::write_attribute_if($obj_writer, $drawing->get_flip_horizontal(), 'flipH', '1');
+            if ($is_two_cell_anchor) {
+                $obj_writer->start_element('a:ext');
+                $obj_writer->write_attribute('cx', self::string_emu($drawing->get_width()));
+                $obj_writer->write_attribute('cy', self::string_emu($drawing->get_height()));
+                $obj_writer->end_element();
             }
-            $objWriter->endElement();
-
+            $obj_writer->end_element();
             // a:prstGeom
-            $objWriter->startElement('a:prstGeom');
-            $objWriter->writeAttribute('prst', 'rect');
-
+            $obj_writer->start_element('a:prstGeom');
+            $obj_writer->write_attribute('prst', 'rect');
             // a:avLst
-            $objWriter->writeElement('a:avLst');
-
-            $objWriter->endElement();
-
-            if ($drawing->getShadow()->getVisible()) {
+            $obj_writer->write_element('a:avLst');
+            $obj_writer->end_element();
+            if ($drawing->get_shadow()->get_visible()) {
                 // a:effectLst
-                $objWriter->startElement('a:effectLst');
-
+                $obj_writer->start_element('a:effectLst');
                 // a:outerShdw
-                $objWriter->startElement('a:outerShdw');
-                $objWriter->writeAttribute('blurRad', self::stringEmu($drawing->getShadow()->getBlurRadius()));
-                $objWriter->writeAttribute('dist', self::stringEmu($drawing->getShadow()->getDistance()));
-                $objWriter->writeAttribute('dir', (string) SharedDrawing::degreesToAngle($drawing->getShadow()->getDirection()));
-                $objWriter->writeAttribute('algn', $drawing->getShadow()->getAlignment());
-                $objWriter->writeAttribute('rotWithShape', '0');
-
+                $obj_writer->start_element('a:outerShdw');
+                $obj_writer->write_attribute('blurRad', self::string_emu($drawing->get_shadow()->get_blur_radius()));
+                $obj_writer->write_attribute('dist', self::string_emu($drawing->get_shadow()->get_distance()));
+                $obj_writer->write_attribute('dir', (string) Shared_Drawing::degrees_to_angle($drawing->get_shadow()->get_direction()));
+                $obj_writer->write_attribute('algn', $drawing->get_shadow()->get_alignment());
+                $obj_writer->write_attribute('rotWithShape', '0');
                 // a:srgbClr
-                $objWriter->startElement('a:srgbClr');
-                $objWriter->writeAttribute('val', $drawing->getShadow()->getColor()->getRGB());
-
+                $obj_writer->start_element('a:srgbClr');
+                $obj_writer->write_attribute('val', $drawing->get_shadow()->get_color()->get_rgb());
                 // a:alpha
-                $objWriter->startElement('a:alpha');
-                $objWriter->writeAttribute('val', (string) ($drawing->getShadow()->getAlpha() * 1000));
-                $objWriter->endElement();
-
-                $objWriter->endElement();
-
-                $objWriter->endElement();
-
-                $objWriter->endElement();
+                $obj_writer->start_element('a:alpha');
+                $obj_writer->write_attribute('val', (string) ($drawing->get_shadow()->get_alpha() * 1000));
+                $obj_writer->end_element();
+                $obj_writer->end_element();
+                $obj_writer->end_element();
+                $obj_writer->end_element();
             }
-            $objWriter->endElement();
-
-            $objWriter->endElement();
-
+            $obj_writer->end_element();
+            $obj_writer->end_element();
             // xdr:clientData
-            $objWriter->writeElement('xdr:clientData');
-
-            $objWriter->endElement();
+            $obj_writer->write_element('xdr:clientData');
+            $obj_writer->end_element();
         } else {
-            throw new WriterException('Invalid parameters passed.');
+            throw new Writer_Exception('Invalid parameters passed.');
         }
     }
-
     /**
      * Write VML header/footer images to XML format.
      *
      * @return string XML Output
      */
-    public function writeVMLHeaderFooterImages(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet): string
+    public function write_vml_header_footer_images(\Php_Office\Php_Spreadsheet\Worksheet\Worksheet $worksheet): string
     {
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // Header/footer images
-        $images = $worksheet->getHeaderFooter()->getImages();
-
+        $images = $worksheet->get_header_footer()->get_images();
         // xml
-        $objWriter->startElement('xml');
-        $objWriter->writeAttribute('xmlns:v', Namespaces::URN_VML);
-        $objWriter->writeAttribute('xmlns:o', Namespaces::URN_MSOFFICE);
-        $objWriter->writeAttribute('xmlns:x', Namespaces::URN_EXCEL);
-
+        $obj_writer->start_element('xml');
+        $obj_writer->write_attribute('xmlns:v', Namespaces::URN_VML);
+        $obj_writer->write_attribute('xmlns:o', Namespaces::URN_MSOFFICE);
+        $obj_writer->write_attribute('xmlns:x', Namespaces::URN_EXCEL);
         // o:shapelayout
-        $objWriter->startElement('o:shapelayout');
-        $objWriter->writeAttribute('v:ext', 'edit');
-
+        $obj_writer->start_element('o:shapelayout');
+        $obj_writer->write_attribute('v:ext', 'edit');
         // o:idmap
-        $objWriter->startElement('o:idmap');
-        $objWriter->writeAttribute('v:ext', 'edit');
-        $objWriter->writeAttribute('data', '1');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('o:idmap');
+        $obj_writer->write_attribute('v:ext', 'edit');
+        $obj_writer->write_attribute('data', '1');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // v:shapetype
-        $objWriter->startElement('v:shapetype');
-        $objWriter->writeAttribute('id', '_x0000_t75');
-        $objWriter->writeAttribute('coordsize', '21600,21600');
-        $objWriter->writeAttribute('o:spt', '75');
-        $objWriter->writeAttribute('o:preferrelative', 't');
-        $objWriter->writeAttribute('path', 'm@4@5l@4@11@9@11@9@5xe');
-        $objWriter->writeAttribute('filled', 'f');
-        $objWriter->writeAttribute('stroked', 'f');
-
+        $obj_writer->start_element('v:shapetype');
+        $obj_writer->write_attribute('id', '_x0000_t75');
+        $obj_writer->write_attribute('coordsize', '21600,21600');
+        $obj_writer->write_attribute('o:spt', '75');
+        $obj_writer->write_attribute('o:preferrelative', 't');
+        $obj_writer->write_attribute('path', 'm@4@5l@4@11@9@11@9@5xe');
+        $obj_writer->write_attribute('filled', 'f');
+        $obj_writer->write_attribute('stroked', 'f');
         // v:stroke
-        $objWriter->startElement('v:stroke');
-        $objWriter->writeAttribute('joinstyle', 'miter');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:stroke');
+        $obj_writer->write_attribute('joinstyle', 'miter');
+        $obj_writer->end_element();
         // v:formulas
-        $objWriter->startElement('v:formulas');
-
+        $obj_writer->start_element('v:formulas');
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'if lineDrawn pixelLineWidth 0');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'if lineDrawn pixelLineWidth 0');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'sum @0 1 0');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'sum @0 1 0');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'sum 0 0 @1');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'sum 0 0 @1');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'prod @2 1 2');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'prod @2 1 2');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'prod @3 21600 pixelWidth');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'prod @3 21600 pixelWidth');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'prod @3 21600 pixelHeight');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'prod @3 21600 pixelHeight');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'sum @0 0 1');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'sum @0 0 1');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'prod @6 1 2');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'prod @6 1 2');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'prod @7 21600 pixelWidth');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'prod @7 21600 pixelWidth');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'sum @8 21600 0');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'sum @8 21600 0');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'prod @7 21600 pixelHeight');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'prod @7 21600 pixelHeight');
+        $obj_writer->end_element();
         // v:f
-        $objWriter->startElement('v:f');
-        $objWriter->writeAttribute('eqn', 'sum @10 21600 0');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:f');
+        $obj_writer->write_attribute('eqn', 'sum @10 21600 0');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // v:path
-        $objWriter->startElement('v:path');
-        $objWriter->writeAttribute('o:extrusionok', 'f');
-        $objWriter->writeAttribute('gradientshapeok', 't');
-        $objWriter->writeAttribute('o:connecttype', 'rect');
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:path');
+        $obj_writer->write_attribute('o:extrusionok', 'f');
+        $obj_writer->write_attribute('gradientshapeok', 't');
+        $obj_writer->write_attribute('o:connecttype', 'rect');
+        $obj_writer->end_element();
         // o:lock
-        $objWriter->startElement('o:lock');
-        $objWriter->writeAttribute('v:ext', 'edit');
-        $objWriter->writeAttribute('aspectratio', 't');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
-
+        $obj_writer->start_element('o:lock');
+        $obj_writer->write_attribute('v:ext', 'edit');
+        $obj_writer->write_attribute('aspectratio', 't');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
         // Loop through images
         foreach ($images as $key => $value) {
-            $this->writeVMLHeaderFooterImage($objWriter, $key, $value);
+            $this->write_vml_header_footer_image($obj_writer, $key, $value);
         }
-
-        $objWriter->endElement();
-
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write VML comment to XML format.
      *
      * @param string $reference Reference
      */
-    private function writeVMLHeaderFooterImage(XMLWriter $objWriter, string $reference, HeaderFooterDrawing $image): void
+    private function write_vml_header_footer_image(Xml_Writer $obj_writer, string $reference, Header_Footer_Drawing $image): void
     {
         // Calculate object id
-        if (!Preg::isMatch('{(\d+)}', md5($reference), $m)) {
+        if (!Preg::is_match('{(\d+)}', md5($reference), $m)) {
             // @codeCoverageIgnoreStart
-            throw new WriterException('Regexp failure in writeVMLHeaderFooterImage');
+            throw new Writer_Exception('Regexp failure in writeVMLHeaderFooterImage');
             // @codeCoverageIgnoreEnd
         }
-        $id = 1500 + ((int) substr((string) $m[1], 0, 2));
-
+        $id = 1500 + (int) substr((string) $m[1], 0, 2);
         // Calculate offset
-        $width = $image->getWidth();
-        $height = $image->getHeight();
-        $marginLeft = $image->getOffsetX();
-        $marginTop = $image->getOffsetY();
-
+        $width = $image->get_width();
+        $height = $image->get_height();
+        $margin_left = $image->get_offset_x();
+        $margin_top = $image->get_offset_y();
         // v:shape
-        $objWriter->startElement('v:shape');
-        $objWriter->writeAttribute('id', $reference);
-        $objWriter->writeAttribute('o:spid', '_x0000_s' . $id);
-        $objWriter->writeAttribute('type', '#_x0000_t75');
-        $objWriter->writeAttribute('style', "position:absolute;margin-left:{$marginLeft}px;margin-top:{$marginTop}px;width:{$width}px;height:{$height}px;z-index:1");
-
+        $obj_writer->start_element('v:shape');
+        $obj_writer->write_attribute('id', $reference);
+        $obj_writer->write_attribute('o:spid', '_x0000_s' . $id);
+        $obj_writer->write_attribute('type', '#_x0000_t75');
+        $obj_writer->write_attribute('style', "position:absolute;margin-left:{$margin_left}px;margin-top:{$margin_top}px;width:{$width}px;height:{$height}px;z-index:1");
         // v:imagedata
-        $objWriter->startElement('v:imagedata');
-        $objWriter->writeAttribute('o:relid', 'rId' . $reference);
-        $objWriter->writeAttribute('o:title', $image->getName());
-        $objWriter->endElement();
-
+        $obj_writer->start_element('v:imagedata');
+        $obj_writer->write_attribute('o:relid', 'rId' . $reference);
+        $obj_writer->write_attribute('o:title', $image->get_name());
+        $obj_writer->end_element();
         // o:lock
-        $objWriter->startElement('o:lock');
-        $objWriter->writeAttribute('v:ext', 'edit');
-        $objWriter->writeAttribute('textRotation', 't');
-        $objWriter->endElement();
-
-        $objWriter->endElement();
+        $obj_writer->start_element('o:lock');
+        $obj_writer->write_attribute('v:ext', 'edit');
+        $obj_writer->write_attribute('textRotation', 't');
+        $obj_writer->end_element();
+        $obj_writer->end_element();
     }
-
     /**
      * Get an array of all drawings.
      *
      * @return BaseDrawing[] All drawings in PhpSpreadsheet
      */
-    public function allDrawings(Spreadsheet $spreadsheet): array
+    public function all_drawings(Spreadsheet $spreadsheet): array
     {
         // Get an array of all drawings
-        $aDrawings = [];
-
+        $a_drawings = [];
         // Loop through PhpSpreadsheet
-        $sheetCount = $spreadsheet->getSheetCount();
-        for ($i = 0; $i < $sheetCount; ++$i) {
+        $sheet_count = $spreadsheet->get_sheet_count();
+        for ($i = 0; $i < $sheet_count; ++$i) {
             // Loop through images and add to array
-            $iterator = $spreadsheet->getSheet($i)->getDrawingCollection()->getIterator();
+            $iterator = $spreadsheet->get_sheet($i)->get_drawing_collection()->getIterator();
             while ($iterator->valid()) {
-                $aDrawings[] = $iterator->current();
-
+                $a_drawings[] = $iterator->current();
                 $iterator->next();
             }
-            $iterator = $spreadsheet->getSheet($i)->getInCellDrawingCollection()->getIterator();
+            $iterator = $spreadsheet->get_sheet($i)->get_in_cell_drawing_collection()->getIterator();
             while ($iterator->valid()) {
-                $aDrawings[] = $iterator->current();
-
+                $a_drawings[] = $iterator->current();
                 $iterator->next();
             }
         }
-
-        return $aDrawings;
+        return $a_drawings;
     }
-
-    private function writeHyperLinkDrawing(XMLWriter $objWriter, ?int $hlinkClickId): void
+    private function write_hyper_link_drawing(Xml_Writer $obj_writer, ?int $hlink_click_id): void
     {
-        if ($hlinkClickId === null) {
+        if ($hlink_click_id === null) {
             return;
         }
-
-        $objWriter->startElement('a:hlinkClick');
-        $objWriter->writeAttribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
-        $objWriter->writeAttribute('r:id', 'rId' . $hlinkClickId);
-        $objWriter->endElement();
+        $obj_writer->start_element('a:hlinkClick');
+        $obj_writer->write_attribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
+        $obj_writer->write_attribute('r:id', 'rId' . $hlink_click_id);
+        $obj_writer->end_element();
     }
-
-    private static function stringEmu(int $pixelValue): string
+    private static function string_emu(int $pixel_value): string
     {
-        return (string) SharedDrawing::pixelsToEMU($pixelValue);
+        return (string) Shared_Drawing::pixels_to_emu($pixel_value);
     }
-
-    private static function writeAttributeIf(XMLWriter $objWriter, ?bool $condition, string $attr, string $val): void
+    private static function write_attribute_if(Xml_Writer $obj_writer, ?bool $condition, string $attr, string $val): void
     {
         if ($condition) {
-            $objWriter->writeAttribute($attr, $val);
+            $obj_writer->write_attribute($attr, $val);
         }
     }
-
     /**
      * Get pass-through drawing XML if available.
      *
@@ -614,18 +518,17 @@ class Drawing extends WriterPart
      *
      * @return ?string The pass-through XML, or null if not available or should not be used
      */
-    private function getPassThroughDrawingXml(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet): ?string
+    private function get_pass_through_drawing_xml(\Php_Office\Php_Spreadsheet\Worksheet\Worksheet $worksheet): ?string
     {
         /** @var array<string, array<string, mixed>> $sheets */
-        $sheets = $worksheet->getParentOrThrow()->getUnparsedLoadedData()['sheets'] ?? [];
-        $sheetData = $sheets[$worksheet->getCodeName()] ?? [];
+        $sheets = $worksheet->get_parent_or_throw()->get_unparsed_loaded_data()['sheets'] ?? [];
+        $sheet_data = $sheets[$worksheet->get_code_name()] ?? [];
         // Only use pass-through XML if the Reader flag was explicitly enabled
         /** @var string[] $drawings */
-        $drawings = $sheetData['Drawings'] ?? [];
-        if (($sheetData['drawingPassThroughEnabled'] ?? false) !== true || $drawings === []) {
+        $drawings = $sheet_data['Drawings'] ?? [];
+        if (($sheet_data['drawingPassThroughEnabled'] ?? false) !== true || $drawings === []) {
             return null;
         }
-
         return reset($drawings) ?: null;
     }
 }

@@ -1,40 +1,35 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
-
-use PhpOffice\PhpSpreadsheet\Style\Conditional;
-use SimpleXMLElement;
-
-class ConditionalFormattingRuleExtension
+use Php_Office\Php_Spreadsheet\Style\Conditional;
+use Simple_Xml_Element;
+class Conditional_Formatting_Rule_Extension
 {
     public const CONDITION_EXTENSION_DATABAR = 'dataBar';
-
     private string $id;
-
-    private ConditionalDataBarExtension $dataBar;
-
+    private Conditional_Data_Bar_Extension $data_bar;
     /** @var string Sequence of References */
     private string $sqref = '';
-
     /**
      * ConditionalFormattingRuleExtension constructor.
      */
-    public function __construct(?string $id = null, /** @var string Conditional Formatting Rule */
-        private string $cfRule = self::CONDITION_EXTENSION_DATABAR)
+    public function __construct(
+        ?string $id = null,
+        /** @var string Conditional Formatting Rule */
+        private string $cf_rule = self::CONDITION_EXTENSION_DATABAR
+    )
     {
         if (null === $id) {
-            $this->id = '{' . $this->generateUuid() . '}';
+            $this->id = '{' . $this->generate_uuid() . '}';
         } else {
             $this->id = $id;
         }
     }
-
-    private function generateUuid(): string
+    private function generate_uuid(): string
     {
         $chars = mb_str_split('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx', 1, 'UTF-8');
-
         foreach ($chars as $i => $char) {
             if ($char === 'x') {
                 $chars[$i] = dechex(random_int(0, 15));
@@ -42,175 +37,151 @@ class ConditionalFormattingRuleExtension
                 $chars[$i] = dechex(random_int(8, 11));
             }
         }
-
         return implode('', $chars);
     }
-
     /** @return mixed[] */
-    public static function parseExtLstXml(?SimpleXMLElement $extLstXml): array
+    public static function parse_ext_lst_xml(?Simple_Xml_Element $ext_lst_xml): array
     {
-        $conditionalFormattingRuleExtensions = [];
-        $conditionalFormattingRuleExtensionXml = null;
-        if ($extLstXml instanceof SimpleXMLElement) {
-            foreach ((count($extLstXml) > 0 ? $extLstXml : [$extLstXml]) as $extLst) {
+        $conditional_formatting_rule_extensions = [];
+        $conditional_formatting_rule_extension_xml = null;
+        if ($ext_lst_xml instanceof Simple_Xml_Element) {
+            foreach (count($ext_lst_xml) > 0 ? $ext_lst_xml : [$ext_lst_xml] as $ext_lst) {
                 //this uri is conditionalFormattings
                 //https://docs.microsoft.com/en-us/openspecs/office_standards/ms-xlsx/07d607af-5618-4ca2-b683-6a78dc0d9627
-                if (isset($extLst->ext['uri']) && (string) $extLst->ext['uri'] === '{78C0D931-6437-407d-A8EE-F0AAD7539E65}') {
-                    $conditionalFormattingRuleExtensionXml = $extLst->ext;
+                if (isset($ext_lst->ext['uri']) && (string) $ext_lst->ext['uri'] === '{78C0D931-6437-407d-A8EE-F0AAD7539E65}') {
+                    $conditional_formatting_rule_extension_xml = $ext_lst->ext;
                 }
             }
-
-            if ($conditionalFormattingRuleExtensionXml) {
-                $ns = $conditionalFormattingRuleExtensionXml->getNamespaces(true);
-                $extFormattingsXml = $conditionalFormattingRuleExtensionXml->children($ns['x14']);
-
-                foreach ($extFormattingsXml->children($ns['x14']) as $extFormattingXml) {
-                    $extCfRuleXml = $extFormattingXml->cfRule;
-                    $attributes = $extCfRuleXml->attributes();
+            if ($conditional_formatting_rule_extension_xml) {
+                $ns = $conditional_formatting_rule_extension_xml->get_namespaces(true);
+                $ext_formattings_xml = $conditional_formatting_rule_extension_xml->children($ns['x14']);
+                foreach ($ext_formattings_xml->children($ns['x14']) as $ext_formatting_xml) {
+                    $ext_cf_rule_xml = $ext_formatting_xml->cf_rule;
+                    $attributes = $ext_cf_rule_xml->attributes();
                     if (!$attributes) {
                         continue;
                     }
-                    if (((string) $attributes->type) !== Conditional::CONDITION_DATABAR) {
+                    if ((string) $attributes->type !== Conditional::CONDITION_DATABAR) {
                         continue;
                     }
-
-                    $extFormattingRuleObj = new self((string) $attributes->id);
-                    $extFormattingRuleObj->setSqref((string) $extFormattingXml->children($ns['xm'])->sqref);
-                    $conditionalFormattingRuleExtensions[$extFormattingRuleObj->getId()] = $extFormattingRuleObj;
-
-                    $extDataBarObj = new ConditionalDataBarExtension();
-                    $extFormattingRuleObj->setDataBarExt($extDataBarObj);
-                    $dataBarXml = $extCfRuleXml->dataBar;
-                    self::parseExtDataBarAttributesFromXml($extDataBarObj, $dataBarXml);
-                    self::parseExtDataBarElementChildrenFromXml($extDataBarObj, $dataBarXml, $ns);
+                    $ext_formatting_rule_obj = new self((string) $attributes->id);
+                    $ext_formatting_rule_obj->set_sqref((string) $ext_formatting_xml->children($ns['xm'])->sqref);
+                    $conditional_formatting_rule_extensions[$ext_formatting_rule_obj->get_id()] = $ext_formatting_rule_obj;
+                    $ext_data_bar_obj = new Conditional_Data_Bar_Extension();
+                    $ext_formatting_rule_obj->set_data_bar_ext($ext_data_bar_obj);
+                    $data_bar_xml = $ext_cf_rule_xml->data_bar;
+                    self::parse_ext_data_bar_attributes_from_xml($ext_data_bar_obj, $data_bar_xml);
+                    self::parse_ext_data_bar_element_children_from_xml($ext_data_bar_obj, $data_bar_xml, $ns);
                 }
             }
         }
-
-        return $conditionalFormattingRuleExtensions;
+        return $conditional_formatting_rule_extensions;
     }
-
-    private static function parseExtDataBarAttributesFromXml(
-        ConditionalDataBarExtension $extDataBarObj,
-        SimpleXMLElement $dataBarXml
-    ): void {
-        $dataBarAttribute = $dataBarXml->attributes();
-        if ($dataBarAttribute === null) {
+    private static function parse_ext_data_bar_attributes_from_xml(Conditional_Data_Bar_Extension $ext_data_bar_obj, Simple_Xml_Element $data_bar_xml): void
+    {
+        $data_bar_attribute = $data_bar_xml->attributes();
+        if ($data_bar_attribute === null) {
             return;
         }
-        if ($dataBarAttribute->minLength) {
-            $extDataBarObj->setMinLength((int) $dataBarAttribute->minLength);
+        if ($data_bar_attribute->min_length) {
+            $ext_data_bar_obj->set_min_length((int) $data_bar_attribute->min_length);
         }
-        if ($dataBarAttribute->maxLength) {
-            $extDataBarObj->setMaxLength((int) $dataBarAttribute->maxLength);
+        if ($data_bar_attribute->max_length) {
+            $ext_data_bar_obj->set_max_length((int) $data_bar_attribute->max_length);
         }
-        if ($dataBarAttribute->border) {
-            $extDataBarObj->setBorder((bool) (string) $dataBarAttribute->border);
+        if ($data_bar_attribute->border) {
+            $ext_data_bar_obj->set_border((bool) (string) $data_bar_attribute->border);
         }
-        if ($dataBarAttribute->gradient) {
-            $extDataBarObj->setGradient((bool) (string) $dataBarAttribute->gradient);
+        if ($data_bar_attribute->gradient) {
+            $ext_data_bar_obj->set_gradient((bool) (string) $data_bar_attribute->gradient);
         }
-        if ($dataBarAttribute->direction) {
-            $extDataBarObj->setDirection((string) $dataBarAttribute->direction);
+        if ($data_bar_attribute->direction) {
+            $ext_data_bar_obj->set_direction((string) $data_bar_attribute->direction);
         }
-        if ($dataBarAttribute->negativeBarBorderColorSameAsPositive) {
-            $extDataBarObj->setNegativeBarBorderColorSameAsPositive((bool) (string) $dataBarAttribute->negativeBarBorderColorSameAsPositive);
+        if ($data_bar_attribute->negative_bar_border_color_same_as_positive) {
+            $ext_data_bar_obj->set_negative_bar_border_color_same_as_positive((bool) (string) $data_bar_attribute->negative_bar_border_color_same_as_positive);
         }
-        if ($dataBarAttribute->axisPosition) {
-            $extDataBarObj->setAxisPosition((string) $dataBarAttribute->axisPosition);
+        if ($data_bar_attribute->axis_position) {
+            $ext_data_bar_obj->set_axis_position((string) $data_bar_attribute->axis_position);
         }
     }
-
     /** @param string[] $ns */
-    private static function parseExtDataBarElementChildrenFromXml(ConditionalDataBarExtension $extDataBarObj, SimpleXMLElement $dataBarXml, array $ns): void
+    private static function parse_ext_data_bar_element_children_from_xml(Conditional_Data_Bar_Extension $ext_data_bar_obj, Simple_Xml_Element $data_bar_xml, array $ns): void
     {
-        if ($dataBarXml->borderColor) {
-            $attributes = $dataBarXml->borderColor->attributes();
+        if ($data_bar_xml->border_color) {
+            $attributes = $data_bar_xml->border_color->attributes();
             if ($attributes !== null) {
-                $extDataBarObj->setBorderColor((string) $attributes['rgb']);
+                $ext_data_bar_obj->set_border_color((string) $attributes['rgb']);
             }
         }
-        if ($dataBarXml->negativeFillColor) {
-            $attributes = $dataBarXml->negativeFillColor->attributes();
+        if ($data_bar_xml->negative_fill_color) {
+            $attributes = $data_bar_xml->negative_fill_color->attributes();
             if ($attributes !== null) {
-                $extDataBarObj->setNegativeFillColor((string) $attributes['rgb']);
+                $ext_data_bar_obj->set_negative_fill_color((string) $attributes['rgb']);
             }
         }
-        if ($dataBarXml->negativeBorderColor) {
-            $attributes = $dataBarXml->negativeBorderColor->attributes();
+        if ($data_bar_xml->negative_border_color) {
+            $attributes = $data_bar_xml->negative_border_color->attributes();
             if ($attributes !== null) {
-                $extDataBarObj->setNegativeBorderColor((string) $attributes['rgb']);
+                $ext_data_bar_obj->set_negative_border_color((string) $attributes['rgb']);
             }
         }
-        if ($dataBarXml->axisColor) {
-            $axisColorAttr = $dataBarXml->axisColor->attributes();
-            if ($axisColorAttr !== null) {
-                $extDataBarObj->setAxisColor((string) $axisColorAttr['rgb'], (string) $axisColorAttr['theme'], (string) $axisColorAttr['tint']);
+        if ($data_bar_xml->axis_color) {
+            $axis_color_attr = $data_bar_xml->axis_color->attributes();
+            if ($axis_color_attr !== null) {
+                $ext_data_bar_obj->set_axis_color((string) $axis_color_attr['rgb'], (string) $axis_color_attr['theme'], (string) $axis_color_attr['tint']);
             }
         }
-        $cfvoIndex = 0;
-        foreach ($dataBarXml->cfvo as $cfvo) {
+        $cfvo_index = 0;
+        foreach ($data_bar_xml->cfvo as $cfvo) {
             $f = (string) $cfvo->children($ns['xm'])->f;
             $attributes = $cfvo->attributes();
-            if (!($attributes)) {
+            if (!$attributes) {
                 continue;
             }
-
-            if ($cfvoIndex === 0) {
-                $extDataBarObj->setMinimumConditionalFormatValueObject(new ConditionalFormatValueObject((string) $attributes['type'], null, (empty($f) ? null : $f)));
+            if ($cfvo_index === 0) {
+                $ext_data_bar_obj->set_minimum_conditional_format_value_object(new Conditional_Format_Value_Object((string) $attributes['type'], null, empty($f) ? null : $f));
             }
-            if ($cfvoIndex === 1) {
-                $extDataBarObj->setMaximumConditionalFormatValueObject(new ConditionalFormatValueObject((string) $attributes['type'], null, (empty($f) ? null : $f)));
+            if ($cfvo_index === 1) {
+                $ext_data_bar_obj->set_maximum_conditional_format_value_object(new Conditional_Format_Value_Object((string) $attributes['type'], null, empty($f) ? null : $f));
             }
-            ++$cfvoIndex;
+            ++$cfvo_index;
         }
     }
-
-    public function getId(): string
+    public function get_id(): string
     {
         return $this->id;
     }
-
-    public function setId(string $id): self
+    public function set_id(string $id): self
     {
         $this->id = $id;
-
         return $this;
     }
-
-    public function getCfRule(): string
+    public function get_cf_rule(): string
     {
-        return $this->cfRule;
+        return $this->cf_rule;
     }
-
-    public function setCfRule(string $cfRule): self
+    public function set_cf_rule(string $cf_rule): self
     {
-        $this->cfRule = $cfRule;
-
+        $this->cf_rule = $cf_rule;
         return $this;
     }
-
-    public function getDataBarExt(): ConditionalDataBarExtension
+    public function get_data_bar_ext(): Conditional_Data_Bar_Extension
     {
-        return $this->dataBar;
+        return $this->data_bar;
     }
-
-    public function setDataBarExt(ConditionalDataBarExtension $dataBar): self
+    public function set_data_bar_ext(Conditional_Data_Bar_Extension $data_bar): self
     {
-        $this->dataBar = $dataBar;
-
+        $this->data_bar = $data_bar;
         return $this;
     }
-
-    public function getSqref(): string
+    public function get_sqref(): string
     {
         return $this->sqref;
     }
-
-    public function setSqref(string $sqref): self
+    public function set_sqref(string $sqref): self
     {
         $this->sqref = $sqref;
-
         return $this;
     }
 }

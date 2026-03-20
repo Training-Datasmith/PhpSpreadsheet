@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Logical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Logical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\Value;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Error_Value;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Value;
 class Conditional
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * STATEMENT_IF.
      *
@@ -48,20 +45,16 @@ class Conditional
      *
      * @return mixed The value of returnIfTrue or returnIfFalse determined by condition
      */
-    public static function statementIf(mixed $condition = true, mixed $returnIfTrue = 0, mixed $returnIfFalse = false): mixed
+    public static function statement_if(mixed $condition = true, mixed $return_if_true = 0, mixed $return_if_false = false): mixed
     {
-        $condition = ($condition === null) ? true : Functions::flattenSingleValue($condition);
-
-        if (ErrorValue::isError($condition, true)) {
+        $condition = $condition === null ? true : Functions::flatten_single_value($condition);
+        if (Error_Value::is_error($condition, true)) {
             return $condition;
         }
-
-        $returnIfTrue ??= 0;
-        $returnIfFalse ??= false;
-
-        return ((bool) $condition) ? $returnIfTrue : $returnIfFalse;
+        $return_if_true ??= 0;
+        $return_if_false ??= false;
+        return (bool) $condition ? $return_if_true : $return_if_false;
     }
-
     /**
      * STATEMENT_SWITCH.
      *
@@ -88,37 +81,31 @@ class Conditional
      *
      * @return mixed The value of matched expression
      */
-    public static function statementSwitch(mixed ...$arguments): mixed
+    public static function statement_switch(mixed ...$arguments): mixed
     {
-        $result = ExcelError::VALUE();
-
+        $result = Excel_Error::VALUE();
         if (count($arguments) > 0) {
-            $targetValue = Functions::flattenSingleValue($arguments[0]);
+            $target_value = Functions::flatten_single_value($arguments[0]);
             $argc = count($arguments) - 1;
-            $switchCount = floor($argc / 2);
-            $hasDefaultClause = $argc % 2 !== 0;
-            $defaultClause = $argc % 2 === 0 ? null : $arguments[$argc];
-
-            $switchSatisfied = false;
-            if ($switchCount > 0) {
-                for ($index = 0; $index < $switchCount; ++$index) {
-                    if ($targetValue == Functions::flattenSingleValue($arguments[$index * 2 + 1])) {
+            $switch_count = floor($argc / 2);
+            $has_default_clause = $argc % 2 !== 0;
+            $default_clause = $argc % 2 === 0 ? null : $arguments[$argc];
+            $switch_satisfied = false;
+            if ($switch_count > 0) {
+                for ($index = 0; $index < $switch_count; ++$index) {
+                    if ($target_value == Functions::flatten_single_value($arguments[$index * 2 + 1])) {
                         $result = $arguments[$index * 2 + 2];
-                        $switchSatisfied = true;
-
+                        $switch_satisfied = true;
                         break;
                     }
                 }
             }
-
-            if ($switchSatisfied !== true) {
-                $result = $hasDefaultClause ? $defaultClause : ExcelError::NA();
+            if ($switch_satisfied !== true) {
+                $result = $has_default_clause ? $default_clause : Excel_Error::NA();
             }
         }
-
         return $result;
     }
-
     /**
      * IFERROR.
      *
@@ -134,18 +121,16 @@ class Conditional
      *         If an array of values is passed as the $testValue argument, then the returned result will also be
      *            an array with the same dimensions
      */
-    public static function IFERROR(mixed $testValue = '', mixed $errorpart = ''): mixed
+    public static function IFERROR(mixed $test_value = '', mixed $errorpart = ''): mixed
     {
-        if (is_array($testValue)) {
-            return self::evaluateArrayArgumentsSubset([self::class, __FUNCTION__], 1, $testValue, $errorpart);
+        if (is_array($test_value)) {
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 1, $test_value, $errorpart);
         }
-
         $errorpart ??= '';
-        $testValue ??= 0; // this is how Excel handles empty cell
-
-        return self::statementIf(ErrorValue::isError($testValue), $errorpart, $testValue);
+        $test_value ??= 0;
+        // this is how Excel handles empty cell
+        return self::statement_if(Error_Value::is_error($test_value), $errorpart, $test_value);
     }
-
     /**
      * IFNA.
      *
@@ -161,18 +146,16 @@ class Conditional
      *         If an array of values is passed as the $testValue argument, then the returned result will also be
      *            an array with the same dimensions
      */
-    public static function IFNA(mixed $testValue = '', mixed $napart = ''): mixed
+    public static function IFNA(mixed $test_value = '', mixed $napart = ''): mixed
     {
-        if (is_array($testValue)) {
-            return self::evaluateArrayArgumentsSubset([self::class, __FUNCTION__], 1, $testValue, $napart);
+        if (is_array($test_value)) {
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 1, $test_value, $napart);
         }
-
         $napart ??= '';
-        $testValue ??= 0; // this is how Excel handles empty cell
-
-        return self::statementIf(ErrorValue::isNa($testValue), $napart, $testValue);
+        $test_value ??= 0;
+        // this is how Excel handles empty cell
+        return self::statement_if(Error_Value::is_na($test_value), $napart, $test_value);
     }
-
     /**
      * IFS.
      *
@@ -191,23 +174,20 @@ class Conditional
      */
     public static function IFS(mixed ...$arguments)
     {
-        $argumentCount = count($arguments);
-
-        if ($argumentCount % 2 != 0) {
-            return ExcelError::NA();
+        $argument_count = count($arguments);
+        if ($argument_count % 2 != 0) {
+            return Excel_Error::NA();
         }
         // We use instance of Exception as a falseValue in order to prevent string collision with value in cell
-        $falseValueException = new Exception();
-        for ($i = 0; $i < $argumentCount; $i += 2) {
-            $testValue = ($arguments[$i] === null) ? '' : Functions::flattenSingleValue($arguments[$i]);
-            $returnIfTrue = $arguments[$i + 1] ?? '';
-            $result = self::statementIf($testValue, $returnIfTrue, $falseValueException);
-
-            if ($result !== $falseValueException) {
+        $false_value_exception = new Exception();
+        for ($i = 0; $i < $argument_count; $i += 2) {
+            $test_value = $arguments[$i] === null ? '' : Functions::flatten_single_value($arguments[$i]);
+            $return_if_true = $arguments[$i + 1] ?? '';
+            $result = self::statement_if($test_value, $return_if_true, $false_value_exception);
+            if ($result !== $false_value_exception) {
                 return $result;
             }
         }
-
-        return ExcelError::NA();
+        return Excel_Error::NA();
     }
 }

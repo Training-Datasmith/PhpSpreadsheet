@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Style;
-
-use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-
+use Php_Office\Php_Spreadsheet\Exception as PhpSpreadsheetException;
 class Alignment extends Supervisor
 {
     // Horizontal alignment styles
@@ -16,18 +14,11 @@ class Alignment extends Supervisor
     public const HORIZONTAL_CENTER_CONTINUOUS = 'centerContinuous';
     public const HORIZONTAL_JUSTIFY = 'justify';
     public const HORIZONTAL_FILL = 'fill';
-    public const HORIZONTAL_DISTRIBUTED = 'distributed'; // Excel2007 only
+    public const HORIZONTAL_DISTRIBUTED = 'distributed';
+    // Excel2007 only
     private const HORIZONTAL_CENTER_CONTINUOUS_LC = 'centercontinuous';
     // Mapping for horizontal alignment
-    public const HORIZONTAL_ALIGNMENT_FOR_XLSX = [
-        self::HORIZONTAL_LEFT => self::HORIZONTAL_LEFT,
-        self::HORIZONTAL_RIGHT => self::HORIZONTAL_RIGHT,
-        self::HORIZONTAL_CENTER => self::HORIZONTAL_CENTER,
-        self::HORIZONTAL_CENTER_CONTINUOUS => self::HORIZONTAL_CENTER_CONTINUOUS,
-        self::HORIZONTAL_JUSTIFY => self::HORIZONTAL_JUSTIFY,
-        self::HORIZONTAL_FILL => self::HORIZONTAL_FILL,
-        self::HORIZONTAL_DISTRIBUTED => self::HORIZONTAL_DISTRIBUTED,
-    ];
+    public const HORIZONTAL_ALIGNMENT_FOR_XLSX = [self::HORIZONTAL_LEFT => self::HORIZONTAL_LEFT, self::HORIZONTAL_RIGHT => self::HORIZONTAL_RIGHT, self::HORIZONTAL_CENTER => self::HORIZONTAL_CENTER, self::HORIZONTAL_CENTER_CONTINUOUS => self::HORIZONTAL_CENTER_CONTINUOUS, self::HORIZONTAL_JUSTIFY => self::HORIZONTAL_JUSTIFY, self::HORIZONTAL_FILL => self::HORIZONTAL_FILL, self::HORIZONTAL_DISTRIBUTED => self::HORIZONTAL_DISTRIBUTED];
     // Mapping for horizontal alignment CSS
     public const HORIZONTAL_ALIGNMENT_FOR_HTML = [
         self::HORIZONTAL_LEFT => self::HORIZONTAL_LEFT,
@@ -38,13 +29,13 @@ class Alignment extends Supervisor
         //self::HORIZONTAL_FILL => self::HORIZONTAL_FILL, // no reasonable equivalent for fill
         self::HORIZONTAL_DISTRIBUTED => self::HORIZONTAL_JUSTIFY,
     ];
-
     // Vertical alignment styles
     public const VERTICAL_BOTTOM = 'bottom';
     public const VERTICAL_TOP = 'top';
     public const VERTICAL_CENTER = 'center';
     public const VERTICAL_JUSTIFY = 'justify';
-    public const VERTICAL_DISTRIBUTED = 'distributed'; // Excel2007 only
+    public const VERTICAL_DISTRIBUTED = 'distributed';
+    // Excel2007 only
     // Vertical alignment CSS
     private const VERTICAL_BASELINE = 'baseline';
     private const VERTICAL_MIDDLE = 'middle';
@@ -52,7 +43,6 @@ class Alignment extends Supervisor
     private const VERTICAL_SUPER = 'super';
     private const VERTICAL_TEXT_BOTTOM = 'text-bottom';
     private const VERTICAL_TEXT_TOP = 'text-top';
-
     // Mapping for vertical alignment
     public const VERTICAL_ALIGNMENT_FOR_XLSX = [
         self::VERTICAL_BOTTOM => self::VERTICAL_BOTTOM,
@@ -68,7 +58,6 @@ class Alignment extends Supervisor
         self::VERTICAL_TEXT_BOTTOM => self::VERTICAL_BOTTOM,
         self::VERTICAL_TEXT_TOP => self::VERTICAL_TOP,
     ];
-
     // Mapping for vertical alignment for Html
     public const VERTICAL_ALIGNMENT_FOR_HTML = [
         self::VERTICAL_BOTTOM => self::VERTICAL_BOTTOM,
@@ -84,58 +73,47 @@ class Alignment extends Supervisor
         self::VERTICAL_TEXT_BOTTOM => self::VERTICAL_TEXT_BOTTOM,
         self::VERTICAL_TEXT_TOP => self::VERTICAL_TEXT_TOP,
     ];
-
     // Read order
     public const READORDER_CONTEXT = 0;
     public const READORDER_LTR = 1;
     public const READORDER_RTL = 2;
-
     // Special value for Text Rotation
     public const TEXTROTATION_STACK_EXCEL = 255;
-    public const TEXTROTATION_STACK_PHPSPREADSHEET = -165; // 90 - 255
-
+    public const TEXTROTATION_STACK_PHPSPREADSHEET = -165;
+    // 90 - 255
     public const INDENT_UNITS_TO_PIXELS = 9;
-
     /**
      * Horizontal alignment.
      */
     protected ?string $horizontal = self::HORIZONTAL_GENERAL;
-
     /**
      * Justify Last Line alignment.
      */
-    protected ?bool $justifyLastLine = null;
-
+    protected ?bool $justify_last_line = null;
     /**
      * Vertical alignment.
      */
     protected ?string $vertical = self::VERTICAL_BOTTOM;
-
     /**
      * Text rotation.
      */
-    protected ?int $textRotation = 0;
-
+    protected ?int $text_rotation = 0;
     /**
      * Wrap text.
      */
-    protected bool $wrapText = false;
-
+    protected bool $wrap_text = false;
     /**
      * Shrink to fit.
      */
-    protected bool $shrinkToFit = false;
-
+    protected bool $shrink_to_fit = false;
     /**
      * Indent - only possible with horizontal alignment left and right.
      */
     protected int $indent = 0;
-
     /**
      * Read order.
      */
-    protected int $readOrder = 0;
-
+    protected int $read_order = 0;
     /**
      * Create a new Alignment.
      *
@@ -146,30 +124,26 @@ class Alignment extends Supervisor
      *                                       Leave this value at default unless you understand exactly what
      *                                          its ramifications are
      */
-    public function __construct(bool $isSupervisor = false, bool $isConditional = false)
+    public function __construct(bool $is_supervisor = false, bool $is_conditional = false)
     {
         // Supervisor?
-        parent::__construct($isSupervisor);
-
-        if ($isConditional) {
+        parent::__construct($is_supervisor);
+        if ($is_conditional) {
             $this->horizontal = null;
             $this->vertical = null;
-            $this->textRotation = null;
+            $this->text_rotation = null;
         }
     }
-
     /**
      * Get the shared style component for the currently active cell in currently active sheet.
      * Only used for style supervisor.
      */
-    public function getSharedComponent(): self
+    public function get_shared_component(): self
     {
         /** @var Style $parent */
         $parent = $this->parent;
-
-        return $parent->getSharedComponent()->getAlignment();
+        return $parent->get_shared_component()->get_alignment();
     }
-
     /**
      * Build style array from subcomponents.
      *
@@ -177,11 +151,10 @@ class Alignment extends Supervisor
      *
      * @return array{alignment: mixed[]}
      */
-    public function getStyleArray(array $array): array
+    public function get_style_array(array $array): array
     {
         return ['alignment' => $array];
     }
-
     /**
      * Apply styles from array.
      *
@@ -200,54 +173,49 @@ class Alignment extends Supervisor
      *
      * @return $this
      */
-    public function applyFromArray(array $styleArray): static
+    public function apply_from_array(array $style_array): static
     {
-        if ($this->isSupervisor) {
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())
-                ->applyFromArray($this->getStyleArray($styleArray));
+        if ($this->is_supervisor) {
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($this->get_style_array($style_array));
         } else {
             /** @var array{horizontal?: string, vertical?: string, justifyLastLine?: bool, textRotation?: int, wrapText?: bool, shrinkToFit?: bool, readOrder?: int, indent?: int} $styleArray */
-            if (isset($styleArray['horizontal'])) {
-                $this->setHorizontal($styleArray['horizontal']);
+            if (isset($style_array['horizontal'])) {
+                $this->set_horizontal($style_array['horizontal']);
             }
-            if (isset($styleArray['justifyLastLine'])) {
-                $this->setJustifyLastLine($styleArray['justifyLastLine']);
+            if (isset($style_array['justifyLastLine'])) {
+                $this->set_justify_last_line($style_array['justifyLastLine']);
             }
-            if (isset($styleArray['vertical'])) {
-                $this->setVertical($styleArray['vertical']);
+            if (isset($style_array['vertical'])) {
+                $this->set_vertical($style_array['vertical']);
             }
-            if (isset($styleArray['textRotation'])) {
-                $this->setTextRotation($styleArray['textRotation']);
+            if (isset($style_array['textRotation'])) {
+                $this->set_text_rotation($style_array['textRotation']);
             }
-            if (isset($styleArray['wrapText'])) {
-                $this->setWrapText($styleArray['wrapText']);
+            if (isset($style_array['wrapText'])) {
+                $this->set_wrap_text($style_array['wrapText']);
             }
-            if (isset($styleArray['shrinkToFit'])) {
-                $this->setShrinkToFit($styleArray['shrinkToFit']);
+            if (isset($style_array['shrinkToFit'])) {
+                $this->set_shrink_to_fit($style_array['shrinkToFit']);
             }
-            if (isset($styleArray['indent'])) {
-                $this->setIndent($styleArray['indent']);
+            if (isset($style_array['indent'])) {
+                $this->set_indent($style_array['indent']);
             }
-            if (isset($styleArray['readOrder'])) {
-                $this->setReadOrder($styleArray['readOrder']);
+            if (isset($style_array['readOrder'])) {
+                $this->set_read_order($style_array['readOrder']);
             }
         }
-
         return $this;
     }
-
     /**
      * Get Horizontal.
      */
-    public function getHorizontal(): null|string
+    public function get_horizontal(): null|string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getHorizontal();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_horizontal();
         }
-
         return $this->horizontal;
     }
-
     /**
      * Set Horizontal.
      *
@@ -255,64 +223,55 @@ class Alignment extends Supervisor
      *
      * @return $this
      */
-    public function setHorizontal(string $horizontalAlignment): static
+    public function set_horizontal(string $horizontal_alignment): static
     {
-        $horizontalAlignment = strtolower($horizontalAlignment);
-        if ($horizontalAlignment === self::HORIZONTAL_CENTER_CONTINUOUS_LC) {
-            $horizontalAlignment = self::HORIZONTAL_CENTER_CONTINUOUS;
+        $horizontal_alignment = strtolower($horizontal_alignment);
+        if ($horizontal_alignment === self::HORIZONTAL_CENTER_CONTINUOUS_LC) {
+            $horizontal_alignment = self::HORIZONTAL_CENTER_CONTINUOUS;
         }
-
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['horizontal' => $horizontalAlignment]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['horizontal' => $horizontal_alignment]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->horizontal = $horizontalAlignment;
+            $this->horizontal = $horizontal_alignment;
         }
-
         return $this;
     }
-
     /**
      * Get Justify Last Line.
      */
-    public function getJustifyLastLine(): ?bool
+    public function get_justify_last_line(): ?bool
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getJustifyLastLine();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_justify_last_line();
         }
-
-        return $this->justifyLastLine;
+        return $this->justify_last_line;
     }
-
     /**
      * Set Justify Last Line.
      *
      * @return $this
      */
-    public function setJustifyLastLine(bool $justifyLastLine): static
+    public function set_justify_last_line(bool $justify_last_line): static
     {
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['justifyLastLine' => $justifyLastLine]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['justifyLastLine' => $justify_last_line]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->justifyLastLine = $justifyLastLine;
+            $this->justify_last_line = $justify_last_line;
         }
-
         return $this;
     }
-
     /**
      * Get Vertical.
      */
-    public function getVertical(): null|string
+    public function get_vertical(): null|string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getVertical();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_vertical();
         }
-
         return $this->vertical;
     }
-
     /**
      * Set Vertical.
      *
@@ -320,231 +279,190 @@ class Alignment extends Supervisor
      *
      * @return $this
      */
-    public function setVertical(string $verticalAlignment): static
+    public function set_vertical(string $vertical_alignment): static
     {
-        $verticalAlignment = strtolower($verticalAlignment);
-
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['vertical' => $verticalAlignment]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        $vertical_alignment = strtolower($vertical_alignment);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['vertical' => $vertical_alignment]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->vertical = $verticalAlignment;
+            $this->vertical = $vertical_alignment;
         }
-
         return $this;
     }
-
     /**
      * Get TextRotation.
      */
-    public function getTextRotation(): null|int
+    public function get_text_rotation(): null|int
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getTextRotation();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_text_rotation();
         }
-
-        return $this->textRotation;
+        return $this->text_rotation;
     }
-
     /**
      * Set TextRotation.
      *
      * @return $this
      */
-    public function setTextRotation(int $angleInDegrees): static
+    public function set_text_rotation(int $angle_in_degrees): static
     {
         // Excel2007 value 255 => PhpSpreadsheet value -165
-        if ($angleInDegrees == self::TEXTROTATION_STACK_EXCEL) {
-            $angleInDegrees = self::TEXTROTATION_STACK_PHPSPREADSHEET;
+        if ($angle_in_degrees == self::TEXTROTATION_STACK_EXCEL) {
+            $angle_in_degrees = self::TEXTROTATION_STACK_PHPSPREADSHEET;
         }
-
         // Set rotation
-        if (($angleInDegrees >= -90 && $angleInDegrees <= 90) || $angleInDegrees == self::TEXTROTATION_STACK_PHPSPREADSHEET) {
-            if ($this->isSupervisor) {
-                $styleArray = $this->getStyleArray(['textRotation' => $angleInDegrees]);
-                $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($angle_in_degrees >= -90 && $angle_in_degrees <= 90 || $angle_in_degrees == self::TEXTROTATION_STACK_PHPSPREADSHEET) {
+            if ($this->is_supervisor) {
+                $style_array = $this->get_style_array(['textRotation' => $angle_in_degrees]);
+                $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
             } else {
-                $this->textRotation = $angleInDegrees;
+                $this->text_rotation = $angle_in_degrees;
             }
         } else {
-            throw new PhpSpreadsheetException("Text rotation $angleInDegrees should be a value between -90 and 90.");
+            throw new Php_Spreadsheet_Exception("Text rotation {$angle_in_degrees} should be a value between -90 and 90.");
         }
-
         return $this;
     }
-
     /**
      * Get Wrap Text.
      */
-    public function getWrapText(): bool
+    public function get_wrap_text(): bool
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getWrapText();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_wrap_text();
         }
-
-        return $this->wrapText;
+        return $this->wrap_text;
     }
-
     /**
      * Set Wrap Text.
      *
      * @return $this
      */
-    public function setWrapText(bool $wrapped): static
+    public function set_wrap_text(bool $wrapped): static
     {
         if ($wrapped == '') {
             $wrapped = false;
         }
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['wrapText' => $wrapped]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['wrapText' => $wrapped]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->wrapText = $wrapped;
+            $this->wrap_text = $wrapped;
         }
-
         return $this;
     }
-
     /**
      * Get Shrink to fit.
      */
-    public function getShrinkToFit(): bool
+    public function get_shrink_to_fit(): bool
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getShrinkToFit();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_shrink_to_fit();
         }
-
-        return $this->shrinkToFit;
+        return $this->shrink_to_fit;
     }
-
     /**
      * Set Shrink to fit.
      *
      * @return $this
      */
-    public function setShrinkToFit(bool $shrink): static
+    public function set_shrink_to_fit(bool $shrink): static
     {
         if ($shrink == '') {
             $shrink = false;
         }
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['shrinkToFit' => $shrink]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['shrinkToFit' => $shrink]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->shrinkToFit = $shrink;
+            $this->shrink_to_fit = $shrink;
         }
-
         return $this;
     }
-
     /**
      * Get indent.
      */
-    public function getIndent(): int
+    public function get_indent(): int
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getIndent();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_indent();
         }
-
         return $this->indent;
     }
-
     /**
      * Set indent.
      *
      * @return $this
      */
-    public function setIndent(int $indent): static
+    public function set_indent(int $indent): static
     {
         if ($indent > 0) {
-            if (
-                $this->getHorizontal() != self::HORIZONTAL_GENERAL
-                && $this->getHorizontal() != self::HORIZONTAL_LEFT
-                && $this->getHorizontal() != self::HORIZONTAL_RIGHT
-                && $this->getHorizontal() != self::HORIZONTAL_DISTRIBUTED
-            ) {
-                $indent = 0; // indent not supported
+            if ($this->get_horizontal() != self::HORIZONTAL_GENERAL && $this->get_horizontal() != self::HORIZONTAL_LEFT && $this->get_horizontal() != self::HORIZONTAL_RIGHT && $this->get_horizontal() != self::HORIZONTAL_DISTRIBUTED) {
+                $indent = 0;
+                // indent not supported
             }
         }
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['indent' => $indent]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['indent' => $indent]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
             $this->indent = $indent;
         }
-
         return $this;
     }
-
     /**
      * Get read order.
      */
-    public function getReadOrder(): int
+    public function get_read_order(): int
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getReadOrder();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_read_order();
         }
-
-        return $this->readOrder;
+        return $this->read_order;
     }
-
     /**
      * Set read order.
      *
      * @return $this
      */
-    public function setReadOrder(int $readOrder): static
+    public function set_read_order(int $read_order): static
     {
-        if ($readOrder < 0 || $readOrder > 2) {
-            $readOrder = 0;
+        if ($read_order < 0 || $read_order > 2) {
+            $read_order = 0;
         }
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['readOrder' => $readOrder]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['readOrder' => $read_order]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->readOrder = $readOrder;
+            $this->read_order = $read_order;
         }
-
         return $this;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getHashCode();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_hash_code();
         }
-
-        return md5(
-            $this->horizontal
-            . (($this->justifyLastLine === null) ? 'null' : ($this->justifyLastLine ? 't' : 'f'))
-            . $this->vertical
-            . $this->textRotation
-            . ($this->wrapText ? 't' : 'f')
-            . ($this->shrinkToFit ? 't' : 'f')
-            . $this->indent
-            . $this->readOrder
-            . self::class
-        );
+        return md5($this->horizontal . ($this->justify_last_line === null ? 'null' : ($this->justify_last_line ? 't' : 'f')) . $this->vertical . $this->text_rotation . ($this->wrap_text ? 't' : 'f') . ($this->shrink_to_fit ? 't' : 'f') . $this->indent . $this->read_order . self::class);
     }
-
     /** @return mixed[] */
-    protected function exportArray1(): array
+    protected function export_array1(): array
     {
-        $exportedArray = [];
-        $this->exportArray2($exportedArray, 'horizontal', $this->getHorizontal());
-        $this->exportArray2($exportedArray, 'justifyLastLine', $this->getJustifyLastLine());
-        $this->exportArray2($exportedArray, 'indent', $this->getIndent());
-        $this->exportArray2($exportedArray, 'readOrder', $this->getReadOrder());
-        $this->exportArray2($exportedArray, 'shrinkToFit', $this->getShrinkToFit());
-        $this->exportArray2($exportedArray, 'textRotation', $this->getTextRotation());
-        $this->exportArray2($exportedArray, 'vertical', $this->getVertical());
-        $this->exportArray2($exportedArray, 'wrapText', $this->getWrapText());
-
-        return $exportedArray;
+        $exported_array = [];
+        $this->export_array2($exported_array, 'horizontal', $this->get_horizontal());
+        $this->export_array2($exported_array, 'justifyLastLine', $this->get_justify_last_line());
+        $this->export_array2($exported_array, 'indent', $this->get_indent());
+        $this->export_array2($exported_array, 'readOrder', $this->get_read_order());
+        $this->export_array2($exported_array, 'shrinkToFit', $this->get_shrink_to_fit());
+        $this->export_array2($exported_array, 'textRotation', $this->get_text_rotation());
+        $this->export_array2($exported_array, 'vertical', $this->get_vertical());
+        $this->export_array2($exported_array, 'wrapText', $this->get_wrap_text());
+        return $exported_array;
     }
 }

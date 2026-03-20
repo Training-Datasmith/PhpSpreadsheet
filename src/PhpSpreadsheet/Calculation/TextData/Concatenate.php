@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Text_Data;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Internal\ExcelArrayPseudoFunctions;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Error_Value;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Internal\Excel_Array_Pseudo_Functions;
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Cell\Data_Type;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Concatenate
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * This implements the CONCAT function, *not* CONCATENATE.
      *
@@ -25,29 +22,23 @@ class Concatenate
      */
     public static function CONCATENATE(...$args): string
     {
-        $returnValue = '';
-
+        $return_value = '';
         // Loop through arguments
-        $aArgs = Functions::flattenArray($args);
-
-        foreach ($aArgs as $arg) {
-            $value = Helpers::extractString($arg);
-            if (ErrorValue::isError($value, true)) {
-                $returnValue = $value;
-
+        $a_args = Functions::flatten_array($args);
+        foreach ($a_args as $arg) {
+            $value = Helpers::extract_string($arg);
+            if (Error_Value::is_error($value, true)) {
+                $return_value = $value;
                 break;
             }
-            $returnValue .= Helpers::extractString($arg);
-            if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-                $returnValue = ExcelError::CALC();
-
+            $return_value .= Helpers::extract_string($arg);
+            if (String_Helper::count_characters($return_value) > Data_Type::MAX_STRING_LENGTH) {
+                $return_value = Excel_Error::CALC();
                 break;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * This implements the CONCATENATE function.
      *
@@ -55,38 +46,36 @@ class Concatenate
      *
      * @return array<string>|string
      */
-    public static function actualCONCATENATE(...$args): array|string
+    public static function actual_concatenate(...$args): array|string
     {
-        $useSingle = false;
+        $use_single = false;
         $cell = null;
         $count = count($args);
         if ($args[$count - 1] instanceof Cell) {
             /** @var Cell */
             $cell = array_pop($args);
-            $type = $cell->getWorksheet()->getParent()?->getCalculationEngine()->getInstanceArrayReturnType() ?? Calculation::getArrayReturnType();
-            $useSingle = $type === Calculation::RETURN_ARRAY_AS_VALUE;
+            $type = $cell->get_worksheet()->get_parent()?->get_calculation_engine()->get_instance_array_return_type() ?? Calculation::get_array_return_type();
+            $use_single = $type === Calculation::RETURN_ARRAY_AS_VALUE;
         }
-        if (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_GNUMERIC) {
+        if (Functions::get_compatibility_mode() === Functions::COMPATIBILITY_GNUMERIC) {
             return self::CONCATENATE(...$args);
         }
         $result = '';
         foreach ($args as $operand2) {
-            if ($useSingle && $cell instanceof Cell && is_array($operand2)) {
-                $temp = Functions::convertArrayToCellRange($operand2);
+            if ($use_single && $cell instanceof Cell && is_array($operand2)) {
+                $temp = Functions::convert_array_to_cell_range($operand2);
                 if ($temp !== '') {
-                    $operand2 = ExcelArrayPseudoFunctions::single($temp, $cell);
+                    $operand2 = Excel_Array_Pseudo_Functions::single($temp, $cell);
                 }
             }
             /** @var null|array<mixed>|bool|float|int|string $operand2 */
             $result = self::concatenate2Args($result, $operand2);
-            if (ErrorValue::isError($result, true) === true) {
+            if (Error_Value::is_error($result, true) === true) {
                 break;
             }
         }
-
         return $result;
     }
-
     /**
      * @param array<string>|string $operand1
      * @param null|array<mixed>|bool|float|int|string $operand2
@@ -96,41 +85,36 @@ class Concatenate
     private static function concatenate2Args(array|string $operand1, null|array|bool|float|int|string $operand2): array|string
     {
         if (is_array($operand1) || is_array($operand2)) {
-            $operand1 = Calculation::boolToString($operand1);
-            $operand2 = Calculation::boolToString($operand2);
-            [$rows, $columns] = Calculation::checkMatrixOperands($operand1, $operand2, 2);
-            $errorFound = false;
-            for ($row = 0; $row < $rows && !$errorFound; ++$row) {
+            $operand1 = Calculation::bool_to_string($operand1);
+            $operand2 = Calculation::bool_to_string($operand2);
+            [$rows, $columns] = Calculation::check_matrix_operands($operand1, $operand2, 2);
+            $error_found = false;
+            for ($row = 0; $row < $rows && !$error_found; ++$row) {
                 for ($column = 0; $column < $columns; ++$column) {
                     /** @var string[][] $operand2 */
-                    if (ErrorValue::isError($operand2[$row][$column])) {
+                    if (Error_Value::is_error($operand2[$row][$column])) {
                         return $operand2[$row][$column];
                     }
                     /** @var string[][] $operand1 */
-                    $operand1[$row][$column]
-                        = StringHelper::convertToString($operand1[$row][$column], convertBool: true)
-                        . StringHelper::convertToString($operand2[$row][$column], convertBool: true);
-                    if (mb_strlen($operand1[$row][$column]) > DataType::MAX_STRING_LENGTH) {
-                        $operand1 = ExcelError::CALC();
-                        $errorFound = true;
-
+                    $operand1[$row][$column] = String_Helper::convert_to_string($operand1[$row][$column], convertBool: true) . String_Helper::convert_to_string($operand2[$row][$column], convertBool: true);
+                    if (mb_strlen($operand1[$row][$column]) > Data_Type::MAX_STRING_LENGTH) {
+                        $operand1 = Excel_Error::CALC();
+                        $error_found = true;
                         break;
                     }
                 }
             }
-        } elseif (ErrorValue::isError($operand2, true) === true) {
+        } elseif (Error_Value::is_error($operand2, true) === true) {
             $operand1 = (string) $operand2;
         } else {
-            $operand1 .= StringHelper::convertToString($operand2, convertBool: true);
-            if (mb_strlen($operand1) > DataType::MAX_STRING_LENGTH) {
-                $operand1 = ExcelError::CALC();
+            $operand1 .= String_Helper::convert_to_string($operand2, convertBool: true);
+            if (mb_strlen($operand1) > Data_Type::MAX_STRING_LENGTH) {
+                $operand1 = Excel_Error::CALC();
             }
         }
         /** @var array<string>|string $operand1 */
-
         return $operand1;
     }
-
     /**
      * TEXTJOIN.
      *
@@ -144,51 +128,38 @@ class Concatenate
      *         If an array of values is passed for the $delimiter or $ignoreEmpty arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function TEXTJOIN($delimiter = '', $ignoreEmpty = true, mixed ...$args): array|string
+    public static function TEXTJOIN($delimiter = '', $ignore_empty = true, mixed ...$args): array|string
     {
-        if (is_array($delimiter) || is_array($ignoreEmpty)) {
-            return self::evaluateArrayArgumentsSubset(
-                [self::class, __FUNCTION__],
-                2,
-                $delimiter,
-                $ignoreEmpty,
-                ...$args
-            );
+        if (is_array($delimiter) || is_array($ignore_empty)) {
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 2, $delimiter, $ignore_empty, ...$args);
         }
-
         $delimiter ??= '';
-        $ignoreEmpty ??= true;
+        $ignore_empty ??= true;
         /** @var mixed[] */
-        $aArgs = Functions::flattenArray($args);
-        $returnValue = self::evaluateTextJoinArray($ignoreEmpty, $aArgs);
-
-        $returnValue ??= implode($delimiter, $aArgs);
-        if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-            return ExcelError::CALC();
+        $a_args = Functions::flatten_array($args);
+        $return_value = self::evaluate_text_join_array($ignore_empty, $a_args);
+        $return_value ??= implode($delimiter, $a_args);
+        if (String_Helper::count_characters($return_value) > Data_Type::MAX_STRING_LENGTH) {
+            return Excel_Error::CALC();
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /** @param mixed[] $aArgs */
-    private static function evaluateTextJoinArray(bool $ignoreEmpty, array &$aArgs): ?string
+    private static function evaluate_text_join_array(bool $ignore_empty, array &$a_args): ?string
     {
-        foreach ($aArgs as $key => &$arg) {
-            $value = Helpers::extractString($arg);
-            if (ErrorValue::isError($value, true)) {
+        foreach ($a_args as $key => &$arg) {
+            $value = Helpers::extract_string($arg);
+            if (Error_Value::is_error($value, true)) {
                 return $value;
             }
-
-            if ($ignoreEmpty === true && ((is_string($arg) && trim($arg) === '') || $arg === null)) {
-                unset($aArgs[$key]);
+            if ($ignore_empty === true && (is_string($arg) && trim($arg) === '' || $arg === null)) {
+                unset($a_args[$key]);
             } elseif (is_bool($arg)) {
-                $arg = Helpers::convertBooleanValue($arg);
+                $arg = Helpers::convert_boolean_value($arg);
             }
         }
-
         return null;
     }
-
     /**
      * REPT.
      *
@@ -203,25 +174,23 @@ class Concatenate
      *         If an array of values is passed for the $stringValue or $repeatCount arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function builtinREPT(mixed $stringValue, mixed $repeatCount): array|string
+    public static function builtin_rept(mixed $string_value, mixed $repeat_count): array|string
     {
-        if (is_array($stringValue) || is_array($repeatCount)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $stringValue, $repeatCount);
+        if (is_array($string_value) || is_array($repeat_count)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $string_value, $repeat_count);
         }
-
-        $stringValue = Helpers::extractString($stringValue);
-
-        if (!is_numeric($repeatCount) || $repeatCount < 0) {
-            $returnValue = ExcelError::VALUE();
-        } elseif (ErrorValue::isError($stringValue, true)) {
-            $returnValue = $stringValue;
+        $string_value = Helpers::extract_string($string_value);
+        if (!is_numeric($repeat_count) || $repeat_count < 0) {
+            $return_value = Excel_Error::VALUE();
+        } elseif (Error_Value::is_error($string_value, true)) {
+            $return_value = $string_value;
         } else {
-            $returnValue = str_repeat($stringValue, (int) $repeatCount);
-            if (StringHelper::countCharacters($returnValue) > DataType::MAX_STRING_LENGTH) {
-                $returnValue = ExcelError::VALUE(); // note VALUE not CALC
+            $return_value = str_repeat($string_value, (int) $repeat_count);
+            if (String_Helper::count_characters($return_value) > Data_Type::MAX_STRING_LENGTH) {
+                $return_value = Excel_Error::VALUE();
+                // note VALUE not CALC
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
 }

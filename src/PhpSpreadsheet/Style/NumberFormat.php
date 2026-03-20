@@ -1,28 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Style;
-
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-
-class NumberFormat extends Supervisor
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+class Number_Format extends Supervisor
 {
     // Pre-defined formats
     public const FORMAT_GENERAL = 'General';
-
     public const FORMAT_TEXT = '@';
-
     public const FORMAT_NUMBER = '0';
     public const FORMAT_NUMBER_0 = '0.0';
     public const FORMAT_NUMBER_00 = '0.00';
     public const FORMAT_NUMBER_COMMA_SEPARATED1 = '#,##0.00';
     public const FORMAT_NUMBER_COMMA_SEPARATED2 = '#,##0.00_-';
-
     public const FORMAT_PERCENTAGE = '0%';
     public const FORMAT_PERCENTAGE_0 = '0.0%';
     public const FORMAT_PERCENTAGE_00 = '0.00%';
-
     public const FORMAT_DATE_YYYYMMDD = 'yyyy-mm-dd';
     public const FORMAT_DATE_DDMMYYYY = 'dd/mm/yyyy';
     public const FORMAT_DATE_DMYSLASH = 'd"/"m"/"yy';
@@ -50,50 +44,8 @@ class NumberFormat extends Supervisor
     public const FORMAT_DATE_TIME_INTERVAL_HMS = '[hh]:mm:ss';
     public const FORMAT_DATE_YYYYMMDDSLASH = 'yyyy"/"mm"/"dd;@';
     public const FORMAT_DATE_LONG_DATE = 'dddd, mmmm d, yyyy';
-
-    public const DATE_TIME_OR_DATETIME_ARRAY = [
-        self::FORMAT_DATE_YYYYMMDD,
-        self::FORMAT_DATE_DDMMYYYY,
-        self::FORMAT_DATE_DMYSLASH,
-        self::FORMAT_DATE_DMYMINUS,
-        self::FORMAT_DATE_DMMINUS,
-        self::FORMAT_DATE_MYMINUS,
-        self::FORMAT_DATE_XLSX14,
-        self::FORMAT_DATE_XLSX14_ACTUAL,
-        self::FORMAT_DATE_XLSX15,
-        self::FORMAT_DATE_XLSX16,
-        self::FORMAT_DATE_XLSX17,
-        self::FORMAT_DATE_XLSX22,
-        self::FORMAT_DATE_XLSX22_ACTUAL,
-        self::FORMAT_DATE_DATETIME,
-        self::FORMAT_DATE_DATETIME_BETTER,
-        self::FORMAT_DATE_TIME1,
-        self::FORMAT_DATE_TIME2,
-        self::FORMAT_DATE_TIME3,
-        self::FORMAT_DATE_TIME4,
-        self::FORMAT_DATE_TIME5,
-        self::FORMAT_DATE_TIME6,
-        self::FORMAT_DATE_TIME7,
-        self::FORMAT_DATE_TIME8,
-        self::FORMAT_DATE_TIME_INTERVAL_HMS,
-        self::FORMAT_DATE_YYYYMMDDSLASH,
-        self::FORMAT_DATE_LONG_DATE,
-    ];
-    public const TIME_OR_DATETIME_ARRAY = [
-        self::FORMAT_DATE_XLSX22,
-        self::FORMAT_DATE_DATETIME,
-        self::FORMAT_DATE_DATETIME_BETTER,
-        self::FORMAT_DATE_TIME1,
-        self::FORMAT_DATE_TIME2,
-        self::FORMAT_DATE_TIME3,
-        self::FORMAT_DATE_TIME4,
-        self::FORMAT_DATE_TIME5,
-        self::FORMAT_DATE_TIME6,
-        self::FORMAT_DATE_TIME7,
-        self::FORMAT_DATE_TIME8,
-        self::FORMAT_DATE_TIME_INTERVAL_HMS,
-    ];
-
+    public const DATE_TIME_OR_DATETIME_ARRAY = [self::FORMAT_DATE_YYYYMMDD, self::FORMAT_DATE_DDMMYYYY, self::FORMAT_DATE_DMYSLASH, self::FORMAT_DATE_DMYMINUS, self::FORMAT_DATE_DMMINUS, self::FORMAT_DATE_MYMINUS, self::FORMAT_DATE_XLSX14, self::FORMAT_DATE_XLSX14_ACTUAL, self::FORMAT_DATE_XLSX15, self::FORMAT_DATE_XLSX16, self::FORMAT_DATE_XLSX17, self::FORMAT_DATE_XLSX22, self::FORMAT_DATE_XLSX22_ACTUAL, self::FORMAT_DATE_DATETIME, self::FORMAT_DATE_DATETIME_BETTER, self::FORMAT_DATE_TIME1, self::FORMAT_DATE_TIME2, self::FORMAT_DATE_TIME3, self::FORMAT_DATE_TIME4, self::FORMAT_DATE_TIME5, self::FORMAT_DATE_TIME6, self::FORMAT_DATE_TIME7, self::FORMAT_DATE_TIME8, self::FORMAT_DATE_TIME_INTERVAL_HMS, self::FORMAT_DATE_YYYYMMDDSLASH, self::FORMAT_DATE_LONG_DATE];
+    public const TIME_OR_DATETIME_ARRAY = [self::FORMAT_DATE_XLSX22, self::FORMAT_DATE_DATETIME, self::FORMAT_DATE_DATETIME_BETTER, self::FORMAT_DATE_TIME1, self::FORMAT_DATE_TIME2, self::FORMAT_DATE_TIME3, self::FORMAT_DATE_TIME4, self::FORMAT_DATE_TIME5, self::FORMAT_DATE_TIME6, self::FORMAT_DATE_TIME7, self::FORMAT_DATE_TIME8, self::FORMAT_DATE_TIME_INTERVAL_HMS];
     private const FORMAT_CURRENCY_AMOUNT_INTEGER = '#,##0_-';
     private const FORMAT_CURRENCY_AMOUNT_FLOAT = '#,##0.00_-';
     public const FORMAT_CURRENCY_USD_INTEGER = '$' . self::FORMAT_CURRENCY_AMOUNT_INTEGER;
@@ -106,48 +58,38 @@ class NumberFormat extends Supervisor
     public const FORMAT_CURRENCY_EUR = '#,##0.00_-[$€]';
     public const FORMAT_ACCOUNTING_USD = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
     public const FORMAT_ACCOUNTING_EUR = '_("€"* #,##0.00_);_("€"* \(#,##0.00\);_("€"* "-"??_);_(@_)';
-
     public const SHORT_DATE_INDEX = 14;
     public const DATE_TIME_INDEX = 22;
     public const FORMAT_SYSDATE_X = '[$-x-sysdate]';
     public const FORMAT_SYSDATE_F800 = '[$-F800]';
     public const FORMAT_SYSTIME_X = '[$-x-systime]';
     public const FORMAT_SYSTIME_F400 = '[$-F400]';
-
-    protected static string $shortDateFormat = self::FORMAT_DATE_XLSX14_ACTUAL;
-
-    protected static string $longDateFormat = self::FORMAT_DATE_LONG_DATE;
-
-    protected static string $dateTimeFormat = self::FORMAT_DATE_XLSX22_ACTUAL;
-
-    protected static string $timeFormat = self::FORMAT_DATE_TIME2;
-
+    protected static string $short_date_format = self::FORMAT_DATE_XLSX14_ACTUAL;
+    protected static string $long_date_format = self::FORMAT_DATE_LONG_DATE;
+    protected static string $date_time_format = self::FORMAT_DATE_XLSX22_ACTUAL;
+    protected static string $time_format = self::FORMAT_DATE_TIME2;
     /**
      * Excel built-in number formats.
      *
      * @var string[]
      */
-    protected static array $builtInFormats;
-
+    protected static array $built_in_formats;
     /**
      * Excel built-in number formats (flipped, for faster lookups).
      *
      * @var int[]
      */
-    protected static array $flippedBuiltInFormats;
-
+    protected static array $flipped_built_in_formats;
     /**
      * Format Code.
      */
-    protected ?string $formatCode = self::FORMAT_GENERAL;
-
+    protected ?string $format_code = self::FORMAT_GENERAL;
     /**
      * Built-in format Code.
      *
      * @var false|int
      */
-    protected $builtInFormatCode = 0;
-
+    protected $built_in_format_code = 0;
     /**
      * Create a new NumberFormat.
      *
@@ -158,29 +100,25 @@ class NumberFormat extends Supervisor
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
      */
-    public function __construct(bool $isSupervisor = false, bool $isConditional = false)
+    public function __construct(bool $is_supervisor = false, bool $is_conditional = false)
     {
         // Supervisor?
-        parent::__construct($isSupervisor);
-
-        if ($isConditional) {
-            $this->formatCode = null;
-            $this->builtInFormatCode = false;
+        parent::__construct($is_supervisor);
+        if ($is_conditional) {
+            $this->format_code = null;
+            $this->built_in_format_code = false;
         }
     }
-
     /**
      * Get the shared style component for the currently active cell in currently active sheet.
      * Only used for style supervisor.
      */
-    public function getSharedComponent(): self
+    public function get_shared_component(): self
     {
         /** @var Style $parent */
         $parent = $this->parent;
-
-        return $parent->getSharedComponent()->getNumberFormat();
+        return $parent->get_shared_component()->get_number_format();
     }
-
     /**
      * Build style array from subcomponents.
      *
@@ -188,11 +126,10 @@ class NumberFormat extends Supervisor
      *
      * @return array{numberFormat: mixed[]}
      */
-    public function getStyleArray(array $array): array
+    public function get_style_array(array $array): array
     {
         return ['numberFormat' => $array];
     }
-
     /**
      * Apply styles from array.
      *
@@ -208,58 +145,49 @@ class NumberFormat extends Supervisor
      *
      * @return $this
      */
-    public function applyFromArray(array $styleArray): static
+    public function apply_from_array(array $style_array): static
     {
-        if ($this->isSupervisor) {
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($this->getStyleArray($styleArray));
-        } else {
-            if (isset($styleArray['formatCode'])) {
-                $this->setFormatCode($styleArray['formatCode']);
-            }
+        if ($this->is_supervisor) {
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($this->get_style_array($style_array));
+        } else if (isset($style_array['formatCode'])) {
+            $this->set_format_code($style_array['formatCode']);
         }
-
         return $this;
     }
-
     /**
      * Get Format Code.
      */
-    public function getFormatCode(bool $extended = false): ?string
+    public function get_format_code(bool $extended = false): ?string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getFormatCode($extended);
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_format_code($extended);
         }
-        $builtin = $this->getBuiltInFormatCode();
+        $builtin = $this->get_built_in_format_code();
         if (is_int($builtin)) {
             if ($extended) {
                 if ($builtin === self::SHORT_DATE_INDEX) {
-                    return self::$shortDateFormat;
+                    return self::$short_date_format;
                 }
                 if ($builtin === self::DATE_TIME_INDEX) {
-                    return self::$dateTimeFormat;
+                    return self::$date_time_format;
                 }
             }
-
-            return self::builtInFormatCode($builtin);
+            return self::built_in_format_code($builtin);
         }
-
-        return $extended ? self::convertSystemFormats($this->formatCode) : $this->formatCode;
+        return $extended ? self::convert_system_formats($this->format_code) : $this->format_code;
     }
-
-    public static function convertSystemFormats(?string $formatCode): ?string
+    public static function convert_system_formats(?string $format_code): ?string
     {
-        if (is_string($formatCode)) {
-            if (stripos($formatCode, self::FORMAT_SYSDATE_F800) !== false || stripos($formatCode, self::FORMAT_SYSDATE_X) !== false) {
-                return self::$longDateFormat;
+        if (is_string($format_code)) {
+            if (stripos($format_code, self::FORMAT_SYSDATE_F800) !== false || stripos($format_code, self::FORMAT_SYSDATE_X) !== false) {
+                return self::$long_date_format;
             }
-            if (stripos($formatCode, self::FORMAT_SYSTIME_F400) !== false || stripos($formatCode, self::FORMAT_SYSTIME_X) !== false) {
-                return self::$timeFormat;
+            if (stripos($format_code, self::FORMAT_SYSTIME_F400) !== false || stripos($format_code, self::FORMAT_SYSTIME_X) !== false) {
+                return self::$time_format;
             }
         }
-
-        return $formatCode;
+        return $format_code;
     }
-
     /**
      * Set Format Code.
      *
@@ -267,36 +195,32 @@ class NumberFormat extends Supervisor
      *
      * @return $this
      */
-    public function setFormatCode(string $formatCode): static
+    public function set_format_code(string $format_code): static
     {
-        if ($formatCode == '') {
-            $formatCode = self::FORMAT_GENERAL;
+        if ($format_code == '') {
+            $format_code = self::FORMAT_GENERAL;
         }
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['formatCode' => $formatCode]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['formatCode' => $format_code]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->formatCode = $formatCode;
-            $this->builtInFormatCode = self::builtInFormatCodeIndex($formatCode);
+            $this->format_code = $format_code;
+            $this->built_in_format_code = self::built_in_format_code_index($format_code);
         }
-
         return $this;
     }
-
     /**
      * Get Built-In Format Code.
      *
      * @return false|int
      */
-    public function getBuiltInFormatCode()
+    public function get_built_in_format_code()
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getBuiltInFormatCode();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_built_in_format_code();
         }
-
-        return $this->builtInFormatCode;
+        return $this->built_in_format_code;
     }
-
     /**
      * Set Built-In Format Code.
      *
@@ -304,23 +228,21 @@ class NumberFormat extends Supervisor
      *
      * @return $this
      */
-    public function setBuiltInFormatCode(int $formatCodeIndex): static
+    public function set_built_in_format_code(int $format_code_index): static
     {
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['formatCode' => self::builtInFormatCode($formatCodeIndex)]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['formatCode' => self::built_in_format_code($format_code_index)]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->builtInFormatCode = $formatCodeIndex;
-            $this->formatCode = self::builtInFormatCode($formatCodeIndex);
+            $this->built_in_format_code = $format_code_index;
+            $this->format_code = self::built_in_format_code($format_code_index);
         }
-
         return $this;
     }
-
     /**
      * Fill built-in format codes.
      */
-    private static function fillBuiltInFormatCodes(): void
+    private static function fill_built_in_format_codes(): void
     {
         //  [MS-OI29500: Microsoft Office Implementation Information for ISO/IEC-29500 Standard Compliance]
         //  18.8.30. numFmt (Number Format)
@@ -343,130 +265,116 @@ class NumberFormat extends Supervisor
         //      40: "#,##0.00_);[Red](#,##0.00)"
         //      47: "mm:ss.0"
         //      KOR fmt 55: "yyyy/mm/dd"
-
         // Built-in format codes
-        if (empty(self::$builtInFormats)) {
-            self::$builtInFormats = [];
-
+        if (empty(self::$built_in_formats)) {
+            self::$built_in_formats = [];
             // General
-            self::$builtInFormats[0] = self::FORMAT_GENERAL;
-            self::$builtInFormats[1] = '0';
-            self::$builtInFormats[2] = '0.00';
-            self::$builtInFormats[3] = '#,##0';
-            self::$builtInFormats[4] = '#,##0.00';
-
-            self::$builtInFormats[9] = '0%';
-            self::$builtInFormats[10] = '0.00%';
-            self::$builtInFormats[11] = '0.00E+00';
-            self::$builtInFormats[12] = '# ?/?';
-            self::$builtInFormats[13] = '# ??/??';
-            self::$builtInFormats[14] = self::FORMAT_DATE_XLSX14_ACTUAL; // Despite ECMA 'mm-dd-yy';
-            self::$builtInFormats[15] = self::FORMAT_DATE_XLSX15;
-            self::$builtInFormats[16] = 'd-mmm';
-            self::$builtInFormats[17] = 'mmm-yy';
-            self::$builtInFormats[18] = 'h:mm AM/PM';
-            self::$builtInFormats[19] = 'h:mm:ss AM/PM';
-            self::$builtInFormats[20] = 'h:mm';
-            self::$builtInFormats[21] = 'h:mm:ss';
-            self::$builtInFormats[22] = self::FORMAT_DATE_XLSX22_ACTUAL; // Despite ECMA 'm/d/yy h:mm';
-
-            self::$builtInFormats[37] = '#,##0_);(#,##0)'; //  Despite ECMA '#,##0 ;(#,##0)';
-            self::$builtInFormats[38] = '#,##0_);[Red](#,##0)'; //  Despite ECMA '#,##0 ;[Red](#,##0)';
-            self::$builtInFormats[39] = '#,##0.00_);(#,##0.00)'; //  Despite ECMA '#,##0.00;(#,##0.00)';
-            self::$builtInFormats[40] = '#,##0.00_);[Red](#,##0.00)'; //  Despite ECMA '#,##0.00;[Red](#,##0.00)';
-
-            self::$builtInFormats[44] = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
-            self::$builtInFormats[45] = 'mm:ss';
-            self::$builtInFormats[46] = '[h]:mm:ss';
-            self::$builtInFormats[47] = 'mm:ss.0'; //  Despite ECMA 'mmss.0';
-            self::$builtInFormats[48] = '##0.0E+0';
-            self::$builtInFormats[49] = '@';
-
+            self::$built_in_formats[0] = self::FORMAT_GENERAL;
+            self::$built_in_formats[1] = '0';
+            self::$built_in_formats[2] = '0.00';
+            self::$built_in_formats[3] = '#,##0';
+            self::$built_in_formats[4] = '#,##0.00';
+            self::$built_in_formats[9] = '0%';
+            self::$built_in_formats[10] = '0.00%';
+            self::$built_in_formats[11] = '0.00E+00';
+            self::$built_in_formats[12] = '# ?/?';
+            self::$built_in_formats[13] = '# ??/??';
+            self::$built_in_formats[14] = self::FORMAT_DATE_XLSX14_ACTUAL;
+            // Despite ECMA 'mm-dd-yy';
+            self::$built_in_formats[15] = self::FORMAT_DATE_XLSX15;
+            self::$built_in_formats[16] = 'd-mmm';
+            self::$built_in_formats[17] = 'mmm-yy';
+            self::$built_in_formats[18] = 'h:mm AM/PM';
+            self::$built_in_formats[19] = 'h:mm:ss AM/PM';
+            self::$built_in_formats[20] = 'h:mm';
+            self::$built_in_formats[21] = 'h:mm:ss';
+            self::$built_in_formats[22] = self::FORMAT_DATE_XLSX22_ACTUAL;
+            // Despite ECMA 'm/d/yy h:mm';
+            self::$built_in_formats[37] = '#,##0_);(#,##0)';
+            //  Despite ECMA '#,##0 ;(#,##0)';
+            self::$built_in_formats[38] = '#,##0_);[Red](#,##0)';
+            //  Despite ECMA '#,##0 ;[Red](#,##0)';
+            self::$built_in_formats[39] = '#,##0.00_);(#,##0.00)';
+            //  Despite ECMA '#,##0.00;(#,##0.00)';
+            self::$built_in_formats[40] = '#,##0.00_);[Red](#,##0.00)';
+            //  Despite ECMA '#,##0.00;[Red](#,##0.00)';
+            self::$built_in_formats[44] = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
+            self::$built_in_formats[45] = 'mm:ss';
+            self::$built_in_formats[46] = '[h]:mm:ss';
+            self::$built_in_formats[47] = 'mm:ss.0';
+            //  Despite ECMA 'mmss.0';
+            self::$built_in_formats[48] = '##0.0E+0';
+            self::$built_in_formats[49] = '@';
             // CHT
-            self::$builtInFormats[27] = '[$-404]e/m/d';
-            self::$builtInFormats[30] = 'm/d/yy';
-            self::$builtInFormats[36] = '[$-404]e/m/d';
-            self::$builtInFormats[50] = '[$-404]e/m/d';
-            self::$builtInFormats[57] = '[$-404]e/m/d';
-
+            self::$built_in_formats[27] = '[$-404]e/m/d';
+            self::$built_in_formats[30] = 'm/d/yy';
+            self::$built_in_formats[36] = '[$-404]e/m/d';
+            self::$built_in_formats[50] = '[$-404]e/m/d';
+            self::$built_in_formats[57] = '[$-404]e/m/d';
             // THA
-            self::$builtInFormats[59] = 't0';
-            self::$builtInFormats[60] = 't0.00';
-            self::$builtInFormats[61] = 't#,##0';
-            self::$builtInFormats[62] = 't#,##0.00';
-            self::$builtInFormats[67] = 't0%';
-            self::$builtInFormats[68] = 't0.00%';
-            self::$builtInFormats[69] = 't# ?/?';
-            self::$builtInFormats[70] = 't# ??/??';
-
+            self::$built_in_formats[59] = 't0';
+            self::$built_in_formats[60] = 't0.00';
+            self::$built_in_formats[61] = 't#,##0';
+            self::$built_in_formats[62] = 't#,##0.00';
+            self::$built_in_formats[67] = 't0%';
+            self::$built_in_formats[68] = 't0.00%';
+            self::$built_in_formats[69] = 't# ?/?';
+            self::$built_in_formats[70] = 't# ??/??';
             // JPN
-            self::$builtInFormats[28] = '[$-411]ggge"年"m"月"d"日"';
-            self::$builtInFormats[29] = '[$-411]ggge"年"m"月"d"日"';
-            self::$builtInFormats[31] = 'yyyy"年"m"月"d"日"';
-            self::$builtInFormats[32] = 'h"時"mm"分"';
-            self::$builtInFormats[33] = 'h"時"mm"分"ss"秒"';
-            self::$builtInFormats[34] = 'yyyy"年"m"月"';
-            self::$builtInFormats[35] = 'm"月"d"日"';
-            self::$builtInFormats[51] = '[$-411]ggge"年"m"月"d"日"';
-            self::$builtInFormats[52] = 'yyyy"年"m"月"';
-            self::$builtInFormats[53] = 'm"月"d"日"';
-            self::$builtInFormats[54] = '[$-411]ggge"年"m"月"d"日"';
-            self::$builtInFormats[55] = 'yyyy"年"m"月"';
-            self::$builtInFormats[56] = 'm"月"d"日"';
-            self::$builtInFormats[58] = '[$-411]ggge"年"m"月"d"日"';
-
+            self::$built_in_formats[28] = '[$-411]ggge"年"m"月"d"日"';
+            self::$built_in_formats[29] = '[$-411]ggge"年"m"月"d"日"';
+            self::$built_in_formats[31] = 'yyyy"年"m"月"d"日"';
+            self::$built_in_formats[32] = 'h"時"mm"分"';
+            self::$built_in_formats[33] = 'h"時"mm"分"ss"秒"';
+            self::$built_in_formats[34] = 'yyyy"年"m"月"';
+            self::$built_in_formats[35] = 'm"月"d"日"';
+            self::$built_in_formats[51] = '[$-411]ggge"年"m"月"d"日"';
+            self::$built_in_formats[52] = 'yyyy"年"m"月"';
+            self::$built_in_formats[53] = 'm"月"d"日"';
+            self::$built_in_formats[54] = '[$-411]ggge"年"m"月"d"日"';
+            self::$built_in_formats[55] = 'yyyy"年"m"月"';
+            self::$built_in_formats[56] = 'm"月"d"日"';
+            self::$built_in_formats[58] = '[$-411]ggge"年"m"月"d"日"';
             // Flip array (for faster lookups)
-            self::$flippedBuiltInFormats = array_flip(self::$builtInFormats);
+            self::$flipped_built_in_formats = array_flip(self::$built_in_formats);
         }
     }
-
     /**
      * Get built-in format code.
      */
-    public static function builtInFormatCode(int $index): string
+    public static function built_in_format_code(int $index): string
     {
         // Ensure built-in format codes are available
-        self::fillBuiltInFormatCodes();
-
-        return self::$builtInFormats[$index] ?? '';
+        self::fill_built_in_format_codes();
+        return self::$built_in_formats[$index] ?? '';
     }
-
     /**
      * Get built-in format code index.
      *
      * @return false|int
      */
-    public static function builtInFormatCodeIndex(string $formatCodeIndex): int|false
+    public static function built_in_format_code_index(string $format_code_index): int|false
     {
         // Ensure built-in format codes are available
-        self::fillBuiltInFormatCodes();
-
+        self::fill_built_in_format_codes();
         // Lookup format code
-        if (array_key_exists($formatCodeIndex, self::$flippedBuiltInFormats)) {
-            return self::$flippedBuiltInFormats[$formatCodeIndex];
+        if (array_key_exists($format_code_index, self::$flipped_built_in_formats)) {
+            return self::$flipped_built_in_formats[$format_code_index];
         }
-
         return false;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getHashCode();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_hash_code();
         }
-
-        return md5(
-            $this->formatCode
-            . $this->builtInFormatCode
-            . self::class
-        );
+        return md5($this->format_code . $this->built_in_format_code . self::class);
     }
-
     /**
      * Convert a value in a pre-defined format to a PHP string.
      *
@@ -478,57 +386,47 @@ class NumberFormat extends Supervisor
      *
      * @return string Formatted string
      */
-    public static function toFormattedString(mixed $value, string $format, ?array $callBack = null, bool $lessFloatPrecision = false): string
+    public static function to_formatted_string(mixed $value, string $format, ?array $call_back = null, bool $less_float_precision = false): string
     {
-        return NumberFormat\Formatter::toFormattedString($value, $format, $callBack, $lessFloatPrecision);
+        return Number_Format\Formatter::to_formatted_string($value, $format, $call_back, $less_float_precision);
     }
-
     /** @return mixed[] */
-    protected function exportArray1(): array
+    protected function export_array1(): array
     {
-        $exportedArray = [];
-        $this->exportArray2($exportedArray, 'formatCode', $this->getFormatCode());
-
-        return $exportedArray;
+        $exported_array = [];
+        $this->export_array2($exported_array, 'formatCode', $this->get_format_code());
+        return $exported_array;
     }
-
-    public static function getShortDateFormat(): string
+    public static function get_short_date_format(): string
     {
-        return self::$shortDateFormat;
+        return self::$short_date_format;
     }
-
-    public static function setShortDateFormat(string $shortDateFormat): void
+    public static function set_short_date_format(string $short_date_format): void
     {
-        self::$shortDateFormat = $shortDateFormat;
+        self::$short_date_format = $short_date_format;
     }
-
-    public static function getLongDateFormat(): string
+    public static function get_long_date_format(): string
     {
-        return self::$longDateFormat;
+        return self::$long_date_format;
     }
-
-    public static function setLongDateFormat(string $longDateFormat): void
+    public static function set_long_date_format(string $long_date_format): void
     {
-        self::$longDateFormat = $longDateFormat;
+        self::$long_date_format = $long_date_format;
     }
-
-    public static function getDateTimeFormat(): string
+    public static function get_date_time_format(): string
     {
-        return self::$dateTimeFormat;
+        return self::$date_time_format;
     }
-
-    public static function setDateTimeFormat(string $dateTimeFormat): void
+    public static function set_date_time_format(string $date_time_format): void
     {
-        self::$dateTimeFormat = $dateTimeFormat;
+        self::$date_time_format = $date_time_format;
     }
-
-    public static function getTimeFormat(): string
+    public static function get_time_format(): string
     {
-        return self::$timeFormat;
+        return self::$time_format;
     }
-
-    public static function setTimeFormat(string $timeFormat): void
+    public static function set_time_format(string $time_format): void
     {
-        self::$timeFormat = $timeFormat;
+        self::$time_format = $time_format;
     }
 }

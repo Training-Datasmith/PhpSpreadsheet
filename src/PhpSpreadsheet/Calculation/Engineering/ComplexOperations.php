@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
 use Complex\Complex as ComplexObject;
 use Complex\Exception as ComplexException;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ComplexOperations
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Complex_Operations
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * IMDIV.
      *
@@ -30,19 +27,17 @@ class ComplexOperations
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMDIV(array|string $complexDividend, array|string $complexDivisor): array|string
+    public static function IMDIV(array|string $complex_dividend, array|string $complex_divisor): array|string
     {
-        if (is_array($complexDividend) || is_array($complexDivisor)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $complexDividend, $complexDivisor);
+        if (is_array($complex_dividend) || is_array($complex_divisor)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $complex_dividend, $complex_divisor);
         }
-
         try {
-            return (string) (new ComplexObject($complexDividend))->divideby(new ComplexObject($complexDivisor));
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            return (string) (new Complex_Object($complex_dividend))->divideby(new Complex_Object($complex_divisor));
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
     }
-
     /**
      * IMSUB.
      *
@@ -59,19 +54,17 @@ class ComplexOperations
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMSUB(array|string $complexNumber1, array|string $complexNumber2): array|string
+    public static function IMSUB(array|string $complex_number1, array|string $complex_number2): array|string
     {
-        if (is_array($complexNumber1) || is_array($complexNumber2)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $complexNumber1, $complexNumber2);
+        if (is_array($complex_number1) || is_array($complex_number2)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $complex_number1, $complex_number2);
         }
-
         try {
-            return (string) (new ComplexObject($complexNumber1))->subtract(new ComplexObject($complexNumber2));
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            return (string) (new Complex_Object($complex_number1))->subtract(new Complex_Object($complex_number2));
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
     }
-
     /**
      * IMSUM.
      *
@@ -82,24 +75,21 @@ class ComplexOperations
      *
      * @param string ...$complexNumbers Series of complex numbers to add
      */
-    public static function IMSUM(...$complexNumbers): string
+    public static function IMSUM(...$complex_numbers): string
     {
         // Return value
-        $returnValue = new ComplexObject(0.0);
-        $aArgs = Functions::flattenArray($complexNumbers);
-
+        $return_value = new Complex_Object(0.0);
+        $a_args = Functions::flatten_array($complex_numbers);
         try {
             // Loop through the arguments
-            foreach ($aArgs as $complex) {
-                $returnValue = $returnValue->add(new ComplexObject($complex));
+            foreach ($a_args as $complex) {
+                $return_value = $return_value->add(new Complex_Object($complex));
             }
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        return (string) $returnValue;
+        return (string) $return_value;
     }
-
     /**
      * IMPRODUCT.
      *
@@ -110,21 +100,19 @@ class ComplexOperations
      *
      * @param string ...$complexNumbers Series of complex numbers to multiply
      */
-    public static function IMPRODUCT(...$complexNumbers): string
+    public static function IMPRODUCT(...$complex_numbers): string
     {
         // Return value
-        $returnValue = new ComplexObject(1.0);
-        $aArgs = Functions::flattenArray($complexNumbers);
-
+        $return_value = new Complex_Object(1.0);
+        $a_args = Functions::flatten_array($complex_numbers);
         try {
             // Loop through the arguments
-            foreach ($aArgs as $complex) {
-                $returnValue = $returnValue->multiply(new ComplexObject($complex));
+            foreach ($a_args as $complex) {
+                $return_value = $return_value->multiply(new Complex_Object($complex));
             }
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        return (string) $returnValue;
+        return (string) $return_value;
     }
 }

@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engine;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engine;
-
-class CyclicReferenceStack
+class Cyclic_Reference_Stack
 {
     /**
      * The call stack for calculated cells.
@@ -12,7 +11,6 @@ class CyclicReferenceStack
      * @var mixed[]
      */
     private array $stack = [];
-
     /**
      * Return the number of entries on the stack.
      */
@@ -20,7 +18,6 @@ class CyclicReferenceStack
     {
         return count($this->stack);
     }
-
     /**
      * Push a new entry onto the stack.
      *
@@ -30,7 +27,6 @@ class CyclicReferenceStack
     {
         $this->stack[$value] = $value;
     }
-
     /**
      * Pop the last entry from the stack.
      */
@@ -38,17 +34,15 @@ class CyclicReferenceStack
     {
         return array_pop($this->stack);
     }
-
     /**
      * Test to see if a specified entry exists on the stack.
      *
      * @param int|string $value The value to test
      */
-    public function onStack($value): bool
+    public function on_stack($value): bool
     {
         return isset($this->stack[$value]);
     }
-
     /**
      * Clear the stack.
      */
@@ -56,13 +50,12 @@ class CyclicReferenceStack
     {
         $this->stack = [];
     }
-
     /**
      * Return an array of all entries on the stack.
      *
      * @return mixed[]
      */
-    public function showStack(): array
+    public function show_stack(): array
     {
         return $this->stack;
     }

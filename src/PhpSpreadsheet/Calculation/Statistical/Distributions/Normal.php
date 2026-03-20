@@ -1,20 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Engineering;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Normal
 {
-    use ArrayEnabled;
-
-    public const SQRT2PI = 2.5066282746310005024157652848110452530069867406099;
-
+    use Array_Enabled;
+    public const SQRT2PI = 2.5066282746310007;
     /**
      * NORMDIST.
      *
@@ -35,32 +31,27 @@ class Normal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function distribution(mixed $value, mixed $mean, mixed $stdDev, mixed $cumulative): array|string|float
+    public static function distribution(mixed $value, mixed $mean, mixed $std_dev, mixed $cumulative): array|string|float
     {
-        if (is_array($value) || is_array($mean) || is_array($stdDev) || is_array($cumulative)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $mean, $stdDev, $cumulative);
+        if (is_array($value) || is_array($mean) || is_array($std_dev) || is_array($cumulative)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $mean, $std_dev, $cumulative);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
-            $mean = DistributionValidations::validateFloat($mean);
-            $stdDev = DistributionValidations::validateFloat($stdDev);
-            $cumulative = DistributionValidations::validateBool($cumulative);
+            $value = Distribution_Validations::validate_float($value);
+            $mean = Distribution_Validations::validate_float($mean);
+            $std_dev = Distribution_Validations::validate_float($std_dev);
+            $cumulative = Distribution_Validations::validate_bool($cumulative);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($stdDev < 0) {
-            return ExcelError::NAN();
+        if ($std_dev < 0) {
+            return Excel_Error::NAN();
         }
-
         if ($cumulative) {
-            return 0.5 * (1 + Engineering\Erf::erfValue(($value - $mean) / ($stdDev * sqrt(2))));
+            return 0.5 * (1 + Engineering\Erf::erf_value(($value - $mean) / ($std_dev * sqrt(2))));
         }
-
-        return (1 / (self::SQRT2PI * $stdDev)) * exp(-(($value - $mean) ** 2 / (2 * ($stdDev * $stdDev))));
+        return 1 / (self::SQRT2PI * $std_dev) * exp(-(($value - $mean) ** 2 / (2 * ($std_dev * $std_dev))));
     }
-
     /**
      * NORMINV.
      *
@@ -77,27 +68,23 @@ class Normal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function inverse(mixed $probability, mixed $mean, mixed $stdDev): array|string|float
+    public static function inverse(mixed $probability, mixed $mean, mixed $std_dev): array|string|float
     {
-        if (is_array($probability) || is_array($mean) || is_array($stdDev)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $probability, $mean, $stdDev);
+        if (is_array($probability) || is_array($mean) || is_array($std_dev)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $probability, $mean, $std_dev);
         }
-
         try {
-            $probability = DistributionValidations::validateProbability($probability);
-            $mean = DistributionValidations::validateFloat($mean);
-            $stdDev = DistributionValidations::validateFloat($stdDev);
+            $probability = Distribution_Validations::validate_probability($probability);
+            $mean = Distribution_Validations::validate_float($mean);
+            $std_dev = Distribution_Validations::validate_float($std_dev);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($stdDev < 0) {
-            return ExcelError::NAN();
+        if ($std_dev < 0) {
+            return Excel_Error::NAN();
         }
-
-        return (self::inverseNcdf($probability) * $stdDev) + $mean;
+        return self::inverse_ncdf($probability) * $std_dev + $mean;
     }
-
     /*
      *                                inverse_ncdf.php
      *                            -------------------
@@ -106,79 +93,44 @@ class Normal
      *    email                : nickersonm@yahoo.com
      *
      */
-    private static function inverseNcdf(float $p): float
+    private static function inverse_ncdf(float $p): float
     {
         //    Inverse ncdf approximation by Peter J. Acklam, implementation adapted to
         //    PHP by Michael Nickerson, using Dr. Thomas Ziegler's C implementation as
         //    a guide. http://home.online.no/~pjacklam/notes/invnorm/index.html
         //    I have not checked the accuracy of this implementation. Be aware that PHP
         //    will truncate the coeficcients to 14 digits.
-
         //    You have permission to use and distribute this function freely for
         //    whatever purpose you want, but please show common courtesy and give credit
         //    where credit is due.
-
         //    Input parameter is $p - probability - where 0 < p < 1.
-
         //    Coefficients in rational approximations
         /** @var array<int, float> */
-        static $a = [
-            1 => -3.969683028665376e+01,
-            2 => 2.209460984245205e+02,
-            3 => -2.759285104469687e+02,
-            4 => 1.383577518672690e+02,
-            5 => -3.066479806614716e+01,
-            6 => 2.506628277459239e+00,
-        ];
-
+        static $a = [1 => -39.69683028665376, 2 => 220.9460984245205, 3 => -275.9285104469687, 4 => 138.357751867269, 5 => -30.66479806614716, 6 => 2.506628277459239];
         /** @var array<int, float> */
-        static $b = [
-            1 => -5.447609879822406e+01,
-            2 => 1.615858368580409e+02,
-            3 => -1.556989798598866e+02,
-            4 => 6.680131188771972e+01,
-            5 => -1.328068155288572e+01,
-        ];
-
+        static $b = [1 => -54.47609879822406, 2 => 161.5858368580409, 3 => -155.6989798598866, 4 => 66.80131188771972, 5 => -13.28068155288572];
         /** @var array<int, float> */
-        static $c = [
-            1 => -7.784894002430293e-03,
-            2 => -3.223964580411365e-01,
-            3 => -2.400758277161838e+00,
-            4 => -2.549732539343734e+00,
-            5 => 4.374664141464968e+00,
-            6 => 2.938163982698783e+00,
-        ];
-
+        static $c = [1 => -0.007784894002430293, 2 => -0.3223964580411365, 3 => -2.400758277161838, 4 => -2.549732539343734, 5 => 4.374664141464968, 6 => 2.938163982698783];
         /** @var array<int, float> */
-        static $d = [
-            1 => 7.784695709041462e-03,
-            2 => 3.224671290700398e-01,
-            3 => 2.445134137142996e+00,
-            4 => 3.754408661907416e+00,
-        ];
-
+        static $d = [1 => 0.007784695709041462, 2 => 0.3224671290700398, 3 => 2.445134137142996, 4 => 3.754408661907416];
         //    Define lower and upper region break-points.
-        $p_low = 0.02425; //Use lower region approx. below this
+        $p_low = 0.02425;
+        //Use lower region approx. below this
         $p_high = 1 - $p_low;
         //Use upper region approx. above this
         if (0 < $p && $p < $p_low) {
             //    Rational approximation for lower region.
             $q = sqrt(-2 * log($p));
-            return ((((($c[1] * $q + $c[2]) * $q + $c[3]) * $q + $c[4]) * $q + $c[5]) * $q + $c[6])
-                / (((($d[1] * $q + $d[2]) * $q + $d[3]) * $q + $d[4]) * $q + 1);
-        } if ($p_high < $p && $p < 1) {
+            return ((((($c[1] * $q + $c[2]) * $q + $c[3]) * $q + $c[4]) * $q + $c[5]) * $q + $c[6]) / (((($d[1] * $q + $d[2]) * $q + $d[3]) * $q + $d[4]) * $q + 1);
+        }
+        if ($p_high < $p && $p < 1) {
             //    Rational approximation for upper region.
             $q = sqrt(-2 * log(1 - $p));
-            return -((((($c[1] * $q + $c[2]) * $q + $c[3]) * $q + $c[4]) * $q + $c[5]) * $q + $c[6])
-                / (((($d[1] * $q + $d[2]) * $q + $d[3]) * $q + $d[4]) * $q + 1);
+            return -((((($c[1] * $q + $c[2]) * $q + $c[3]) * $q + $c[4]) * $q + $c[5]) * $q + $c[6]) / (((($d[1] * $q + $d[2]) * $q + $d[3]) * $q + $d[4]) * $q + 1);
         }
-
         //    Rational approximation for central region.
         $q = $p - 0.5;
         $r = $q * $q;
-
-        return ((((($a[1] * $r + $a[2]) * $r + $a[3]) * $r + $a[4]) * $r + $a[5]) * $r + $a[6]) * $q
-                / ((((($b[1] * $r + $b[2]) * $r + $b[3]) * $r + $b[4]) * $r + $b[5]) * $r + 1);
+        return ((((($a[1] * $r + $a[2]) * $r + $a[3]) * $r + $a[4]) * $r + $a[5]) * $r + $a[6]) * $q / ((((($b[1] * $r + $b[2]) * $r + $b[3]) * $r + $b[4]) * $r + $b[5]) * $r + 1);
     }
 }

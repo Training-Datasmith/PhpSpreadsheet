@@ -1,26 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-class HeaderFooterDrawing extends Drawing
+class Header_Footer_Drawing extends Drawing
 {
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        return md5(
-            $this->getPath()
-            . $this->name
-            . $this->offsetX
-            . $this->offsetY
-            . $this->width
-            . $this->height
-            . self::class
-        );
+        return md5($this->get_path() . $this->name . $this->offset_x . $this->offset_y . $this->width . $this->height . self::class);
     }
 }

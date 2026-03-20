@@ -1,27 +1,18 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting\Wizard;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\Wizard;
-
-use PhpOffice\PhpSpreadsheet\Style\Conditional;
-use PhpOffice\PhpSpreadsheet\Style\Style;
-
-interface WizardInterface
+use Php_Office\Php_Spreadsheet\Style\Conditional;
+use Php_Office\Php_Spreadsheet\Style\Style;
+interface Wizard_Interface
 {
-    public function getCellRange(): string;
-
-    public function setCellRange(string $cellRange): void;
-
-    public function getStyle(): Style;
-
-    public function setStyle(Style $style): void;
-
-    public function getStopIfTrue(): bool;
-
-    public function setStopIfTrue(bool $stopIfTrue): void;
-
-    public function getConditional(): Conditional;
-
-    public static function fromConditional(Conditional $conditional, string $cellRange = 'A1'): self;
+    public function get_cell_range(): string;
+    public function set_cell_range(string $cell_range): void;
+    public function get_style(): Style;
+    public function set_style(Style $style): void;
+    public function get_stop_if_true(): bool;
+    public function set_stop_if_true(bool $stop_if_true): void;
+    public function get_conditional(): Conditional;
+    public static function from_conditional(Conditional $conditional, string $cell_range = 'A1'): self;
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
 use DateTime;
 use DateTimeImmutable;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Current
 {
     /**
@@ -30,11 +28,9 @@ class Current
     public static function today(): DateTime|float|int|string
     {
         $dti = new DateTimeImmutable();
-        $dateArray = Helpers::dateParse($dti->format('c'));
-
-        return Helpers::dateParseSucceeded($dateArray) ? Helpers::returnIn3FormatsArray($dateArray, true) : ExcelError::VALUE();
+        $date_array = Helpers::date_parse($dti->format('c'));
+        return Helpers::date_parse_succeeded($date_array) ? Helpers::return_in3formats_array($date_array, true) : Excel_Error::VALUE();
     }
-
     /**
      * DATETIMENOW.
      *
@@ -55,8 +51,7 @@ class Current
     public static function now(): DateTime|float|int|string
     {
         $dti = new DateTimeImmutable();
-        $dateArray = Helpers::dateParse($dti->format('c'));
-
-        return Helpers::dateParseSucceeded($dateArray) ? Helpers::returnIn3FormatsArray($dateArray) : ExcelError::VALUE();
+        $date_array = Helpers::date_parse($dti->format('c'));
+        return Helpers::date_parse_succeeded($date_array) ? Helpers::return_in3formats_array($date_array) : Excel_Error::VALUE();
     }
 }

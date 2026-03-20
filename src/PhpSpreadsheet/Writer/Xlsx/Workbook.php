@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\DefinedNames as DefinedNamesWriter;
-
-class Workbook extends WriterPart
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Shared\Date;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Writer\Exception as WriterException;
+use Php_Office\Php_Spreadsheet\Writer\Xlsx\Defined_Names as DefinedNamesWriter;
+class Workbook extends Writer_Part
 {
     /**
      * Write workbook to XML format.
@@ -21,195 +19,158 @@ class Workbook extends WriterPart
      *
      * @return string XML Output
      */
-    public function writeWorkbook(Spreadsheet $spreadsheet, bool $preCalculateFormulas = false, ?bool $forceFullCalc = null): string
+    public function write_workbook(Spreadsheet $spreadsheet, bool $pre_calculate_formulas = false, ?bool $force_full_calc = null): string
     {
         // Create XML writer
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // workbook
-        $objWriter->startElement('workbook');
-        $objWriter->writeAttribute('xmlns', Namespaces::MAIN);
-        $objWriter->writeAttribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
-
+        $obj_writer->start_element('workbook');
+        $obj_writer->write_attribute('xmlns', Namespaces::MAIN);
+        $obj_writer->write_attribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
         // fileVersion
-        $this->writeFileVersion($objWriter);
-
+        $this->write_file_version($obj_writer);
         // workbookPr
-        $this->writeWorkbookPr($objWriter, $spreadsheet);
-
+        $this->write_workbook_pr($obj_writer, $spreadsheet);
         // workbookProtection
-        $this->writeWorkbookProtection($objWriter, $spreadsheet);
-
+        $this->write_workbook_protection($obj_writer, $spreadsheet);
         // bookViews
-        if ($this->getParentWriter()->getOffice2003Compatibility() === false) {
-            $this->writeBookViews($objWriter, $spreadsheet);
+        if ($this->get_parent_writer()->get_office2003compatibility() === false) {
+            $this->write_book_views($obj_writer, $spreadsheet);
         }
-
         // sheets
-        $this->writeSheets($objWriter, $spreadsheet);
-
+        $this->write_sheets($obj_writer, $spreadsheet);
         // definedNames
-        (new DefinedNamesWriter($objWriter, $spreadsheet))->write();
-
+        (new Defined_Names_Writer($obj_writer, $spreadsheet))->write();
         // calcPr
-        $this->writeCalcPr($objWriter, $preCalculateFormulas, $forceFullCalc);
-
-        $objWriter->endElement();
-
+        $this->write_calc_pr($obj_writer, $pre_calculate_formulas, $force_full_calc);
+        $obj_writer->end_element();
         // Return
-        return $objWriter->getData();
+        return $obj_writer->get_data();
     }
-
     /**
      * Write file version.
      */
-    private function writeFileVersion(XMLWriter $objWriter): void
+    private function write_file_version(Xml_Writer $obj_writer): void
     {
-        $objWriter->startElement('fileVersion');
-        $objWriter->writeAttribute('appName', 'xl');
-        $objWriter->writeAttribute('lastEdited', '4');
-        $objWriter->writeAttribute('lowestEdited', '4');
-        $objWriter->writeAttribute('rupBuild', '4505');
-        $objWriter->endElement();
+        $obj_writer->start_element('fileVersion');
+        $obj_writer->write_attribute('appName', 'xl');
+        $obj_writer->write_attribute('lastEdited', '4');
+        $obj_writer->write_attribute('lowestEdited', '4');
+        $obj_writer->write_attribute('rupBuild', '4505');
+        $obj_writer->end_element();
     }
-
     /**
      * Write WorkbookPr.
      */
-    private function writeWorkbookPr(XMLWriter $objWriter, Spreadsheet $spreadsheet): void
+    private function write_workbook_pr(Xml_Writer $obj_writer, Spreadsheet $spreadsheet): void
     {
-        $objWriter->startElement('workbookPr');
-
-        if ($spreadsheet->getExcelCalendar() === Date::CALENDAR_MAC_1904) {
-            $objWriter->writeAttribute('date1904', '1');
+        $obj_writer->start_element('workbookPr');
+        if ($spreadsheet->get_excel_calendar() === Date::CALENDAR_MAC_1904) {
+            $obj_writer->write_attribute('date1904', '1');
         }
-
-        $objWriter->writeAttribute('codeName', 'ThisWorkbook');
-
-        $objWriter->endElement();
+        $obj_writer->write_attribute('codeName', 'ThisWorkbook');
+        $obj_writer->end_element();
     }
-
     /**
      * Write BookViews.
      */
-    private function writeBookViews(XMLWriter $objWriter, Spreadsheet $spreadsheet): void
+    private function write_book_views(Xml_Writer $obj_writer, Spreadsheet $spreadsheet): void
     {
         // bookViews
-        $objWriter->startElement('bookViews');
-
+        $obj_writer->start_element('bookViews');
         // workbookView
-        $objWriter->startElement('workbookView');
-
-        $objWriter->writeAttribute('activeTab', (string) $spreadsheet->getActiveSheetIndex());
-        $objWriter->writeAttribute('autoFilterDateGrouping', ($spreadsheet->getAutoFilterDateGrouping() ? 'true' : 'false'));
-        $objWriter->writeAttribute('firstSheet', (string) $spreadsheet->getFirstSheetIndex());
-        $objWriter->writeAttribute('minimized', ($spreadsheet->getMinimized() ? 'true' : 'false'));
-        $objWriter->writeAttribute('showHorizontalScroll', ($spreadsheet->getShowHorizontalScroll() ? 'true' : 'false'));
-        $objWriter->writeAttribute('showSheetTabs', ($spreadsheet->getShowSheetTabs() ? 'true' : 'false'));
-        $objWriter->writeAttribute('showVerticalScroll', ($spreadsheet->getShowVerticalScroll() ? 'true' : 'false'));
-        $objWriter->writeAttribute('tabRatio', (string) $spreadsheet->getTabRatio());
-        $objWriter->writeAttribute('visibility', $spreadsheet->getVisibility());
-
-        $objWriter->endElement();
-
-        $objWriter->endElement();
+        $obj_writer->start_element('workbookView');
+        $obj_writer->write_attribute('activeTab', (string) $spreadsheet->get_active_sheet_index());
+        $obj_writer->write_attribute('autoFilterDateGrouping', $spreadsheet->get_auto_filter_date_grouping() ? 'true' : 'false');
+        $obj_writer->write_attribute('firstSheet', (string) $spreadsheet->get_first_sheet_index());
+        $obj_writer->write_attribute('minimized', $spreadsheet->get_minimized() ? 'true' : 'false');
+        $obj_writer->write_attribute('showHorizontalScroll', $spreadsheet->get_show_horizontal_scroll() ? 'true' : 'false');
+        $obj_writer->write_attribute('showSheetTabs', $spreadsheet->get_show_sheet_tabs() ? 'true' : 'false');
+        $obj_writer->write_attribute('showVerticalScroll', $spreadsheet->get_show_vertical_scroll() ? 'true' : 'false');
+        $obj_writer->write_attribute('tabRatio', (string) $spreadsheet->get_tab_ratio());
+        $obj_writer->write_attribute('visibility', $spreadsheet->get_visibility());
+        $obj_writer->end_element();
+        $obj_writer->end_element();
     }
-
     /**
      * Write WorkbookProtection.
      */
-    private function writeWorkbookProtection(XMLWriter $objWriter, Spreadsheet $spreadsheet): void
+    private function write_workbook_protection(Xml_Writer $obj_writer, Spreadsheet $spreadsheet): void
     {
-        $security = $spreadsheet->getSecurity();
-        if ($security->isSecurityEnabled()) {
-            $objWriter->startElement('workbookProtection');
-            $objWriter->writeAttribute('lockRevision', ($security->getLockRevision() ? 'true' : 'false'));
-            $objWriter->writeAttribute('lockStructure', ($security->getLockStructure() ? 'true' : 'false'));
-            $objWriter->writeAttribute('lockWindows', ($security->getLockWindows() ? 'true' : 'false'));
-
-            if ($security->getRevisionsPassword() !== '') {
-                $objWriter->writeAttribute('revisionsPassword', $security->getRevisionsPassword());
+        $security = $spreadsheet->get_security();
+        if ($security->is_security_enabled()) {
+            $obj_writer->start_element('workbookProtection');
+            $obj_writer->write_attribute('lockRevision', $security->get_lock_revision() ? 'true' : 'false');
+            $obj_writer->write_attribute('lockStructure', $security->get_lock_structure() ? 'true' : 'false');
+            $obj_writer->write_attribute('lockWindows', $security->get_lock_windows() ? 'true' : 'false');
+            if ($security->get_revisions_password() !== '') {
+                $obj_writer->write_attribute('revisionsPassword', $security->get_revisions_password());
             } else {
-                $hashValue = $security->getRevisionsHashValue();
-                if ($hashValue !== '') {
-                    $objWriter->writeAttribute('revisionsAlgorithmName', $security->getRevisionsAlgorithmName());
-                    $objWriter->writeAttribute('revisionsHashValue', $hashValue);
-                    $objWriter->writeAttribute('revisionsSaltValue', $security->getRevisionsSaltValue());
-                    $objWriter->writeAttribute('revisionsSpinCount', (string) $security->getRevisionsSpinCount());
+                $hash_value = $security->get_revisions_hash_value();
+                if ($hash_value !== '') {
+                    $obj_writer->write_attribute('revisionsAlgorithmName', $security->get_revisions_algorithm_name());
+                    $obj_writer->write_attribute('revisionsHashValue', $hash_value);
+                    $obj_writer->write_attribute('revisionsSaltValue', $security->get_revisions_salt_value());
+                    $obj_writer->write_attribute('revisionsSpinCount', (string) $security->get_revisions_spin_count());
                 }
             }
-
-            if ($security->getWorkbookPassword() !== '') {
-                $objWriter->writeAttribute('workbookPassword', $security->getWorkbookPassword());
+            if ($security->get_workbook_password() !== '') {
+                $obj_writer->write_attribute('workbookPassword', $security->get_workbook_password());
             } else {
-                $hashValue = $security->getWorkbookHashValue();
-                if ($hashValue !== '') {
-                    $objWriter->writeAttribute('workbookAlgorithmName', $security->getWorkbookAlgorithmName());
-                    $objWriter->writeAttribute('workbookHashValue', $hashValue);
-                    $objWriter->writeAttribute('workbookSaltValue', $security->getWorkbookSaltValue());
-                    $objWriter->writeAttribute('workbookSpinCount', (string) $security->getWorkbookSpinCount());
+                $hash_value = $security->get_workbook_hash_value();
+                if ($hash_value !== '') {
+                    $obj_writer->write_attribute('workbookAlgorithmName', $security->get_workbook_algorithm_name());
+                    $obj_writer->write_attribute('workbookHashValue', $hash_value);
+                    $obj_writer->write_attribute('workbookSaltValue', $security->get_workbook_salt_value());
+                    $obj_writer->write_attribute('workbookSpinCount', (string) $security->get_workbook_spin_count());
                 }
             }
-
-            $objWriter->endElement();
+            $obj_writer->end_element();
         }
     }
-
     /**
      * Write calcPr.
      *
      * @param bool $preCalculateFormulas If true, formulas will be calculated before writing
      */
-    private function writeCalcPr(XMLWriter $objWriter, bool $preCalculateFormulas, ?bool $forceFullCalc): void
+    private function write_calc_pr(Xml_Writer $obj_writer, bool $pre_calculate_formulas, ?bool $force_full_calc): void
     {
-        $objWriter->startElement('calcPr');
-
+        $obj_writer->start_element('calcPr');
         //    Set the calcid to a higher value than Excel itself will use, otherwise Excel will always recalc
         //  If MS Excel does do a recalc, then users opening a file in MS Excel will be prompted to save on exit
         //     because the file has changed
-        $objWriter->writeAttribute('calcId', '999999');
-        $objWriter->writeAttribute('calcMode', 'auto');
+        $obj_writer->write_attribute('calcId', '999999');
+        $obj_writer->write_attribute('calcMode', 'auto');
         //    fullCalcOnLoad isn't needed if we will calculate before writing
-        $objWriter->writeAttribute('calcCompleted', ($preCalculateFormulas) ? '1' : '0');
-        $objWriter->writeAttribute('fullCalcOnLoad', ($preCalculateFormulas) ? '0' : '1');
-        if ($forceFullCalc === null) {
-            $objWriter->writeAttribute('forceFullCalc', $preCalculateFormulas ? '0' : '1');
+        $obj_writer->write_attribute('calcCompleted', $pre_calculate_formulas ? '1' : '0');
+        $obj_writer->write_attribute('fullCalcOnLoad', $pre_calculate_formulas ? '0' : '1');
+        if ($force_full_calc === null) {
+            $obj_writer->write_attribute('forceFullCalc', $pre_calculate_formulas ? '0' : '1');
         } else {
-            $objWriter->writeAttribute('forceFullCalc', $forceFullCalc ? '1' : '0');
+            $obj_writer->write_attribute('forceFullCalc', $force_full_calc ? '1' : '0');
         }
-
-        $objWriter->endElement();
+        $obj_writer->end_element();
     }
-
     /**
      * Write sheets.
      */
-    private function writeSheets(XMLWriter $objWriter, Spreadsheet $spreadsheet): void
+    private function write_sheets(Xml_Writer $obj_writer, Spreadsheet $spreadsheet): void
     {
         // Write sheets
-        $objWriter->startElement('sheets');
-        $sheetCount = $spreadsheet->getSheetCount();
-        for ($i = 0; $i < $sheetCount; ++$i) {
+        $obj_writer->start_element('sheets');
+        $sheet_count = $spreadsheet->get_sheet_count();
+        for ($i = 0; $i < $sheet_count; ++$i) {
             // sheet
-            $this->writeSheet(
-                $objWriter,
-                $spreadsheet->getSheet($i)->getTitle(),
-                ($i + 1),
-                ($i + 1 + 3),
-                $spreadsheet->getSheet($i)->getSheetState()
-            );
+            $this->write_sheet($obj_writer, $spreadsheet->get_sheet($i)->get_title(), $i + 1, $i + 1 + 3, $spreadsheet->get_sheet($i)->get_sheet_state());
         }
-
-        $objWriter->endElement();
+        $obj_writer->end_element();
     }
-
     /**
      * Write sheet.
      *
@@ -218,20 +179,20 @@ class Workbook extends WriterPart
      * @param int $relId Relationship ID
      * @param string $sheetState Sheet state (visible, hidden, veryHidden)
      */
-    private function writeSheet(XMLWriter $objWriter, string $worksheetName, int $worksheetId = 1, int $relId = 1, string $sheetState = 'visible'): void
+    private function write_sheet(Xml_Writer $obj_writer, string $worksheet_name, int $worksheet_id = 1, int $rel_id = 1, string $sheet_state = 'visible'): void
     {
-        if ($worksheetName != '') {
+        if ($worksheet_name != '') {
             // Write sheet
-            $objWriter->startElement('sheet');
-            $objWriter->writeAttribute('name', $worksheetName);
-            $objWriter->writeAttribute('sheetId', (string) $worksheetId);
-            if ($sheetState !== 'visible' && $sheetState != '') {
-                $objWriter->writeAttribute('state', $sheetState);
+            $obj_writer->start_element('sheet');
+            $obj_writer->write_attribute('name', $worksheet_name);
+            $obj_writer->write_attribute('sheetId', (string) $worksheet_id);
+            if ($sheet_state !== 'visible' && $sheet_state != '') {
+                $obj_writer->write_attribute('state', $sheet_state);
             }
-            $objWriter->writeAttribute('r:id', 'rId' . $relId);
-            $objWriter->endElement();
+            $obj_writer->write_attribute('r:id', 'rId' . $rel_id);
+            $obj_writer->end_element();
         } else {
-            throw new WriterException('Invalid parameters passed.');
+            throw new Writer_Exception('Invalid parameters passed.');
         }
     }
 }

@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Helpers;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Helpers;
 class Tangent
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * TAN.
      *
@@ -27,18 +24,15 @@ class Tangent
     public static function tan(mixed $angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::verySmallDenominator(sin($angle), cos($angle));
+        return Helpers::very_small_denominator(sin($angle), cos($angle));
     }
-
     /**
      * TANH.
      *
@@ -53,18 +47,15 @@ class Tangent
     public static function tanh(mixed $angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         return tanh($angle);
     }
-
     /**
      * ATAN.
      *
@@ -79,18 +70,15 @@ class Tangent
     public static function atan($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(atan($number));
+        return Helpers::number_or_nan(atan($number));
     }
-
     /**
      * ATANH.
      *
@@ -105,18 +93,15 @@ class Tangent
     public static function atanh($number): array|string|float
     {
         if (is_array($number)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $number);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $number);
         }
-
         try {
-            $number = Helpers::validateNumericNullBool($number);
+            $number = Helpers::validate_numeric_null_bool($number);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::numberOrNan(atanh($number));
+        return Helpers::number_or_nan(atanh($number));
     }
-
     /**
      * ATAN2.
      *
@@ -140,23 +125,20 @@ class Tangent
      *         If an array of numbers is passed as one of the arguments, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function atan2(mixed $xCoordinate, mixed $yCoordinate): array|string|float
+    public static function atan2(mixed $x_coordinate, mixed $y_coordinate): array|string|float
     {
-        if (is_array($xCoordinate) || is_array($yCoordinate)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $xCoordinate, $yCoordinate);
+        if (is_array($x_coordinate) || is_array($y_coordinate)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $x_coordinate, $y_coordinate);
         }
-
         try {
-            $xCoordinate = Helpers::validateNumericNullBool($xCoordinate);
-            $yCoordinate = Helpers::validateNumericNullBool($yCoordinate);
+            $x_coordinate = Helpers::validate_numeric_null_bool($x_coordinate);
+            $y_coordinate = Helpers::validate_numeric_null_bool($y_coordinate);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($xCoordinate == 0) && ($yCoordinate == 0)) {
-            return ExcelError::DIV0();
+        if ($x_coordinate == 0 && $y_coordinate == 0) {
+            return Excel_Error::DIV0();
         }
-
-        return atan2($yCoordinate, $xCoordinate);
+        return atan2($y_coordinate, $x_coordinate);
     }
 }

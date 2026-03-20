@@ -1,92 +1,81 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
-
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Borders;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\Style;
-
-class StyleMerger
+use Php_Office\Php_Spreadsheet\Style\Border;
+use Php_Office\Php_Spreadsheet\Style\Borders;
+use Php_Office\Php_Spreadsheet\Style\Fill;
+use Php_Office\Php_Spreadsheet\Style\Font;
+use Php_Office\Php_Spreadsheet\Style\Style;
+class Style_Merger
 {
-    protected Style $baseStyle;
-
-    public function __construct(Style $baseStyle)
+    protected Style $base_style;
+    public function __construct(Style $base_style)
     {
         // Setting to $baseStyle sometimes causes problems later on.
-        $array = $baseStyle->exportArray();
-        $this->baseStyle = new Style();
-        $this->baseStyle->applyFromArray($array);
+        $array = $base_style->export_array();
+        $this->base_style = new Style();
+        $this->base_style->apply_from_array($array);
     }
-
-    public function getStyle(): Style
+    public function get_style(): Style
     {
-        return $this->baseStyle;
+        return $this->base_style;
     }
-
-    public function mergeStyle(Style $style): void
+    public function merge_style(Style $style): void
     {
-        if ($style->getNumberFormat()->getFormatCode() !== null) {
-            $this->baseStyle->getNumberFormat()->setFormatCode($style->getNumberFormat()->getFormatCode());
+        if ($style->get_number_format()->get_format_code() !== null) {
+            $this->base_style->get_number_format()->set_format_code($style->get_number_format()->get_format_code());
         }
-        $this->mergeFontStyle($this->baseStyle->getFont(), $style->getFont());
-        $this->mergeFillStyle($this->baseStyle->getFill(), $style->getFill());
-        $this->mergeBordersStyle($this->baseStyle->getBorders(), $style->getBorders());
+        $this->merge_font_style($this->base_style->get_font(), $style->get_font());
+        $this->merge_fill_style($this->base_style->get_fill(), $style->get_fill());
+        $this->merge_borders_style($this->base_style->get_borders(), $style->get_borders());
     }
-
-    protected function mergeFontStyle(Font $baseFontStyle, Font $fontStyle): void
+    protected function merge_font_style(Font $base_font_style, Font $font_style): void
     {
-        if ($fontStyle->getBold() !== null) {
-            $baseFontStyle->setBold($fontStyle->getBold());
+        if ($font_style->get_bold() !== null) {
+            $base_font_style->set_bold($font_style->get_bold());
         }
-        if ($fontStyle->getItalic() !== null) {
-            $baseFontStyle->setItalic($fontStyle->getItalic());
+        if ($font_style->get_italic() !== null) {
+            $base_font_style->set_italic($font_style->get_italic());
         }
-        if ($fontStyle->getStrikethrough() !== null) {
-            $baseFontStyle->setStrikethrough($fontStyle->getStrikethrough());
+        if ($font_style->get_strikethrough() !== null) {
+            $base_font_style->set_strikethrough($font_style->get_strikethrough());
         }
-        if ($fontStyle->getUnderline() !== null) {
-            $baseFontStyle->setUnderline($fontStyle->getUnderline());
+        if ($font_style->get_underline() !== null) {
+            $base_font_style->set_underline($font_style->get_underline());
         }
-        if ($fontStyle->getColor()->getARGB() !== null) {
-            $baseFontStyle->setColor($fontStyle->getColor());
+        if ($font_style->get_color()->get_argb() !== null) {
+            $base_font_style->set_color($font_style->get_color());
         }
     }
-
-    protected function mergeFillStyle(Fill $baseFillStyle, Fill $fillStyle): void
+    protected function merge_fill_style(Fill $base_fill_style, Fill $fill_style): void
     {
-        if ($fillStyle->getFillType() !== null) {
-            $baseFillStyle->setFillType($fillStyle->getFillType());
+        if ($fill_style->get_fill_type() !== null) {
+            $base_fill_style->set_fill_type($fill_style->get_fill_type());
         }
-        $baseFillStyle->setRotation($fillStyle->getRotation());
-        if ($fillStyle->getStartColor()->getARGB() !== null) {
-            $baseFillStyle->setStartColor($fillStyle->getStartColor());
+        $base_fill_style->set_rotation($fill_style->get_rotation());
+        if ($fill_style->get_start_color()->get_argb() !== null) {
+            $base_fill_style->set_start_color($fill_style->get_start_color());
         }
-        if ($fillStyle->getEndColor()->getARGB() !== null) {
-            $baseFillStyle->setEndColor($fillStyle->getEndColor());
+        if ($fill_style->get_end_color()->get_argb() !== null) {
+            $base_fill_style->set_end_color($fill_style->get_end_color());
         }
     }
-
-    protected function mergeBordersStyle(Borders $baseBordersStyle, Borders $bordersStyle): void
+    protected function merge_borders_style(Borders $base_borders_style, Borders $borders_style): void
     {
-        $this->mergeBorderStyle($baseBordersStyle->getTop(), $bordersStyle->getTop());
-        $this->mergeBorderStyle($baseBordersStyle->getBottom(), $bordersStyle->getBottom());
-        $this->mergeBorderStyle($baseBordersStyle->getLeft(), $bordersStyle->getLeft());
-        $this->mergeBorderStyle($baseBordersStyle->getRight(), $bordersStyle->getRight());
+        $this->merge_border_style($base_borders_style->get_top(), $borders_style->get_top());
+        $this->merge_border_style($base_borders_style->get_bottom(), $borders_style->get_bottom());
+        $this->merge_border_style($base_borders_style->get_left(), $borders_style->get_left());
+        $this->merge_border_style($base_borders_style->get_right(), $borders_style->get_right());
     }
-
-    protected function mergeBorderStyle(Border $baseBorderStyle, Border $borderStyle): void
+    protected function merge_border_style(Border $base_border_style, Border $border_style): void
     {
-        if ($borderStyle->getBorderStyle() !== Border::BORDER_OMIT) {
-            $baseBorderStyle->setBorderStyle(
-                $borderStyle->getBorderStyle()
-            );
+        if ($border_style->get_border_style() !== Border::BORDER_OMIT) {
+            $base_border_style->set_border_style($border_style->get_border_style());
         }
-        if ($borderStyle->getColor()->getARGB() !== null) {
-            $baseBorderStyle->setColor($borderStyle->getColor());
+        if ($border_style->get_color()->get_argb() !== null) {
+            $base_border_style->set_color($border_style->get_color());
         }
     }
 }

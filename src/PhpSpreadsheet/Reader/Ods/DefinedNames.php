@@ -1,72 +1,63 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Ods;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Ods;
-
-use DOMElement;
-use PhpOffice\PhpSpreadsheet\DefinedName;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-class DefinedNames extends BaseLoader
+use Dom_Element;
+use Php_Office\Php_Spreadsheet\Defined_Name;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+class Defined_Names extends Base_Loader
 {
-    public function read(DOMElement $workbookData): void
+    public function read(Dom_Element $workbook_data): void
     {
-        $this->readDefinedRanges($workbookData);
-        $this->readDefinedExpressions($workbookData);
+        $this->read_defined_ranges($workbook_data);
+        $this->read_defined_expressions($workbook_data);
     }
-
     /**
      * Read any Named Ranges that are defined in this spreadsheet.
      */
-    protected function readDefinedRanges(DOMElement $workbookData): void
+    protected function read_defined_ranges(Dom_Element $workbook_data): void
     {
-        $namedRanges = $workbookData->getElementsByTagNameNS($this->tableNs, 'named-range');
-        foreach ($namedRanges as $definedNameElement) {
-            $definedName = $definedNameElement->getAttributeNS($this->tableNs, 'name');
-            $baseAddress = $definedNameElement->getAttributeNS($this->tableNs, 'base-cell-address');
-            $range = $definedNameElement->getAttributeNS($this->tableNs, 'cell-range-address');
-
+        $named_ranges = $workbook_data->get_elements_by_tag_name_ns($this->table_ns, 'named-range');
+        foreach ($named_ranges as $defined_name_element) {
+            $defined_name = $defined_name_element->get_attribute_ns($this->table_ns, 'name');
+            $base_address = $defined_name_element->get_attribute_ns($this->table_ns, 'base-cell-address');
+            $range = $defined_name_element->get_attribute_ns($this->table_ns, 'cell-range-address');
             /** @var non-empty-string $baseAddress */
-            $baseAddress = FormulaTranslator::convertToExcelAddressValue($baseAddress);
-            $range = FormulaTranslator::convertToExcelAddressValue($range);
-
-            $this->addDefinedName($baseAddress, $definedName, $range);
+            $base_address = Formula_Translator::convert_to_excel_address_value($base_address);
+            $range = Formula_Translator::convert_to_excel_address_value($range);
+            $this->add_defined_name($base_address, $defined_name, $range);
         }
     }
-
     /**
      * Read any Named Formulae that are defined in this spreadsheet.
      */
-    protected function readDefinedExpressions(DOMElement $workbookData): void
+    protected function read_defined_expressions(Dom_Element $workbook_data): void
     {
-        $namedExpressions = $workbookData->getElementsByTagNameNS($this->tableNs, 'named-expression');
-        foreach ($namedExpressions as $definedNameElement) {
-            $definedName = $definedNameElement->getAttributeNS($this->tableNs, 'name');
-            $baseAddress = $definedNameElement->getAttributeNS($this->tableNs, 'base-cell-address');
-            $expression = $definedNameElement->getAttributeNS($this->tableNs, 'expression');
-
+        $named_expressions = $workbook_data->get_elements_by_tag_name_ns($this->table_ns, 'named-expression');
+        foreach ($named_expressions as $defined_name_element) {
+            $defined_name = $defined_name_element->get_attribute_ns($this->table_ns, 'name');
+            $base_address = $defined_name_element->get_attribute_ns($this->table_ns, 'base-cell-address');
+            $expression = $defined_name_element->get_attribute_ns($this->table_ns, 'expression');
             /** @var non-empty-string $baseAddress */
-            $baseAddress = FormulaTranslator::convertToExcelAddressValue($baseAddress);
+            $base_address = Formula_Translator::convert_to_excel_address_value($base_address);
             $expression = substr($expression, strpos($expression, ':=') + 1);
-            $expression = FormulaTranslator::convertToExcelFormulaValue($expression);
-
-            $this->addDefinedName($baseAddress, $definedName, $expression);
+            $expression = Formula_Translator::convert_to_excel_formula_value($expression);
+            $this->add_defined_name($base_address, $defined_name, $expression);
         }
     }
-
     /**
      * Assess scope and store the Defined Name.
      *
      * @param non-empty-string $baseAddress
      */
-    private function addDefinedName(string $baseAddress, string $definedName, string $value): void
+    private function add_defined_name(string $base_address, string $defined_name, string $value): void
     {
-        [$sheetReference] = Worksheet::extractSheetTitle($baseAddress, true, true);
-        $worksheet = $this->spreadsheet->getSheetByName($sheetReference);
+        [$sheet_reference] = Worksheet::extract_sheet_title($base_address, true, true);
+        $worksheet = $this->spreadsheet->get_sheet_by_name($sheet_reference);
         // Worksheet might still be null if we're only loading selected sheets rather than the full spreadsheet
         if ($worksheet !== null) {
-            $this->spreadsheet->addDefinedName(DefinedName::createInstance($definedName, $worksheet, $value));
+            $this->spreadsheet->add_defined_name(Defined_Name::create_instance($defined_name, $worksheet, $value));
         }
     }
 }

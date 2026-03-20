@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format\Wizard;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard;
-
-enum CurrencyNegative
+enum Currency_Negative
 {
     case minus;
     case redMinus;
     case parentheses;
     case redParentheses;
-
     public function start(): string
     {
         return match ($this) {
@@ -18,7 +16,6 @@ enum CurrencyNegative
             self::parentheses, self::redParentheses => '\(',
         };
     }
-
     public function end(): string
     {
         return match ($this) {
@@ -26,7 +23,6 @@ enum CurrencyNegative
             self::parentheses, self::redParentheses => '\)',
         };
     }
-
     public function color(): string
     {
         return match ($this) {

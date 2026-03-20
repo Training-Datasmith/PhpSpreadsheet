@@ -1,137 +1,112 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Cell;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
 use DateTimeInterface;
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 use Stringable;
-
-class StringValueBinder extends DefaultValueBinder implements IValueBinder
+class String_Value_Binder extends Default_Value_Binder implements I_Value_Binder
 {
-    protected bool $convertNull = true;
-
-    protected bool $convertBoolean = true;
-
-    protected bool $convertNumeric = true;
-
-    protected bool $convertFormula = true;
-
-    protected bool $setIgnoredErrors = false;
-
-    public function setSetIgnoredErrors(bool $setIgnoredErrors = false): self
+    protected bool $convert_null = true;
+    protected bool $convert_boolean = true;
+    protected bool $convert_numeric = true;
+    protected bool $convert_formula = true;
+    protected bool $set_ignored_errors = false;
+    public function set_set_ignored_errors(bool $set_ignored_errors = false): self
     {
-        $this->setIgnoredErrors = $setIgnoredErrors;
-
+        $this->set_ignored_errors = $set_ignored_errors;
         return $this;
     }
-
-    public function setNullConversion(bool $suppressConversion = false): self
+    public function set_null_conversion(bool $suppress_conversion = false): self
     {
-        $this->convertNull = $suppressConversion;
-
+        $this->convert_null = $suppress_conversion;
         return $this;
     }
-
-    public function setBooleanConversion(bool $suppressConversion = false): self
+    public function set_boolean_conversion(bool $suppress_conversion = false): self
     {
-        $this->convertBoolean = $suppressConversion;
-
+        $this->convert_boolean = $suppress_conversion;
         return $this;
     }
-
-    public function getBooleanConversion(): bool
+    public function get_boolean_conversion(): bool
     {
-        return $this->convertBoolean;
+        return $this->convert_boolean;
     }
-
-    public function setNumericConversion(bool $suppressConversion = false): self
+    public function set_numeric_conversion(bool $suppress_conversion = false): self
     {
-        $this->convertNumeric = $suppressConversion;
-
+        $this->convert_numeric = $suppress_conversion;
         return $this;
     }
-
-    public function setFormulaConversion(bool $suppressConversion = false): self
+    public function set_formula_conversion(bool $suppress_conversion = false): self
     {
-        $this->convertFormula = $suppressConversion;
-
+        $this->convert_formula = $suppress_conversion;
         return $this;
     }
-
-    public function setConversionForAllValueTypes(bool $suppressConversion = false): self
+    public function set_conversion_for_all_value_types(bool $suppress_conversion = false): self
     {
-        $this->convertNull = $suppressConversion;
-        $this->convertBoolean = $suppressConversion;
-        $this->convertNumeric = $suppressConversion;
-        $this->convertFormula = $suppressConversion;
-
+        $this->convert_null = $suppress_conversion;
+        $this->convert_boolean = $suppress_conversion;
+        $this->convert_numeric = $suppress_conversion;
+        $this->convert_formula = $suppress_conversion;
         return $this;
     }
-
     /**
      * Bind value to a cell.
      *
      * @param Cell $cell Cell to bind value to
      * @param mixed $value Value to bind in cell
      */
-    public function bindValue(Cell $cell, mixed $value): bool
+    public function bind_value(Cell $cell, mixed $value): bool
     {
         if (is_object($value)) {
-            return $this->bindObjectValue($cell, $value);
+            return $this->bind_object_value($cell, $value);
         }
         if ($value !== null && !is_scalar($value)) {
-            throw new SpreadsheetException('Unable to bind unstringable ' . gettype($value));
+            throw new Spreadsheet_Exception('Unable to bind unstringable ' . gettype($value));
         }
-
         // sanitize UTF-8 strings
         if (is_string($value)) {
-            $value = StringHelper::sanitizeUTF8($value);
+            $value = String_Helper::sanitize_utf8($value);
         }
-
-        $ignoredErrors = false;
-        if ($value === null && $this->convertNull === false) {
-            $cell->setValueExplicit($value, DataType::TYPE_NULL);
-        } elseif (is_bool($value) && $this->convertBoolean === false) {
-            $cell->setValueExplicit($value, DataType::TYPE_BOOL);
-        } elseif ((is_int($value) || is_float($value)) && $this->convertNumeric === false) {
-            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
-        } elseif (is_string($value) && strlen($value) > 1 && $value[0] === '=' && $this->convertFormula === false && parent::dataTypeForValue($value) === DataType::TYPE_FORMULA) {
-            $cell->setValueExplicit($value, DataType::TYPE_FORMULA);
+        $ignored_errors = false;
+        if ($value === null && $this->convert_null === false) {
+            $cell->set_value_explicit($value, Data_Type::TYPE_NULL);
+        } elseif (is_bool($value) && $this->convert_boolean === false) {
+            $cell->set_value_explicit($value, Data_Type::TYPE_BOOL);
+        } elseif ((is_int($value) || is_float($value)) && $this->convert_numeric === false) {
+            $cell->set_value_explicit($value, Data_Type::TYPE_NUMERIC);
+        } elseif (is_string($value) && strlen($value) > 1 && $value[0] === '=' && $this->convert_formula === false && parent::data_type_for_value($value) === Data_Type::TYPE_FORMULA) {
+            $cell->set_value_explicit($value, Data_Type::TYPE_FORMULA);
         } else {
-            $ignoredErrors = is_numeric($value);
-            $cell->setValueExplicit((string) $value, DataType::TYPE_STRING);
+            $ignored_errors = is_numeric($value);
+            $cell->set_value_explicit((string) $value, Data_Type::TYPE_STRING);
         }
-        if ($this->setIgnoredErrors) {
-            $cell->getIgnoredErrors()->setNumberStoredAsText($ignoredErrors);
+        if ($this->set_ignored_errors) {
+            $cell->get_ignored_errors()->set_number_stored_as_text($ignored_errors);
         }
-
         return true;
     }
-
-    protected function bindObjectValue(Cell $cell, object $value): bool
+    protected function bind_object_value(Cell $cell, object $value): bool
     {
         // Handle any objects that might be injected
-        $ignoredErrors = false;
+        $ignored_errors = false;
         if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y-m-d H:i:s');
-            $cell->setValueExplicit($value, DataType::TYPE_STRING);
-        } elseif ($value instanceof RichText) {
-            $cell->setValueExplicit($value, DataType::TYPE_INLINE);
-            $ignoredErrors = is_numeric($value->getPlainText());
+            $cell->set_value_explicit($value, Data_Type::TYPE_STRING);
+        } elseif ($value instanceof Rich_Text) {
+            $cell->set_value_explicit($value, Data_Type::TYPE_INLINE);
+            $ignored_errors = is_numeric($value->get_plain_text());
         } elseif ($value instanceof Stringable) {
-            $cell->setValueExplicit((string) $value, DataType::TYPE_STRING);
-            $ignoredErrors = is_numeric((string) $value);
+            $cell->set_value_explicit((string) $value, Data_Type::TYPE_STRING);
+            $ignored_errors = is_numeric((string) $value);
         } else {
-            throw new SpreadsheetException('Unable to bind unstringable object of type ' . $value::class);
+            throw new Spreadsheet_Exception('Unable to bind unstringable object of type ' . $value::class);
         }
-        if ($this->setIgnoredErrors) {
-            $cell->getIgnoredErrors()->setNumberStoredAsText($ignoredErrors);
+        if ($this->set_ignored_errors) {
+            $cell->get_ignored_errors()->set_number_stored_as_text($ignored_errors);
         }
-
         return true;
     }
 }

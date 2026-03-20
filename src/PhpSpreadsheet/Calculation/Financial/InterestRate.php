@@ -1,14 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class InterestRate
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Interest_Rate
 {
     /**
      * EFFECT.
@@ -22,25 +20,21 @@ class InterestRate
      * @param mixed $nominalRate Nominal interest rate as a float
      * @param mixed $periodsPerYear Integer number of compounding payments per year
      */
-    public static function effective(mixed $nominalRate = 0, mixed $periodsPerYear = 0): string|float
+    public static function effective(mixed $nominal_rate = 0, mixed $periods_per_year = 0): string|float
     {
-        $nominalRate = Functions::flattenSingleValue($nominalRate);
-        $periodsPerYear = Functions::flattenSingleValue($periodsPerYear);
-
+        $nominal_rate = Functions::flatten_single_value($nominal_rate);
+        $periods_per_year = Functions::flatten_single_value($periods_per_year);
         try {
-            $nominalRate = FinancialValidations::validateFloat($nominalRate);
-            $periodsPerYear = FinancialValidations::validateInt($periodsPerYear);
+            $nominal_rate = Financial_Validations::validate_float($nominal_rate);
+            $periods_per_year = Financial_Validations::validate_int($periods_per_year);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($nominalRate <= 0 || $periodsPerYear < 1) {
-            return ExcelError::NAN();
+        if ($nominal_rate <= 0 || $periods_per_year < 1) {
+            return Excel_Error::NAN();
         }
-
-        return ((1 + $nominalRate / $periodsPerYear) ** $periodsPerYear) - 1;
+        return (1 + $nominal_rate / $periods_per_year) ** $periods_per_year - 1;
     }
-
     /**
      * NOMINAL.
      *
@@ -51,23 +45,20 @@ class InterestRate
      *
      * @return float|string Result, or a string containing an error
      */
-    public static function nominal(mixed $effectiveRate = 0, mixed $periodsPerYear = 0): string|float
+    public static function nominal(mixed $effective_rate = 0, mixed $periods_per_year = 0): string|float
     {
-        $effectiveRate = Functions::flattenSingleValue($effectiveRate);
-        $periodsPerYear = Functions::flattenSingleValue($periodsPerYear);
-
+        $effective_rate = Functions::flatten_single_value($effective_rate);
+        $periods_per_year = Functions::flatten_single_value($periods_per_year);
         try {
-            $effectiveRate = FinancialValidations::validateFloat($effectiveRate);
-            $periodsPerYear = FinancialValidations::validateInt($periodsPerYear);
+            $effective_rate = Financial_Validations::validate_float($effective_rate);
+            $periods_per_year = Financial_Validations::validate_int($periods_per_year);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($effectiveRate <= 0 || $periodsPerYear < 1) {
-            return ExcelError::NAN();
+        if ($effective_rate <= 0 || $periods_per_year < 1) {
+            return Excel_Error::NAN();
         }
-
         // Calculate
-        return $periodsPerYear * (($effectiveRate + 1) ** (1 / $periodsPerYear) - 1);
+        return $periods_per_year * (($effective_rate + 1) ** (1 / $periods_per_year) - 1);
     }
 }

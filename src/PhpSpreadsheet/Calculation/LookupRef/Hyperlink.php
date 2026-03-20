@@ -1,14 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Hyperlink
 {
     /**
@@ -23,33 +21,24 @@ class Hyperlink
      *
      * @return string The value of $displayName (or $linkURL if $displayName was blank)
      */
-    public static function set(mixed $linkURL = '', mixed $displayName = null, ?Cell $cell = null): string
+    public static function set(mixed $link_url = '', mixed $display_name = null, ?Cell $cell = null): string
     {
         $worksheet = null;
         $coordinate = '';
         if ($cell !== null) {
-            $coordinate = $cell->getCoordinate();
-            $worksheet = $cell->getWorksheetOrNull();
+            $coordinate = $cell->get_coordinate();
+            $worksheet = $cell->get_worksheet_or_null();
         }
-
-        $linkURL = ($linkURL === null) ? '' : StringHelper::convertToString(Functions::flattenSingleValue($linkURL));
-        $displayName = ($displayName === null) ? '' : Functions::flattenSingleValue($displayName);
-
-        if ((!is_object($cell)) || (trim($linkURL) == '')) {
-            return ExcelError::REF();
+        $link_url = $link_url === null ? '' : String_Helper::convert_to_string(Functions::flatten_single_value($link_url));
+        $display_name = $display_name === null ? '' : Functions::flatten_single_value($display_name);
+        if (!is_object($cell) || trim($link_url) == '') {
+            return Excel_Error::REF();
         }
-
-        $displayName = StringHelper::convertToString($displayName, false);
-        if (trim($displayName) === '') {
-            $displayName = $linkURL;
+        $display_name = String_Helper::convert_to_string($display_name, false);
+        if (trim($display_name) === '') {
+            $display_name = $link_url;
         }
-
-        $worksheet?->getCell($coordinate)
-            ->getHyperlink()
-            ->setUrl($linkURL)
-            ->setTooltip($displayName)
-            ->setDisplay('');
-
-        return $displayName;
+        $worksheet?->get_cell($coordinate)->get_hyperlink()->set_url($link_url)->set_tooltip($display_name)->set_display('');
+        return $display_name;
     }
 }

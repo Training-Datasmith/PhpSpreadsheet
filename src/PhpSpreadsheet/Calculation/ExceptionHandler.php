@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation;
-
-class ExceptionHandler
+class Exception_Handler
 {
     /**
      * Register errorhandler.
@@ -12,10 +11,9 @@ class ExceptionHandler
     public function __construct()
     {
         /** @var callable $callable */
-        $callable = Exception::errorHandlerCallback(...);
+        $callable = Exception::error_handler_callback(...);
         set_error_handler($callable, E_ALL);
     }
-
     /**
      * Unregister errorhandler.
      */

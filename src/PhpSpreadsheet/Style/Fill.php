@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Style;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style;
 
 class Fill extends Supervisor
 {
@@ -28,33 +27,25 @@ class Fill extends Supervisor
     public const FILL_PATTERN_LIGHTUP = 'lightUp';
     public const FILL_PATTERN_LIGHTVERTICAL = 'lightVertical';
     public const FILL_PATTERN_MEDIUMGRAY = 'mediumGray';
-
-    public ?int $startcolorIndex = null;
-
-    public ?int $endcolorIndex = null;
-
+    public ?int $startcolor_index = null;
+    public ?int $endcolor_index = null;
     /**
      * Fill type.
      */
-    protected ?string $fillType = self::FILL_NONE;
-
+    protected ?string $fill_type = self::FILL_NONE;
     /**
      * Rotation.
      */
     protected float $rotation = 0.0;
-
     /**
      * Start color.
      */
-    protected Color $startColor;
-
+    protected Color $start_color;
     /**
      * End color.
      */
-    protected Color $endColor;
-
-    private bool $colorChanged = false;
-
+    protected Color $end_color;
+    private bool $color_changed = false;
     /**
      * Create a new Fill.
      *
@@ -65,37 +56,32 @@ class Fill extends Supervisor
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
      */
-    public function __construct(bool $isSupervisor = false, bool $isConditional = false)
+    public function __construct(bool $is_supervisor = false, bool $is_conditional = false)
     {
         // Supervisor?
-        parent::__construct($isSupervisor);
-
+        parent::__construct($is_supervisor);
         // Initialise values
-        if ($isConditional) {
-            $this->fillType = null;
+        if ($is_conditional) {
+            $this->fill_type = null;
         }
-        $this->startColor = new Color(Color::COLOR_WHITE, $isSupervisor, $isConditional);
-        $this->endColor = new Color(Color::COLOR_BLACK, $isSupervisor, $isConditional);
-
+        $this->start_color = new Color(Color::COLOR_WHITE, $is_supervisor, $is_conditional);
+        $this->end_color = new Color(Color::COLOR_BLACK, $is_supervisor, $is_conditional);
         // bind parent if we are a supervisor
-        if ($isSupervisor) {
-            $this->startColor->bindParent($this, 'startColor');
-            $this->endColor->bindParent($this, 'endColor');
+        if ($is_supervisor) {
+            $this->start_color->bind_parent($this, 'startColor');
+            $this->end_color->bind_parent($this, 'endColor');
         }
     }
-
     /**
      * Get the shared style component for the currently active cell in currently active sheet.
      * Only used for style supervisor.
      */
-    public function getSharedComponent(): self
+    public function get_shared_component(): self
     {
         /** @var Style $parent */
         $parent = $this->parent;
-
-        return $parent->getSharedComponent()->getFill();
+        return $parent->get_shared_component()->get_fill();
     }
-
     /**
      * Build style array from subcomponents.
      *
@@ -103,11 +89,10 @@ class Fill extends Supervisor
      *
      * @return array{fill: mixed[]}
      */
-    public function getStyleArray(array $array): array
+    public function get_style_array(array $array): array
     {
         return ['fill' => $array];
     }
-
     /**
      * Apply styles from array.
      *
@@ -130,48 +115,40 @@ class Fill extends Supervisor
      *
      * @return $this
      */
-    public function applyFromArray(array $styleArray): static
+    public function apply_from_array(array $style_array): static
     {
-        if ($this->isSupervisor) {
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($this->getStyleArray($styleArray));
+        if ($this->is_supervisor) {
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($this->get_style_array($style_array));
         } else {
-            if (isset($styleArray['fillType'])) {
-                $this->setFillType($styleArray['fillType']);
+            if (isset($style_array['fillType'])) {
+                $this->set_fill_type($style_array['fillType']);
             }
-            if (isset($styleArray['rotation'])) {
-                $this->setRotation($styleArray['rotation']);
+            if (isset($style_array['rotation'])) {
+                $this->set_rotation($style_array['rotation']);
             }
-            if (isset($styleArray['startColor'])) {
-                $this->getStartColor()
-                    ->applyFromArray($styleArray['startColor']);
+            if (isset($style_array['startColor'])) {
+                $this->get_start_color()->apply_from_array($style_array['startColor']);
             }
-            if (isset($styleArray['endColor'])) {
-                $this->getEndColor()
-                    ->applyFromArray($styleArray['endColor']);
+            if (isset($style_array['endColor'])) {
+                $this->get_end_color()->apply_from_array($style_array['endColor']);
             }
-            if (isset($styleArray['color'])) {
-                $this->getStartColor()
-                    ->applyFromArray($styleArray['color']);
-                $this->getEndColor()
-                    ->applyFromArray($styleArray['color']);
+            if (isset($style_array['color'])) {
+                $this->get_start_color()->apply_from_array($style_array['color']);
+                $this->get_end_color()->apply_from_array($style_array['color']);
             }
         }
-
         return $this;
     }
-
     /**
      * Get Fill Type.
      */
-    public function getFillType(): ?string
+    public function get_fill_type(): ?string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getFillType();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_fill_type();
         }
-
-        return $this->fillType;
+        return $this->fill_type;
     }
-
     /**
      * Set Fill Type.
      *
@@ -179,155 +156,130 @@ class Fill extends Supervisor
      *
      * @return $this
      */
-    public function setFillType(string $fillType): static
+    public function set_fill_type(string $fill_type): static
     {
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['fillType' => $fillType]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['fillType' => $fill_type]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->fillType = $fillType;
+            $this->fill_type = $fill_type;
         }
-
         return $this;
     }
-
     /**
      * Get Rotation.
      */
-    public function getRotation(): float
+    public function get_rotation(): float
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getRotation();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_rotation();
         }
-
         return $this->rotation;
     }
-
     /**
      * Set Rotation.
      *
      * @return $this
      */
-    public function setRotation(float $angleInDegrees): static
+    public function set_rotation(float $angle_in_degrees): static
     {
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['rotation' => $angleInDegrees]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['rotation' => $angle_in_degrees]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->rotation = $angleInDegrees;
+            $this->rotation = $angle_in_degrees;
         }
-
         return $this;
     }
-
     /**
      * Get Start Color.
      */
-    public function getStartColor(): Color
+    public function get_start_color(): Color
     {
-        return $this->startColor;
+        return $this->start_color;
     }
-
     /**
      * Set Start Color.
      *
      * @return $this
      */
-    public function setStartColor(Color $color): static
+    public function set_start_color(Color $color): static
     {
-        $this->colorChanged = true;
+        $this->color_changed = true;
         // make sure parameter is a real color and not a supervisor
-        $color = $color->getIsSupervisor() ? $color->getSharedComponent() : $color;
-
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStartColor()->getStyleArray(['argb' => $color->getARGB()]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        $color = $color->get_is_supervisor() ? $color->get_shared_component() : $color;
+        if ($this->is_supervisor) {
+            $style_array = $this->get_start_color()->get_style_array(['argb' => $color->get_argb()]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->startColor = $color;
+            $this->start_color = $color;
         }
-
         return $this;
     }
-
     /**
      * Get End Color.
      */
-    public function getEndColor(): Color
+    public function get_end_color(): Color
     {
-        return $this->endColor;
+        return $this->end_color;
     }
-
     /**
      * Set End Color.
      *
      * @return $this
      */
-    public function setEndColor(Color $color): static
+    public function set_end_color(Color $color): static
     {
-        $this->colorChanged = true;
+        $this->color_changed = true;
         // make sure parameter is a real color and not a supervisor
-        $color = $color->getIsSupervisor() ? $color->getSharedComponent() : $color;
-
-        if ($this->isSupervisor) {
-            $styleArray = $this->getEndColor()->getStyleArray(['argb' => $color->getARGB()]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        $color = $color->get_is_supervisor() ? $color->get_shared_component() : $color;
+        if ($this->is_supervisor) {
+            $style_array = $this->get_end_color()->get_style_array(['argb' => $color->get_argb()]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->endColor = $color;
+            $this->end_color = $color;
         }
-
         return $this;
     }
-
-    public function getColorsChanged(): bool
+    public function get_colors_changed(): bool
     {
-        if ($this->isSupervisor) {
-            $changed = $this->getSharedComponent()->colorChanged;
+        if ($this->is_supervisor) {
+            $changed = $this->get_shared_component()->color_changed;
         } else {
-            $changed = $this->colorChanged;
+            $changed = $this->color_changed;
         }
         if ($changed) {
             return true;
         }
-        if ($this->startColor->getHasChanged()) {
+        if ($this->start_color->get_has_changed()) {
             return true;
         }
-        return $this->endColor->getHasChanged();
+        return $this->end_color->get_has_changed();
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getHashCode();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_hash_code();
         }
-
         // Note that we don't care about colours for fill type NONE, but could have duplicate NONEs with
         //  different hashes if we don't explicitly prevent this
-        return md5(
-            $this->getFillType()
-            . $this->getRotation()
-            . ($this->getFillType() !== self::FILL_NONE ? $this->getStartColor()->getHashCode() : '')
-            . ($this->getFillType() !== self::FILL_NONE ? $this->getEndColor()->getHashCode() : '')
-            . ($this->getColorsChanged())
-            . self::class
-        );
+        return md5($this->get_fill_type() . $this->get_rotation() . ($this->get_fill_type() !== self::FILL_NONE ? $this->get_start_color()->get_hash_code() : '') . ($this->get_fill_type() !== self::FILL_NONE ? $this->get_end_color()->get_hash_code() : '') . $this->get_colors_changed() . self::class);
     }
-
     /** @return mixed[] */
-    protected function exportArray1(): array
+    protected function export_array1(): array
     {
-        $exportedArray = [];
-        $this->exportArray2($exportedArray, 'fillType', $this->getFillType());
-        $this->exportArray2($exportedArray, 'rotation', $this->getRotation());
-        if ($this->getColorsChanged()) {
-            $this->exportArray2($exportedArray, 'endColor', $this->getEndColor());
-            $this->exportArray2($exportedArray, 'startColor', $this->getStartColor());
+        $exported_array = [];
+        $this->export_array2($exported_array, 'fillType', $this->get_fill_type());
+        $this->export_array2($exported_array, 'rotation', $this->get_rotation());
+        if ($this->get_colors_changed()) {
+            $this->export_array2($exported_array, 'endColor', $this->get_end_color());
+            $this->export_array2($exported_array, 'startColor', $this->get_start_color());
         }
-
-        return $exportedArray;
+        return $exported_array;
     }
 }

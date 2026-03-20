@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Rich_Text;
 
-namespace PhpOffice\PhpSpreadsheet\RichText;
-
-use PhpOffice\PhpSpreadsheet\Style\Font;
-
-class TextElement implements ITextElement
+use Php_Office\Php_Spreadsheet\Style\Font;
+class Text_Element implements I_Text_Element
 {
     /**
      * Create a new TextElement instance.
@@ -16,17 +14,15 @@ class TextElement implements ITextElement
     public function __construct(private string $text = '')
     {
     }
-
     /**
      * Get text.
      *
      * @return string Text
      */
-    public function getText(): string
+    public function get_text(): string
     {
         return $this->text;
     }
-
     /**
      * Set text.
      *
@@ -34,31 +30,25 @@ class TextElement implements ITextElement
      *
      * @return $this
      */
-    public function setText(string $text): self
+    public function set_text(string $text): self
     {
         $this->text = $text;
-
         return $this;
     }
-
     /**
      * Get font. For this class, the return value is always null.
      */
-    public function getFont(): ?Font
+    public function get_font(): ?Font
     {
         return null;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        return md5(
-            $this->text
-            . self::class
-        );
+        return md5($this->text . self::class);
     }
 }

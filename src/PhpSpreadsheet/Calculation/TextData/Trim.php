@@ -1,15 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Text_Data;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\TextData;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
 class Trim
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * CLEAN.
      *
@@ -19,17 +16,14 @@ class Trim
      * @return array<mixed>|string If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function nonPrintable(mixed $stringValue = '')
+    public static function non_printable(mixed $string_value = '')
     {
-        if (is_array($stringValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $stringValue);
+        if (is_array($string_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $string_value);
         }
-
-        $stringValue = Helpers::extractString($stringValue);
-
-        return (string) preg_replace('/[\x00-\x1f]/', '', "$stringValue");
+        $string_value = Helpers::extract_string($string_value);
+        return (string) preg_replace('/[\x00-\x1f]/', '', "{$string_value}");
     }
-
     /**
      * TRIM.
      *
@@ -39,14 +33,12 @@ class Trim
      * @return array<mixed>|string If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function spaces(mixed $stringValue = ''): array|string
+    public static function spaces(mixed $string_value = ''): array|string
     {
-        if (is_array($stringValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $stringValue);
+        if (is_array($string_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $string_value);
         }
-
-        $stringValue = Helpers::extractString($stringValue);
-
-        return trim(preg_replace('/ +/', ' ', trim("$stringValue", ' ')) ?? '', ' ');
+        $string_value = Helpers::extract_string($string_value);
+        return trim(preg_replace('/ +/', ' ', trim("{$string_value}", ' ')) ?? '', ' ');
     }
 }

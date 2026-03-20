@@ -1,54 +1,38 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Chart;
 
-namespace PhpOffice\PhpSpreadsheet\Chart;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-class DataSeriesValues extends Properties
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+class Data_Series_Values extends Properties
 {
     public const DATASERIES_TYPE_STRING = 'String';
     public const DATASERIES_TYPE_NUMBER = 'Number';
-
-    private const DATA_TYPE_VALUES = [
-        self::DATASERIES_TYPE_STRING,
-        self::DATASERIES_TYPE_NUMBER,
-    ];
-
+    private const DATA_TYPE_VALUES = [self::DATASERIES_TYPE_STRING, self::DATASERIES_TYPE_NUMBER];
     /**
      * Series Data Type.
      */
-    private string $dataType;
-
-    private ChartColor $markerFillColor;
-
-    private ChartColor $markerBorderColor;
-
+    private string $data_type;
+    private Chart_Color $marker_fill_color;
+    private Chart_Color $marker_border_color;
     /**
      * Series Point Size.
      */
-    private int $pointSize = 3;
-
+    private int $point_size = 3;
     /**
      * Fill color (can be array with colors if dataseries have custom colors).
      *
      * @var null|ChartColor|ChartColor[]
      */
-    private array|\PhpOffice\PhpSpreadsheet\Chart\ChartColor|null $fillColor = null;
-
-    private bool $scatterLines = true;
-
+    private array|\Php_Office\Php_Spreadsheet\Chart\Chart_Color|null $fill_color = null;
+    private bool $scatter_lines = true;
     private bool $bubble3D = false;
-
-    private ?Layout $labelLayout = null;
-
+    private ?Layout $label_layout = null;
     /** @var TrendLine[] */
-    private array $trendLines = [];
-
+    private array $trend_lines = [];
     /**
      * Create a new DataSeriesValues object.
      *
@@ -56,50 +40,49 @@ class DataSeriesValues extends Properties
      * @param null|ChartColor|ChartColor[]|string|string[] $fillColor
      */
     public function __construct(
-        string $dataType = self::DATASERIES_TYPE_NUMBER,
+        string $data_type = self::DATASERIES_TYPE_NUMBER,
         /**
          * Series Data Source.
          */
-        private ?string $dataSource = null,
+        private ?string $data_source = null,
         /**
          * Format Code.
          */
-        private ?string $formatCode = null,
+        private ?string $format_code = null,
         /**
          * Point Count (The number of datapoints in the dataseries).
          */
-        private int $pointCount = 0,
+        private int $point_count = 0,
         /**
          * Data Values.
          */
-        private ?array $dataValues = [],
+        private ?array $data_values = [],
         /**
          * Series Point Marker.
          */
-        private ?string $pointMarker = null,
-        null|ChartColor|array|string $fillColor = null,
-        int|string $pointSize = 3
-    ) {
+        private ?string $point_marker = null,
+        null|Chart_Color|array|string $fill_color = null,
+        int|string $point_size = 3
+    )
+    {
         parent::__construct();
-        $this->markerFillColor = new ChartColor();
-        $this->markerBorderColor = new ChartColor();
-        $this->setDataType($dataType);
-        if ($fillColor !== null) {
-            $this->setFillColor($fillColor);
+        $this->marker_fill_color = new Chart_Color();
+        $this->marker_border_color = new Chart_Color();
+        $this->set_data_type($data_type);
+        if ($fill_color !== null) {
+            $this->set_fill_color($fill_color);
         }
-        if (is_numeric($pointSize)) {
-            $this->pointSize = (int) $pointSize;
+        if (is_numeric($point_size)) {
+            $this->point_size = (int) $point_size;
         }
     }
-
     /**
      * Get Series Data Type.
      */
-    public function getDataType(): string
+    public function get_data_type(): string
     {
-        return $this->dataType;
+        return $this->data_type;
     }
-
     /**
      * Set Series Data Type.
      *
@@ -112,181 +95,156 @@ class DataSeriesValues extends Properties
      *
      * @return $this
      */
-    public function setDataType(string $dataType): static
+    public function set_data_type(string $data_type): static
     {
-        if (!in_array($dataType, self::DATA_TYPE_VALUES)) {
+        if (!in_array($data_type, self::DATA_TYPE_VALUES)) {
             throw new Exception('Invalid datatype for chart data series values');
         }
-        $this->dataType = $dataType;
-
+        $this->data_type = $data_type;
         return $this;
     }
-
     /**
      * Get Series Data Source (formula).
      */
-    public function getDataSource(): ?string
+    public function get_data_source(): ?string
     {
-        return $this->dataSource;
+        return $this->data_source;
     }
-
     /**
      * Set Series Data Source (formula).
      *
      * @return $this
      */
-    public function setDataSource(?string $dataSource): static
+    public function set_data_source(?string $data_source): static
     {
-        $this->dataSource = $dataSource;
-
+        $this->data_source = $data_source;
         return $this;
     }
-
     /**
      * Get Point Marker.
      */
-    public function getPointMarker(): ?string
+    public function get_point_marker(): ?string
     {
-        return $this->pointMarker;
+        return $this->point_marker;
     }
-
     /**
      * Set Point Marker.
      *
      * @return $this
      */
-    public function setPointMarker(string $marker): static
+    public function set_point_marker(string $marker): static
     {
-        $this->pointMarker = $marker;
-
+        $this->point_marker = $marker;
         return $this;
     }
-
-    public function getMarkerFillColor(): ChartColor
+    public function get_marker_fill_color(): Chart_Color
     {
-        return $this->markerFillColor;
+        return $this->marker_fill_color;
     }
-
-    public function getMarkerBorderColor(): ChartColor
+    public function get_marker_border_color(): Chart_Color
     {
-        return $this->markerBorderColor;
+        return $this->marker_border_color;
     }
-
     /**
      * Get Point Size.
      */
-    public function getPointSize(): int
+    public function get_point_size(): int
     {
-        return $this->pointSize;
+        return $this->point_size;
     }
-
     /**
      * Set Point Size.
      *
      * @return $this
      */
-    public function setPointSize(int $size = 3): static
+    public function set_point_size(int $size = 3): static
     {
-        $this->pointSize = $size;
-
+        $this->point_size = $size;
         return $this;
     }
-
     /**
      * Get Series Format Code.
      */
-    public function getFormatCode(): ?string
+    public function get_format_code(): ?string
     {
-        return $this->formatCode;
+        return $this->format_code;
     }
-
     /**
      * Set Series Format Code.
      *
      * @return $this
      */
-    public function setFormatCode(string $formatCode): static
+    public function set_format_code(string $format_code): static
     {
-        $this->formatCode = $formatCode;
-
+        $this->format_code = $format_code;
         return $this;
     }
-
     /**
      * Get Series Point Count.
      */
-    public function getPointCount(): int
+    public function get_point_count(): int
     {
-        return $this->pointCount;
+        return $this->point_count;
     }
-
     /**
      * Get fill color object.
      *
      * @return null|ChartColor|ChartColor[]
      */
-    public function getFillColorObject()
+    public function get_fill_color_object()
     {
-        return $this->fillColor;
+        return $this->fill_color;
     }
-
-    private function stringToChartColor(string $fillString): ChartColor
+    private function string_to_chart_color(string $fill_string): Chart_Color
     {
         $value = $type = '';
-        if (str_starts_with($fillString, '*')) {
+        if (str_starts_with($fill_string, '*')) {
             $type = 'schemeClr';
-            $value = substr($fillString, 1);
-        } elseif (str_starts_with($fillString, '/')) {
+            $value = substr($fill_string, 1);
+        } elseif (str_starts_with($fill_string, '/')) {
             $type = 'prstClr';
-            $value = substr($fillString, 1);
-        } elseif ($fillString !== '') {
+            $value = substr($fill_string, 1);
+        } elseif ($fill_string !== '') {
             $type = 'srgbClr';
-            $value = $fillString;
-            $this->validateColor($value);
+            $value = $fill_string;
+            $this->validate_color($value);
         }
-
-        return new ChartColor($value, null, $type);
+        return new Chart_Color($value, null, $type);
     }
-
-    private function chartColorToString(ChartColor $chartColor): string
+    private function chart_color_to_string(Chart_Color $chart_color): string
     {
-        $type = (string) $chartColor->getColorProperty('type');
-        $value = (string) $chartColor->getColorProperty('value');
+        $type = (string) $chart_color->get_color_property('type');
+        $value = (string) $chart_color->get_color_property('value');
         if ($type === '' || $value === '') {
             return '';
         }
         if ($type === 'schemeClr') {
-            return "*$value";
+            return "*{$value}";
         }
         if ($type === 'prstClr') {
-            return "/$value";
+            return "/{$value}";
         }
-
         return $value;
     }
-
     /**
      * Get fill color.
      *
      * @return string|string[] HEX color or array with HEX colors
      */
-    public function getFillColor(): string|array
+    public function get_fill_color(): string|array
     {
-        if ($this->fillColor === null) {
+        if ($this->fill_color === null) {
             return '';
         }
-        if (is_array($this->fillColor)) {
+        if (is_array($this->fill_color)) {
             $array = [];
-            foreach ($this->fillColor as $chartColor) {
-                $array[] = $this->chartColorToString($chartColor);
+            foreach ($this->fill_color as $chart_color) {
+                $array[] = $this->chart_color_to_string($chart_color);
             }
-
             return $array;
         }
-
-        return $this->chartColorToString($this->fillColor);
+        return $this->chart_color_to_string($this->fill_color);
     }
-
     /**
      * Set fill color for series.
      *
@@ -294,116 +252,102 @@ class DataSeriesValues extends Properties
      *
      * @return   $this
      */
-    public function setFillColor($color): static
+    public function set_fill_color($color): static
     {
         if (is_array($color)) {
-            $this->fillColor = [];
-            foreach ($color as $fillString) {
-                if ($fillString instanceof ChartColor) {
-                    $this->fillColor[] = $fillString;
+            $this->fill_color = [];
+            foreach ($color as $fill_string) {
+                if ($fill_string instanceof Chart_Color) {
+                    $this->fill_color[] = $fill_string;
                 } else {
-                    $this->fillColor[] = $this->stringToChartColor($fillString);
+                    $this->fill_color[] = $this->string_to_chart_color($fill_string);
                 }
             }
-        } elseif ($color instanceof ChartColor) {
-            $this->fillColor = $color;
+        } elseif ($color instanceof Chart_Color) {
+            $this->fill_color = $color;
         } else {
-            $this->fillColor = $this->stringToChartColor($color);
+            $this->fill_color = $this->string_to_chart_color($color);
         }
-
         return $this;
     }
-
     /**
      * Method for validating hex color.
      *
      * @param string $color value for color
      */
-    private function validateColor(string $color): void
+    private function validate_color(string $color): void
     {
         if (!preg_match('/^[a-f0-9]{6}$/i', $color)) {
             throw new Exception(sprintf('Invalid hex color for chart series (color: "%s")', $color));
         }
     }
-
     /**
      * Get line width for series.
      */
-    public function getLineWidth(): null|float|int
+    public function get_line_width(): null|float|int
     {
         /** @var null|float|int */
-        $temp = $this->lineStyleProperties['width'];
-
+        $temp = $this->line_style_properties['width'];
         return $temp;
     }
-
     /**
      * Set line width for the series.
      *
      * @return $this
      */
-    public function setLineWidth(null|float|int $width): static
+    public function set_line_width(null|float|int $width): static
     {
-        $this->lineStyleProperties['width'] = $width;
-
+        $this->line_style_properties['width'] = $width;
         return $this;
     }
-
     /**
      * Identify if the Data Series is a multi-level or a simple series.
      */
-    public function isMultiLevelSeries(): ?bool
+    public function is_multi_level_series(): ?bool
     {
-        if (!empty($this->dataValues)) {
-            return is_array(array_values($this->dataValues)[0]);
+        if (!empty($this->data_values)) {
+            return is_array(array_values($this->data_values)[0]);
         }
-
         return null;
     }
-
     /**
      * Return the level count of a multi-level Data Series.
      */
-    public function multiLevelCount(): int
+    public function multi_level_count(): int
     {
-        $levelCount = 0;
-        foreach (($this->dataValues ?? []) as $dataValueSet) {
+        $level_count = 0;
+        foreach ($this->data_values ?? [] as $data_value_set) {
             /** @var mixed[] $dataValueSet */
-            $levelCount = max($levelCount, count($dataValueSet));
+            $level_count = max($level_count, count($data_value_set));
         }
-
-        return $levelCount;
+        return $level_count;
     }
-
     /**
      * Get Series Data Values.
      *
      * @return null|mixed[]
      */
-    public function getDataValues(): ?array
+    public function get_data_values(): ?array
     {
-        return $this->dataValues;
+        return $this->data_values;
     }
-
     /**
      * Get the first Series Data value.
      */
-    public function getDataValue(): mixed
+    public function get_data_value(): mixed
     {
-        if ($this->dataValues === null) {
+        if ($this->data_values === null) {
             return null;
         }
-        $count = count($this->dataValues);
+        $count = count($this->data_values);
         if ($count == 0) {
             return null;
         }
         if ($count == 1) {
-            return $this->dataValues[0];
+            return $this->data_values[0];
         }
-
-        return $this->dataValues;
+        return $this->data_values;
     }
-
     /**
      * Set Series Data Values.
      *
@@ -411,157 +355,131 @@ class DataSeriesValues extends Properties
      *
      * @return $this
      */
-    public function setDataValues(array $dataValues): static
+    public function set_data_values(array $data_values): static
     {
-        $this->dataValues = Functions::flattenArray($dataValues);
-        $this->pointCount = count($dataValues);
-
+        $this->data_values = Functions::flatten_array($data_values);
+        $this->point_count = count($data_values);
         return $this;
     }
-
     public function refresh(Worksheet $worksheet, bool $flatten = true): void
     {
-        if ($this->dataSource !== null) {
-            $calcEngine = Calculation::getInstance($worksheet->getParent());
-            $newDataValues = Calculation::unwrapResult(
-                $calcEngine->_calculateFormulaValue(
-                    '=' . $this->dataSource,
-                    null,
-                    $worksheet->getCell('A1')
-                )
-            );
+        if ($this->data_source !== null) {
+            $calc_engine = Calculation::get_instance($worksheet->get_parent());
+            $new_data_values = Calculation::unwrap_result($calc_engine->_calculate_formula_value('=' . $this->data_source, null, $worksheet->get_cell('A1')));
             if ($flatten) {
-                $this->dataValues = Functions::flattenArray($newDataValues);
-                foreach ($this->dataValues as &$dataValue) {
-                    if (is_string($dataValue) && !empty($dataValue) && $dataValue[0] == '#') {
-                        $dataValue = 0.0;
+                $this->data_values = Functions::flatten_array($new_data_values);
+                foreach ($this->data_values as &$data_value) {
+                    if (is_string($data_value) && !empty($data_value) && $data_value[0] == '#') {
+                        $data_value = 0.0;
                     }
                 }
-                unset($dataValue);
+                unset($data_value);
             } else {
-                [, $cellRange] = Worksheet::extractSheetTitle($this->dataSource, true);
-                $dimensions = Coordinate::rangeDimension(str_replace('$', '', $cellRange ?? ''));
-                if (($dimensions[0] == 1) || ($dimensions[1] == 1)) {
-                    $this->dataValues = Functions::flattenArray($newDataValues);
+                [, $cell_range] = Worksheet::extract_sheet_title($this->data_source, true);
+                $dimensions = Coordinate::range_dimension(str_replace('$', '', $cell_range ?? ''));
+                if ($dimensions[0] == 1 || $dimensions[1] == 1) {
+                    $this->data_values = Functions::flatten_array($new_data_values);
                 } else {
                     /** @var array<int, mixed[]> */
-                    $newDataValuesx = $newDataValues;
+                    $new_data_valuesx = $new_data_values;
                     /** @var mixed[][] $newArray */
-                    $newArray = array_values(array_shift($newDataValuesx) ?? []);
-                    foreach ($newArray as $i => $newDataSet) {
-                        $newArray[$i] = [$newDataSet];
+                    $new_array = array_values(array_shift($new_data_valuesx) ?? []);
+                    foreach ($new_array as $i => $new_data_set) {
+                        $new_array[$i] = [$new_data_set];
                     }
-
-                    foreach ($newDataValuesx as $newDataSet) {
+                    foreach ($new_data_valuesx as $new_data_set) {
                         $i = 0;
-                        foreach ($newDataSet as $newDataVal) {
-                            array_unshift($newArray[$i++], $newDataVal);
+                        foreach ($new_data_set as $new_data_val) {
+                            array_unshift($new_array[$i++], $new_data_val);
                         }
                     }
-                    $this->dataValues = $newArray;
+                    $this->data_values = $new_array;
                 }
             }
-            $this->pointCount = count($this->dataValues ?? []);
+            $this->point_count = count($this->data_values ?? []);
         }
     }
-
-    public function getScatterLines(): bool
+    public function get_scatter_lines(): bool
     {
-        return $this->scatterLines;
+        return $this->scatter_lines;
     }
-
-    public function setScatterLines(bool $scatterLines): self
+    public function set_scatter_lines(bool $scatter_lines): self
     {
-        $this->scatterLines = $scatterLines;
-
+        $this->scatter_lines = $scatter_lines;
         return $this;
     }
-
-    public function getBubble3D(): bool
+    public function get_bubble3d(): bool
     {
         return $this->bubble3D;
     }
-
-    public function setBubble3D(bool $bubble3D): self
+    public function set_bubble3d(bool $bubble3D): self
     {
         $this->bubble3D = $bubble3D;
-
         return $this;
     }
-
     /**
      * Smooth Line. Must be specified for both DataSeries and DataSeriesValues.
      */
-    private bool $smoothLine = false;
-
+    private bool $smooth_line = false;
     /**
      * Get Smooth Line.
      */
-    public function getSmoothLine(): bool
+    public function get_smooth_line(): bool
     {
-        return $this->smoothLine;
+        return $this->smooth_line;
     }
-
     /**
      * Set Smooth Line.
      *
      * @return $this
      */
-    public function setSmoothLine(bool $smoothLine): static
+    public function set_smooth_line(bool $smooth_line): static
     {
-        $this->smoothLine = $smoothLine;
-
+        $this->smooth_line = $smooth_line;
         return $this;
     }
-
-    public function getLabelLayout(): ?Layout
+    public function get_label_layout(): ?Layout
     {
-        return $this->labelLayout;
+        return $this->label_layout;
     }
-
-    public function setLabelLayout(?Layout $labelLayout): self
+    public function set_label_layout(?Layout $label_layout): self
     {
-        $this->labelLayout = $labelLayout;
-
+        $this->label_layout = $label_layout;
         return $this;
     }
-
     /** @param TrendLine[] $trendLines */
-    public function setTrendLines(array $trendLines): self
+    public function set_trend_lines(array $trend_lines): self
     {
-        $this->trendLines = $trendLines;
-
+        $this->trend_lines = $trend_lines;
         return $this;
     }
-
     /** @return TrendLine[] */
-    public function getTrendLines(): array
+    public function get_trend_lines(): array
     {
-        return $this->trendLines;
+        return $this->trend_lines;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
     public function __clone()
     {
         parent::__clone();
-        $this->markerFillColor = clone $this->markerFillColor;
-        $this->markerBorderColor = clone $this->markerBorderColor;
-        if (is_array($this->fillColor)) {
-            $fillColor = $this->fillColor;
-            $this->fillColor = [];
-            foreach ($fillColor as $color) {
-                $this->fillColor[] = clone $color;
+        $this->marker_fill_color = clone $this->marker_fill_color;
+        $this->marker_border_color = clone $this->marker_border_color;
+        if (is_array($this->fill_color)) {
+            $fill_color = $this->fill_color;
+            $this->fill_color = [];
+            foreach ($fill_color as $color) {
+                $this->fill_color[] = clone $color;
             }
-        } elseif ($this->fillColor instanceof ChartColor) {
-            $this->fillColor = clone $this->fillColor;
+        } elseif ($this->fill_color instanceof Chart_Color) {
+            $this->fill_color = clone $this->fill_color;
         }
-        $this->labelLayout = ($this->labelLayout === null) ? null : clone $this->labelLayout;
-        $trendLines = $this->trendLines;
-        $this->trendLines = [];
-        foreach ($trendLines as $trendLine) {
-            $this->trendLines[] = clone $trendLine;
+        $this->label_layout = $this->label_layout === null ? null : clone $this->label_layout;
+        $trend_lines = $this->trend_lines;
+        $this->trend_lines = [];
+        foreach ($trend_lines as $trend_line) {
+            $this->trend_lines[] = clone $trend_line;
         }
     }
 }

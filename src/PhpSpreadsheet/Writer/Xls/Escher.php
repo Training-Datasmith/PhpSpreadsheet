@@ -1,40 +1,35 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xls;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
-
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Shared\Escher as SharedEscher;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DgContainer;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DgContainer\SpgrContainer;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DgContainer\SpgrContainer\SpContainer;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DggContainer;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DggContainer\BstoreContainer;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DggContainer\BstoreContainer\BSE;
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DggContainer\BstoreContainer\BSE\Blip;
-
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Shared\Escher as SharedEscher;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dg_Container;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dg_Container\Spgr_Container;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dg_Container\Spgr_Container\Sp_Container;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dgg_Container;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dgg_Container\Bstore_Container;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dgg_Container\Bstore_Container\BSE;
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dgg_Container\Bstore_Container\BSE\Blip;
 class Escher
 {
     /**
      * The written binary data.
      */
     private string $data;
-
     /**
      * Shape offsets. Positions in binary stream where a new shape record begins.
      *
      * @var int[]
      */
-    private array $spOffsets;
-
+    private array $sp_offsets;
     /**
      * Shape types.
      *
      * @var mixed[]
      */
-    private array $spTypes;
-
+    private array $sp_types;
     /**
      * Constructor.
      */
@@ -42,10 +37,10 @@ class Escher
         /**
          * The object we are writing.
          */
-        private readonly Blip|BSE|BstoreContainer|DgContainer|DggContainer|Escher|SpContainer|SpgrContainer|SharedEscher $object
-    ) {
+        private readonly Blip|BSE|Bstore_Container|Dg_Container|Dgg_Container|Escher|Sp_Container|Spgr_Container|Shared_Escher $object
+    )
+    {
     }
-
     /**
      * Process the object to be written.
      */
@@ -53,455 +48,348 @@ class Escher
     {
         // initialize
         $this->data = '';
-
         switch ($this->object::class) {
-            case SharedEscher::class:
-                if ($dggContainer = $this->object->getDggContainer()) {
-                    $writer = new self($dggContainer);
+            case Shared_Escher::class:
+                if ($dgg_container = $this->object->get_dgg_container()) {
+                    $writer = new self($dgg_container);
                     $this->data = $writer->close();
-                } elseif ($dgContainer = $this->object->getDgContainer()) {
-                    $writer = new self($dgContainer);
+                } elseif ($dg_container = $this->object->get_dg_container()) {
+                    $writer = new self($dg_container);
                     $this->data = $writer->close();
-                    $this->spOffsets = $writer->getSpOffsets();
-                    $this->spTypes = $writer->getSpTypes();
+                    $this->sp_offsets = $writer->get_sp_offsets();
+                    $this->sp_types = $writer->get_sp_types();
                 }
-
                 break;
-            case DggContainer::class:
+            case Dgg_Container::class:
                 // this is a container record
-
                 // initialize
-                $innerData = '';
-
+                $inner_data = '';
                 // write the dgg
-                $recVer = 0x0;
-                $recInstance = 0x0000;
-                $recType = 0xF006;
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
+                $rec_ver = 0x0;
+                $rec_instance = 0x0;
+                $rec_type = 0xf006;
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
                 // dgg data
-                $dggData
-                    = pack(
-                        'VVVV',
-                        $this->object->getSpIdMax(), // maximum shape identifier increased by one
-                        $this->object->getCDgSaved() + 1, // number of file identifier clusters increased by one
-                        $this->object->getCSpSaved(),
-                        $this->object->getCDgSaved() // count total number of drawings saved
-                    );
-
+                $dgg_data = pack(
+                    'VVVV',
+                    $this->object->get_sp_id_max(),
+                    // maximum shape identifier increased by one
+                    $this->object->get_c_dg_saved() + 1,
+                    // number of file identifier clusters increased by one
+                    $this->object->get_c_sp_saved(),
+                    $this->object->get_c_dg_saved()
+                );
                 // add file identifier clusters (one per drawing)
-                $IDCLs = $this->object->getIDCLs();
-
-                foreach ($IDCLs as $dgId => $maxReducedSpId) {
+                $idc_ls = $this->object->get_idc_ls();
+                foreach ($idc_ls as $dg_id => $max_reduced_sp_id) {
                     /** @var int $maxReducedSpId */
-                    $dggData .= pack('VV', $dgId, $maxReducedSpId + 1);
+                    $dgg_data .= pack('VV', $dg_id, $max_reduced_sp_id + 1);
                 }
-
-                $header = pack('vvV', $recVerInstance, $recType, strlen($dggData));
-                $innerData .= $header . $dggData;
-
+                $header = pack('vvV', $rec_ver_instance, $rec_type, strlen($dgg_data));
+                $inner_data .= $header . $dgg_data;
                 // write the bstoreContainer
-                if ($bstoreContainer = $this->object->getBstoreContainer()) {
-                    $writer = new self($bstoreContainer);
-                    $innerData .= $writer->close();
+                if ($bstore_container = $this->object->get_bstore_container()) {
+                    $writer = new self($bstore_container);
+                    $inner_data .= $writer->close();
                 }
-
                 // write the record
-                $recVer = 0xF;
-                $recInstance = 0x0000;
-                $recType = 0xF000;
-                $length = strlen($innerData);
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
-                $this->data = $header . $innerData;
-
+                $rec_ver = 0xf;
+                $rec_instance = 0x0;
+                $rec_type = 0xf000;
+                $length = strlen($inner_data);
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                $this->data = $header . $inner_data;
                 break;
-            case BstoreContainer::class:
+            case Bstore_Container::class:
                 // this is a container record
-
                 // initialize
-                $innerData = '';
-
+                $inner_data = '';
                 // treat the inner data
-                if ($BSECollection = $this->object->getBSECollection()) {
-                    foreach ($BSECollection as $BSE) {
+                if ($bse_collection = $this->object->get_bse_collection()) {
+                    foreach ($bse_collection as $BSE) {
                         $writer = new self($BSE);
-                        $innerData .= $writer->close();
+                        $inner_data .= $writer->close();
                     }
                 }
-
                 // write the record
-                $recVer = 0xF;
-                $recInstance = count($this->object->getBSECollection());
-                $recType = 0xF001;
-                $length = strlen($innerData);
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
-                $this->data = $header . $innerData;
-
+                $rec_ver = 0xf;
+                $rec_instance = count($this->object->get_bse_collection());
+                $rec_type = 0xf001;
+                $length = strlen($inner_data);
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                $this->data = $header . $inner_data;
                 break;
             case BSE::class:
                 // this is a semi-container record
-
                 // initialize
-                $innerData = '';
-
+                $inner_data = '';
                 // here we treat the inner data
-                if ($blip = $this->object->getBlip()) {
+                if ($blip = $this->object->get_blip()) {
                     $writer = new self($blip);
-                    $innerData .= $writer->close();
+                    $inner_data .= $writer->close();
                 }
-
                 // initialize
                 $data = '';
-
-                $btWin32 = $this->object->getBlipType();
-                $btMacOS = $this->object->getBlipType();
-                $data .= pack('CC', $btWin32, $btMacOS);
-
-                $rgbUid = pack('VVVV', 0, 0, 0, 0); // todo
-                $data .= $rgbUid;
-
+                $bt_win32 = $this->object->get_blip_type();
+                $bt_mac_os = $this->object->get_blip_type();
+                $data .= pack('CC', $bt_win32, $bt_mac_os);
+                $rgb_uid = pack('VVVV', 0, 0, 0, 0);
+                // todo
+                $data .= $rgb_uid;
                 $tag = 0;
-                $size = strlen($innerData);
-                $cRef = 1;
-                $foDelay = 0; //todo
+                $size = strlen($inner_data);
+                $c_ref = 1;
+                $fo_delay = 0;
+                //todo
                 $unused1 = 0x0;
-                $cbName = 0x0;
+                $cb_name = 0x0;
                 $unused2 = 0x0;
                 $unused3 = 0x0;
-                $data .= pack('vVVVCCCC', $tag, $size, $cRef, $foDelay, $unused1, $cbName, $unused2, $unused3);
-
-                $data .= $innerData;
-
+                $data .= pack('vVVVCCCC', $tag, $size, $c_ref, $fo_delay, $unused1, $cb_name, $unused2, $unused3);
+                $data .= $inner_data;
                 // write the record
-                $recVer = 0x2;
-                $recInstance = $this->object->getBlipType();
-                $recType = 0xF007;
+                $rec_ver = 0x2;
+                $rec_instance = $this->object->get_blip_type();
+                $rec_type = 0xf007;
                 $length = strlen($data);
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
                 $this->data = $header;
-
                 $this->data .= $data;
-
                 break;
             case Blip::class:
                 // this is an atom record
-
                 // write the record
-                switch ($this->object->getParent()->getBlipType()) {
+                switch ($this->object->get_parent()->get_blip_type()) {
                     case BSE::BLIPTYPE_JPEG:
                         // initialize
-                        $innerData = '';
-
-                        $rgbUid1 = pack('VVVV', 0, 0, 0, 0); // todo
-                        $innerData .= $rgbUid1;
-
-                        $tag = 0xFF; // todo
-                        $innerData .= pack('C', $tag);
-
-                        $innerData .= $this->object->getData();
-
-                        $recVer = 0x0;
-                        $recInstance = 0x46A;
-                        $recType = 0xF01D;
-                        $length = strlen($innerData);
-
-                        $recVerInstance = $recVer;
-                        $recVerInstance |= $recInstance << 4;
-
-                        $header = pack('vvV', $recVerInstance, $recType, $length);
-
+                        $inner_data = '';
+                        $rgb_uid1 = pack('VVVV', 0, 0, 0, 0);
+                        // todo
+                        $inner_data .= $rgb_uid1;
+                        $tag = 0xff;
+                        // todo
+                        $inner_data .= pack('C', $tag);
+                        $inner_data .= $this->object->get_data();
+                        $rec_ver = 0x0;
+                        $rec_instance = 0x46a;
+                        $rec_type = 0xf01d;
+                        $length = strlen($inner_data);
+                        $rec_ver_instance = $rec_ver;
+                        $rec_ver_instance |= $rec_instance << 4;
+                        $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
                         $this->data = $header;
-
-                        $this->data .= $innerData;
-
+                        $this->data .= $inner_data;
                         break;
                     case BSE::BLIPTYPE_PNG:
                         // initialize
-                        $innerData = '';
-
-                        $rgbUid1 = pack('VVVV', 0, 0, 0, 0); // todo
-                        $innerData .= $rgbUid1;
-
-                        $tag = 0xFF; // todo
-                        $innerData .= pack('C', $tag);
-
-                        $innerData .= $this->object->getData();
-
-                        $recVer = 0x0;
-                        $recInstance = 0x6E0;
-                        $recType = 0xF01E;
-                        $length = strlen($innerData);
-
-                        $recVerInstance = $recVer;
-                        $recVerInstance |= $recInstance << 4;
-
-                        $header = pack('vvV', $recVerInstance, $recType, $length);
-
+                        $inner_data = '';
+                        $rgb_uid1 = pack('VVVV', 0, 0, 0, 0);
+                        // todo
+                        $inner_data .= $rgb_uid1;
+                        $tag = 0xff;
+                        // todo
+                        $inner_data .= pack('C', $tag);
+                        $inner_data .= $this->object->get_data();
+                        $rec_ver = 0x0;
+                        $rec_instance = 0x6e0;
+                        $rec_type = 0xf01e;
+                        $length = strlen($inner_data);
+                        $rec_ver_instance = $rec_ver;
+                        $rec_ver_instance |= $rec_instance << 4;
+                        $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
                         $this->data = $header;
-
-                        $this->data .= $innerData;
-
+                        $this->data .= $inner_data;
                         break;
                 }
-
                 break;
-            case DgContainer::class:
+            case Dg_Container::class:
                 // this is a container record
-
                 // initialize
-                $innerData = '';
-
+                $inner_data = '';
                 // write the dg
-                $recVer = 0x0;
-                $recInstance = $this->object->getDgId();
-                $recType = 0xF008;
+                $rec_ver = 0x0;
+                $rec_instance = $this->object->get_dg_id();
+                $rec_type = 0xf008;
                 $length = 8;
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
                 // number of shapes in this drawing (including group shape)
-                $countShapes = count($this->object->getSpgrContainerOrThrow()->getChildren());
-                $innerData .= $header . pack('VV', $countShapes, $this->object->getLastSpId());
-
+                $count_shapes = count($this->object->get_spgr_container_or_throw()->get_children());
+                $inner_data .= $header . pack('VV', $count_shapes, $this->object->get_last_sp_id());
                 // write the spgrContainer
-                if ($spgrContainer = $this->object->getSpgrContainer()) {
-                    $writer = new self($spgrContainer);
-                    $innerData .= $writer->close();
-
+                if ($spgr_container = $this->object->get_spgr_container()) {
+                    $writer = new self($spgr_container);
+                    $inner_data .= $writer->close();
                     // get the shape offsets relative to the spgrContainer record
-                    $spOffsets = $writer->getSpOffsets();
-                    $spTypes = $writer->getSpTypes();
-
+                    $sp_offsets = $writer->get_sp_offsets();
+                    $sp_types = $writer->get_sp_types();
                     // save the shape offsets relative to dgContainer
-                    foreach ($spOffsets as &$spOffset) {
-                        $spOffset += 24; // add length of dgContainer header data (8 bytes) plus dg data (16 bytes)
+                    foreach ($sp_offsets as &$sp_offset) {
+                        $sp_offset += 24;
+                        // add length of dgContainer header data (8 bytes) plus dg data (16 bytes)
                     }
-
-                    $this->spOffsets = $spOffsets;
-                    $this->spTypes = $spTypes;
+                    $this->sp_offsets = $sp_offsets;
+                    $this->sp_types = $sp_types;
                 }
-
                 // write the record
-                $recVer = 0xF;
-                $recInstance = 0x0000;
-                $recType = 0xF002;
-                $length = strlen($innerData);
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
-                $this->data = $header . $innerData;
-
+                $rec_ver = 0xf;
+                $rec_instance = 0x0;
+                $rec_type = 0xf002;
+                $length = strlen($inner_data);
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                $this->data = $header . $inner_data;
                 break;
-            case SpgrContainer::class:
+            case Spgr_Container::class:
                 // this is a container record
-
                 // initialize
-                $innerData = '';
-
+                $inner_data = '';
                 // initialize spape offsets
-                $totalSize = 8;
-                $spOffsets = [];
-                $spTypes = [];
-
+                $total_size = 8;
+                $sp_offsets = [];
+                $sp_types = [];
                 // treat the inner data
-                foreach ($this->object->getChildren() as $spContainer) {
+                foreach ($this->object->get_children() as $sp_container) {
                     /** @var Blip|BSE|BstoreContainer|DgContainer|DggContainer|SharedEscher|SpContainer|SpgrContainer $spContainer */
-                    $writer = new self($spContainer);
-                    $spData = $writer->close();
-                    $innerData .= $spData;
-
+                    $writer = new self($sp_container);
+                    $sp_data = $writer->close();
+                    $inner_data .= $sp_data;
                     // save the shape offsets (where new shape records begin)
-                    $totalSize += strlen($spData);
-                    $spOffsets[] = $totalSize;
-
-                    $spTypes = array_merge($spTypes, $writer->getSpTypes());
+                    $total_size += strlen($sp_data);
+                    $sp_offsets[] = $total_size;
+                    $sp_types = array_merge($sp_types, $writer->get_sp_types());
                 }
-
                 // write the record
-                $recVer = 0xF;
-                $recInstance = 0x0000;
-                $recType = 0xF003;
-                $length = strlen($innerData);
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
-                $this->data = $header . $innerData;
-                $this->spOffsets = $spOffsets;
-                $this->spTypes = $spTypes;
-
+                $rec_ver = 0xf;
+                $rec_instance = 0x0;
+                $rec_type = 0xf003;
+                $length = strlen($inner_data);
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                $this->data = $header . $inner_data;
+                $this->sp_offsets = $sp_offsets;
+                $this->sp_types = $sp_types;
                 break;
-            case SpContainer::class:
+            case Sp_Container::class:
                 // initialize
                 $data = '';
-
                 // build the data
-
                 // write group shape record, if necessary?
-                if ($this->object->getSpgr()) {
-                    $recVer = 0x1;
-                    $recInstance = 0x0000;
-                    $recType = 0xF009;
-                    $length = 0x00000010;
-
-                    $recVerInstance = $recVer;
-                    $recVerInstance |= $recInstance << 4;
-
-                    $header = pack('vvV', $recVerInstance, $recType, $length);
-
+                if ($this->object->get_spgr()) {
+                    $rec_ver = 0x1;
+                    $rec_instance = 0x0;
+                    $rec_type = 0xf009;
+                    $length = 0x10;
+                    $rec_ver_instance = $rec_ver;
+                    $rec_ver_instance |= $rec_instance << 4;
+                    $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
                     $data .= $header . pack('VVVV', 0, 0, 0, 0);
                 }
-                $this->spTypes[] = ($this->object->getSpType());
-
+                $this->sp_types[] = $this->object->get_sp_type();
                 // write the shape record
-                $recVer = 0x2;
-                $recInstance = $this->object->getSpType(); // shape type
-                $recType = 0xF00A;
-                $length = 0x00000008;
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
-                $data .= $header . pack('VV', $this->object->getSpId(), $this->object->getSpgr() ? 0x0005 : 0x0A00);
-
+                $rec_ver = 0x2;
+                $rec_instance = $this->object->get_sp_type();
+                // shape type
+                $rec_type = 0xf00a;
+                $length = 0x8;
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                $data .= $header . pack('VV', $this->object->get_sp_id(), $this->object->get_spgr() ? 0x5 : 0xa00);
                 // the options
-                if ($this->object->getOPTCollection()) {
-                    $optData = '';
-
-                    $recVer = 0x3;
-                    $recInstance = count($this->object->getOPTCollection());
-                    $recType = 0xF00B;
-                    foreach ($this->object->getOPTCollection() as $property => $value) {
-                        $optData .= pack('vV', $property, $value);
+                if ($this->object->get_opt_collection()) {
+                    $opt_data = '';
+                    $rec_ver = 0x3;
+                    $rec_instance = count($this->object->get_opt_collection());
+                    $rec_type = 0xf00b;
+                    foreach ($this->object->get_opt_collection() as $property => $value) {
+                        $opt_data .= pack('vV', $property, $value);
                     }
-                    $length = strlen($optData);
-
-                    $recVerInstance = $recVer;
-                    $recVerInstance |= $recInstance << 4;
-
-                    $header = pack('vvV', $recVerInstance, $recType, $length);
-                    $data .= $header . $optData;
+                    $length = strlen($opt_data);
+                    $rec_ver_instance = $rec_ver;
+                    $rec_ver_instance |= $rec_instance << 4;
+                    $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                    $data .= $header . $opt_data;
                 }
-
                 // the client anchor
-                if ($this->object->getStartCoordinates()) {
-                    $recVer = 0x0;
-                    $recInstance = 0x0;
-                    $recType = 0xF010;
-
+                if ($this->object->get_start_coordinates()) {
+                    $rec_ver = 0x0;
+                    $rec_instance = 0x0;
+                    $rec_type = 0xf010;
                     // start coordinates
-                    [$column, $row] = Coordinate::indexesFromString($this->object->getStartCoordinates());
+                    [$column, $row] = Coordinate::indexes_from_string($this->object->get_start_coordinates());
                     $c1 = $column - 1;
                     $r1 = $row - 1;
-
                     // start offsetX
-                    $startOffsetX = $this->object->getStartOffsetX();
-
+                    $start_offset_x = $this->object->get_start_offset_x();
                     // start offsetY
-                    $startOffsetY = $this->object->getStartOffsetY();
-
+                    $start_offset_y = $this->object->get_start_offset_y();
                     // end coordinates
-                    [$column, $row] = Coordinate::indexesFromString($this->object->getEndCoordinates());
+                    [$column, $row] = Coordinate::indexes_from_string($this->object->get_end_coordinates());
                     $c2 = $column - 1;
                     $r2 = $row - 1;
-
                     // end offsetX
-                    $endOffsetX = $this->object->getEndOffsetX();
-
+                    $end_offset_x = $this->object->get_end_offset_x();
                     // end offsetY
-                    $endOffsetY = $this->object->getEndOffsetY();
-
-                    $clientAnchorData = pack('vvvvvvvvv', $this->object->getSpFlag(), $c1, $startOffsetX, $r1, $startOffsetY, $c2, $endOffsetX, $r2, $endOffsetY);
-
-                    $length = strlen($clientAnchorData);
-
-                    $recVerInstance = $recVer;
-                    $recVerInstance |= $recInstance << 4;
-
-                    $header = pack('vvV', $recVerInstance, $recType, $length);
-                    $data .= $header . $clientAnchorData;
+                    $end_offset_y = $this->object->get_end_offset_y();
+                    $client_anchor_data = pack('vvvvvvvvv', $this->object->get_sp_flag(), $c1, $start_offset_x, $r1, $start_offset_y, $c2, $end_offset_x, $r2, $end_offset_y);
+                    $length = strlen($client_anchor_data);
+                    $rec_ver_instance = $rec_ver;
+                    $rec_ver_instance |= $rec_instance << 4;
+                    $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                    $data .= $header . $client_anchor_data;
                 }
-
                 // the client data, just empty for now
-                if (!$this->object->getSpgr()) {
-                    $clientDataData = '';
-
-                    $recVer = 0x0;
-                    $recInstance = 0x0;
-                    $recType = 0xF011;
-
-                    $length = strlen($clientDataData);
-
-                    $recVerInstance = $recVer;
-                    $recVerInstance |= $recInstance << 4;
-
-                    $header = pack('vvV', $recVerInstance, $recType, $length);
-                    $data .= $header . $clientDataData;
+                if (!$this->object->get_spgr()) {
+                    $client_data_data = '';
+                    $rec_ver = 0x0;
+                    $rec_instance = 0x0;
+                    $rec_type = 0xf011;
+                    $length = strlen($client_data_data);
+                    $rec_ver_instance = $rec_ver;
+                    $rec_ver_instance |= $rec_instance << 4;
+                    $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
+                    $data .= $header . $client_data_data;
                 }
-
                 // write the record
-                $recVer = 0xF;
-                $recInstance = 0x0000;
-                $recType = 0xF004;
+                $rec_ver = 0xf;
+                $rec_instance = 0x0;
+                $rec_type = 0xf004;
                 $length = strlen($data);
-
-                $recVerInstance = $recVer;
-                $recVerInstance |= $recInstance << 4;
-
-                $header = pack('vvV', $recVerInstance, $recType, $length);
-
+                $rec_ver_instance = $rec_ver;
+                $rec_ver_instance |= $rec_instance << 4;
+                $header = pack('vvV', $rec_ver_instance, $rec_type, $length);
                 $this->data = $header . $data;
-
                 break;
         }
-
         return $this->data;
     }
-
     /**
      * Gets the shape offsets.
      *
      * @return int[]
      */
-    public function getSpOffsets(): array
+    public function get_sp_offsets(): array
     {
-        return $this->spOffsets;
+        return $this->sp_offsets;
     }
-
     /**
      * Gets the shape types.
      *
      * @return mixed[]
      */
-    public function getSpTypes(): array
+    public function get_sp_types(): array
     {
-        return $this->spTypes;
+        return $this->sp_types;
     }
 }

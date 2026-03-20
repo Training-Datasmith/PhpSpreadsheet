@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDateHelper;
-
-class DateParts
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDateHelper;
+class Date_Parts
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * DAYOFMONTH.
      *
@@ -30,30 +27,25 @@ class DateParts
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function day(mixed $dateValue): array|int|string
+    public static function day(mixed $date_value): array|int|string
     {
-        if (is_array($dateValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $dateValue);
+        if (is_array($date_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $date_value);
         }
-
-        $weirdResult = self::weirdCondition($dateValue);
-        if ($weirdResult >= 0) {
-            return $weirdResult;
+        $weird_result = self::weird_condition($date_value);
+        if ($weird_result >= 0) {
+            return $weird_result;
         }
-
         try {
-            $dateValue = Helpers::getDateValue($dateValue);
+            $date_value = Helpers::get_date_value($date_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
-        $PHPDateObject = SharedDateHelper::excelToDateTimeObject($dateValue);
-        SharedDateHelper::roundMicroseconds($PHPDateObject);
-
-        return (int) $PHPDateObject->format('j');
+        $php_date_object = Shared_Date_Helper::excel_to_date_time_object($date_value);
+        Shared_Date_Helper::round_microseconds($php_date_object);
+        return (int) $php_date_object->format('j');
     }
-
     /**
      * MONTHOFYEAR.
      *
@@ -71,28 +63,24 @@ class DateParts
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function month(mixed $dateValue): array|string|int
+    public static function month(mixed $date_value): array|string|int
     {
-        if (is_array($dateValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $dateValue);
+        if (is_array($date_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $date_value);
         }
-
         try {
-            $dateValue = Helpers::getDateValue($dateValue);
+            $date_value = Helpers::get_date_value($date_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-        if ($dateValue < 1 && SharedDateHelper::getExcelCalendar() === SharedDateHelper::CALENDAR_WINDOWS_1900) {
+        if ($date_value < 1 && Shared_Date_Helper::get_excel_calendar() === Shared_Date_Helper::CALENDAR_WINDOWS_1900) {
             return 1;
         }
-
         // Execute function
-        $PHPDateObject = SharedDateHelper::excelToDateTimeObject($dateValue);
-        SharedDateHelper::roundMicroseconds($PHPDateObject);
-
-        return (int) $PHPDateObject->format('n');
+        $php_date_object = Shared_Date_Helper::excel_to_date_time_object($date_value);
+        Shared_Date_Helper::round_microseconds($php_date_object);
+        return (int) $php_date_object->format('n');
     }
-
     /**
      * YEAR.
      *
@@ -110,47 +98,42 @@ class DateParts
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function year(mixed $dateValue): array|string|int
+    public static function year(mixed $date_value): array|string|int
     {
-        if (is_array($dateValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $dateValue);
+        if (is_array($date_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $date_value);
         }
-
         try {
-            $dateValue = Helpers::getDateValue($dateValue);
+            $date_value = Helpers::get_date_value($date_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($dateValue < 1 && SharedDateHelper::getExcelCalendar() === SharedDateHelper::CALENDAR_WINDOWS_1900) {
+        if ($date_value < 1 && Shared_Date_Helper::get_excel_calendar() === Shared_Date_Helper::CALENDAR_WINDOWS_1900) {
             return 1900;
         }
         // Execute function
-        $PHPDateObject = SharedDateHelper::excelToDateTimeObject($dateValue);
-        SharedDateHelper::roundMicroseconds($PHPDateObject);
-
-        return (int) $PHPDateObject->format('Y');
+        $php_date_object = Shared_Date_Helper::excel_to_date_time_object($date_value);
+        Shared_Date_Helper::round_microseconds($php_date_object);
+        return (int) $php_date_object->format('Y');
     }
-
     /**
      * @param mixed $dateValue Excel date serial value (float), PHP date timestamp (integer),
      *                                    PHP DateTime object, or a standard date string
      */
-    private static function weirdCondition(mixed $dateValue): int
+    private static function weird_condition(mixed $date_value): int
     {
         // Excel does not treat 0 consistently for DAY vs. (MONTH or YEAR)
-        if (SharedDateHelper::getExcelCalendar() === SharedDateHelper::CALENDAR_WINDOWS_1900 && Functions::getCompatibilityMode() == Functions::COMPATIBILITY_EXCEL) {
-            if (is_bool($dateValue)) {
-                return (int) $dateValue;
+        if (Shared_Date_Helper::get_excel_calendar() === Shared_Date_Helper::CALENDAR_WINDOWS_1900 && Functions::get_compatibility_mode() == Functions::COMPATIBILITY_EXCEL) {
+            if (is_bool($date_value)) {
+                return (int) $date_value;
             }
-            if ($dateValue === null) {
+            if ($date_value === null) {
                 return 0;
             }
-            if (is_numeric($dateValue) && $dateValue < 1 && $dateValue >= 0) {
+            if (is_numeric($date_value) && $date_value < 1 && $date_value >= 0) {
                 return 0;
             }
         }
-
         return -1;
     }
 }

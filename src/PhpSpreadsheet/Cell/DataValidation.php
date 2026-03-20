@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Cell;
-
-class DataValidation
+class Data_Validation
 {
     // Data validation types
     public const TYPE_NONE = 'none';
@@ -15,12 +14,10 @@ class DataValidation
     public const TYPE_TEXTLENGTH = 'textLength';
     public const TYPE_TIME = 'time';
     public const TYPE_WHOLE = 'whole';
-
     // Data validation error styles
     public const STYLE_STOP = 'stop';
     public const STYLE_WARNING = 'warning';
     public const STYLE_INFORMATION = 'information';
-
     // Data validation operators
     public const OPERATOR_BETWEEN = 'between';
     public const OPERATOR_EQUAL = 'equal';
@@ -31,140 +28,116 @@ class DataValidation
     public const OPERATOR_NOTBETWEEN = 'notBetween';
     public const OPERATOR_NOTEQUAL = 'notEqual';
     private const DEFAULT_OPERATOR = self::OPERATOR_BETWEEN;
-
     /**
      * Formula 1.
      */
     private string $formula1 = '';
-
     /**
      * Formula 2.
      */
     private string $formula2 = '';
-
     /**
      * Type.
      */
     private string $type = self::TYPE_NONE;
-
     /**
      * Error style.
      */
-    private string $errorStyle = self::STYLE_STOP;
-
+    private string $error_style = self::STYLE_STOP;
     /**
      * Operator.
      */
     private string $operator = self::DEFAULT_OPERATOR;
-
     /**
      * Allow Blank.
      */
-    private bool $allowBlank = false;
-
+    private bool $allow_blank = false;
     /**
      * Show DropDown.
      */
-    private bool $showDropDown = false;
-
+    private bool $show_drop_down = false;
     /**
      * Show InputMessage.
      */
-    private bool $showInputMessage = false;
-
+    private bool $show_input_message = false;
     /**
      * Show ErrorMessage.
      */
-    private bool $showErrorMessage = false;
-
+    private bool $show_error_message = false;
     /**
      * Error title.
      */
-    private string $errorTitle = '';
-
+    private string $error_title = '';
     /**
      * Error.
      */
     private string $error = '';
-
     /**
      * Prompt title.
      */
-    private string $promptTitle = '';
-
+    private string $prompt_title = '';
     /**
      * Prompt.
      */
     private string $prompt = '';
-
     /**
      * Get Formula 1.
      */
-    public function getFormula1(): string
+    public function get_formula1(): string
     {
         return $this->formula1;
     }
-
     /**
      * Set Formula 1.
      *
      * @return $this
      */
-    public function setFormula1(string $formula): static
+    public function set_formula1(string $formula): static
     {
         $this->formula1 = $formula;
-
         return $this;
     }
-
     /**
      * Get Formula 2.
      */
-    public function getFormula2(): string
+    public function get_formula2(): string
     {
         return $this->formula2;
     }
-
     /**
      * Set Formula 2.
      *
      * @return $this
      */
-    public function setFormula2(string $formula): static
+    public function set_formula2(string $formula): static
     {
         $this->formula2 = $formula;
-
         return $this;
     }
-
     /**
      * Get Type.
      */
-    public function getType(): string
+    public function get_type(): string
     {
         return $this->type;
     }
-
     /**
      * Set Type.
      *
      * @return $this
      */
-    public function setType(string $type): static
+    public function set_type(string $type): static
     {
         $this->type = $type;
-
         return $this;
     }
-
     /**
      * Get Error style.
      */
-    public function getErrorStyle(): string
+    public function get_error_style(): string
     {
-        return $this->errorStyle;
+        return $this->error_style;
     }
-
     /**
      * Set Error style.
      *
@@ -172,230 +145,181 @@ class DataValidation
      *
      * @return $this
      */
-    public function setErrorStyle(string $errorStyle): static
+    public function set_error_style(string $error_style): static
     {
-        $this->errorStyle = $errorStyle;
-
+        $this->error_style = $error_style;
         return $this;
     }
-
     /**
      * Get Operator.
      */
-    public function getOperator(): string
+    public function get_operator(): string
     {
         return $this->operator;
     }
-
     /**
      * Set Operator.
      *
      * @return $this
      */
-    public function setOperator(string $operator): static
+    public function set_operator(string $operator): static
     {
-        $this->operator = ($operator === '') ? self::DEFAULT_OPERATOR : $operator;
-
+        $this->operator = $operator === '' ? self::DEFAULT_OPERATOR : $operator;
         return $this;
     }
-
     /**
      * Get Allow Blank.
      */
-    public function getAllowBlank(): bool
+    public function get_allow_blank(): bool
     {
-        return $this->allowBlank;
+        return $this->allow_blank;
     }
-
     /**
      * Set Allow Blank.
      *
      * @return $this
      */
-    public function setAllowBlank(bool $allowBlank): static
+    public function set_allow_blank(bool $allow_blank): static
     {
-        $this->allowBlank = $allowBlank;
-
+        $this->allow_blank = $allow_blank;
         return $this;
     }
-
     /**
      * Get Show DropDown.
      */
-    public function getShowDropDown(): bool
+    public function get_show_drop_down(): bool
     {
-        return $this->showDropDown;
+        return $this->show_drop_down;
     }
-
     /**
      * Set Show DropDown.
      *
      * @return $this
      */
-    public function setShowDropDown(bool $showDropDown): static
+    public function set_show_drop_down(bool $show_drop_down): static
     {
-        $this->showDropDown = $showDropDown;
-
+        $this->show_drop_down = $show_drop_down;
         return $this;
     }
-
     /**
      * Get Show InputMessage.
      */
-    public function getShowInputMessage(): bool
+    public function get_show_input_message(): bool
     {
-        return $this->showInputMessage;
+        return $this->show_input_message;
     }
-
     /**
      * Set Show InputMessage.
      *
      * @return $this
      */
-    public function setShowInputMessage(bool $showInputMessage): static
+    public function set_show_input_message(bool $show_input_message): static
     {
-        $this->showInputMessage = $showInputMessage;
-
+        $this->show_input_message = $show_input_message;
         return $this;
     }
-
     /**
      * Get Show ErrorMessage.
      */
-    public function getShowErrorMessage(): bool
+    public function get_show_error_message(): bool
     {
-        return $this->showErrorMessage;
+        return $this->show_error_message;
     }
-
     /**
      * Set Show ErrorMessage.
      *
      * @return $this
      */
-    public function setShowErrorMessage(bool $showErrorMessage): static
+    public function set_show_error_message(bool $show_error_message): static
     {
-        $this->showErrorMessage = $showErrorMessage;
-
+        $this->show_error_message = $show_error_message;
         return $this;
     }
-
     /**
      * Get Error title.
      */
-    public function getErrorTitle(): string
+    public function get_error_title(): string
     {
-        return $this->errorTitle;
+        return $this->error_title;
     }
-
     /**
      * Set Error title.
      *
      * @return $this
      */
-    public function setErrorTitle(string $errorTitle): static
+    public function set_error_title(string $error_title): static
     {
-        $this->errorTitle = $errorTitle;
-
+        $this->error_title = $error_title;
         return $this;
     }
-
     /**
      * Get Error.
      */
-    public function getError(): string
+    public function get_error(): string
     {
         return $this->error;
     }
-
     /**
      * Set Error.
      *
      * @return $this
      */
-    public function setError(string $error): static
+    public function set_error(string $error): static
     {
         $this->error = $error;
-
         return $this;
     }
-
     /**
      * Get Prompt title.
      */
-    public function getPromptTitle(): string
+    public function get_prompt_title(): string
     {
-        return $this->promptTitle;
+        return $this->prompt_title;
     }
-
     /**
      * Set Prompt title.
      *
      * @return $this
      */
-    public function setPromptTitle(string $promptTitle): static
+    public function set_prompt_title(string $prompt_title): static
     {
-        $this->promptTitle = $promptTitle;
-
+        $this->prompt_title = $prompt_title;
         return $this;
     }
-
     /**
      * Get Prompt.
      */
-    public function getPrompt(): string
+    public function get_prompt(): string
     {
         return $this->prompt;
     }
-
     /**
      * Set Prompt.
      *
      * @return $this
      */
-    public function setPrompt(string $prompt): static
+    public function set_prompt(string $prompt): static
     {
         $this->prompt = $prompt;
-
         return $this;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        return md5(
-            $this->formula1
-            . $this->formula2
-            . $this->type
-            . $this->errorStyle
-            . $this->operator
-            . ($this->allowBlank ? 't' : 'f')
-            . ($this->showDropDown ? 't' : 'f')
-            . ($this->showInputMessage ? 't' : 'f')
-            . ($this->showErrorMessage ? 't' : 'f')
-            . $this->errorTitle
-            . $this->error
-            . $this->promptTitle
-            . $this->prompt
-            . $this->sqref
-            . self::class
-        );
+        return md5($this->formula1 . $this->formula2 . $this->type . $this->error_style . $this->operator . ($this->allow_blank ? 't' : 'f') . ($this->show_drop_down ? 't' : 'f') . ($this->show_input_message ? 't' : 'f') . ($this->show_error_message ? 't' : 'f') . $this->error_title . $this->error . $this->prompt_title . $this->prompt . $this->sqref . self::class);
     }
-
     private ?string $sqref = null;
-
-    public function getSqref(): ?string
+    public function get_sqref(): ?string
     {
         return $this->sqref;
     }
-
-    public function setSqref(?string $str): self
+    public function set_sqref(?string $str): self
     {
         $this->sqref = $str;
-
         return $this;
     }
 }

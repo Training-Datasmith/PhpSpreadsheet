@@ -1,559 +1,489 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Borders;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Style\Protection;
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table\TableDxfsStyle;
-use SimpleXMLElement;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx;
+use Php_Office\Php_Spreadsheet\Style\Alignment;
+use Php_Office\Php_Spreadsheet\Style\Border;
+use Php_Office\Php_Spreadsheet\Style\Borders;
+use Php_Office\Php_Spreadsheet\Style\Color;
+use Php_Office\Php_Spreadsheet\Style\Fill;
+use Php_Office\Php_Spreadsheet\Style\Font;
+use Php_Office\Php_Spreadsheet\Style\Number_Format;
+use Php_Office\Php_Spreadsheet\Style\Protection;
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Table\Table_Dxfs_Style;
+use Simple_Xml_Element;
 use stdClass;
-
-class Styles extends BaseParserClass
+class Styles extends Base_Parser_Class
 {
     /**
      * Theme instance.
      */
     private ?Theme $theme = null;
-
     /** @var string[] */
-    private array $workbookPalette = [];
-
+    private array $workbook_palette = [];
     /** @var mixed[] */
     private array $styles = [];
-
     /** @var array<SimpleXMLElement|stdClass> */
-    private array $cellStyles = [];
-
-    private SimpleXMLElement $styleXml;
-
+    private array $cell_styles = [];
+    private Simple_Xml_Element $style_xml;
     private string $namespace = '';
-
     /** @var array<string, int> */
-    private array $fontCharsets = [];
-
+    private array $font_charsets = [];
     /** @return array<string, int> */
-    public function getFontCharsets(): array
+    public function get_font_charsets(): array
     {
-        return $this->fontCharsets;
+        return $this->font_charsets;
     }
-
-    public function setNamespace(string $namespace): void
+    public function set_namespace(string $namespace): void
     {
         $this->namespace = $namespace;
     }
-
     /** @param string[] $palette */
-    public function setWorkbookPalette(array $palette): void
+    public function set_workbook_palette(array $palette): void
     {
-        $this->workbookPalette = $palette;
+        $this->workbook_palette = $palette;
     }
-
-    private function getStyleAttributes(SimpleXMLElement $value): SimpleXMLElement
+    private function get_style_attributes(Simple_Xml_Element $value): Simple_Xml_Element
     {
         $attr = $value->attributes('');
         if ($attr === null || count($attr) === 0) {
             $attr = $value->attributes($this->namespace);
         }
-
-        return Xlsx::testSimpleXml($attr);
+        return Xlsx::test_simple_xml($attr);
     }
-
-    public function setStyleXml(SimpleXMLElement $styleXml): void
+    public function set_style_xml(Simple_Xml_Element $style_xml): void
     {
-        $this->styleXml = $styleXml;
+        $this->style_xml = $style_xml;
     }
-
-    public function setTheme(Theme $theme): void
+    public function set_theme(Theme $theme): void
     {
         $this->theme = $theme;
     }
-
     /**
      * @param mixed[] $styles
      * @param array<SimpleXMLElement|stdClass> $cellStyles
      */
-    public function setStyleBaseData(?Theme $theme = null, array $styles = [], array $cellStyles = []): void
+    public function set_style_base_data(?Theme $theme = null, array $styles = [], array $cell_styles = []): void
     {
         $this->theme = $theme;
         $this->styles = $styles;
-        $this->cellStyles = $cellStyles;
+        $this->cell_styles = $cell_styles;
     }
-
-    public function readFontStyle(Font $fontStyle, SimpleXMLElement $fontStyleXml): void
+    public function read_font_style(Font $font_style, Simple_Xml_Element $font_style_xml): void
     {
-        if (isset($fontStyleXml->name)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->name);
+        if (isset($font_style_xml->name)) {
+            $attr = $this->get_style_attributes($font_style_xml->name);
             if (isset($attr['val'])) {
-                $fontStyle->setName((string) $attr['val']);
+                $font_style->set_name((string) $attr['val']);
             }
-            if (isset($fontStyleXml->charset)) {
-                $charsetAttr = $this->getStyleAttributes($fontStyleXml->charset);
-                if (isset($charsetAttr['val'])) {
-                    $charsetVal = (int) $charsetAttr['val'];
-                    $this->fontCharsets[$fontStyle->getName()] = $charsetVal;
+            if (isset($font_style_xml->charset)) {
+                $charset_attr = $this->get_style_attributes($font_style_xml->charset);
+                if (isset($charset_attr['val'])) {
+                    $charset_val = (int) $charset_attr['val'];
+                    $this->font_charsets[$font_style->get_name()] = $charset_val;
                 }
             }
         }
-        if (isset($fontStyleXml->sz)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->sz);
+        if (isset($font_style_xml->sz)) {
+            $attr = $this->get_style_attributes($font_style_xml->sz);
             if (isset($attr['val'])) {
-                $fontStyle->setSize((float) $attr['val']);
+                $font_style->set_size((float) $attr['val']);
             }
         }
-        if (isset($fontStyleXml->b)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->b);
-            $fontStyle->setBold(!isset($attr['val']) || self::boolean((string) $attr['val']));
+        if (isset($font_style_xml->b)) {
+            $attr = $this->get_style_attributes($font_style_xml->b);
+            $font_style->set_bold(!isset($attr['val']) || self::boolean((string) $attr['val']));
         }
-        if (isset($fontStyleXml->i)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->i);
-            $fontStyle->setItalic(!isset($attr['val']) || self::boolean((string) $attr['val']));
+        if (isset($font_style_xml->i)) {
+            $attr = $this->get_style_attributes($font_style_xml->i);
+            $font_style->set_italic(!isset($attr['val']) || self::boolean((string) $attr['val']));
         }
-        if (isset($fontStyleXml->strike)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->strike);
-            $fontStyle->setStrikethrough(!isset($attr['val']) || self::boolean((string) $attr['val']));
+        if (isset($font_style_xml->strike)) {
+            $attr = $this->get_style_attributes($font_style_xml->strike);
+            $font_style->set_strikethrough(!isset($attr['val']) || self::boolean((string) $attr['val']));
         }
-        $fontStyle->getColor()
-            ->setARGB(
-                $this->readColor($fontStyleXml->color)
-            );
-        $theme = $this->readColorTheme($fontStyleXml->color);
+        $font_style->get_color()->set_argb($this->read_color($font_style_xml->color));
+        $theme = $this->read_color_theme($font_style_xml->color);
         if ($theme >= 0) {
-            $fontStyle->getColor()->setTheme($theme);
+            $font_style->get_color()->set_theme($theme);
         }
-
-        if (isset($fontStyleXml->u)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->u);
+        if (isset($font_style_xml->u)) {
+            $attr = $this->get_style_attributes($font_style_xml->u);
             if (!isset($attr['val'])) {
-                $fontStyle->setUnderline(Font::UNDERLINE_SINGLE);
+                $font_style->set_underline(Font::UNDERLINE_SINGLE);
             } else {
-                $fontStyle->setUnderline((string) $attr['val']);
+                $font_style->set_underline((string) $attr['val']);
             }
         }
-        if (isset($fontStyleXml->vertAlign)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->vertAlign);
+        if (isset($font_style_xml->vert_align)) {
+            $attr = $this->get_style_attributes($font_style_xml->vert_align);
             if (isset($attr['val'])) {
-                $verticalAlign = strtolower((string) $attr['val']);
-                if ($verticalAlign === 'superscript') {
-                    $fontStyle->setSuperscript(true);
-                } elseif ($verticalAlign === 'subscript') {
-                    $fontStyle->setSubscript(true);
+                $vertical_align = strtolower((string) $attr['val']);
+                if ($vertical_align === 'superscript') {
+                    $font_style->set_superscript(true);
+                } elseif ($vertical_align === 'subscript') {
+                    $font_style->set_subscript(true);
                 }
             }
         }
-        if (isset($fontStyleXml->scheme)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->scheme);
-            $fontStyle->setScheme((string) $attr['val']);
+        if (isset($font_style_xml->scheme)) {
+            $attr = $this->get_style_attributes($font_style_xml->scheme);
+            $font_style->set_scheme((string) $attr['val']);
         }
-        if (isset($fontStyleXml->auto)) {
-            $attr = $this->getStyleAttributes($fontStyleXml->auto);
+        if (isset($font_style_xml->auto)) {
+            $attr = $this->get_style_attributes($font_style_xml->auto);
             if (isset($attr['val'])) {
-                $fontStyle->setAutoColor(self::boolean((string) $attr['val']));
+                $font_style->set_auto_color(self::boolean((string) $attr['val']));
             }
         }
     }
-
-    private function readNumberFormat(NumberFormat $numfmtStyle, SimpleXMLElement $numfmtStyleXml): void
+    private function read_number_format(Number_Format $numfmt_style, Simple_Xml_Element $numfmt_style_xml): void
     {
-        if ((string) $numfmtStyleXml['formatCode'] !== '') {
-            $numfmtStyle->setFormatCode(self::formatGeneral((string) $numfmtStyleXml['formatCode']));
-
+        if ((string) $numfmt_style_xml['formatCode'] !== '') {
+            $numfmt_style->set_format_code(self::format_general((string) $numfmt_style_xml['formatCode']));
             return;
         }
-        $numfmt = $this->getStyleAttributes($numfmtStyleXml);
+        $numfmt = $this->get_style_attributes($numfmt_style_xml);
         if (isset($numfmt['formatCode'])) {
-            $numfmtStyle->setFormatCode(self::formatGeneral((string) $numfmt['formatCode']));
+            $numfmt_style->set_format_code(self::format_general((string) $numfmt['formatCode']));
         }
     }
-
-    public function readFillStyle(Fill $fillStyle, SimpleXMLElement $fillStyleXml): void
+    public function read_fill_style(Fill $fill_style, Simple_Xml_Element $fill_style_xml): void
     {
-        if ($fillStyleXml->gradientFill) {
+        if ($fill_style_xml->gradient_fill) {
             /** @var SimpleXMLElement $gradientFill */
-            $gradientFill = $fillStyleXml->gradientFill[0];
-            $attr = $this->getStyleAttributes($gradientFill);
+            $gradient_fill = $fill_style_xml->gradient_fill[0];
+            $attr = $this->get_style_attributes($gradient_fill);
             if (!empty($attr['type'])) {
-                $fillStyle->setFillType((string) $attr['type']);
+                $fill_style->set_fill_type((string) $attr['type']);
             }
-            $fillStyle->setRotation((float) ($attr['degree']));
-            $gradientFill->registerXPathNamespace('sml', Namespaces::MAIN);
-            $fillStyle->getStartColor()->setARGB($this->readColor(self::getArrayItem($gradientFill->xpath('sml:stop[@position=0]'))->color)); //* @phpstan-ignore-line
-            $fillStyle->getEndColor()->setARGB($this->readColor(self::getArrayItem($gradientFill->xpath('sml:stop[@position=1]'))->color)); //* @phpstan-ignore-line
-        } elseif ($fillStyleXml->patternFill) {
-            $defaultFillStyle = ($fillStyle->getFillType() !== null) ? Fill::FILL_NONE : '';
-            $fgFound = false;
-            $bgFound = false;
-            if ($fillStyleXml->patternFill->fgColor) {
-                $fillStyle->getStartColor()->setARGB($this->readColor($fillStyleXml->patternFill->fgColor, true));
-                if ($fillStyle->getFillType() !== null) {
-                    $defaultFillStyle = Fill::FILL_SOLID;
+            $fill_style->set_rotation((float) $attr['degree']);
+            $gradient_fill->register_x_path_namespace('sml', Namespaces::MAIN);
+            $fill_style->get_start_color()->set_argb($this->read_color(self::get_array_item($gradient_fill->xpath('sml:stop[@position=0]'))->color));
+            //* @phpstan-ignore-line
+            $fill_style->get_end_color()->set_argb($this->read_color(self::get_array_item($gradient_fill->xpath('sml:stop[@position=1]'))->color));
+            //* @phpstan-ignore-line
+        } elseif ($fill_style_xml->pattern_fill) {
+            $default_fill_style = $fill_style->get_fill_type() !== null ? Fill::FILL_NONE : '';
+            $fg_found = false;
+            $bg_found = false;
+            if ($fill_style_xml->pattern_fill->fg_color) {
+                $fill_style->get_start_color()->set_argb($this->read_color($fill_style_xml->pattern_fill->fg_color, true));
+                if ($fill_style->get_fill_type() !== null) {
+                    $default_fill_style = Fill::FILL_SOLID;
                 }
-                $fgFound = true;
+                $fg_found = true;
             }
-            if ($fillStyleXml->patternFill->bgColor) {
-                $fillStyle->getEndColor()->setARGB($this->readColor($fillStyleXml->patternFill->bgColor, true));
-                if ($fillStyle->getFillType() !== null) {
-                    $defaultFillStyle = Fill::FILL_SOLID;
+            if ($fill_style_xml->pattern_fill->bg_color) {
+                $fill_style->get_end_color()->set_argb($this->read_color($fill_style_xml->pattern_fill->bg_color, true));
+                if ($fill_style->get_fill_type() !== null) {
+                    $default_fill_style = Fill::FILL_SOLID;
                 }
-                $bgFound = true;
+                $bg_found = true;
             }
-
             $type = '';
-            if ((string) $fillStyleXml->patternFill['patternType'] !== '') {
-                $type = (string) $fillStyleXml->patternFill['patternType'];
+            if ((string) $fill_style_xml->pattern_fill['patternType'] !== '') {
+                $type = (string) $fill_style_xml->pattern_fill['patternType'];
             } else {
-                $attr = $this->getStyleAttributes($fillStyleXml->patternFill);
+                $attr = $this->get_style_attributes($fill_style_xml->pattern_fill);
                 $type = (string) $attr['patternType'];
             }
-            $patternType = ($type === '') ? $defaultFillStyle : $type;
-
-            $fillStyle->setFillType($patternType);
-            if (
-                !$fgFound // no foreground color specified
-                && !in_array($patternType, [Fill::FILL_NONE, Fill::FILL_SOLID], true) // these patterns aren't relevant
-                && $fillStyle->getStartColor()->getARGB() // not conditional
-            ) {
-                $fillStyle->getStartColor()
-                    ->setARGB('', true);
+            $pattern_type = $type === '' ? $default_fill_style : $type;
+            $fill_style->set_fill_type($pattern_type);
+            if (!$fg_found && !in_array($pattern_type, [Fill::FILL_NONE, Fill::FILL_SOLID], true) && $fill_style->get_start_color()->get_argb()) {
+                $fill_style->get_start_color()->set_argb('', true);
             }
-            if (
-                !$bgFound // no background color specified
-                && !in_array($patternType, [Fill::FILL_NONE, Fill::FILL_SOLID], true) // these patterns aren't relevant
-                && $fillStyle->getEndColor()->getARGB() // not conditional
-            ) {
-                $fillStyle->getEndColor()
-                    ->setARGB('', true);
+            if (!$bg_found && !in_array($pattern_type, [Fill::FILL_NONE, Fill::FILL_SOLID], true) && $fill_style->get_end_color()->get_argb()) {
+                $fill_style->get_end_color()->set_argb('', true);
             }
         }
     }
-
-    public function readBorderStyle(Borders $borderStyle, SimpleXMLElement $borderStyleXml): void
+    public function read_border_style(Borders $border_style, Simple_Xml_Element $border_style_xml): void
     {
-        $diagonalUp = $this->getAttribute($borderStyleXml, 'diagonalUp');
-        $diagonalUp = self::boolean($diagonalUp);
-        $diagonalDown = $this->getAttribute($borderStyleXml, 'diagonalDown');
-        $diagonalDown = self::boolean($diagonalDown);
-        if ($diagonalUp === false) {
-            if ($diagonalDown === false) {
-                $borderStyle->setDiagonalDirection(Borders::DIAGONAL_NONE);
+        $diagonal_up = $this->get_attribute($border_style_xml, 'diagonalUp');
+        $diagonal_up = self::boolean($diagonal_up);
+        $diagonal_down = $this->get_attribute($border_style_xml, 'diagonalDown');
+        $diagonal_down = self::boolean($diagonal_down);
+        if ($diagonal_up === false) {
+            if ($diagonal_down === false) {
+                $border_style->set_diagonal_direction(Borders::DIAGONAL_NONE);
             } else {
-                $borderStyle->setDiagonalDirection(Borders::DIAGONAL_DOWN);
+                $border_style->set_diagonal_direction(Borders::DIAGONAL_DOWN);
             }
-        } elseif ($diagonalDown === false) {
-            $borderStyle->setDiagonalDirection(Borders::DIAGONAL_UP);
+        } elseif ($diagonal_down === false) {
+            $border_style->set_diagonal_direction(Borders::DIAGONAL_UP);
         } else {
-            $borderStyle->setDiagonalDirection(Borders::DIAGONAL_BOTH);
+            $border_style->set_diagonal_direction(Borders::DIAGONAL_BOTH);
         }
-
-        if (isset($borderStyleXml->left)) {
-            $this->readBorder($borderStyle->getLeft(), $borderStyleXml->left);
+        if (isset($border_style_xml->left)) {
+            $this->read_border($border_style->get_left(), $border_style_xml->left);
         }
-        if (isset($borderStyleXml->right)) {
-            $this->readBorder($borderStyle->getRight(), $borderStyleXml->right);
+        if (isset($border_style_xml->right)) {
+            $this->read_border($border_style->get_right(), $border_style_xml->right);
         }
-        if (isset($borderStyleXml->top)) {
-            $this->readBorder($borderStyle->getTop(), $borderStyleXml->top);
+        if (isset($border_style_xml->top)) {
+            $this->read_border($border_style->get_top(), $border_style_xml->top);
         }
-        if (isset($borderStyleXml->bottom)) {
-            $this->readBorder($borderStyle->getBottom(), $borderStyleXml->bottom);
+        if (isset($border_style_xml->bottom)) {
+            $this->read_border($border_style->get_bottom(), $border_style_xml->bottom);
         }
-        if (isset($borderStyleXml->diagonal)) {
-            $this->readBorder($borderStyle->getDiagonal(), $borderStyleXml->diagonal);
+        if (isset($border_style_xml->diagonal)) {
+            $this->read_border($border_style->get_diagonal(), $border_style_xml->diagonal);
         }
     }
-
-    private function getAttribute(SimpleXMLElement $xml, string $attribute): string
+    private function get_attribute(Simple_Xml_Element $xml, string $attribute): string
     {
         $style = '';
         if ((string) $xml[$attribute] !== '') {
             $style = (string) $xml[$attribute];
         } else {
-            $attr = $this->getStyleAttributes($xml);
+            $attr = $this->get_style_attributes($xml);
             if (isset($attr[$attribute])) {
                 $style = (string) $attr[$attribute];
             }
         }
-
         return $style;
     }
-
-    private function readBorder(Border $border, SimpleXMLElement $borderXml): void
+    private function read_border(Border $border, Simple_Xml_Element $border_xml): void
     {
-        $style = $this->getAttribute($borderXml, 'style');
+        $style = $this->get_attribute($border_xml, 'style');
         if ($style !== '') {
-            $border->setBorderStyle($style);
+            $border->set_border_style($style);
         } else {
-            $border->setBorderStyle(Border::BORDER_NONE);
+            $border->set_border_style(Border::BORDER_NONE);
         }
-        if (isset($borderXml->color)) {
-            $border->getColor()->setARGB($this->readColor($borderXml->color));
+        if (isset($border_xml->color)) {
+            $border->get_color()->set_argb($this->read_color($border_xml->color));
         }
     }
-
-    public function readAlignmentStyle(Alignment $alignment, SimpleXMLElement $alignmentXml): void
+    public function read_alignment_style(Alignment $alignment, Simple_Xml_Element $alignment_xml): void
     {
-        $horizontal = $this->getAttribute($alignmentXml, 'horizontal');
+        $horizontal = $this->get_attribute($alignment_xml, 'horizontal');
         if ($horizontal !== '') {
-            $alignment->setHorizontal($horizontal);
+            $alignment->set_horizontal($horizontal);
         }
-        $justifyLastLine = $this->getAttribute($alignmentXml, 'justifyLastLine');
-        if ($justifyLastLine !== '') {
-            $alignment->setJustifyLastLine(
-                self::boolean($justifyLastLine)
-            );
+        $justify_last_line = $this->get_attribute($alignment_xml, 'justifyLastLine');
+        if ($justify_last_line !== '') {
+            $alignment->set_justify_last_line(self::boolean($justify_last_line));
         }
-        $vertical = $this->getAttribute($alignmentXml, 'vertical');
+        $vertical = $this->get_attribute($alignment_xml, 'vertical');
         if ($vertical !== '') {
-            $alignment->setVertical($vertical);
+            $alignment->set_vertical($vertical);
         }
-
-        $textRotation = (int) $this->getAttribute($alignmentXml, 'textRotation');
-        if ($textRotation > 90) {
-            $textRotation = 90 - $textRotation;
+        $text_rotation = (int) $this->get_attribute($alignment_xml, 'textRotation');
+        if ($text_rotation > 90) {
+            $text_rotation = 90 - $text_rotation;
         }
-        $alignment->setTextRotation($textRotation);
-
-        $wrapText = $this->getAttribute($alignmentXml, 'wrapText');
-        $alignment->setWrapText(self::boolean($wrapText));
-        $shrinkToFit = $this->getAttribute($alignmentXml, 'shrinkToFit');
-        $alignment->setShrinkToFit(self::boolean($shrinkToFit));
-        $indent = (int) $this->getAttribute($alignmentXml, 'indent');
-        $alignment->setIndent(max($indent, 0));
-        $readingOrder = (int) $this->getAttribute($alignmentXml, 'readingOrder');
-        $alignment->setReadOrder(max($readingOrder, 0));
+        $alignment->set_text_rotation($text_rotation);
+        $wrap_text = $this->get_attribute($alignment_xml, 'wrapText');
+        $alignment->set_wrap_text(self::boolean($wrap_text));
+        $shrink_to_fit = $this->get_attribute($alignment_xml, 'shrinkToFit');
+        $alignment->set_shrink_to_fit(self::boolean($shrink_to_fit));
+        $indent = (int) $this->get_attribute($alignment_xml, 'indent');
+        $alignment->set_indent(max($indent, 0));
+        $reading_order = (int) $this->get_attribute($alignment_xml, 'readingOrder');
+        $alignment->set_read_order(max($reading_order, 0));
     }
-
-    private static function formatGeneral(string $formatString): string
+    private static function format_general(string $format_string): string
     {
-        if ($formatString === 'GENERAL') {
-            return NumberFormat::FORMAT_GENERAL;
+        if ($format_string === 'GENERAL') {
+            return Number_Format::FORMAT_GENERAL;
         }
-
-        return $formatString;
+        return $format_string;
     }
-
     /**
      * Read style.
      */
-    public function readStyle(Style $docStyle, SimpleXMLElement|stdClass $style): void
+    public function read_style(Style $doc_style, Simple_Xml_Element|stdClass $style): void
     {
-        if ($style instanceof SimpleXMLElement) {
-            $this->readNumberFormat($docStyle->getNumberFormat(), $style->numFmt);
+        if ($style instanceof Simple_Xml_Element) {
+            $this->read_number_format($doc_style->get_number_format(), $style->num_fmt);
         } else {
             /** @var SimpleXMLElement */
-            $temp = $style->numFmt;
-            $docStyle->getNumberFormat()->setFormatCode(self::formatGeneral((string) $temp));
+            $temp = $style->num_fmt;
+            $doc_style->get_number_format()->set_format_code(self::format_general((string) $temp));
         }
-
         /** @var SimpleXMLElement $style */
         if (isset($style->font)) {
-            $this->readFontStyle($docStyle->getFont(), $style->font);
+            $this->read_font_style($doc_style->get_font(), $style->font);
         }
-
         if (isset($style->fill)) {
-            $this->readFillStyle($docStyle->getFill(), $style->fill);
+            $this->read_fill_style($doc_style->get_fill(), $style->fill);
         }
-
         if (isset($style->border)) {
-            $this->readBorderStyle($docStyle->getBorders(), $style->border);
+            $this->read_border_style($doc_style->get_borders(), $style->border);
         }
-
         if (isset($style->alignment)) {
-            $this->readAlignmentStyle($docStyle->getAlignment(), $style->alignment);
+            $this->read_alignment_style($doc_style->get_alignment(), $style->alignment);
         }
-
         // protection
         if (isset($style->protection)) {
-            $this->readProtectionLocked($docStyle, $style->protection);
-            $this->readProtectionHidden($docStyle, $style->protection);
+            $this->read_protection_locked($doc_style, $style->protection);
+            $this->read_protection_hidden($doc_style, $style->protection);
         }
-
         // top-level style settings
-        if (isset($style->quotePrefix)) {
-            $docStyle->setQuotePrefix((bool) $style->quotePrefix);
+        if (isset($style->quote_prefix)) {
+            $doc_style->set_quote_prefix((bool) $style->quote_prefix);
         }
     }
-
     /**
      * Read protection locked attribute.
      */
-    public function readProtectionLocked(Style $docStyle, SimpleXMLElement $style): void
+    public function read_protection_locked(Style $doc_style, Simple_Xml_Element $style): void
     {
         $locked = '';
         if ((string) $style['locked'] !== '') {
             $locked = (string) $style['locked'];
         } else {
-            $attr = $this->getStyleAttributes($style);
+            $attr = $this->get_style_attributes($style);
             if (isset($attr['locked'])) {
                 $locked = (string) $attr['locked'];
             }
         }
         if ($locked !== '') {
             if (self::boolean($locked)) {
-                $docStyle->getProtection()->setLocked(Protection::PROTECTION_PROTECTED);
+                $doc_style->get_protection()->set_locked(Protection::PROTECTION_PROTECTED);
             } else {
-                $docStyle->getProtection()->setLocked(Protection::PROTECTION_UNPROTECTED);
+                $doc_style->get_protection()->set_locked(Protection::PROTECTION_UNPROTECTED);
             }
         }
     }
-
     /**
      * Read protection hidden attribute.
      */
-    public function readProtectionHidden(Style $docStyle, SimpleXMLElement $style): void
+    public function read_protection_hidden(Style $doc_style, Simple_Xml_Element $style): void
     {
         $hidden = '';
         if ((string) $style['hidden'] !== '') {
             $hidden = (string) $style['hidden'];
         } else {
-            $attr = $this->getStyleAttributes($style);
+            $attr = $this->get_style_attributes($style);
             if (isset($attr['hidden'])) {
                 $hidden = (string) $attr['hidden'];
             }
         }
         if ($hidden !== '') {
             if (self::boolean($hidden)) {
-                $docStyle->getProtection()->setHidden(Protection::PROTECTION_PROTECTED);
+                $doc_style->get_protection()->set_hidden(Protection::PROTECTION_PROTECTED);
             } else {
-                $docStyle->getProtection()->setHidden(Protection::PROTECTION_UNPROTECTED);
+                $doc_style->get_protection()->set_hidden(Protection::PROTECTION_UNPROTECTED);
             }
         }
     }
-
-    public function readColorTheme(SimpleXMLElement $color): int
+    public function read_color_theme(Simple_Xml_Element $color): int
     {
-        $attr = $this->getStyleAttributes($color);
+        $attr = $this->get_style_attributes($color);
         if (isset($attr['theme']) && is_numeric((string) $attr['theme']) && !isset($attr['tint'])) {
             return (int) $attr['theme'];
         }
-
         return -1;
     }
-
-    public function readColor(SimpleXMLElement $color, bool $background = false): string
+    public function read_color(Simple_Xml_Element $color, bool $background = false): string
     {
-        $attr = $this->getStyleAttributes($color);
+        $attr = $this->get_style_attributes($color);
         if (isset($attr['rgb'])) {
             return (string) $attr['rgb'];
         }
         if (isset($attr['indexed'])) {
-            $indexedColor = (int) $attr['indexed'];
-            if ($indexedColor >= count($this->workbookPalette)) {
-                return Color::indexedColor($indexedColor - 7, $background)->getARGB() ?? '';
+            $indexed_color = (int) $attr['indexed'];
+            if ($indexed_color >= count($this->workbook_palette)) {
+                return Color::indexed_color($indexed_color - 7, $background)->get_argb() ?? '';
             }
-
-            return Color::indexedColor($indexedColor, $background, $this->workbookPalette)->getARGB() ?? '';
+            return Color::indexed_color($indexed_color, $background, $this->workbook_palette)->get_argb() ?? '';
         }
         if (isset($attr['theme'])) {
             if ($this->theme !== null) {
-                $returnColour = $this->theme->getColourByIndex((int) $attr['theme']);
+                $return_colour = $this->theme->get_colour_by_index((int) $attr['theme']);
                 if (isset($attr['tint'])) {
-                    $tintAdjust = (float) $attr['tint'];
-                    $returnColour = Color::changeBrightness($returnColour ?? '', $tintAdjust);
+                    $tint_adjust = (float) $attr['tint'];
+                    $return_colour = Color::change_brightness($return_colour ?? '', $tint_adjust);
                 }
-
-                return 'FF' . $returnColour;
+                return 'FF' . $return_colour;
             }
         }
-
-        return ($background) ? 'FFFFFFFF' : 'FF000000';
+        return $background ? 'FFFFFFFF' : 'FF000000';
     }
-
     /** @return Style[] */
-    public function dxfs(bool $readDataOnly = false): array
+    public function dxfs(bool $read_data_only = false): array
     {
         $dxfs = [];
-        if (!$readDataOnly && $this->styleXml) {
+        if (!$read_data_only && $this->style_xml) {
             //    Conditional Styles
-            if ($this->styleXml->dxfs) {
-                foreach ($this->styleXml->dxfs->dxf as $dxf) {
+            if ($this->style_xml->dxfs) {
+                foreach ($this->style_xml->dxfs->dxf as $dxf) {
                     $style = new Style(false, true);
-                    $this->readStyle($style, $dxf);
+                    $this->read_style($style, $dxf);
                     $dxfs[] = $style;
                 }
             }
             //    Cell Styles
-            if ($this->styleXml->cellStyles) {
-                foreach ($this->styleXml->cellStyles->cellStyle as $cellStylex) {
-                    $cellStyle = Xlsx::getAttributes($cellStylex);
-                    if ((int) ($cellStyle['builtinId']) == 0) {
-                        if (isset($this->cellStyles[(int) ($cellStyle['xfId'])])) {
+            if ($this->style_xml->cell_styles) {
+                foreach ($this->style_xml->cell_styles->cell_style as $cell_stylex) {
+                    $cell_style = Xlsx::get_attributes($cell_stylex);
+                    if ((int) $cell_style['builtinId'] == 0) {
+                        if (isset($this->cell_styles[(int) $cell_style['xfId']])) {
                             // Set default style
                             $style = new Style();
-                            $this->readStyle($style, $this->cellStyles[(int) ($cellStyle['xfId'])]);
-
+                            $this->read_style($style, $this->cell_styles[(int) $cell_style['xfId']]);
                             // normal style, currently not using it for anything
                         }
                     }
                 }
             }
         }
-
         return $dxfs;
     }
-
     /** @return TableDxfsStyle[] */
-    public function tableStyles(bool $readDataOnly = false): array
+    public function table_styles(bool $read_data_only = false): array
     {
-        $tableStyles = [];
-        if (!$readDataOnly && $this->styleXml) {
+        $table_styles = [];
+        if (!$read_data_only && $this->style_xml) {
             //    Conditional Styles
-            if ($this->styleXml->tableStyles) {
-                foreach ($this->styleXml->tableStyles->tableStyle as $s) {
-                    $attrs = Xlsx::getAttributes($s);
+            if ($this->style_xml->table_styles) {
+                foreach ($this->style_xml->table_styles->table_style as $s) {
+                    $attrs = Xlsx::get_attributes($s);
                     if (isset($attrs['name'][0])) {
-                        $style = new TableDxfsStyle((string) ($attrs['name'][0]));
-                        foreach ($s->tableStyleElement as $e) {
-                            $a = Xlsx::getAttributes($e);
+                        $style = new Table_Dxfs_Style((string) $attrs['name'][0]);
+                        foreach ($s->table_style_element as $e) {
+                            $a = Xlsx::get_attributes($e);
                             if (isset($a['dxfId'][0], $a['type'][0])) {
                                 switch ($a['type'][0]) {
                                     case 'headerRow':
-                                        $style->setHeaderRow((int) ($a['dxfId'][0]));
-
+                                        $style->set_header_row((int) $a['dxfId'][0]);
                                         break;
                                     case 'firstRowStripe':
-                                        $style->setFirstRowStripe((int) ($a['dxfId'][0]));
-
+                                        $style->set_first_row_stripe((int) $a['dxfId'][0]);
                                         break;
                                     case 'secondRowStripe':
-                                        $style->setSecondRowStripe((int) ($a['dxfId'][0]));
-
+                                        $style->set_second_row_stripe((int) $a['dxfId'][0]);
                                         break;
                                     default:
                                 }
                             }
                         }
-                        $tableStyles[] = $style;
+                        $table_styles[] = $style;
                     }
                 }
             }
         }
-
-        return $tableStyles;
+        return $table_styles;
     }
-
     /** @return mixed[] */
     public function styles(): array
     {
         return $this->styles;
     }
-
     /**
      * Get array item.
      *
      * @param false|mixed[] $array (usually array, in theory can be false)
      */
-    private static function getArrayItem(mixed $array): ?SimpleXMLElement
+    private static function get_array_item(mixed $array): ?Simple_Xml_Element
     {
-        return is_array($array) ? ($array[0] ?? null) : null; // @phpstan-ignore-line
+        return is_array($array) ? $array[0] ?? null : null;
+        // @phpstan-ignore-line
     }
 }

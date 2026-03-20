@@ -1,90 +1,66 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared\Trend;
 
-namespace PhpOffice\PhpSpreadsheet\Shared\Trend;
-
-abstract class BestFit
+abstract class Best_Fit
 {
     /**
      * Indicator flag for a calculation error.
      */
     protected bool $error = false;
-
     /**
      * Algorithm type to use for best-fit.
      */
-    protected string $bestFitType = 'undetermined';
-
+    protected string $best_fit_type = 'undetermined';
     /**
      * Number of entries in the sets of x- and y-value arrays.
      */
-    protected int $valueCount;
-
+    protected int $value_count;
     /**
      * X-value dataseries of values.
      *
      * @var float[]
      */
-    protected array $xValues = [];
-
+    protected array $x_values = [];
     /**
      * Y-value dataseries of values.
      *
      * @var float[]
      */
-    protected array $yValues = [];
-
+    protected array $y_values = [];
     /**
      * Flag indicating whether values should be adjusted to Y=0.
      */
-    protected bool $adjustToZero = false;
-
+    protected bool $adjust_to_zero = false;
     /**
      * Y-value series of best-fit values.
      *
      * @var float[]
      */
-    protected array $yBestFitValues = [];
-
-    protected float $goodnessOfFit = 1;
-
-    protected float $stdevOfResiduals = 0;
-
+    protected array $y_best_fit_values = [];
+    protected float $goodness_of_fit = 1;
+    protected float $stdev_of_residuals = 0;
     protected float $covariance = 0;
-
     protected float $correlation = 0;
-
-    protected float $SSRegression = 0;
-
-    protected float $SSResiduals = 0;
-
-    protected float $DFResiduals = 0;
-
+    protected float $ss_regression = 0;
+    protected float $ss_residuals = 0;
+    protected float $df_residuals = 0;
     protected float $f = 0;
-
     protected float $slope = 0;
-
-    protected float $slopeSE = 0;
-
+    protected float $slope_se = 0;
     protected float $intersect = 0;
-
-    protected float $intersectSE = 0;
-
-    protected float $xOffset = 0;
-
-    protected float $yOffset = 0;
-
-    public function getError(): bool
+    protected float $intersect_se = 0;
+    protected float $x_offset = 0;
+    protected float $y_offset = 0;
+    public function get_error(): bool
     {
         return $this->error;
     }
-
-    public function getBestFitType(): string
+    public function get_best_fit_type(): string
     {
-        return $this->bestFitType;
+        return $this->best_fit_type;
     }
-
     /**
      * Return the Y-Value for a specified value of X.
      *
@@ -92,8 +68,7 @@ abstract class BestFit
      *
      * @return float Y-Value
      */
-    abstract public function getValueOfYForX(float $xValue): float;
-
+    abstract public function get_value_of_y_for_x(float $x_value): float;
     /**
      * Return the X-Value for a specified value of Y.
      *
@@ -101,339 +76,287 @@ abstract class BestFit
      *
      * @return float X-Value
      */
-    abstract public function getValueOfXForY(float $yValue): float;
-
+    abstract public function get_value_of_x_for_y(float $y_value): float;
     /**
      * Return the original set of X-Values.
      *
      * @return float[] X-Values
      */
-    public function getXValues(): array
+    public function get_x_values(): array
     {
-        return $this->xValues;
+        return $this->x_values;
     }
-
     /**
      * Return the original set of Y-Values.
      *
      * @return float[] Y-Values
      */
-    public function getYValues(): array
+    public function get_y_values(): array
     {
-        return $this->yValues;
+        return $this->y_values;
     }
-
     /**
      * Return the Equation of the best-fit line.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    abstract public function getEquation(int $dp = 0): string;
-
+    abstract public function get_equation(int $dp = 0): string;
     /**
      * Return the Slope of the line.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    public function getSlope(int $dp = 0): float
+    public function get_slope(int $dp = 0): float
     {
         if ($dp != 0) {
             return round($this->slope, $dp);
         }
-
         return $this->slope;
     }
-
     /**
      * Return the standard error of the Slope.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    public function getSlopeSE(int $dp = 0): float
+    public function get_slope_se(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->slopeSE, $dp);
+            return round($this->slope_se, $dp);
         }
-
-        return $this->slopeSE;
+        return $this->slope_se;
     }
-
     /**
      * Return the Value of X where it intersects Y = 0.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    public function getIntersect(int $dp = 0): float
+    public function get_intersect(int $dp = 0): float
     {
         if ($dp != 0) {
             return round($this->intersect, $dp);
         }
-
         return $this->intersect;
     }
-
     /**
      * Return the standard error of the Intersect.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    public function getIntersectSE(int $dp = 0): float
+    public function get_intersect_se(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->intersectSE, $dp);
+            return round($this->intersect_se, $dp);
         }
-
-        return $this->intersectSE;
+        return $this->intersect_se;
     }
-
     /**
      * Return the goodness of fit for this regression.
      *
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getGoodnessOfFit(int $dp = 0): float
+    public function get_goodness_of_fit(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->goodnessOfFit, $dp);
+            return round($this->goodness_of_fit, $dp);
         }
-
-        return $this->goodnessOfFit;
+        return $this->goodness_of_fit;
     }
-
     /**
      * Return the goodness of fit for this regression.
      *
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getGoodnessOfFitPercent(int $dp = 0): float
+    public function get_goodness_of_fit_percent(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->goodnessOfFit * 100, $dp);
+            return round($this->goodness_of_fit * 100, $dp);
         }
-
-        return $this->goodnessOfFit * 100;
+        return $this->goodness_of_fit * 100;
     }
-
     /**
      * Return the standard deviation of the residuals for this regression.
      *
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getStdevOfResiduals(int $dp = 0): float
+    public function get_stdev_of_residuals(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->stdevOfResiduals, $dp);
+            return round($this->stdev_of_residuals, $dp);
         }
-
-        return $this->stdevOfResiduals;
+        return $this->stdev_of_residuals;
     }
-
     /**
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getSSRegression(int $dp = 0): float
+    public function get_ss_regression(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->SSRegression, $dp);
+            return round($this->ss_regression, $dp);
         }
-
-        return $this->SSRegression;
+        return $this->ss_regression;
     }
-
     /**
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getSSResiduals(int $dp = 0): float
+    public function get_ss_residuals(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->SSResiduals, $dp);
+            return round($this->ss_residuals, $dp);
         }
-
-        return $this->SSResiduals;
+        return $this->ss_residuals;
     }
-
     /**
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getDFResiduals(int $dp = 0): float
+    public function get_df_residuals(int $dp = 0): float
     {
         if ($dp != 0) {
-            return round($this->DFResiduals, $dp);
+            return round($this->df_residuals, $dp);
         }
-
-        return $this->DFResiduals;
+        return $this->df_residuals;
     }
-
     /**
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getF(int $dp = 0): float
+    public function get_f(int $dp = 0): float
     {
         if ($dp != 0) {
             return round($this->f, $dp);
         }
-
         return $this->f;
     }
-
     /**
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getCovariance(int $dp = 0): float
+    public function get_covariance(int $dp = 0): float
     {
         if ($dp != 0) {
             return round($this->covariance, $dp);
         }
-
         return $this->covariance;
     }
-
     /**
      * @param int $dp Number of places of decimal precision to return
      */
-    public function getCorrelation(int $dp = 0): float
+    public function get_correlation(int $dp = 0): float
     {
         if ($dp != 0) {
             return round($this->correlation, $dp);
         }
-
         return $this->correlation;
     }
-
     /**
      * @return float[]
      */
-    public function getYBestFitValues(): array
+    public function get_y_best_fit_values(): array
     {
-        return $this->yBestFitValues;
+        return $this->y_best_fit_values;
     }
-
-    protected function calculateGoodnessOfFit(float $sumX, float $sumY, float $sumX2, float $sumY2, float $sumXY, float $meanX, float $meanY, bool|int $const): void
+    protected function calculate_goodness_of_fit(float $sum_x, float $sum_y, float $sum_x2, float $sum_y2, float $sum_xy, float $mean_x, float $mean_y, bool|int $const): void
     {
-        $SSres = $SScov = $SStot = $SSsex = 0.0;
-        foreach ($this->xValues as $xKey => $xValue) {
-            $bestFitY = $this->yBestFitValues[$xKey] = $this->getValueOfYForX($xValue);
-
-            $SSres += ($this->yValues[$xKey] - $bestFitY) * ($this->yValues[$xKey] - $bestFitY);
+        $s_sres = $s_scov = $s_stot = $s_ssex = 0.0;
+        foreach ($this->x_values as $x_key => $x_value) {
+            $best_fit_y = $this->y_best_fit_values[$x_key] = $this->get_value_of_y_for_x($x_value);
+            $s_sres += ($this->y_values[$x_key] - $best_fit_y) * ($this->y_values[$x_key] - $best_fit_y);
             if ($const === true) {
-                $SStot += ($this->yValues[$xKey] - $meanY) * ($this->yValues[$xKey] - $meanY);
+                $s_stot += ($this->y_values[$x_key] - $mean_y) * ($this->y_values[$x_key] - $mean_y);
             } else {
-                $SStot += $this->yValues[$xKey] * $this->yValues[$xKey];
+                $s_stot += $this->y_values[$x_key] * $this->y_values[$x_key];
             }
-            $SScov += ($this->xValues[$xKey] - $meanX) * ($this->yValues[$xKey] - $meanY);
+            $s_scov += ($this->x_values[$x_key] - $mean_x) * ($this->y_values[$x_key] - $mean_y);
             if ($const === true) {
-                $SSsex += ($this->xValues[$xKey] - $meanX) * ($this->xValues[$xKey] - $meanX);
+                $s_ssex += ($this->x_values[$x_key] - $mean_x) * ($this->x_values[$x_key] - $mean_x);
             } else {
-                $SSsex += $this->xValues[$xKey] * $this->xValues[$xKey];
+                $s_ssex += $this->x_values[$x_key] * $this->x_values[$x_key];
             }
         }
-
-        $this->SSResiduals = $SSres;
-        $this->DFResiduals = $this->valueCount - 1 - ($const === true ? 1 : 0);
-
-        if ($this->DFResiduals == 0.0) {
-            $this->stdevOfResiduals = 0.0;
+        $this->ss_residuals = $s_sres;
+        $this->df_residuals = $this->value_count - 1 - ($const === true ? 1 : 0);
+        if ($this->df_residuals == 0.0) {
+            $this->stdev_of_residuals = 0.0;
         } else {
-            $this->stdevOfResiduals = sqrt($SSres / $this->DFResiduals);
+            $this->stdev_of_residuals = sqrt($s_sres / $this->df_residuals);
         }
-
-        if ($SStot == 0.0 || $SSres == $SStot) {
-            $this->goodnessOfFit = 1;
+        if ($s_stot == 0.0 || $s_sres == $s_stot) {
+            $this->goodness_of_fit = 1;
         } else {
-            $this->goodnessOfFit = 1 - ($SSres / $SStot);
+            $this->goodness_of_fit = 1 - $s_sres / $s_stot;
         }
-
-        $this->SSRegression = $this->goodnessOfFit * $SStot;
-        $this->covariance = $SScov / $this->valueCount;
-        $this->correlation = ($this->valueCount * $sumXY - $sumX * $sumY) / sqrt(($this->valueCount * $sumX2 - $sumX ** 2) * ($this->valueCount * $sumY2 - $sumY ** 2));
-        $this->slopeSE = $this->stdevOfResiduals / sqrt($SSsex);
-        $this->intersectSE = $this->stdevOfResiduals * sqrt(1 / ($this->valueCount - ($sumX * $sumX) / $sumX2));
-        if ($this->SSResiduals != 0.0) {
-            if ($this->DFResiduals == 0.0) {
+        $this->ss_regression = $this->goodness_of_fit * $s_stot;
+        $this->covariance = $s_scov / $this->value_count;
+        $this->correlation = ($this->value_count * $sum_xy - $sum_x * $sum_y) / sqrt(($this->value_count * $sum_x2 - $sum_x ** 2) * ($this->value_count * $sum_y2 - $sum_y ** 2));
+        $this->slope_se = $this->stdev_of_residuals / sqrt($s_ssex);
+        $this->intersect_se = $this->stdev_of_residuals * sqrt(1 / ($this->value_count - $sum_x * $sum_x / $sum_x2));
+        if ($this->ss_residuals != 0.0) {
+            if ($this->df_residuals == 0.0) {
                 $this->f = 0.0;
             } else {
-                $this->f = $this->SSRegression / ($this->SSResiduals / $this->DFResiduals);
+                $this->f = $this->ss_regression / ($this->ss_residuals / $this->df_residuals);
             }
+        } else if ($this->df_residuals == 0.0) {
+            $this->f = 0.0;
         } else {
-            if ($this->DFResiduals == 0.0) {
-                $this->f = 0.0;
-            } else {
-                $this->f = $this->SSRegression / $this->DFResiduals;
-            }
+            $this->f = $this->ss_regression / $this->df_residuals;
         }
     }
-
     /**
      * @param array<float|int> $values
      */
-    private function sumSquares(array $values): float|int
+    private function sum_squares(array $values): float|int
     {
-        return array_sum(
-            array_map(
-                fn (float|int $value): float|int => $value ** 2,
-                $values
-            )
-        );
+        return array_sum(array_map(fn(float|int $value): float|int => $value ** 2, $values));
     }
-
     /**
      * @param float[] $yValues
      * @param float[] $xValues
      */
-    protected function leastSquareFit(array $yValues, array $xValues, bool $const): void
+    protected function least_square_fit(array $y_values, array $x_values, bool $const): void
     {
         // calculate sums
-        $sumValuesX = array_sum($xValues);
-        $sumValuesY = array_sum($yValues);
-        $meanValueX = $sumValuesX / $this->valueCount;
-        $meanValueY = $sumValuesY / $this->valueCount;
-        $sumSquaresX = $this->sumSquares($xValues);
-        $sumSquaresY = $this->sumSquares($yValues);
-        $mBase = $mDivisor = 0.0;
+        $sum_values_x = array_sum($x_values);
+        $sum_values_y = array_sum($y_values);
+        $mean_value_x = $sum_values_x / $this->value_count;
+        $mean_value_y = $sum_values_y / $this->value_count;
+        $sum_squares_x = $this->sum_squares($x_values);
+        $sum_squares_y = $this->sum_squares($y_values);
+        $m_base = $m_divisor = 0.0;
         $xy_sum = 0.0;
-        for ($i = 0; $i < $this->valueCount; ++$i) {
-            $xy_sum += $xValues[$i] * $yValues[$i];
-
+        for ($i = 0; $i < $this->value_count; ++$i) {
+            $xy_sum += $x_values[$i] * $y_values[$i];
             if ($const === true) {
-                $mBase += ($xValues[$i] - $meanValueX) * ($yValues[$i] - $meanValueY);
-                $mDivisor += ($xValues[$i] - $meanValueX) * ($xValues[$i] - $meanValueX);
+                $m_base += ($x_values[$i] - $mean_value_x) * ($y_values[$i] - $mean_value_y);
+                $m_divisor += ($x_values[$i] - $mean_value_x) * ($x_values[$i] - $mean_value_x);
             } else {
-                $mBase += $xValues[$i] * $yValues[$i];
-                $mDivisor += $xValues[$i] * $xValues[$i];
+                $m_base += $x_values[$i] * $y_values[$i];
+                $m_divisor += $x_values[$i] * $x_values[$i];
             }
         }
-
         // calculate slope
-        $this->slope = $mBase / $mDivisor;
-
+        $this->slope = $m_base / $m_divisor;
         // calculate intersect
-        $this->intersect = ($const === true) ? $meanValueY - ($this->slope * $meanValueX) : 0.0;
-
-        $this->calculateGoodnessOfFit($sumValuesX, $sumValuesY, $sumSquaresX, $sumSquaresY, $xy_sum, $meanValueX, $meanValueY, $const);
+        $this->intersect = $const === true ? $mean_value_y - $this->slope * $mean_value_x : 0.0;
+        $this->calculate_goodness_of_fit($sum_values_x, $sum_values_y, $sum_squares_x, $sum_squares_y, $xy_sum, $mean_value_x, $mean_value_y, $const);
     }
-
     /**
      * Define the regression.
      *
      * @param float[] $yValues The set of Y-values for this regression
      * @param float[] $xValues The set of X-values for this regression
      */
-    public function __construct(array $yValues, array $xValues = [])
+    public function __construct(array $y_values, array $x_values = [])
     {
         //    Calculate number of points
-        $yValueCount = count($yValues);
-        $xValueCount = count($xValues);
-
+        $y_value_count = count($y_values);
+        $x_value_count = count($x_values);
         //    Define X Values if necessary
-        if ($xValueCount === 0) {
-            $xValues = range(1.0, $yValueCount);
-        } elseif ($yValueCount !== $xValueCount) {
+        if ($x_value_count === 0) {
+            $x_values = range(1.0, $y_value_count);
+        } elseif ($y_value_count !== $x_value_count) {
             //    Ensure both arrays of points are the same size
             $this->error = true;
         }
-
-        $this->valueCount = $yValueCount;
-        $this->xValues = $xValues;
-        $this->yValues = $yValues;
+        $this->value_count = $y_value_count;
+        $this->x_values = $x_values;
+        $this->y_values = $y_values;
     }
 }

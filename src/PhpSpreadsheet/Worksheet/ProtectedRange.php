@@ -1,40 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-
-class ProtectedRange
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+class Protected_Range
 {
     /**
      * No setters aside from constructor.
      */
-    public function __construct(private readonly string $sqref, private readonly string $password = '', private readonly string $name = '', private readonly string $securityDescriptor = '')
+    public function __construct(private readonly string $sqref, private readonly string $password = '', private readonly string $name = '', private readonly string $security_descriptor = '')
     {
     }
-
-    public function getSqref(): string
+    public function get_sqref(): string
     {
         return $this->sqref;
     }
-
-    public function getName(): string
+    public function get_name(): string
     {
-        return $this->name ?: ('p' . md5($this->sqref));
+        return $this->name ?: 'p' . md5($this->sqref);
     }
-
-    public function getPassword(): string
+    public function get_password(): string
     {
         return $this->password;
     }
-
-    public function getSecurityDescriptor(): string
+    public function get_security_descriptor(): string
     {
-        return $this->securityDescriptor;
+        return $this->security_descriptor;
     }
-
     /**
      * Split range into coordinate strings.
      *
@@ -42,8 +35,8 @@ class ProtectedRange
      *                                e.g. ['B4','D9'] or [['B4','D9'], ['H2','O11']]
      *                                        or ['B4']
      */
-    public function allRanges(): array
+    public function all_ranges(): array
     {
-        return Coordinate::allRanges($this->sqref, false);
+        return Coordinate::all_ranges($this->sqref, false);
     }
 }

@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xml;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xml;
-
-use PhpOffice\PhpSpreadsheet\Style\Protection;
-use SimpleXMLElement;
-
+use Php_Office\Php_Spreadsheet\Style\Protection;
+use Simple_Xml_Element;
 class Style
 {
     /**
@@ -15,74 +13,63 @@ class Style
      * @var mixed[]
      */
     protected array $styles = [];
-
     /**
      * @param string[] $namespaces
      *
      * @return mixed[]
      */
-    public function parseStyles(SimpleXMLElement $xml, array $namespaces): array
+    public function parse_styles(Simple_Xml_Element $xml, array $namespaces): array
     {
         $children = $xml->children('urn:schemas-microsoft-com:office:spreadsheet');
-        $stylesXml = $children->Styles[0];
-        if (!isset($stylesXml)) {
+        $styles_xml = $children->Styles[0];
+        if (!isset($styles_xml)) {
             return [];
         }
-
-        $alignmentStyleParser = new Style\Alignment();
-        $borderStyleParser = new Style\Border();
-        $fontStyleParser = new Style\Font();
-        $fillStyleParser = new Style\Fill();
-        $numberFormatStyleParser = new Style\NumberFormat();
-
-        foreach ($stylesXml as $style) {
-            $style_ss = self::getAttributes($style, $namespaces['ss']);
-            $styleID = (string) $style_ss['ID'];
-            $this->styles[$styleID] = $this->styles['Default'] ?? [];
-
-            $alignment = $border = $font = $fill = $numberFormat = $protection = [];
-
-            foreach ($style as $styleType => $styleDatax) {
-                $styleData = self::getSxml($styleDatax);
-                $styleAttributes = $styleData->attributes($namespaces['ss']);
-
-                switch ($styleType) {
+        $alignment_style_parser = new Style\Alignment();
+        $border_style_parser = new Style\Border();
+        $font_style_parser = new Style\Font();
+        $fill_style_parser = new Style\Fill();
+        $number_format_style_parser = new Style\Number_Format();
+        foreach ($styles_xml as $style) {
+            $style_ss = self::get_attributes($style, $namespaces['ss']);
+            $style_id = (string) $style_ss['ID'];
+            $this->styles[$style_id] = $this->styles['Default'] ?? [];
+            $alignment = $border = $font = $fill = $number_format = $protection = [];
+            foreach ($style as $style_type => $style_datax) {
+                $style_data = self::get_sxml($style_datax);
+                $style_attributes = $style_data->attributes($namespaces['ss']);
+                switch ($style_type) {
                     case 'Alignment':
-                        if ($styleAttributes) {
-                            $alignment = $alignmentStyleParser->parseStyle($styleAttributes);
+                        if ($style_attributes) {
+                            $alignment = $alignment_style_parser->parse_style($style_attributes);
                         }
-
                         break;
                     case 'Borders':
-                        $border = $borderStyleParser->parseStyle($styleData, $namespaces);
-
+                        $border = $border_style_parser->parse_style($style_data, $namespaces);
                         break;
                     case 'Font':
-                        if ($styleAttributes) {
-                            $font = $fontStyleParser->parseStyle($styleAttributes);
+                        if ($style_attributes) {
+                            $font = $font_style_parser->parse_style($style_attributes);
                         }
-
                         break;
                     case 'Interior':
-                        if ($styleAttributes) {
-                            $fill = $fillStyleParser->parseStyle($styleAttributes);
+                        if ($style_attributes) {
+                            $fill = $fill_style_parser->parse_style($style_attributes);
                         }
-
                         break;
                     case 'NumberFormat':
-                        if ($styleAttributes) {
-                            $numberFormat = $numberFormatStyleParser->parseStyle($styleAttributes);
+                        if ($style_attributes) {
+                            $number_format = $number_format_style_parser->parse_style($style_attributes);
                         }
-
                         break;
                     case 'Protection':
                         $locked = $hidden = null;
-                        $styleAttributesP = array_key_exists('x', $namespaces) ? $styleData->attributes($namespaces['x']) : [];
-                        if (isset($styleAttributes['Protected'])) {
-                            $locked = ((bool) (string) $styleAttributes['Protected']) ? Protection::PROTECTION_PROTECTED : Protection::PROTECTION_UNPROTECTED;
+                        $style_attributes_p = array_key_exists('x', $namespaces) ? $style_data->attributes($namespaces['x']) : [];
+                        if (isset($style_attributes['Protected'])) {
+                            $locked = (bool) (string) $style_attributes['Protected'] ? Protection::PROTECTION_PROTECTED : Protection::PROTECTION_UNPROTECTED;
                         }
-                        if (isset($styleAttributesP['HideFormula'])) {
-                            $hidden = ((bool) (string) $styleAttributesP['HideFormula']) ? Protection::PROTECTION_PROTECTED : Protection::PROTECTION_UNPROTECTED;
+                        if (isset($style_attributes_p['HideFormula'])) {
+                            $hidden = (bool) (string) $style_attributes_p['HideFormula'] ? Protection::PROTECTION_PROTECTED : Protection::PROTECTION_UNPROTECTED;
                         }
                         if ($locked !== null || $hidden !== null) {
                             $protection['protection'] = [];
@@ -93,24 +80,19 @@ class Style
                                 $protection['protection']['hidden'] = $hidden;
                             }
                         }
-
                         break;
                 }
             }
-
-            $this->styles[$styleID] = array_merge($alignment, $border, $font, $fill, $numberFormat, $protection);
+            $this->styles[$style_id] = array_merge($alignment, $border, $font, $fill, $number_format, $protection);
         }
-
         return $this->styles;
     }
-
-    private static function getAttributes(?SimpleXMLElement $simple, string $node): SimpleXMLElement
+    private static function get_attributes(?Simple_Xml_Element $simple, string $node): Simple_Xml_Element
     {
-        return ($simple === null) ? new SimpleXMLElement('<xml></xml>') : ($simple->attributes($node) ?? new SimpleXMLElement('<xml></xml>'));
+        return $simple === null ? new Simple_Xml_Element('<xml></xml>') : $simple->attributes($node) ?? new Simple_Xml_Element('<xml></xml>');
     }
-
-    private static function getSxml(?SimpleXMLElement $simple): SimpleXMLElement
+    private static function get_sxml(?Simple_Xml_Element $simple): Simple_Xml_Element
     {
-        return $simple ?? new SimpleXMLElement('<xml></xml>');
+        return $simple ?? new Simple_Xml_Element('<xml></xml>');
     }
 }

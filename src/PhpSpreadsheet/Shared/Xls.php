@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared;
 
-namespace PhpOffice\PhpSpreadsheet\Shared;
-
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Helper\Dimension;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Helper\Dimension;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 class Xls
 {
     /**
@@ -20,37 +18,32 @@ class Xls
      *
      * @return int The width in pixels
      */
-    public static function sizeCol(Worksheet $worksheet, string $col = 'A'): int
+    public static function size_col(Worksheet $worksheet, string $col = 'A'): int
     {
         // default font of the workbook
-        $font = $worksheet->getParentOrThrow()->getDefaultStyle()->getFont();
-
-        $columnDimensions = $worksheet->getColumnDimensions();
-
+        $font = $worksheet->get_parent_or_throw()->get_default_style()->get_font();
+        $column_dimensions = $worksheet->get_column_dimensions();
         // first find the true column width in pixels (uncollapsed and unhidden)
-        if (isset($columnDimensions[$col]) && $columnDimensions[$col]->getWidth() != -1) {
+        if (isset($column_dimensions[$col]) && $column_dimensions[$col]->get_width() != -1) {
             // then we have column dimension with explicit width
-            $columnDimension = $columnDimensions[$col];
-            $width = $columnDimension->getWidth();
-            $pixelWidth = Drawing::cellDimensionToPixels($width, $font);
-        } elseif ($worksheet->getDefaultColumnDimension()->getWidth() != -1) {
+            $column_dimension = $column_dimensions[$col];
+            $width = $column_dimension->get_width();
+            $pixel_width = Drawing::cell_dimension_to_pixels($width, $font);
+        } elseif ($worksheet->get_default_column_dimension()->get_width() != -1) {
             // then we have default column dimension with explicit width
-            $defaultColumnDimension = $worksheet->getDefaultColumnDimension();
-            $width = $defaultColumnDimension->getWidth();
-            $pixelWidth = Drawing::cellDimensionToPixels($width, $font);
+            $default_column_dimension = $worksheet->get_default_column_dimension();
+            $width = $default_column_dimension->get_width();
+            $pixel_width = Drawing::cell_dimension_to_pixels($width, $font);
         } else {
             // we don't even have any default column dimension. Width depends on default font
-            $pixelWidth = Font::getDefaultColumnWidthByFont($font, true);
+            $pixel_width = Font::get_default_column_width_by_font($font, true);
         }
-
         // now find the effective column width in pixels
-        if (isset($columnDimensions[$col]) && !$columnDimensions[$col]->getVisible()) {
+        if (isset($column_dimensions[$col]) && !$column_dimensions[$col]->get_visible()) {
             return 0;
         }
-
-        return $pixelWidth;
+        return $pixel_width;
     }
-
     /**
      * Convert the height of a cell from user's units to pixels. By interpolation
      * the relationship is: y = 4/3x. If the height hasn't been set by the user we
@@ -61,39 +54,35 @@ class Xls
      *
      * @return int The width in pixels
      */
-    public static function sizeRow(Worksheet $worksheet, int $row = 1): int
+    public static function size_row(Worksheet $worksheet, int $row = 1): int
     {
         // default font of the workbook
-        $font = $worksheet->getParentOrThrow()->getDefaultStyle()->getFont();
-
-        $rowDimensions = $worksheet->getRowDimensions();
-
+        $font = $worksheet->get_parent_or_throw()->get_default_style()->get_font();
+        $row_dimensions = $worksheet->get_row_dimensions();
         // first find the true row height in pixels (uncollapsed and unhidden)
-        if (isset($rowDimensions[$row]) && $rowDimensions[$row]->getRowHeight() != -1) {
+        if (isset($row_dimensions[$row]) && $row_dimensions[$row]->get_row_height() != -1) {
             // then we have a row dimension
-            $rowDimension = $rowDimensions[$row];
-            $rowHeight = $rowDimension->getRowHeight();
-            $pixelRowHeight = (int) ceil(4 * $rowHeight / 3); // here we assume Arial 10
-        } elseif ($worksheet->getDefaultRowDimension()->getRowHeight() != -1) {
+            $row_dimension = $row_dimensions[$row];
+            $row_height = $row_dimension->get_row_height();
+            $pixel_row_height = (int) ceil(4 * $row_height / 3);
+            // here we assume Arial 10
+        } elseif ($worksheet->get_default_row_dimension()->get_row_height() != -1) {
             // then we have a default row dimension with explicit height
-            $defaultRowDimension = $worksheet->getDefaultRowDimension();
-            $pixelRowHeight = $defaultRowDimension->getRowHeight(Dimension::UOM_PIXELS);
+            $default_row_dimension = $worksheet->get_default_row_dimension();
+            $pixel_row_height = $default_row_dimension->get_row_height(Dimension::UOM_PIXELS);
         } else {
             // we don't even have any default row dimension. Height depends on default font
-            $pointRowHeight = Font::getDefaultRowHeightByFont($font);
-            $pixelRowHeight = Font::fontSizeToPixels((int) $pointRowHeight);
+            $point_row_height = Font::get_default_row_height_by_font($font);
+            $pixel_row_height = Font::font_size_to_pixels((int) $point_row_height);
         }
-
         // now find the effective row height in pixels
-        if (isset($rowDimensions[$row]) && !$rowDimensions[$row]->getVisible()) {
-            $effectivePixelRowHeight = 0;
+        if (isset($row_dimensions[$row]) && !$row_dimensions[$row]->get_visible()) {
+            $effective_pixel_row_height = 0;
         } else {
-            $effectivePixelRowHeight = $pixelRowHeight;
+            $effective_pixel_row_height = $pixel_row_height;
         }
-
-        return (int) $effectivePixelRowHeight;
+        return (int) $effective_pixel_row_height;
     }
-
     /**
      * Get the horizontal distance in pixels between two anchors
      * The distanceX is found as sum of all the spanning columns widths minus correction for the two offsets.
@@ -103,26 +92,21 @@ class Xls
      *
      * @return int Horizontal measured in pixels
      */
-    public static function getDistanceX(Worksheet $worksheet, string $startColumn = 'A', float|int $startOffsetX = 0, string $endColumn = 'A', float|int $endOffsetX = 0): int
+    public static function get_distance_x(Worksheet $worksheet, string $start_column = 'A', float|int $start_offset_x = 0, string $end_column = 'A', float|int $end_offset_x = 0): int
     {
-        $distanceX = 0;
-
+        $distance_x = 0;
         // add the widths of the spanning columns
-        $startColumnIndex = Coordinate::columnIndexFromString($startColumn);
-        $endColumnIndex = Coordinate::columnIndexFromString($endColumn);
-        for ($i = $startColumnIndex; $i <= $endColumnIndex; ++$i) {
-            $distanceX += self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($i));
+        $start_column_index = Coordinate::column_index_from_string($start_column);
+        $end_column_index = Coordinate::column_index_from_string($end_column);
+        for ($i = $start_column_index; $i <= $end_column_index; ++$i) {
+            $distance_x += self::size_col($worksheet, Coordinate::string_from_column_index($i));
         }
-
         // correct for offsetX in startcell
-        $distanceX -= (int) floor(self::sizeCol($worksheet, $startColumn) * $startOffsetX / 1024);
-
+        $distance_x -= (int) floor(self::size_col($worksheet, $start_column) * $start_offset_x / 1024);
         // correct for offsetX in endcell
-        $distanceX -= (int) floor(self::sizeCol($worksheet, $endColumn) * (1 - $endOffsetX / 1024));
-
-        return $distanceX;
+        $distance_x -= (int) floor(self::size_col($worksheet, $end_column) * (1 - $end_offset_x / 1024));
+        return $distance_x;
     }
-
     /**
      * Get the vertical distance in pixels between two anchors
      * The distanceY is found as sum of all the spanning rows minus two offsets.
@@ -134,24 +118,19 @@ class Xls
      *
      * @return int Vertical distance measured in pixels
      */
-    public static function getDistanceY(Worksheet $worksheet, int $startRow = 1, float|int $startOffsetY = 0, int $endRow = 1, float|int $endOffsetY = 0): int
+    public static function get_distance_y(Worksheet $worksheet, int $start_row = 1, float|int $start_offset_y = 0, int $end_row = 1, float|int $end_offset_y = 0): int
     {
-        $distanceY = 0;
-
+        $distance_y = 0;
         // add the widths of the spanning rows
-        for ($row = $startRow; $row <= $endRow; ++$row) {
-            $distanceY += self::sizeRow($worksheet, $row);
+        for ($row = $start_row; $row <= $end_row; ++$row) {
+            $distance_y += self::size_row($worksheet, $row);
         }
-
         // correct for offsetX in startcell
-        $distanceY -= (int) floor(self::sizeRow($worksheet, $startRow) * $startOffsetY / 256);
-
+        $distance_y -= (int) floor(self::size_row($worksheet, $start_row) * $start_offset_y / 256);
         // correct for offsetX in endcell
-        $distanceY -= (int) floor(self::sizeRow($worksheet, $endRow) * (1 - $endOffsetY / 256));
-
-        return $distanceY;
+        $distance_y -= (int) floor(self::size_row($worksheet, $end_row) * (1 - $end_offset_y / 256));
+        return $distance_y;
     }
-
     /**
      * Convert 1-cell anchor coordinates to 2-cell anchor coordinates
      * This function is ported from PEAR Spreadsheet_Writer_Excel with small modifications.
@@ -204,68 +183,50 @@ class Xls
      *
      * @return ?array{startCoordinates: string, startOffsetX: float|int, startOffsetY: float|int, endCoordinates: string, endOffsetX: float|int, endOffsetY: float|int}
      */
-    public static function oneAnchor2twoAnchor(Worksheet $worksheet, string $coordinates, int $offsetX, int $offsetY, int $width, int $height): ?array
+    public static function one_anchor2two_anchor(Worksheet $worksheet, string $coordinates, int $offset_x, int $offset_y, int $width, int $height): ?array
     {
-        [$col_start, $row] = Coordinate::indexesFromString($coordinates);
+        [$col_start, $row] = Coordinate::indexes_from_string($coordinates);
         $row_start = $row - 1;
-
-        $x1 = $offsetX;
-        $y1 = $offsetY;
-
+        $x1 = $offset_x;
+        $y1 = $offset_y;
         // Initialise end cell to the same as the start cell
-        $col_end = $col_start; // Col containing lower right corner of object
-        $row_end = $row_start; // Row containing bottom right corner of object
-
+        $col_end = $col_start;
+        // Col containing lower right corner of object
+        $row_end = $row_start;
+        // Row containing bottom right corner of object
         // Zero the specified offset if greater than the cell dimensions
-        if ($x1 >= self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_start))) {
+        if ($x1 >= self::size_col($worksheet, Coordinate::string_from_column_index($col_start))) {
             $x1 = 0;
         }
-        if ($y1 >= self::sizeRow($worksheet, $row_start + 1)) {
+        if ($y1 >= self::size_row($worksheet, $row_start + 1)) {
             $y1 = 0;
         }
-
         $width = $width + $x1 - 1;
         $height = $height + $y1 - 1;
-
         // Subtract the underlying cell widths to find the end cell of the image
-        while ($width >= self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_end))) {
-            $width -= self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_end));
+        while ($width >= self::size_col($worksheet, Coordinate::string_from_column_index($col_end))) {
+            $width -= self::size_col($worksheet, Coordinate::string_from_column_index($col_end));
             ++$col_end;
         }
-
         // Subtract the underlying cell heights to find the end cell of the image
-        while ($height >= self::sizeRow($worksheet, $row_end + 1)) {
-            $height -= self::sizeRow($worksheet, $row_end + 1);
+        while ($height >= self::size_row($worksheet, $row_end + 1)) {
+            $height -= self::size_row($worksheet, $row_end + 1);
             ++$row_end;
         }
-
         // Bitmap isn't allowed to start or finish in a hidden cell, i.e. a cell
         // with zero height or width.
-        if (
-            self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_start)) == 0
-            || self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_end)) == 0
-            || self::sizeRow($worksheet, $row_start + 1) == 0
-            || self::sizeRow($worksheet, $row_end + 1) == 0
-        ) {
+        if (self::size_col($worksheet, Coordinate::string_from_column_index($col_start)) == 0 || self::size_col($worksheet, Coordinate::string_from_column_index($col_end)) == 0 || self::size_row($worksheet, $row_start + 1) == 0 || self::size_row($worksheet, $row_end + 1) == 0) {
             return null;
         }
-
         // Convert the pixel values to the percentage value expected by Excel
-        $x1 = $x1 / self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_start)) * 1024;
-        $y1 = $y1 / self::sizeRow($worksheet, $row_start + 1) * 256;
-        $x2 = ($width + 1) / self::sizeCol($worksheet, Coordinate::stringFromColumnIndex($col_end)) * 1024; // Distance to right side of object
-        $y2 = ($height + 1) / self::sizeRow($worksheet, $row_end + 1) * 256; // Distance to bottom of object
-
-        $startCoordinates = Coordinate::stringFromColumnIndex($col_start) . ($row_start + 1);
-        $endCoordinates = Coordinate::stringFromColumnIndex($col_end) . ($row_end + 1);
-
-        return [
-            'startCoordinates' => $startCoordinates,
-            'startOffsetX' => $x1,
-            'startOffsetY' => $y1,
-            'endCoordinates' => $endCoordinates,
-            'endOffsetX' => $x2,
-            'endOffsetY' => $y2,
-        ];
+        $x1 = $x1 / self::size_col($worksheet, Coordinate::string_from_column_index($col_start)) * 1024;
+        $y1 = $y1 / self::size_row($worksheet, $row_start + 1) * 256;
+        $x2 = ($width + 1) / self::size_col($worksheet, Coordinate::string_from_column_index($col_end)) * 1024;
+        // Distance to right side of object
+        $y2 = ($height + 1) / self::size_row($worksheet, $row_end + 1) * 256;
+        // Distance to bottom of object
+        $start_coordinates = Coordinate::string_from_column_index($col_start) . ($row_start + 1);
+        $end_coordinates = Coordinate::string_from_column_index($col_end) . ($row_end + 1);
+        return ['startCoordinates' => $start_coordinates, 'startOffsetX' => $x1, 'startOffsetY' => $y1, 'endCoordinates' => $end_coordinates, 'endOffsetX' => $x2, 'endOffsetY' => $y2];
     }
 }

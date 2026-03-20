@@ -1,111 +1,83 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Document;
 
-namespace PhpOffice\PhpSpreadsheet\Document;
-
-use PhpOffice\PhpSpreadsheet\Shared\PasswordHasher;
-
+use Php_Office\Php_Spreadsheet\Shared\Password_Hasher;
 class Security
 {
     /**
      * LockRevision.
      */
-    private bool $lockRevision = false;
-
+    private bool $lock_revision = false;
     /**
      * LockStructure.
      */
-    private bool $lockStructure = false;
-
+    private bool $lock_structure = false;
     /**
      * LockWindows.
      */
-    private bool $lockWindows = false;
-
+    private bool $lock_windows = false;
     /**
      * RevisionsPassword.
      */
-    private string $revisionsPassword = '';
-
+    private string $revisions_password = '';
     /**
      * WorkbookPassword.
      */
-    private string $workbookPassword = '';
-
-    private string $workbookAlgorithmName = '';
-
-    private string $workbookHashValue = '';
-
-    private string $workbookSaltValue = '';
-
-    private int $workbookSpinCount = 0;
-
-    private string $revisionsAlgorithmName = '';
-
-    private string $revisionsHashValue = '';
-
-    private string $revisionsSaltValue = '';
-
-    private int $revisionsSpinCount = 0;
-
+    private string $workbook_password = '';
+    private string $workbook_algorithm_name = '';
+    private string $workbook_hash_value = '';
+    private string $workbook_salt_value = '';
+    private int $workbook_spin_count = 0;
+    private string $revisions_algorithm_name = '';
+    private string $revisions_hash_value = '';
+    private string $revisions_salt_value = '';
+    private int $revisions_spin_count = 0;
     /**
      * Is some sort of document security enabled?
      */
-    public function isSecurityEnabled(): bool
+    public function is_security_enabled(): bool
     {
-        return $this->lockRevision
-                || $this->lockStructure
-                || $this->lockWindows;
+        return $this->lock_revision || $this->lock_structure || $this->lock_windows;
     }
-
-    public function getLockRevision(): bool
+    public function get_lock_revision(): bool
     {
-        return $this->lockRevision;
+        return $this->lock_revision;
     }
-
-    public function setLockRevision(?bool $locked): self
+    public function set_lock_revision(?bool $locked): self
     {
         if ($locked !== null) {
-            $this->lockRevision = $locked;
+            $this->lock_revision = $locked;
         }
-
         return $this;
     }
-
-    public function getLockStructure(): bool
+    public function get_lock_structure(): bool
     {
-        return $this->lockStructure;
+        return $this->lock_structure;
     }
-
-    public function setLockStructure(?bool $locked): self
+    public function set_lock_structure(?bool $locked): self
     {
         if ($locked !== null) {
-            $this->lockStructure = $locked;
+            $this->lock_structure = $locked;
         }
-
         return $this;
     }
-
-    public function getLockWindows(): bool
+    public function get_lock_windows(): bool
     {
-        return $this->lockWindows;
+        return $this->lock_windows;
     }
-
-    public function setLockWindows(?bool $locked): self
+    public function set_lock_windows(?bool $locked): self
     {
         if ($locked !== null) {
-            $this->lockWindows = $locked;
+            $this->lock_windows = $locked;
         }
-
         return $this;
     }
-
-    public function getRevisionsPassword(): string
+    public function get_revisions_password(): string
     {
-        return $this->revisionsPassword;
+        return $this->revisions_password;
     }
-
     /**
      * Set RevisionsPassword.
      *
@@ -113,31 +85,28 @@ class Security
      *
      * @return $this
      */
-    public function setRevisionsPassword(?string $password, bool $alreadyHashed = false): static
+    public function set_revisions_password(?string $password, bool $already_hashed = false): static
     {
         if ($password !== null) {
-            if ($this->advancedRevisionsPassword()) {
-                if (!$alreadyHashed) {
-                    $password = PasswordHasher::hashPassword($password, $this->revisionsAlgorithmName, $this->revisionsSaltValue, $this->revisionsSpinCount);
+            if ($this->advanced_revisions_password()) {
+                if (!$already_hashed) {
+                    $password = Password_Hasher::hash_password($password, $this->revisions_algorithm_name, $this->revisions_salt_value, $this->revisions_spin_count);
                 }
-                $this->revisionsHashValue = $password;
-                $this->revisionsPassword = '';
+                $this->revisions_hash_value = $password;
+                $this->revisions_password = '';
             } else {
-                if (!$alreadyHashed) {
-                    $password = PasswordHasher::hashPassword($password);
+                if (!$already_hashed) {
+                    $password = Password_Hasher::hash_password($password);
                 }
-                $this->revisionsPassword = $password;
+                $this->revisions_password = $password;
             }
         }
-
         return $this;
     }
-
-    public function getWorkbookPassword(): string
+    public function get_workbook_password(): string
     {
-        return $this->workbookPassword;
+        return $this->workbook_password;
     }
-
     /**
      * Set WorkbookPassword.
      *
@@ -145,115 +114,92 @@ class Security
      *
      * @return $this
      */
-    public function setWorkbookPassword(?string $password, bool $alreadyHashed = false): static
+    public function set_workbook_password(?string $password, bool $already_hashed = false): static
     {
         if ($password !== null) {
-            if ($this->advancedPassword()) {
-                if (!$alreadyHashed) {
-                    $password = PasswordHasher::hashPassword($password, $this->workbookAlgorithmName, $this->workbookSaltValue, $this->workbookSpinCount);
+            if ($this->advanced_password()) {
+                if (!$already_hashed) {
+                    $password = Password_Hasher::hash_password($password, $this->workbook_algorithm_name, $this->workbook_salt_value, $this->workbook_spin_count);
                 }
-                $this->workbookHashValue = $password;
-                $this->workbookPassword = '';
+                $this->workbook_hash_value = $password;
+                $this->workbook_password = '';
             } else {
-                if (!$alreadyHashed) {
-                    $password = PasswordHasher::hashPassword($password);
+                if (!$already_hashed) {
+                    $password = Password_Hasher::hash_password($password);
                 }
-                $this->workbookPassword = $password;
+                $this->workbook_password = $password;
             }
         }
-
         return $this;
     }
-
-    public function getWorkbookHashValue(): string
+    public function get_workbook_hash_value(): string
     {
-        return $this->advancedPassword() ? $this->workbookHashValue : '';
+        return $this->advanced_password() ? $this->workbook_hash_value : '';
     }
-
-    public function advancedPassword(): bool
+    public function advanced_password(): bool
     {
-        return $this->workbookAlgorithmName !== '' && $this->workbookSaltValue !== '' && $this->workbookSpinCount > 0;
+        return $this->workbook_algorithm_name !== '' && $this->workbook_salt_value !== '' && $this->workbook_spin_count > 0;
     }
-
-    public function getWorkbookAlgorithmName(): string
+    public function get_workbook_algorithm_name(): string
     {
-        return $this->workbookAlgorithmName;
+        return $this->workbook_algorithm_name;
     }
-
-    public function setWorkbookAlgorithmName(string $workbookAlgorithmName): static
+    public function set_workbook_algorithm_name(string $workbook_algorithm_name): static
     {
-        $this->workbookAlgorithmName = $workbookAlgorithmName;
-
+        $this->workbook_algorithm_name = $workbook_algorithm_name;
         return $this;
     }
-
-    public function getWorkbookSpinCount(): int
+    public function get_workbook_spin_count(): int
     {
-        return $this->workbookSpinCount;
+        return $this->workbook_spin_count;
     }
-
-    public function setWorkbookSpinCount(int $workbookSpinCount): static
+    public function set_workbook_spin_count(int $workbook_spin_count): static
     {
-        $this->workbookSpinCount = $workbookSpinCount;
-
+        $this->workbook_spin_count = $workbook_spin_count;
         return $this;
     }
-
-    public function getWorkbookSaltValue(): string
+    public function get_workbook_salt_value(): string
     {
-        return $this->workbookSaltValue;
+        return $this->workbook_salt_value;
     }
-
-    public function setWorkbookSaltValue(string $workbookSaltValue, bool $base64Required): static
+    public function set_workbook_salt_value(string $workbook_salt_value, bool $base64Required): static
     {
-        $this->workbookSaltValue = $base64Required ? base64_encode($workbookSaltValue) : $workbookSaltValue;
-
+        $this->workbook_salt_value = $base64Required ? base64_encode($workbook_salt_value) : $workbook_salt_value;
         return $this;
     }
-
-    public function getRevisionsHashValue(): string
+    public function get_revisions_hash_value(): string
     {
-        return $this->advancedRevisionsPassword() ? $this->revisionsHashValue : '';
+        return $this->advanced_revisions_password() ? $this->revisions_hash_value : '';
     }
-
-    public function advancedRevisionsPassword(): bool
+    public function advanced_revisions_password(): bool
     {
-        return $this->revisionsAlgorithmName !== '' && $this->revisionsSaltValue !== '' && $this->revisionsSpinCount > 0;
+        return $this->revisions_algorithm_name !== '' && $this->revisions_salt_value !== '' && $this->revisions_spin_count > 0;
     }
-
-    public function getRevisionsAlgorithmName(): string
+    public function get_revisions_algorithm_name(): string
     {
-        return $this->revisionsAlgorithmName;
+        return $this->revisions_algorithm_name;
     }
-
-    public function setRevisionsAlgorithmName(string $revisionsAlgorithmName): static
+    public function set_revisions_algorithm_name(string $revisions_algorithm_name): static
     {
-        $this->revisionsAlgorithmName = $revisionsAlgorithmName;
-
+        $this->revisions_algorithm_name = $revisions_algorithm_name;
         return $this;
     }
-
-    public function getRevisionsSpinCount(): int
+    public function get_revisions_spin_count(): int
     {
-        return $this->revisionsSpinCount;
+        return $this->revisions_spin_count;
     }
-
-    public function setRevisionsSpinCount(int $revisionsSpinCount): static
+    public function set_revisions_spin_count(int $revisions_spin_count): static
     {
-        $this->revisionsSpinCount = $revisionsSpinCount;
-
+        $this->revisions_spin_count = $revisions_spin_count;
         return $this;
     }
-
-    public function getRevisionsSaltValue(): string
+    public function get_revisions_salt_value(): string
     {
-        return $this->revisionsSaltValue;
+        return $this->revisions_salt_value;
     }
-
-    public function setRevisionsSaltValue(string $revisionsSaltValue, bool $base64Required): static
+    public function set_revisions_salt_value(string $revisions_salt_value, bool $base64Required): static
     {
-        $this->revisionsSaltValue = $base64Required ? base64_encode($revisionsSaltValue) : $revisionsSaltValue;
-
+        $this->revisions_salt_value = $base64Required ? base64_encode($revisions_salt_value) : $revisions_salt_value;
         return $this;
     }
 }

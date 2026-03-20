@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-use PhpOffice\PhpSpreadsheet\Shared\IntOrFloat;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
+use Php_Office\Php_Spreadsheet\Shared\Int_Or_Float;
 class Permutations
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * PERMUT.
      *
@@ -32,37 +29,33 @@ class Permutations
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function PERMUT(mixed $numObjs, mixed $numInSet): array|string|float|int
+    public static function PERMUT(mixed $num_objs, mixed $num_in_set): array|string|float|int
     {
-        if (is_array($numObjs) || is_array($numInSet)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $numObjs, $numInSet);
+        if (is_array($num_objs) || is_array($num_in_set)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $num_objs, $num_in_set);
         }
-
         try {
-            $numObjs = StatisticalValidations::validateInt($numObjs);
-            $numInSet = StatisticalValidations::validateInt($numInSet);
+            $num_objs = Statistical_Validations::validate_int($num_objs);
+            $num_in_set = Statistical_Validations::validate_int($num_in_set);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($numObjs < $numInSet) {
-            return ExcelError::NAN();
+        if ($num_objs < $num_in_set) {
+            return Excel_Error::NAN();
         }
         /** @var float|int|string */
-        $result1 = MathTrig\Factorial::fact($numObjs);
+        $result1 = Math_Trig\Factorial::fact($num_objs);
         if (is_string($result1)) {
             return $result1;
         }
         /** @var float|int|string */
-        $result2 = MathTrig\Factorial::fact($numObjs - $numInSet);
+        $result2 = Math_Trig\Factorial::fact($num_objs - $num_in_set);
         if (is_string($result2)) {
             return $result2;
         }
         $result = round($result1 / $result2);
-
-        return IntOrFloat::evaluate($result);
+        return Int_Or_Float::evaluate($result);
     }
-
     /**
      * PERMUTATIONA.
      *
@@ -78,25 +71,21 @@ class Permutations
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function PERMUTATIONA(mixed $numObjs, mixed $numInSet): array|string|float|int
+    public static function PERMUTATIONA(mixed $num_objs, mixed $num_in_set): array|string|float|int
     {
-        if (is_array($numObjs) || is_array($numInSet)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $numObjs, $numInSet);
+        if (is_array($num_objs) || is_array($num_in_set)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $num_objs, $num_in_set);
         }
-
         try {
-            $numObjs = StatisticalValidations::validateInt($numObjs);
-            $numInSet = StatisticalValidations::validateInt($numInSet);
+            $num_objs = Statistical_Validations::validate_int($num_objs);
+            $num_in_set = Statistical_Validations::validate_int($num_in_set);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($numObjs < 0 || $numInSet < 0) {
-            return ExcelError::NAN();
+        if ($num_objs < 0 || $num_in_set < 0) {
+            return Excel_Error::NAN();
         }
-
-        $result = $numObjs ** $numInSet;
-
-        return IntOrFloat::evaluate($result);
+        $result = $num_objs ** $num_in_set;
+        return Int_Or_Float::evaluate($result);
     }
 }

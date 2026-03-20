@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class LogNormal
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Log_Normal
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * LOGNORMDIST.
      *
@@ -29,27 +26,23 @@ class LogNormal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function cumulative(mixed $value, mixed $mean, mixed $stdDev)
+    public static function cumulative(mixed $value, mixed $mean, mixed $std_dev)
     {
-        if (is_array($value) || is_array($mean) || is_array($stdDev)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $mean, $stdDev);
+        if (is_array($value) || is_array($mean) || is_array($std_dev)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $mean, $std_dev);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
-            $mean = DistributionValidations::validateFloat($mean);
-            $stdDev = DistributionValidations::validateFloat($stdDev);
+            $value = Distribution_Validations::validate_float($value);
+            $mean = Distribution_Validations::validate_float($mean);
+            $std_dev = Distribution_Validations::validate_float($std_dev);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($value <= 0) || ($stdDev <= 0)) {
-            return ExcelError::NAN();
+        if ($value <= 0 || $std_dev <= 0) {
+            return Excel_Error::NAN();
         }
-
-        return StandardNormal::cumulative((log($value) - $mean) / $stdDev);
+        return Standard_Normal::cumulative((log($value) - $mean) / $std_dev);
     }
-
     /**
      * LOGNORM.DIST.
      *
@@ -69,33 +62,27 @@ class LogNormal
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function distribution(mixed $value, mixed $mean, mixed $stdDev, mixed $cumulative = false)
+    public static function distribution(mixed $value, mixed $mean, mixed $std_dev, mixed $cumulative = false)
     {
-        if (is_array($value) || is_array($mean) || is_array($stdDev) || is_array($cumulative)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $mean, $stdDev, $cumulative);
+        if (is_array($value) || is_array($mean) || is_array($std_dev) || is_array($cumulative)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $mean, $std_dev, $cumulative);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
-            $mean = DistributionValidations::validateFloat($mean);
-            $stdDev = DistributionValidations::validateFloat($stdDev);
-            $cumulative = DistributionValidations::validateBool($cumulative);
+            $value = Distribution_Validations::validate_float($value);
+            $mean = Distribution_Validations::validate_float($mean);
+            $std_dev = Distribution_Validations::validate_float($std_dev);
+            $cumulative = Distribution_Validations::validate_bool($cumulative);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($value <= 0) || ($stdDev <= 0)) {
-            return ExcelError::NAN();
+        if ($value <= 0 || $std_dev <= 0) {
+            return Excel_Error::NAN();
         }
-
         if ($cumulative === true) {
-            return StandardNormal::distribution((log($value) - $mean) / $stdDev, true);
+            return Standard_Normal::distribution((log($value) - $mean) / $std_dev, true);
         }
-
-        return (1 / (sqrt(2 * M_PI) * $stdDev * $value))
-            * exp(-((log($value) - $mean) ** 2 / (2 * $stdDev ** 2)));
+        return 1 / (sqrt(2 * M_PI) * $std_dev * $value) * exp(-((log($value) - $mean) ** 2 / (2 * $std_dev ** 2)));
     }
-
     /**
      * LOGINV.
      *
@@ -116,26 +103,23 @@ class LogNormal
      *            accuracy if I can get my head round the mathematics
      *            (as described at) http://home.online.no/~pjacklam/notes/invnorm/
      */
-    public static function inverse(mixed $probability, mixed $mean, mixed $stdDev): array|string|float
+    public static function inverse(mixed $probability, mixed $mean, mixed $std_dev): array|string|float
     {
-        if (is_array($probability) || is_array($mean) || is_array($stdDev)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $probability, $mean, $stdDev);
+        if (is_array($probability) || is_array($mean) || is_array($std_dev)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $probability, $mean, $std_dev);
         }
-
         try {
-            $probability = DistributionValidations::validateProbability($probability);
-            $mean = DistributionValidations::validateFloat($mean);
-            $stdDev = DistributionValidations::validateFloat($stdDev);
+            $probability = Distribution_Validations::validate_probability($probability);
+            $mean = Distribution_Validations::validate_float($mean);
+            $std_dev = Distribution_Validations::validate_float($std_dev);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ($stdDev <= 0) {
-            return ExcelError::NAN();
+        if ($std_dev <= 0) {
+            return Excel_Error::NAN();
         }
         /** @var float $inverse */
-        $inverse = StandardNormal::inverse($probability);
-
-        return exp($mean + $stdDev * $inverse);
+        $inverse = Standard_Normal::inverse($probability);
+        return exp($mean + $std_dev * $inverse);
     }
 }

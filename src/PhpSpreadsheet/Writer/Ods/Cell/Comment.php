@@ -1,47 +1,43 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Ods\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Ods\Cell;
-
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
 /**
  * @author     Alexander Pervakov <frost-nzcr4@jagmort.com>
  */
 class Comment
 {
-    public static function write(XMLWriter $objWriter, Cell $cell): void
+    public static function write(Xml_Writer $obj_writer, Cell $cell): void
     {
-        $comments = $cell->getWorksheet()->getComments();
-        if (!isset($comments[$cell->getCoordinate()])) {
+        $comments = $cell->get_worksheet()->get_comments();
+        if (!isset($comments[$cell->get_coordinate()])) {
             return;
         }
-        $comment = $comments[$cell->getCoordinate()];
-
-        $objWriter->startElement('office:annotation');
-        $objWriter->writeAttribute('svg:width', $comment->getWidth());
-        $objWriter->writeAttribute('svg:height', $comment->getHeight());
-        $objWriter->writeAttribute('svg:x', $comment->getMarginLeft());
-        $objWriter->writeAttribute('svg:y', $comment->getMarginTop());
-        $objWriter->writeElement('dc:creator', $comment->getAuthor());
-
-        $objWriter->startElement('text:p');
-        $text = $comment->getText()->getPlainText();
-        $textElements = explode("\n", $text);
-        $newLineOwed = false;
-        foreach ($textElements as $textSegment) {
-            if ($newLineOwed) {
-                $objWriter->writeElement('text:line-break');
+        $comment = $comments[$cell->get_coordinate()];
+        $obj_writer->start_element('office:annotation');
+        $obj_writer->write_attribute('svg:width', $comment->get_width());
+        $obj_writer->write_attribute('svg:height', $comment->get_height());
+        $obj_writer->write_attribute('svg:x', $comment->get_margin_left());
+        $obj_writer->write_attribute('svg:y', $comment->get_margin_top());
+        $obj_writer->write_element('dc:creator', $comment->get_author());
+        $obj_writer->start_element('text:p');
+        $text = $comment->get_text()->get_plain_text();
+        $text_elements = explode("\n", $text);
+        $new_line_owed = false;
+        foreach ($text_elements as $text_segment) {
+            if ($new_line_owed) {
+                $obj_writer->write_element('text:line-break');
             }
-            $newLineOwed = true;
-            if ($textSegment !== '') {
-                $objWriter->writeElement('text:span', $textSegment);
+            $new_line_owed = true;
+            if ($text_segment !== '') {
+                $obj_writer->write_element('text:span', $text_segment);
             }
         }
-        $objWriter->endElement(); // text:p
-
-        $objWriter->endElement();
+        $obj_writer->end_element();
+        // text:p
+        $obj_writer->end_element();
     }
 }

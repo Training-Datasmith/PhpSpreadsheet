@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDateHelper;
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDateHelper;
 use Throwable;
-
-class TimeParts
+class Time_Parts
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * HOUROFDAY.
      *
@@ -31,35 +28,31 @@ class TimeParts
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function hour(mixed $timeValue): array|string|int
+    public static function hour(mixed $time_value): array|string|int
     {
-        if (is_array($timeValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $timeValue);
+        if (is_array($time_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $time_value);
         }
-
         try {
-            Helpers::nullFalseTrueToNumber($timeValue);
-            if (is_string($timeValue) && !is_numeric($timeValue)) {
-                $timeValue = Helpers::getTimeValue($timeValue);
+            Helpers::null_false_true_to_number($time_value);
+            if (is_string($time_value) && !is_numeric($time_value)) {
+                $time_value = Helpers::get_time_value($time_value);
             }
-            Helpers::validateNotNegative($timeValue);
+            Helpers::validate_not_negative($time_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
         try {
-            SharedDateHelper::excelToDateTimeObject($timeValue);
+            Shared_Date_Helper::excel_to_date_time_object($time_value);
         } catch (Throwable) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-        $timeValue = fmod($timeValue, 1);
-        $timeValue = SharedDateHelper::excelToDateTimeObject($timeValue);
-        SharedDateHelper::roundMicroseconds($timeValue);
-
-        return (int) $timeValue->format('H');
+        $time_value = fmod($time_value, 1);
+        $time_value = Shared_Date_Helper::excel_to_date_time_object($time_value);
+        Shared_Date_Helper::round_microseconds($time_value);
+        return (int) $time_value->format('H');
     }
-
     /**
      * MINUTE.
      *
@@ -77,35 +70,31 @@ class TimeParts
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function minute(mixed $timeValue): array|string|int
+    public static function minute(mixed $time_value): array|string|int
     {
-        if (is_array($timeValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $timeValue);
+        if (is_array($time_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $time_value);
         }
-
         try {
-            Helpers::nullFalseTrueToNumber($timeValue);
-            if (is_string($timeValue) && !is_numeric($timeValue)) {
-                $timeValue = Helpers::getTimeValue($timeValue);
+            Helpers::null_false_true_to_number($time_value);
+            if (is_string($time_value) && !is_numeric($time_value)) {
+                $time_value = Helpers::get_time_value($time_value);
             }
-            Helpers::validateNotNegative($timeValue);
+            Helpers::validate_not_negative($time_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
         try {
-            SharedDateHelper::excelToDateTimeObject($timeValue);
+            Shared_Date_Helper::excel_to_date_time_object($time_value);
         } catch (Throwable) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-        $timeValue = fmod($timeValue, 1);
-        $timeValue = SharedDateHelper::excelToDateTimeObject($timeValue);
-        SharedDateHelper::roundMicroseconds($timeValue);
-
-        return (int) $timeValue->format('i');
+        $time_value = fmod($time_value, 1);
+        $time_value = Shared_Date_Helper::excel_to_date_time_object($time_value);
+        Shared_Date_Helper::round_microseconds($time_value);
+        return (int) $time_value->format('i');
     }
-
     /**
      * SECOND.
      *
@@ -123,32 +112,29 @@ class TimeParts
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function second(mixed $timeValue): array|string|int
+    public static function second(mixed $time_value): array|string|int
     {
-        if (is_array($timeValue)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $timeValue);
+        if (is_array($time_value)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $time_value);
         }
-
         try {
-            Helpers::nullFalseTrueToNumber($timeValue);
-            if (is_string($timeValue) && !is_numeric($timeValue)) {
-                $timeValue = Helpers::getTimeValue($timeValue);
+            Helpers::null_false_true_to_number($time_value);
+            if (is_string($time_value) && !is_numeric($time_value)) {
+                $time_value = Helpers::get_time_value($time_value);
             }
-            Helpers::validateNotNegative($timeValue);
+            Helpers::validate_not_negative($time_value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
         try {
-            SharedDateHelper::excelToDateTimeObject($timeValue);
+            Shared_Date_Helper::excel_to_date_time_object($time_value);
         } catch (Throwable) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-        $timeValue = fmod($timeValue, 1);
-        $timeValue = SharedDateHelper::excelToDateTimeObject($timeValue);
-        SharedDateHelper::roundMicroseconds($timeValue);
-
-        return (int) $timeValue->format('s');
+        $time_value = fmod($time_value, 1);
+        $time_value = Shared_Date_Helper::excel_to_date_time_object($time_value);
+        Shared_Date_Helper::round_microseconds($time_value);
+        return (int) $time_value->format('s');
     }
 }

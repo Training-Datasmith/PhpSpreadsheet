@@ -1,26 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xls;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xls;
-
-class ErrorCode
+class Error_Code
 {
     /**
      * @var array<string, int>
      */
-    protected static array $errorCodeMap = [
-        '#NULL!' => 0x00,
-        '#DIV/0!' => 0x07,
-        '#VALUE!' => 0x0F,
-        '#REF!' => 0x17,
-        '#NAME?' => 0x1D,
-        '#NUM!' => 0x24,
-        '#N/A' => 0x2A,
-    ];
-
-    public static function error(string $errorCode): int
+    protected static array $error_code_map = ['#NULL!' => 0x0, '#DIV/0!' => 0x7, '#VALUE!' => 0xf, '#REF!' => 0x17, '#NAME?' => 0x1d, '#NUM!' => 0x24, '#N/A' => 0x2a];
+    public static function error(string $error_code): int
     {
-        return self::$errorCodeMap[$errorCode] ?? 0;
+        return self::$error_code_map[$error_code] ?? 0;
     }
 }

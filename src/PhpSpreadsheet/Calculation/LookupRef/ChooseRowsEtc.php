@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ChooseRowsEtc
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Choose_Rows_Etc
 {
     /**
      * Transpose 2-dimensional array.
@@ -20,15 +18,14 @@ class ChooseRowsEtc
      */
     public static function transpose(array $array): array
     {
-        return empty($array) ? [] : (array_map((count($array) === 1) ? (fn ($x): array => [$x]) : null, ...$array)); // @phpstan-ignore-line
+        return empty($array) ? [] : array_map(count($array) === 1 ? fn($x): array => [$x] : null, ...$array);
+        // @phpstan-ignore-line
     }
-
     /** @return mixed[] */
-    private static function arrayValues(mixed $array): array
+    private static function array_values(mixed $array): array
     {
         return is_array($array) ? array_values($array) : [$array];
     }
-
     /**
      * CHOOSECOLS.
      *
@@ -36,16 +33,14 @@ class ChooseRowsEtc
      *
      * @return mixed[]|string
      */
-    public static function chooseCols(mixed $input, mixed ...$args): array|string
+    public static function choose_cols(mixed $input, mixed ...$args): array|string
     {
         if (!is_array($input)) {
             $input = [[$input]];
         }
-        $retval = self::chooseRows(self::transpose($input), ...$args);
-
+        $retval = self::choose_rows(self::transpose($input), ...$args);
         return is_array($retval) ? self::transpose($retval) : $retval;
     }
-
     /**
      * CHOOSEROWS.
      *
@@ -53,54 +48,53 @@ class ChooseRowsEtc
      *
      * @return mixed[]|string
      */
-    public static function chooseRows(mixed $input, mixed ...$args): array|string
+    public static function choose_rows(mixed $input, mixed ...$args): array|string
     {
         if (!is_array($input)) {
             $input = [[$input]];
         }
-        $inputArray = [[]]; // no row 0
-        $numRows = 0;
-        foreach ($input as $inputRow) {
-            $inputArray[] = self::arrayValues($inputRow);
-            ++$numRows;
+        $input_array = [[]];
+        // no row 0
+        $num_rows = 0;
+        foreach ($input as $input_row) {
+            $input_array[] = self::array_values($input_row);
+            ++$num_rows;
         }
-        $outputArray = [];
-        foreach (Functions::flattenArray2(...$args) as $arg) {
+        $output_array = [];
+        foreach (Functions::flatten_array2(...$args) as $arg) {
             if (!is_numeric($arg)) {
-                return ExcelError::VALUE();
+                return Excel_Error::VALUE();
             }
             $index = (int) $arg;
             if ($index < 0) {
-                $index += $numRows + 1;
+                $index += $num_rows + 1;
             }
-            if ($index <= 0 || $index > $numRows) {
-                return ExcelError::VALUE();
+            if ($index <= 0 || $index > $num_rows) {
+                return Excel_Error::VALUE();
             }
-            $outputArray[] = $inputArray[$index];
+            $output_array[] = $input_array[$index];
         }
-
-        return $outputArray;
+        return $output_array;
     }
-
     /**
      * @param mixed[] $array
      *
      * @return mixed[]|string
      */
-    private static function dropRows(array $array, mixed $offset): array|string
+    private static function drop_rows(array $array, mixed $offset): array|string
     {
         if ($offset === null) {
             return $array;
         }
         if (!is_numeric($offset)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         $offset = (int) $offset;
         $count = count($array);
         if (abs($offset) >= $count) {
             // In theory, this should be #CALC!, but Excel treats
             // #CALC! as corrupt, and it's not worth figuring out why
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         if ($offset === 0) {
             return $array;
@@ -108,10 +102,8 @@ class ChooseRowsEtc
         if ($offset > 0) {
             return array_slice($array, $offset);
         }
-
         return array_slice($array, 0, $count + $offset);
     }
-
     /**
      * DROP.
      *
@@ -124,40 +116,39 @@ class ChooseRowsEtc
         if (!is_array($input)) {
             $input = [[$input]];
         }
-        $inputArray = []; // no row 0
-        foreach ($input as $inputRow) {
-            $inputArray[] = self::arrayValues($inputRow);
+        $input_array = [];
+        // no row 0
+        foreach ($input as $input_row) {
+            $input_array[] = self::array_values($input_row);
         }
-        $outputArray1 = self::dropRows($inputArray, $rows);
-        if (is_string($outputArray1)) {
-            return $outputArray1;
+        $output_array1 = self::drop_rows($input_array, $rows);
+        if (is_string($output_array1)) {
+            return $output_array1;
         }
-        $outputArray2 = self::transpose($outputArray1);
-        $outputArray3 = self::dropRows($outputArray2, $columns);
-        if (is_string($outputArray3)) {
-            return $outputArray3;
+        $output_array2 = self::transpose($output_array1);
+        $output_array3 = self::drop_rows($output_array2, $columns);
+        if (is_string($output_array3)) {
+            return $output_array3;
         }
-
-        return self::transpose($outputArray3);
+        return self::transpose($output_array3);
     }
-
     /**
      * @param mixed[] $array
      *
      * @return mixed[]|string
      */
-    private static function takeRows(array $array, mixed $offset): array|string
+    private static function take_rows(array $array, mixed $offset): array|string
     {
         if ($offset === null) {
             return $array;
         }
         if (!is_numeric($offset)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         $offset = (int) $offset;
         if ($offset === 0) {
             // should be #CALC! - see above
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         $count = count($array);
         if (abs($offset) >= $count) {
@@ -166,10 +157,8 @@ class ChooseRowsEtc
         if ($offset > 0) {
             return array_slice($array, 0, $offset);
         }
-
         return array_slice($array, $count + $offset);
     }
-
     /**
      * TAKE.
      *
@@ -185,23 +174,21 @@ class ChooseRowsEtc
         if ($rows === null && $columns === null) {
             return $input;
         }
-        $inputArray = [];
-        foreach ($input as $inputRow) {
-            $inputArray[] = self::arrayValues($inputRow);
+        $input_array = [];
+        foreach ($input as $input_row) {
+            $input_array[] = self::array_values($input_row);
         }
-        $outputArray1 = self::takeRows($inputArray, $rows);
-        if (is_string($outputArray1)) {
-            return $outputArray1;
+        $output_array1 = self::take_rows($input_array, $rows);
+        if (is_string($output_array1)) {
+            return $output_array1;
         }
-        $outputArray2 = self::transpose($outputArray1);
-        $outputArray3 = self::takeRows($outputArray2, $columns);
-        if (is_string($outputArray3)) {
-            return $outputArray3;
+        $output_array2 = self::transpose($output_array1);
+        $output_array3 = self::take_rows($output_array2, $columns);
+        if (is_string($output_array3)) {
+            return $output_array3;
         }
-
-        return self::transpose($outputArray3);
+        return self::transpose($output_array3);
     }
-
     /**
      * EXPAND.
      *
@@ -217,37 +204,36 @@ class ChooseRowsEtc
         if ($rows === null && $columns === null) {
             return $input;
         }
-        $numRows = count($input);
-        $rows ??= $numRows;
+        $num_rows = count($input);
+        $rows ??= $num_rows;
         if (!is_numeric($rows)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         $rows = (int) $rows;
         if ($rows < count($input)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-        $numCols = 0;
-        foreach ($input as $inputRow) {
-            $numCols = max($numCols, is_array($inputRow) ? count($inputRow) : 1);
+        $num_cols = 0;
+        foreach ($input as $input_row) {
+            $num_cols = max($num_cols, is_array($input_row) ? count($input_row) : 1);
         }
-        $columns ??= $numCols;
+        $columns ??= $num_cols;
         if (!is_numeric($columns)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         $columns = (int) $columns;
-        if ($columns < $numCols) {
-            return ExcelError::VALUE();
+        if ($columns < $num_cols) {
+            return Excel_Error::VALUE();
         }
-        $inputArray = [];
-        foreach ($input as $inputRow) {
-            $inputArray[] = array_pad(self::arrayValues($inputRow), $columns, $pad);
+        $input_array = [];
+        foreach ($input as $input_row) {
+            $input_array[] = array_pad(self::array_values($input_row), $columns, $pad);
         }
-        $outputArray = [];
-        $padRow = array_pad([], $columns, $pad);
+        $output_array = [];
+        $pad_row = array_pad([], $columns, $pad);
         for ($count = 0; $count < $rows; ++$count) {
-            $outputArray[] = ($count >= $numRows) ? $padRow : $inputArray[$count];
+            $output_array[] = $count >= $num_rows ? $pad_row : $input_array[$count];
         }
-
-        return $outputArray;
+        return $output_array;
     }
 }

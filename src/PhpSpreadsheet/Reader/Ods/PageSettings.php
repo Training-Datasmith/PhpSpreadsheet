@@ -1,178 +1,137 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Ods;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Ods;
-
-use DOMDocument;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Dom_Document;
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Setup;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 use stdClass;
-
-class PageSettings
+class Page_Settings
 {
-    private string $officeNs = '';
-
-    private string $stylesNs = '';
-
-    private string $stylesFo = '';
-
-    private string $tableNs = '';
-
+    private string $office_ns = '';
+    private string $styles_ns = '';
+    private string $styles_fo = '';
+    private string $table_ns = '';
     /**
      * @var string[]
      */
-    private array $tableStylesCrossReference = [];
-
+    private array $table_styles_cross_reference = [];
     /** @var mixed[] */
-    private array $pageLayoutStyles = [];
-
+    private array $page_layout_styles = [];
     /**
      * @var string[]
      */
-    private array $masterStylesCrossReference = [];
-
+    private array $master_styles_cross_reference = [];
     /**
      * @var string[]
      */
-    private array $masterPrintStylesCrossReference = [];
-
-    public function __construct(DOMDocument $styleDom)
+    private array $master_print_styles_cross_reference = [];
+    public function __construct(Dom_Document $style_dom)
     {
-        $this->setDomNameSpaces($styleDom);
-        $this->readPageSettingStyles($styleDom);
-        $this->readStyleMasterLookup($styleDom);
+        $this->set_dom_name_spaces($style_dom);
+        $this->read_page_setting_styles($style_dom);
+        $this->read_style_master_lookup($style_dom);
     }
-
-    private function setDomNameSpaces(DOMDocument $styleDom): void
+    private function set_dom_name_spaces(Dom_Document $style_dom): void
     {
-        $this->officeNs = (string) $styleDom->lookupNamespaceUri('office');
-        $this->stylesNs = (string) $styleDom->lookupNamespaceUri('style');
-        $this->stylesFo = (string) $styleDom->lookupNamespaceUri('fo');
-        $this->tableNs = (string) $styleDom->lookupNamespaceUri('table');
+        $this->office_ns = (string) $style_dom->lookup_namespace_uri('office');
+        $this->styles_ns = (string) $style_dom->lookup_namespace_uri('style');
+        $this->styles_fo = (string) $style_dom->lookup_namespace_uri('fo');
+        $this->table_ns = (string) $style_dom->lookup_namespace_uri('table');
     }
-
-    private function readPageSettingStyles(DOMDocument $styleDom): void
+    private function read_page_setting_styles(Dom_Document $style_dom): void
     {
-        $item0 = $styleDom->getElementsByTagNameNS($this->officeNs, 'automatic-styles')->item(0);
-        $styles = ($item0 === null) ? [] : $item0->getElementsByTagNameNS($this->stylesNs, 'page-layout');
-
-        foreach ($styles as $styleSet) {
-            $styleName = $styleSet->getAttributeNS($this->stylesNs, 'name');
-            $pageLayoutProperties = $styleSet->getElementsByTagNameNS($this->stylesNs, 'page-layout-properties')->item(0);
-            $styleOrientation = $pageLayoutProperties?->getAttributeNS($this->stylesNs, 'print-orientation');
-            $styleScale = $pageLayoutProperties?->getAttributeNS($this->stylesNs, 'scale-to');
-            $stylePrintOrder = $pageLayoutProperties?->getAttributeNS($this->stylesNs, 'print-page-order');
-            $centered = $pageLayoutProperties?->getAttributeNS($this->stylesNs, 'table-centering');
-
-            $marginLeft = $pageLayoutProperties?->getAttributeNS($this->stylesFo, 'margin-left');
-            $marginRight = $pageLayoutProperties?->getAttributeNS($this->stylesFo, 'margin-right');
-            $marginTop = $pageLayoutProperties?->getAttributeNS($this->stylesFo, 'margin-top');
-            $marginBottom = $pageLayoutProperties?->getAttributeNS($this->stylesFo, 'margin-bottom');
-            $header = $styleSet->getElementsByTagNameNS($this->stylesNs, 'header-style')->item(0);
-            $headerProperties = $header?->getElementsByTagNameNS($this->stylesNs, 'header-footer-properties')?->item(0);
-            $marginHeader = $headerProperties?->getAttributeNS($this->stylesFo, 'min-height');
-            $footer = $styleSet->getElementsByTagNameNS($this->stylesNs, 'footer-style')->item(0);
-            $footerProperties = $footer?->getElementsByTagNameNS($this->stylesNs, 'header-footer-properties')?->item(0);
-            $marginFooter = $footerProperties?->getAttributeNS($this->stylesFo, 'min-height');
-
-            $this->pageLayoutStyles[$styleName] = (object) [
-                'orientation' => $styleOrientation ?: PageSetup::ORIENTATION_DEFAULT,
-                'scale' => $styleScale ?: 100,
-                'printOrder' => $stylePrintOrder,
+        $item0 = $style_dom->get_elements_by_tag_name_ns($this->office_ns, 'automatic-styles')->item(0);
+        $styles = $item0 === null ? [] : $item0->get_elements_by_tag_name_ns($this->styles_ns, 'page-layout');
+        foreach ($styles as $style_set) {
+            $style_name = $style_set->get_attribute_ns($this->styles_ns, 'name');
+            $page_layout_properties = $style_set->get_elements_by_tag_name_ns($this->styles_ns, 'page-layout-properties')->item(0);
+            $style_orientation = $page_layout_properties?->get_attribute_ns($this->styles_ns, 'print-orientation');
+            $style_scale = $page_layout_properties?->get_attribute_ns($this->styles_ns, 'scale-to');
+            $style_print_order = $page_layout_properties?->get_attribute_ns($this->styles_ns, 'print-page-order');
+            $centered = $page_layout_properties?->get_attribute_ns($this->styles_ns, 'table-centering');
+            $margin_left = $page_layout_properties?->get_attribute_ns($this->styles_fo, 'margin-left');
+            $margin_right = $page_layout_properties?->get_attribute_ns($this->styles_fo, 'margin-right');
+            $margin_top = $page_layout_properties?->get_attribute_ns($this->styles_fo, 'margin-top');
+            $margin_bottom = $page_layout_properties?->get_attribute_ns($this->styles_fo, 'margin-bottom');
+            $header = $style_set->get_elements_by_tag_name_ns($this->styles_ns, 'header-style')->item(0);
+            $header_properties = $header?->get_elements_by_tag_name_ns($this->styles_ns, 'header-footer-properties')?->item(0);
+            $margin_header = $header_properties?->get_attribute_ns($this->styles_fo, 'min-height');
+            $footer = $style_set->get_elements_by_tag_name_ns($this->styles_ns, 'footer-style')->item(0);
+            $footer_properties = $footer?->get_elements_by_tag_name_ns($this->styles_ns, 'header-footer-properties')?->item(0);
+            $margin_footer = $footer_properties?->get_attribute_ns($this->styles_fo, 'min-height');
+            $this->page_layout_styles[$style_name] = (object) [
+                'orientation' => $style_orientation ?: Page_Setup::ORIENTATION_DEFAULT,
+                'scale' => $style_scale ?: 100,
+                'printOrder' => $style_print_order,
                 'horizontalCentered' => $centered === 'horizontal' || $centered === 'both',
                 'verticalCentered' => $centered === 'vertical' || $centered === 'both',
                 // margin size is already stored in inches, so no UOM conversion is required
-                'marginLeft' => (float) ($marginLeft ?? 0.7),
-                'marginRight' => (float) ($marginRight ?? 0.7),
-                'marginTop' => (float) ($marginTop ?? 0.3),
-                'marginBottom' => (float) ($marginBottom ?? 0.3),
-                'marginHeader' => (float) ($marginHeader ?? 0.45),
-                'marginFooter' => (float) ($marginFooter ?? 0.45),
+                'marginLeft' => (float) ($margin_left ?? 0.7),
+                'marginRight' => (float) ($margin_right ?? 0.7),
+                'marginTop' => (float) ($margin_top ?? 0.3),
+                'marginBottom' => (float) ($margin_bottom ?? 0.3),
+                'marginHeader' => (float) ($margin_header ?? 0.45),
+                'marginFooter' => (float) ($margin_footer ?? 0.45),
             ];
         }
     }
-
-    private function readStyleMasterLookup(DOMDocument $styleDom): void
+    private function read_style_master_lookup(Dom_Document $style_dom): void
     {
-        $item0 = $styleDom->getElementsByTagNameNS($this->officeNs, 'master-styles')->item(0);
-        $styleMasterLookup = ($item0 === null) ? [] : $item0->getElementsByTagNameNS($this->stylesNs, 'master-page');
-
-        foreach ($styleMasterLookup as $styleMasterSet) {
-            $styleMasterName = $styleMasterSet->getAttributeNS($this->stylesNs, 'name');
-            $pageLayoutName = $styleMasterSet->getAttributeNS($this->stylesNs, 'page-layout-name');
-            $this->masterPrintStylesCrossReference[$styleMasterName] = $pageLayoutName;
+        $item0 = $style_dom->get_elements_by_tag_name_ns($this->office_ns, 'master-styles')->item(0);
+        $style_master_lookup = $item0 === null ? [] : $item0->get_elements_by_tag_name_ns($this->styles_ns, 'master-page');
+        foreach ($style_master_lookup as $style_master_set) {
+            $style_master_name = $style_master_set->get_attribute_ns($this->styles_ns, 'name');
+            $page_layout_name = $style_master_set->get_attribute_ns($this->styles_ns, 'page-layout-name');
+            $this->master_print_styles_cross_reference[$style_master_name] = $page_layout_name;
         }
     }
-
-    public function readStyleCrossReferences(DOMDocument $contentDom): void
+    public function read_style_cross_references(Dom_Document $content_dom): void
     {
-        $item0 = $contentDom->getElementsByTagNameNS($this->officeNs, 'automatic-styles')->item(0);
-        $styleXReferences = ($item0 === null) ? [] : $item0->getElementsByTagNameNS($this->stylesNs, 'style');
-
-        foreach ($styleXReferences as $styleXreferenceSet) {
-            $styleXRefName = $styleXreferenceSet->getAttributeNS($this->stylesNs, 'name');
-            $stylePageLayoutName = $styleXreferenceSet->getAttributeNS($this->stylesNs, 'master-page-name');
-            $styleFamilyName = $styleXreferenceSet->getAttributeNS($this->stylesNs, 'family');
-            if (!empty($styleFamilyName) && $styleFamilyName === 'table') {
-                $styleVisibility = 'true';
-                foreach ($styleXreferenceSet->getElementsByTagNameNS($this->stylesNs, 'table-properties') as $tableProperties) {
-                    $styleVisibility = $tableProperties->getAttributeNS($this->tableNs, 'display');
+        $item0 = $content_dom->get_elements_by_tag_name_ns($this->office_ns, 'automatic-styles')->item(0);
+        $style_x_references = $item0 === null ? [] : $item0->get_elements_by_tag_name_ns($this->styles_ns, 'style');
+        foreach ($style_x_references as $style_xreference_set) {
+            $style_x_ref_name = $style_xreference_set->get_attribute_ns($this->styles_ns, 'name');
+            $style_page_layout_name = $style_xreference_set->get_attribute_ns($this->styles_ns, 'master-page-name');
+            $style_family_name = $style_xreference_set->get_attribute_ns($this->styles_ns, 'family');
+            if (!empty($style_family_name) && $style_family_name === 'table') {
+                $style_visibility = 'true';
+                foreach ($style_xreference_set->get_elements_by_tag_name_ns($this->styles_ns, 'table-properties') as $table_properties) {
+                    $style_visibility = $table_properties->get_attribute_ns($this->table_ns, 'display');
                 }
-                $this->tableStylesCrossReference[$styleXRefName] = $styleVisibility;
+                $this->table_styles_cross_reference[$style_x_ref_name] = $style_visibility;
             }
-            if (!empty($stylePageLayoutName)) {
-                $this->masterStylesCrossReference[$styleXRefName] = $stylePageLayoutName;
+            if (!empty($style_page_layout_name)) {
+                $this->master_styles_cross_reference[$style_x_ref_name] = $style_page_layout_name;
             }
         }
     }
-
-    public function setVisibilityForWorksheet(Worksheet $worksheet, string $styleName): void
+    public function set_visibility_for_worksheet(Worksheet $worksheet, string $style_name): void
     {
-        if (!array_key_exists($styleName, $this->tableStylesCrossReference)) {
+        if (!array_key_exists($style_name, $this->table_styles_cross_reference)) {
             return;
         }
-
-        $worksheet->setSheetState(
-            $this->tableStylesCrossReference[$styleName] === 'false'
-                ? Worksheet::SHEETSTATE_HIDDEN
-                : Worksheet::SHEETSTATE_VISIBLE
-        );
+        $worksheet->set_sheet_state($this->table_styles_cross_reference[$style_name] === 'false' ? Worksheet::SHEETSTATE_HIDDEN : Worksheet::SHEETSTATE_VISIBLE);
     }
-
-    public function setPrintSettingsForWorksheet(Worksheet $worksheet, string $styleName): void
+    public function set_print_settings_for_worksheet(Worksheet $worksheet, string $style_name): void
     {
-        if (!array_key_exists($styleName, $this->masterStylesCrossReference)) {
+        if (!array_key_exists($style_name, $this->master_styles_cross_reference)) {
             return;
         }
-        $masterStyleName = $this->masterStylesCrossReference[$styleName];
-
-        if (!array_key_exists($masterStyleName, $this->masterPrintStylesCrossReference)) {
+        $master_style_name = $this->master_styles_cross_reference[$style_name];
+        if (!array_key_exists($master_style_name, $this->master_print_styles_cross_reference)) {
             return;
         }
-        $printSettingsIndex = $this->masterPrintStylesCrossReference[$masterStyleName];
-
-        if (!array_key_exists($printSettingsIndex, $this->pageLayoutStyles)) {
+        $print_settings_index = $this->master_print_styles_cross_reference[$master_style_name];
+        if (!array_key_exists($print_settings_index, $this->page_layout_styles)) {
             return;
         }
         /** @var (object{orientation: string, scale: int|string, printOrder: ?string,
          * horizontalCentered: bool, verticalCentered: bool, marginLeft: float, marginRight: float, marginTop: float,
          * marginBottom: float, marginHeader: float, marginFooter: float}&stdClass) */
-        $printSettings = $this->pageLayoutStyles[$printSettingsIndex];
-
-        $worksheet->getPageSetup()
-            ->setOrientation($printSettings->orientation ?? PageSetup::ORIENTATION_DEFAULT)
-            ->setPageOrder($printSettings->printOrder === 'ltr' ? PageSetup::PAGEORDER_OVER_THEN_DOWN : PageSetup::PAGEORDER_DOWN_THEN_OVER)
-            ->setScale((int) trim((string) $printSettings->scale, '%'))
-            ->setHorizontalCentered($printSettings->horizontalCentered)
-            ->setVerticalCentered($printSettings->verticalCentered);
-
-        $worksheet->getPageMargins()
-            ->setLeft($printSettings->marginLeft)
-            ->setRight($printSettings->marginRight)
-            ->setTop($printSettings->marginTop)
-            ->setBottom($printSettings->marginBottom)
-            ->setHeader($printSettings->marginHeader)
-            ->setFooter($printSettings->marginFooter);
+        $print_settings = $this->page_layout_styles[$print_settings_index];
+        $worksheet->get_page_setup()->set_orientation($print_settings->orientation ?? Page_Setup::ORIENTATION_DEFAULT)->set_page_order($print_settings->print_order === 'ltr' ? Page_Setup::PAGEORDER_OVER_THEN_DOWN : Page_Setup::PAGEORDER_DOWN_THEN_OVER)->set_scale((int) trim((string) $print_settings->scale, '%'))->set_horizontal_centered($print_settings->horizontal_centered)->set_vertical_centered($print_settings->vertical_centered);
+        $worksheet->get_page_margins()->set_left($print_settings->margin_left)->set_right($print_settings->margin_right)->set_top($print_settings->margin_top)->set_bottom($print_settings->margin_bottom)->set_header($print_settings->margin_header)->set_footer($print_settings->margin_footer);
     }
 }

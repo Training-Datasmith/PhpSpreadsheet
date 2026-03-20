@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Worksheet\Validations;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Worksheet\Validations;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 class Offset
 {
     /**
@@ -44,124 +42,100 @@ class Offset
      *
      * @return array<mixed>|string An array containing a cell or range of cells, or a string on error
      */
-    public static function OFFSET(?string $cellAddress = null, $rows = 0, $columns = 0, $height = null, $width = null, ?Cell $cell = null): string|array
+    public static function OFFSET(?string $cell_address = null, $rows = 0, $columns = 0, $height = null, $width = null, ?Cell $cell = null): string|array
     {
         /** @var int */
-        $rows = Functions::flattenSingleValue($rows);
+        $rows = Functions::flatten_single_value($rows);
         /** @var int */
-        $columns = Functions::flattenSingleValue($columns);
+        $columns = Functions::flatten_single_value($columns);
         /** @var int */
-        $height = Functions::flattenSingleValue($height);
+        $height = Functions::flatten_single_value($height);
         /** @var int */
-        $width = Functions::flattenSingleValue($width);
-
-        if ($cellAddress === null || $cellAddress === '') {
-            return ExcelError::VALUE();
+        $width = Functions::flatten_single_value($width);
+        if ($cell_address === null || $cell_address === '') {
+            return Excel_Error::VALUE();
         }
-
         if (!is_object($cell)) {
-            return ExcelError::REF();
+            return Excel_Error::REF();
         }
-        $sheet = $cell->getParent()?->getParent(); // worksheet
+        $sheet = $cell->get_parent()?->get_parent();
+        // worksheet
         if ($sheet !== null) {
-            $cellAddress = Validations::definedNameToCoordinate($cellAddress, $sheet);
+            $cell_address = Validations::defined_name_to_coordinate($cell_address, $sheet);
         }
-
-        [$cellAddress, $worksheet] = self::extractWorksheet($cellAddress, $cell);
-
-        $startCell = $endCell = $cellAddress;
-        if (strpos($cellAddress, ':')) {
-            [$startCell, $endCell] = explode(':', $cellAddress);
+        [$cell_address, $worksheet] = self::extract_worksheet($cell_address, $cell);
+        $start_cell = $end_cell = $cell_address;
+        if (strpos($cell_address, ':')) {
+            [$start_cell, $end_cell] = explode(':', $cell_address);
         }
-        [$startCellColumn, $startCellRow] = Coordinate::indexesFromString($startCell);
-        [, $endCellRow, $endCellColumn] = Coordinate::indexesFromString($endCell);
-
-        $startCellRow += $rows;
-        $startCellColumn += $columns - 1;
-
-        if (($startCellRow <= 0) || ($startCellColumn < 0)) {
-            return ExcelError::REF();
+        [$start_cell_column, $start_cell_row] = Coordinate::indexes_from_string($start_cell);
+        [, $end_cell_row, $end_cell_column] = Coordinate::indexes_from_string($end_cell);
+        $start_cell_row += $rows;
+        $start_cell_column += $columns - 1;
+        if ($start_cell_row <= 0 || $start_cell_column < 0) {
+            return Excel_Error::REF();
         }
-
-        $endCellColumn = self::adjustEndCellColumnForWidth($endCellColumn, $width, $startCellColumn, $columns);
-        $startCellColumn = Coordinate::stringFromColumnIndex($startCellColumn + 1);
-
-        $endCellRow = self::adjustEndCellRowForHeight($height, $startCellRow, $rows, $endCellRow);
-
-        if (($endCellRow <= 0) || ($endCellColumn < 0)) {
-            return ExcelError::REF();
+        $end_cell_column = self::adjust_end_cell_column_for_width($end_cell_column, $width, $start_cell_column, $columns);
+        $start_cell_column = Coordinate::string_from_column_index($start_cell_column + 1);
+        $end_cell_row = self::adjust_end_cell_row_for_height($height, $start_cell_row, $rows, $end_cell_row);
+        if ($end_cell_row <= 0 || $end_cell_column < 0) {
+            return Excel_Error::REF();
         }
-        $endCellColumn = Coordinate::stringFromColumnIndex($endCellColumn + 1);
-
-        $cellAddress = "{$startCellColumn}{$startCellRow}";
-        if (($startCellColumn != $endCellColumn) || ($startCellRow != $endCellRow)) {
-            $cellAddress .= ":{$endCellColumn}{$endCellRow}";
+        $end_cell_column = Coordinate::string_from_column_index($end_cell_column + 1);
+        $cell_address = "{$start_cell_column}{$start_cell_row}";
+        if ($start_cell_column != $end_cell_column || $start_cell_row != $end_cell_row) {
+            $cell_address .= ":{$end_cell_column}{$end_cell_row}";
         }
-
-        return self::extractRequiredCells($worksheet, $cellAddress);
+        return self::extract_required_cells($worksheet, $cell_address);
     }
-
     /** @return mixed[] */
-    private static function extractRequiredCells(?Worksheet $worksheet, string $cellAddress): array
+    private static function extract_required_cells(?Worksheet $worksheet, string $cell_address): array
     {
-        return Calculation::getInstance($worksheet?->getParent())
-            ->extractCellRange($cellAddress, $worksheet, false);
+        return Calculation::get_instance($worksheet?->get_parent())->extract_cell_range($cell_address, $worksheet, false);
     }
-
     /** @return array{string, ?Worksheet} */
-    private static function extractWorksheet(?string $cellAddress, Cell $cell): array
+    private static function extract_worksheet(?string $cell_address, Cell $cell): array
     {
-        $cellAddress = self::assessCellAddress($cellAddress ?? '', $cell);
-
-        $sheetName = '';
-        if (str_contains($cellAddress, '!')) {
-            [$sheetName, $cellAddress] = Worksheet::extractSheetTitle($cellAddress, true, true);
+        $cell_address = self::assess_cell_address($cell_address ?? '', $cell);
+        $sheet_name = '';
+        if (str_contains($cell_address, '!')) {
+            [$sheet_name, $cell_address] = Worksheet::extract_sheet_title($cell_address, true, true);
         }
-
-        $worksheet = ($sheetName !== '')
-            ? $cell->getWorksheet()->getParentOrThrow()->getSheetByName($sheetName)
-            : $cell->getWorksheet();
-
-        return [$cellAddress, $worksheet];
+        $worksheet = $sheet_name !== '' ? $cell->get_worksheet()->get_parent_or_throw()->get_sheet_by_name($sheet_name) : $cell->get_worksheet();
+        return [$cell_address, $worksheet];
     }
-
-    private static function assessCellAddress(string $cellAddress, Cell $cell): string
+    private static function assess_cell_address(string $cell_address, Cell $cell): string
     {
-        if (preg_match('/^' . Calculation::CALCULATION_REGEXP_DEFINEDNAME . '$/mui', $cellAddress) !== false) {
-            return Functions::expandDefinedName($cellAddress, $cell);
+        if (preg_match('/^' . Calculation::CALCULATION_REGEXP_DEFINEDNAME . '$/mui', $cell_address) !== false) {
+            return Functions::expand_defined_name($cell_address, $cell);
         }
-
-        return $cellAddress;
+        return $cell_address;
     }
-
     /**
      * @param null|object|scalar $width
      * @param scalar $columns
      */
-    private static function adjustEndCellColumnForWidth(string $endCellColumn, $width, int $startCellColumn, $columns): int
+    private static function adjust_end_cell_column_for_width(string $end_cell_column, $width, int $start_cell_column, $columns): int
     {
-        $endCellColumn = Coordinate::columnIndexFromString($endCellColumn) - 1;
-        if (($width !== null) && (!is_object($width))) {
-            $endCellColumn = $startCellColumn + (int) $width - 1;
+        $end_cell_column = Coordinate::column_index_from_string($end_cell_column) - 1;
+        if ($width !== null && !is_object($width)) {
+            $end_cell_column = $start_cell_column + (int) $width - 1;
         } else {
-            $endCellColumn += (int) $columns;
+            $end_cell_column += (int) $columns;
         }
-
-        return $endCellColumn;
+        return $end_cell_column;
     }
-
     /**
      * @param null|object|scalar $height
      * @param scalar $rows
      */
-    private static function adjustEndCellRowForHeight($height, int $startCellRow, $rows, int $endCellRow): int
+    private static function adjust_end_cell_row_for_height($height, int $start_cell_row, $rows, int $end_cell_row): int
     {
-        if (($height !== null) && (!is_object($height))) {
-            $endCellRow = $startCellRow + (int) $height - 1;
+        if ($height !== null && !is_object($height)) {
+            $end_cell_row = $start_cell_row + (int) $height - 1;
         } else {
-            $endCellRow += (int) $rows;
+            $end_cell_row += (int) $rows;
         }
-
-        return $endCellRow;
+        return $end_cell_row;
     }
 }

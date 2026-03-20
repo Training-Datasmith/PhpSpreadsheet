@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Database;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class DGet extends DatabaseAbstract
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class D_Get extends Database_Abstract
 {
     /**
      * DGET.
@@ -34,19 +32,16 @@ class DGet extends DatabaseAbstract
      */
     public static function evaluate(array $database, array|null|int|string $field, array $criteria): null|float|int|string
     {
-        $field = self::fieldExtract($database, $field);
+        $field = self::field_extract($database, $field);
         if ($field === null) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
-        $columnData = self::getFilteredColumn($database, $field, $criteria);
-        if (count($columnData) > 1) {
-            return ExcelError::NAN();
+        $column_data = self::get_filtered_column($database, $field, $criteria);
+        if (count($column_data) > 1) {
+            return Excel_Error::NAN();
         }
-
         /** @var array<null|float|int|string> */
-        $row = array_pop($columnData);
-
+        $row = array_pop($column_data);
         return array_pop($row);
     }
 }

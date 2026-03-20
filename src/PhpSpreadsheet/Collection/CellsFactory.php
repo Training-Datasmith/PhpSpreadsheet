@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Collection;
 
-namespace PhpOffice\PhpSpreadsheet\Collection;
-
-use PhpOffice\PhpSpreadsheet\Settings;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-abstract class CellsFactory
+use Php_Office\Php_Spreadsheet\Settings;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+abstract class Cells_Factory
 {
     /**
      * Initialise the cache storage.
@@ -15,8 +13,8 @@ abstract class CellsFactory
      * @param Worksheet $worksheet Enable cell caching for this worksheet
      *
      * */
-    public static function getInstance(Worksheet $worksheet): Cells
+    public static function get_instance(Worksheet $worksheet): Cells
     {
-        return new Cells($worksheet, Settings::getCache());
+        return new Cells($worksheet, Settings::get_cache());
     }
 }

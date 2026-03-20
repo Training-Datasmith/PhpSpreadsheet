@@ -1,23 +1,21 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Ods\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Ods\Cell;
-
-use PhpOffice\PhpSpreadsheet\Helper\Dimension;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Borders;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Style\Protection;
-use PhpOffice\PhpSpreadsheet\Style\Style as CellStyle;
-use PhpOffice\PhpSpreadsheet\Worksheet\ColumnDimension;
-use PhpOffice\PhpSpreadsheet\Worksheet\RowDimension;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
+use Php_Office\Php_Spreadsheet\Helper\Dimension;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Style\Alignment;
+use Php_Office\Php_Spreadsheet\Style\Border;
+use Php_Office\Php_Spreadsheet\Style\Borders;
+use Php_Office\Php_Spreadsheet\Style\Fill;
+use Php_Office\Php_Spreadsheet\Style\Font;
+use Php_Office\Php_Spreadsheet\Style\Number_Format;
+use Php_Office\Php_Spreadsheet\Style\Protection;
+use Php_Office\Php_Spreadsheet\Style\Style as CellStyle;
+use Php_Office\Php_Spreadsheet\Worksheet\Column_Dimension;
+use Php_Office\Php_Spreadsheet\Worksheet\Row_Dimension;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 class Style
 {
     public const CELL_STYLE_PREFIX = 'ce';
@@ -25,20 +23,17 @@ class Style
     public const ROW_STYLE_PREFIX = 'ro';
     public const TABLE_STYLE_PREFIX = 'ta';
     public const INDENT_TO_INCHES = 0.1043;
-
     /** @param array<string, callable> $additionalNumberFormats */
-    public function __construct(private readonly XMLWriter $writer, private array $additionalNumberFormats = [])
+    public function __construct(private readonly Xml_Writer $writer, private array $additional_number_formats = [])
     {
     }
-
-    public function getWriter(): XMLWriter
+    public function get_writer(): Xml_Writer
     {
         return $this->writer;
     }
-
-    private function mapHorizontalAlignment(?string $horizontalAlignment): string
+    private function map_horizontal_alignment(?string $horizontal_alignment): string
     {
-        return match ($horizontalAlignment) {
+        return match ($horizontal_alignment) {
             Alignment::HORIZONTAL_CENTER, Alignment::HORIZONTAL_CENTER_CONTINUOUS, Alignment::HORIZONTAL_DISTRIBUTED => 'center',
             Alignment::HORIZONTAL_RIGHT => 'end',
             Alignment::HORIZONTAL_FILL, Alignment::HORIZONTAL_JUSTIFY => 'justify',
@@ -46,76 +41,52 @@ class Style
             default => 'start',
         };
     }
-
-    private function mapVerticalAlignment(string $verticalAlignment): string
+    private function map_vertical_alignment(string $vertical_alignment): string
     {
-        return match ($verticalAlignment) {
+        return match ($vertical_alignment) {
             Alignment::VERTICAL_TOP => 'top',
             Alignment::VERTICAL_CENTER => 'middle',
             Alignment::VERTICAL_DISTRIBUTED, Alignment::VERTICAL_JUSTIFY => 'automatic',
             default => 'bottom',
         };
     }
-
-    private function writeFillStyle(Fill $fill): void
+    private function write_fill_style(Fill $fill): void
     {
-        switch ($fill->getFillType()) {
+        switch ($fill->get_fill_type()) {
             case Fill::FILL_SOLID:
-                $this->writer->writeAttribute(
-                    'fo:background-color',
-                    sprintf(
-                        '#%s',
-                        // no idea why strtolower, but it doesn't hurt
-                        strtolower($fill->getStartColor()->getRGB())
-                    )
-                );
-
+                $this->writer->write_attribute('fo:background-color', sprintf(
+                    '#%s',
+                    // no idea why strtolower, but it doesn't hurt
+                    strtolower($fill->get_start_color()->get_rgb())
+                ));
                 break;
             case Fill::FILL_NONE:
-                $this->writer->writeAttribute(
-                    'fo:background-color',
-                    'transparent'
-                );
-
+                $this->writer->write_attribute('fo:background-color', 'transparent');
                 break;
-                //case Fill::FILL_GRADIENT_LINEAR:
-                //case Fill::FILL_GRADIENT_PATH:
-                // TODO :: To be implemented
-                //break;
-                //default:
         }
     }
-
-    private function writeBordersStyle(Borders $borders): void
+    private function write_borders_style(Borders $borders): void
     {
-        $this->writeBorderStyle('bottom', $borders->getBottom());
-        $this->writeBorderStyle('left', $borders->getLeft());
-        $this->writeBorderStyle('right', $borders->getRight());
-        $this->writeBorderStyle('top', $borders->getTop());
-        $diagonal = $borders->getDiagonalDirection();
+        $this->write_border_style('bottom', $borders->get_bottom());
+        $this->write_border_style('left', $borders->get_left());
+        $this->write_border_style('right', $borders->get_right());
+        $this->write_border_style('top', $borders->get_top());
+        $diagonal = $borders->get_diagonal_direction();
         if ($diagonal === Borders::DIAGONAL_DOWN || $diagonal === Borders::DIAGONAL_BOTH) {
-            $this->writeBorderStyle('style:diagonal-tl-br', $borders->getDiagonal());
+            $this->write_border_style('style:diagonal-tl-br', $borders->get_diagonal());
         }
         if ($diagonal === Borders::DIAGONAL_UP || $diagonal === Borders::DIAGONAL_BOTH) {
-            $this->writeBorderStyle('style:diagonal-bl-tr', $borders->getDiagonal());
+            $this->write_border_style('style:diagonal-bl-tr', $borders->get_diagonal());
         }
     }
-
-    private function writeBorderStyle(string $direction, Border $border): void
+    private function write_border_style(string $direction, Border $border): void
     {
-        if ($border->getBorderStyle() === Border::BORDER_NONE) {
+        if ($border->get_border_style() === Border::BORDER_NONE) {
             return;
         }
-
-        $attrName = str_starts_with($direction, 'style:') ? $direction : ('fo:border-' . $direction);
-        $this->writer->writeAttribute($attrName, sprintf(
-            '%s %s #%s',
-            $this->mapBorderWidth($border),
-            $this->mapBorderStyle($border),
-            $border->getColor()->getRGB(),
-        ));
+        $attr_name = str_starts_with($direction, 'style:') ? $direction : 'fo:border-' . $direction;
+        $this->writer->write_attribute($attr_name, sprintf('%s %s #%s', $this->map_border_width($border), $this->map_border_style($border), $border->get_color()->get_rgb()));
     }
-
     private const MAP_BORDER_WIDTH = [
         Border::BORDER_THIN => '0.75pt',
         Border::BORDER_DASHED => '0.75pt',
@@ -133,1006 +104,982 @@ class Style
         Border::BORDER_DOUBLE => '2.5pt',
         Border::BORDER_THICK => '2.5pt',
     ];
-
-    private function mapBorderWidth(Border $border): string
+    private function map_border_width(Border $border): string
     {
-        return self::MAP_BORDER_WIDTH[$border->getBorderStyle()] ?? '1pt';
+        return self::MAP_BORDER_WIDTH[$border->get_border_style()] ?? '1pt';
     }
-
-    private const MAP_BORDER_STYLE = [
-        Border::BORDER_DOTTED => 'dotted',
-        Border::BORDER_DASHED => 'dashed',
-        Border::BORDER_MEDIUMDASHED => 'dashed',
-        Border::BORDER_DASHDOT => 'dash-dot',
-        Border::BORDER_MEDIUMDASHDOT => 'dash-dot',
-        Border::BORDER_DASHDOTDOT => 'dash-dot-dot',
-        Border::BORDER_MEDIUMDASHDOTDOT => 'dash-dot-dot',
-        Border::BORDER_SLANTDASHDOT => 'dashed',
-        Border::BORDER_DOUBLE => 'double',
-        Border::BORDER_NONE => 'none',
-        // HAIR, MEDIUM, THICK, THIN fall through to default solid
-    ];
-
-    private function mapBorderStyle(Border $border): string
+    private const MAP_BORDER_STYLE = [Border::BORDER_DOTTED => 'dotted', Border::BORDER_DASHED => 'dashed', Border::BORDER_MEDIUMDASHED => 'dashed', Border::BORDER_DASHDOT => 'dash-dot', Border::BORDER_MEDIUMDASHDOT => 'dash-dot', Border::BORDER_DASHDOTDOT => 'dash-dot-dot', Border::BORDER_MEDIUMDASHDOTDOT => 'dash-dot-dot', Border::BORDER_SLANTDASHDOT => 'dashed', Border::BORDER_DOUBLE => 'double', Border::BORDER_NONE => 'none'];
+    private function map_border_style(Border $border): string
     {
-        return self::MAP_BORDER_STYLE[$border->getBorderStyle()] ?? 'solid';
+        return self::MAP_BORDER_STYLE[$border->get_border_style()] ?? 'solid';
     }
-
     // 2d array, 1st index is locked, 2nd is hidden
-    private const PROTECTION_MAP = [
-        Protection::PROTECTION_PROTECTED => [Protection::PROTECTION_PROTECTED => 'protected formula-hidden', Protection::PROTECTION_UNPROTECTED => 'protected'],
-        Protection::PROTECTION_UNPROTECTED => [Protection::PROTECTION_PROTECTED => 'formula-hidden', Protection::PROTECTION_UNPROTECTED => 'none'],
-    ];
-
+    private const PROTECTION_MAP = [Protection::PROTECTION_PROTECTED => [Protection::PROTECTION_PROTECTED => 'protected formula-hidden', Protection::PROTECTION_UNPROTECTED => 'protected'], Protection::PROTECTION_UNPROTECTED => [Protection::PROTECTION_PROTECTED => 'formula-hidden', Protection::PROTECTION_UNPROTECTED => 'none']];
     /** @internal */
-    public function writeCellProperties(CellStyle $style): void
+    public function write_cell_properties(Cell_Style $style): void
     {
         // Align
-        $hAlign = $style->getAlignment()->getHorizontal();
-        $hAlign = $this->mapHorizontalAlignment($hAlign);
-        $vAlign = $style->getAlignment()->getVertical();
-        $wrap = $style->getAlignment()->getWrapText();
-        $indent = $style->getAlignment()->getIndent();
-        $readOrder = $style->getAlignment()->getReadOrder();
-        $shrinkToFit = $style->getAlignment()->getShrinkToFit();
-        $textRotation = $style->getAlignment()->getTextRotation();
-
-        $this->writer->startElement('style:table-cell-properties');
-        if (!empty($vAlign) || $wrap) {
-            if (!empty($vAlign)) {
-                $vAlign = $this->mapVerticalAlignment($vAlign);
-                $this->writer->writeAttribute('style:vertical-align', $vAlign);
+        $h_align = $style->get_alignment()->get_horizontal();
+        $h_align = $this->map_horizontal_alignment($h_align);
+        $v_align = $style->get_alignment()->get_vertical();
+        $wrap = $style->get_alignment()->get_wrap_text();
+        $indent = $style->get_alignment()->get_indent();
+        $read_order = $style->get_alignment()->get_read_order();
+        $shrink_to_fit = $style->get_alignment()->get_shrink_to_fit();
+        $text_rotation = $style->get_alignment()->get_text_rotation();
+        $this->writer->start_element('style:table-cell-properties');
+        if (!empty($v_align) || $wrap) {
+            if (!empty($v_align)) {
+                $v_align = $this->map_vertical_alignment($v_align);
+                $this->writer->write_attribute('style:vertical-align', $v_align);
             }
             if ($wrap) {
-                $this->writer->writeAttribute('fo:wrap-option', 'wrap');
+                $this->writer->write_attribute('fo:wrap-option', 'wrap');
             }
         }
-        if ($textRotation !== null) {
-            if ($textRotation < 0) {
-                $textRotation += 360;
+        if ($text_rotation !== null) {
+            if ($text_rotation < 0) {
+                $text_rotation += 360;
             }
-            $this->writer->writeAttribute('style:rotation-angle', (string) $textRotation);
+            $this->writer->write_attribute('style:rotation-angle', (string) $text_rotation);
         }
-        $this->writer->writeAttribute('style:rotation-align', 'none');
-        if ($shrinkToFit) {
-            $this->writer->writeAttribute('style:shrink-to-fit', 'true');
+        $this->writer->write_attribute('style:rotation-align', 'none');
+        if ($shrink_to_fit) {
+            $this->writer->write_attribute('style:shrink-to-fit', 'true');
         }
-
         // Fill
-        $this->writeFillStyle($style->getFill());
-
+        $this->write_fill_style($style->get_fill());
         // Border
-        $this->writeBordersStyle($style->getBorders());
-
+        $this->write_borders_style($style->get_borders());
         // protection
-        $protection = self::PROTECTION_MAP[$style->getProtection()->getLocked()][$style->getProtection()->getHidden()] ?? '';
+        $protection = self::PROTECTION_MAP[$style->get_protection()->get_locked()][$style->get_protection()->get_hidden()] ?? '';
         if ($protection !== '') {
-            $this->writer->writeAttribute('style:cell-protect', $protection);
+            $this->writer->write_attribute('style:cell-protect', $protection);
         }
-
-        $this->writer->endElement();
-
-        if ($hAlign !== '' || !empty($indent) || $readOrder === Alignment::READORDER_RTL || $readOrder === Alignment::READORDER_LTR) {
-            $this->writer
-                ->startElement('style:paragraph-properties');
-            if ($hAlign !== '') {
-                $this->writer->writeAttribute('fo:text-align', $hAlign);
+        $this->writer->end_element();
+        if ($h_align !== '' || !empty($indent) || $read_order === Alignment::READORDER_RTL || $read_order === Alignment::READORDER_LTR) {
+            $this->writer->start_element('style:paragraph-properties');
+            if ($h_align !== '') {
+                $this->writer->write_attribute('fo:text-align', $h_align);
             }
             if (!empty($indent)) {
-                $indentString = sprintf('%.4f', $indent * self::INDENT_TO_INCHES) . 'in';
-                $this->writer->writeAttribute('fo:margin-left', $indentString);
+                $indent_string = sprintf('%.4f', $indent * self::INDENT_TO_INCHES) . 'in';
+                $this->writer->write_attribute('fo:margin-left', $indent_string);
             }
-            if ($readOrder === Alignment::READORDER_RTL) {
-                $this->writer->writeAttribute('style:writing-mode', 'rl-tb');
-            } elseif ($readOrder === Alignment::READORDER_LTR) {
-                $this->writer->writeAttribute('style:writing-mode', 'lr-tb');
+            if ($read_order === Alignment::READORDER_RTL) {
+                $this->writer->write_attribute('style:writing-mode', 'rl-tb');
+            } elseif ($read_order === Alignment::READORDER_LTR) {
+                $this->writer->write_attribute('style:writing-mode', 'lr-tb');
             }
-            $this->writer->endElement();
+            $this->writer->end_element();
         }
     }
-
-    protected function mapUnderlineStyle(Font $font): string
+    protected function map_underline_style(Font $font): string
     {
-        return match ($font->getUnderline()) {
+        return match ($font->get_underline()) {
             Font::UNDERLINE_DOUBLE, Font::UNDERLINE_DOUBLEACCOUNTING => 'double',
             Font::UNDERLINE_SINGLE, Font::UNDERLINE_SINGLEACCOUNTING => 'single',
             default => 'none',
         };
     }
-
     /** @internal */
-    public function writeTextProperties(CellStyle $style): void
+    public function write_text_properties(Cell_Style $style): void
     {
         // Font
-        $this->writer->startElement('style:text-properties');
-
-        $font = $style->getFont();
-
-        if ($font->getBold()) {
-            $this->writer->writeAttribute('fo:font-weight', 'bold');
-            $this->writer->writeAttribute(
-                'style:font-weight-complex',
-                'bold'
-            );
-            $this->writer->writeAttribute(
-                'style:font-weight-asian',
-                'bold'
-            );
+        $this->writer->start_element('style:text-properties');
+        $font = $style->get_font();
+        if ($font->get_bold()) {
+            $this->writer->write_attribute('fo:font-weight', 'bold');
+            $this->writer->write_attribute('style:font-weight-complex', 'bold');
+            $this->writer->write_attribute('style:font-weight-asian', 'bold');
         }
-
-        if ($font->getItalic()) {
-            $this->writer->writeAttribute('fo:font-style', 'italic');
+        if ($font->get_italic()) {
+            $this->writer->write_attribute('fo:font-style', 'italic');
         }
-
-        if ($font->getAutoColor()) {
-            $this->writer
-                ->writeAttribute('style:use-window-font-color', 'true');
+        if ($font->get_auto_color()) {
+            $this->writer->write_attribute('style:use-window-font-color', 'true');
         } else {
-            $this->writer->writeAttribute('fo:color', sprintf('#%s', $font->getColor()->getRGB()));
+            $this->writer->write_attribute('fo:color', sprintf('#%s', $font->get_color()->get_rgb()));
         }
-
-        if ($family = $font->getName()) {
-            $this->writer->writeAttribute('fo:font-family', $family);
+        if ($family = $font->get_name()) {
+            $this->writer->write_attribute('fo:font-family', $family);
         }
-
-        if ($size = $font->getSize()) {
-            $this->writer->writeAttribute('fo:font-size', ($size == (int) $size) ? sprintf('%dpt', $size) : sprintf('%.1Fpt', $size));
+        if ($size = $font->get_size()) {
+            $this->writer->write_attribute('fo:font-size', $size == (int) $size ? sprintf('%dpt', $size) : sprintf('%.1Fpt', $size));
         }
-
-        if ($font->getUnderline() && $font->getUnderline() !== Font::UNDERLINE_NONE) {
-            $this->writer
-                ->writeAttribute('style:text-underline-style', 'solid');
-            $this->writer
-                ->writeAttribute('style:text-underline-width', 'auto');
-            $this->writer
-                ->writeAttribute('style:text-underline-color', 'font-color');
-
-            $underline = $this->mapUnderlineStyle($font);
-            $this->writer
-                ->writeAttribute('style:text-underline-type', $underline);
+        if ($font->get_underline() && $font->get_underline() !== Font::UNDERLINE_NONE) {
+            $this->writer->write_attribute('style:text-underline-style', 'solid');
+            $this->writer->write_attribute('style:text-underline-width', 'auto');
+            $this->writer->write_attribute('style:text-underline-color', 'font-color');
+            $underline = $this->map_underline_style($font);
+            $this->writer->write_attribute('style:text-underline-type', $underline);
         }
-
-        if ($font->getStrikethrough()) {
-            $this->writer
-                ->writeAttribute('style:text-line-through-style', 'solid');
-            $this->writer
-                ->writeAttribute('style:text-line-through-type', 'single');
+        if ($font->get_strikethrough()) {
+            $this->writer->write_attribute('style:text-line-through-style', 'solid');
+            $this->writer->write_attribute('style:text-line-through-type', 'single');
         }
-
-        $this->writer->endElement(); // Close style:text-properties
+        $this->writer->end_element();
+        // Close style:text-properties
     }
-
-    protected function writeColumnProperties(ColumnDimension $columnDimension): void
+    protected function write_column_properties(Column_Dimension $column_dimension): void
     {
-        $this->writer->startElement('style:table-column-properties');
-        $this->writer->writeAttribute(
-            'style:column-width',
-            round($columnDimension->getWidth(Dimension::UOM_CENTIMETERS), 3) . 'cm'
-        );
-        $this->writer->writeAttribute('fo:break-before', 'auto');
-
+        $this->writer->start_element('style:table-column-properties');
+        $this->writer->write_attribute('style:column-width', round($column_dimension->get_width(Dimension::UOM_CENTIMETERS), 3) . 'cm');
+        $this->writer->write_attribute('fo:break-before', 'auto');
         // End
-        $this->writer->endElement(); // Close style:table-column-properties
+        $this->writer->end_element();
+        // Close style:table-column-properties
     }
-
-    public function writeColumnStyles(ColumnDimension $columnDimension, int $sheetId): void
+    public function write_column_styles(Column_Dimension $column_dimension, int $sheet_id): void
     {
-        $this->writer->startElement('style:style');
-        $this->writer->writeAttribute('style:family', 'table-column');
-        $this->writer->writeAttribute(
-            'style:name',
-            sprintf('%s_%d_%d', self::COLUMN_STYLE_PREFIX, $sheetId, $columnDimension->getColumnNumeric())
-        );
-
-        $this->writeColumnProperties($columnDimension);
-
+        $this->writer->start_element('style:style');
+        $this->writer->write_attribute('style:family', 'table-column');
+        $this->writer->write_attribute('style:name', sprintf('%s_%d_%d', self::COLUMN_STYLE_PREFIX, $sheet_id, $column_dimension->get_column_numeric()));
+        $this->write_column_properties($column_dimension);
         // End
-        $this->writer->endElement(); // Close style:style
+        $this->writer->end_element();
+        // Close style:style
     }
-
-    protected function writeRowProperties(RowDimension $rowDimension): void
+    protected function write_row_properties(Row_Dimension $row_dimension): void
     {
-        $this->writer->startElement('style:table-row-properties');
-        $this->writer->writeAttribute(
-            'style:row-height',
-            round($rowDimension->getRowHeight(Dimension::UOM_CENTIMETERS), 3) . 'cm'
-        );
-        $this->writer->writeAttribute('style:use-optimal-row-height', 'false');
-        $this->writer->writeAttribute('fo:break-before', 'auto');
-
+        $this->writer->start_element('style:table-row-properties');
+        $this->writer->write_attribute('style:row-height', round($row_dimension->get_row_height(Dimension::UOM_CENTIMETERS), 3) . 'cm');
+        $this->writer->write_attribute('style:use-optimal-row-height', 'false');
+        $this->writer->write_attribute('fo:break-before', 'auto');
         // End
-        $this->writer->endElement(); // Close style:table-row-properties
+        $this->writer->end_element();
+        // Close style:table-row-properties
     }
-
-    public function writeRowStyles(RowDimension $rowDimension, int $sheetId): void
+    public function write_row_styles(Row_Dimension $row_dimension, int $sheet_id): void
     {
-        $this->writer->startElement('style:style');
-        $this->writer->writeAttribute('style:family', 'table-row');
-        $this->writer->writeAttribute(
-            'style:name',
-            sprintf('%s_%d_%d', self::ROW_STYLE_PREFIX, $sheetId, $rowDimension->getRowIndex())
-        );
-
-        $this->writeRowProperties($rowDimension);
-
+        $this->writer->start_element('style:style');
+        $this->writer->write_attribute('style:family', 'table-row');
+        $this->writer->write_attribute('style:name', sprintf('%s_%d_%d', self::ROW_STYLE_PREFIX, $sheet_id, $row_dimension->get_row_index()));
+        $this->write_row_properties($row_dimension);
         // End
-        $this->writer->endElement(); // Close style:style
+        $this->writer->end_element();
+        // Close style:style
     }
-
-    public function writeDefaultRowStyle(RowDimension $rowDimension, int $sheetId): void
+    public function write_default_row_style(Row_Dimension $row_dimension, int $sheet_id): void
     {
-        $this->writer->startElement('style:style');
-        $this->writer->writeAttribute('style:family', 'table-row');
-        $this->writer->writeAttribute(
-            'style:name',
-            sprintf('%s%d', self::ROW_STYLE_PREFIX, $sheetId)
-        );
-
-        $this->writeRowProperties($rowDimension);
-
+        $this->writer->start_element('style:style');
+        $this->writer->write_attribute('style:family', 'table-row');
+        $this->writer->write_attribute('style:name', sprintf('%s%d', self::ROW_STYLE_PREFIX, $sheet_id));
+        $this->write_row_properties($row_dimension);
         // End
-        $this->writer->endElement(); // Close style:style
+        $this->writer->end_element();
+        // Close style:style
     }
-
-    public function writeTableStyle(Worksheet $worksheet, int $sheetId): void
+    public function write_table_style(Worksheet $worksheet, int $sheet_id): void
     {
-        $this->writer->startElement('style:style');
-        $this->writer->writeAttribute('style:family', 'table');
-        $this->writer->writeAttribute(
-            'style:name',
-            sprintf('%s%d', self::TABLE_STYLE_PREFIX, $sheetId)
-        );
-        $this->writer->writeAttribute('style:master-page-name', 'Default');
-
-        $this->writer->startElement('style:table-properties');
-
-        $this->writer->writeAttribute(
-            'table:display',
-            $worksheet->getSheetState() === Worksheet::SHEETSTATE_VISIBLE ? 'true' : 'false'
-        );
-
-        $this->writer->endElement(); // Close style:table-properties
-        $this->writer->endElement(); // Close style:style
+        $this->writer->start_element('style:style');
+        $this->writer->write_attribute('style:family', 'table');
+        $this->writer->write_attribute('style:name', sprintf('%s%d', self::TABLE_STYLE_PREFIX, $sheet_id));
+        $this->writer->write_attribute('style:master-page-name', 'Default');
+        $this->writer->start_element('style:table-properties');
+        $this->writer->write_attribute('table:display', $worksheet->get_sheet_state() === Worksheet::SHEETSTATE_VISIBLE ? 'true' : 'false');
+        $this->writer->end_element();
+        // Close style:table-properties
+        $this->writer->end_element();
+        // Close style:style
     }
-
-    private int $numFmtIndex = 199;
-
+    private int $num_fmt_index = 199;
     /** @var array<string, string> */
-    private array $numFmtIndexes = [];
-
-    private function writeNumFmt(string $numFmt): void
+    private array $num_fmt_indexes = [];
+    private function write_num_fmt(string $num_fmt): void
     {
-        if (array_key_exists($numFmt, $this->numFmtIndexes)) {
+        if (array_key_exists($num_fmt, $this->num_fmt_indexes)) {
             return;
         }
-        $method = $this->additionalNumberFormats[$numFmt] ?? self::NUMBER_FORMAT_METHODS[$numFmt] ?? null;
+        $method = $this->additional_number_formats[$num_fmt] ?? self::NUMBER_FORMAT_METHODS[$num_fmt] ?? null;
         if ($method === null) {
             return;
         }
-        ++$this->numFmtIndex;
-        $name = 'N' . $this->numFmtIndex;
-        $this->numFmtIndexes[$numFmt] = $name;
+        ++$this->num_fmt_index;
+        $name = 'N' . $this->num_fmt_index;
+        $this->num_fmt_indexes[$num_fmt] = $name;
         $method($this, $name);
     }
-
-    public function write(CellStyle $style): void
+    public function write(Cell_Style $style): void
     {
-        $numFmt = (string) $style->getNumberFormat()->getFormatCode();
-        $this->writeNumFmt($numFmt);
-        $this->writer->startElement('style:style');
-        $this->writer->writeAttribute('style:name', self::CELL_STYLE_PREFIX . $style->getIndex());
-        $this->writer->writeAttribute('style:family', 'table-cell');
-        $this->writer->writeAttribute('style:parent-style-name', 'Default');
-        if (array_key_exists($numFmt, $this->numFmtIndexes)) {
-            $this->writer->writeAttribute(
-                'style:data-style-name',
-                $this->numFmtIndexes[$numFmt]
-            );
+        $num_fmt = (string) $style->get_number_format()->get_format_code();
+        $this->write_num_fmt($num_fmt);
+        $this->writer->start_element('style:style');
+        $this->writer->write_attribute('style:name', self::CELL_STYLE_PREFIX . $style->get_index());
+        $this->writer->write_attribute('style:family', 'table-cell');
+        $this->writer->write_attribute('style:parent-style-name', 'Default');
+        if (array_key_exists($num_fmt, $this->num_fmt_indexes)) {
+            $this->writer->write_attribute('style:data-style-name', $this->num_fmt_indexes[$num_fmt]);
         }
-
         // Alignment, fill colour, etc
-        $this->writeCellProperties($style);
-
+        $this->write_cell_properties($style);
         // style:text-properties
-        $this->writeTextProperties($style);
-
+        $this->write_text_properties($style);
         // End
-        $this->writer->endElement(); // Close style:style
+        $this->writer->end_element();
+        // Close style:style
     }
-
     private const NUMBER_FORMAT_METHODS = [
-        NumberFormat::FORMAT_NUMBER => [self::class, 'formatNumber'],
-        NumberFormat::FORMAT_NUMBER_0 => [self::class, 'formatNumber0'],
-        NumberFormat::FORMAT_NUMBER_00 => [self::class, 'formatNumber00'],
-        NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1 => [self::class, 'formatNumberCommaSeparated1'],
-        NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2 => [self::class, 'formatNumberCommaSeparated2'],
-        NumberFormat::FORMAT_PERCENTAGE => [self::class, 'formatPercentage'],
-        NumberFormat::FORMAT_PERCENTAGE_0 => [self::class, 'formatPercentage0'],
-        NumberFormat::FORMAT_PERCENTAGE_00 => [self::class, 'formatPercentage00'],
-        NumberFormat::FORMAT_DATE_YYYYMMDD => [self::class, 'formatDateYyyymmdd'],
-        NumberFormat::FORMAT_DATE_DDMMYYYY => [self::class, 'formatDateDdmmyyyy'],
-        NumberFormat::FORMAT_DATE_DMYSLASH => [self::class, 'formatDateDmyslash'],
-        NumberFormat::FORMAT_DATE_DMYMINUS => [self::class, 'formatDateDmyminus'],
-        NumberFormat::FORMAT_DATE_DMMINUS => [self::class, 'formatDateDmminus'],
-        NumberFormat::FORMAT_DATE_MYMINUS => [self::class, 'formatDateMyminus'],
-        NumberFormat::FORMAT_DATE_XLSX14 => [self::class, 'formatDateXlsx14'],
-        NumberFormat::FORMAT_DATE_XLSX14_ACTUAL => [self::class, 'formatDateXlsx14Actual'],
-        NumberFormat::FORMAT_DATE_XLSX15 => [self::class, 'formatDateXlsx15'],
-        NumberFormat::FORMAT_DATE_XLSX15_YYYY => [self::class, 'formatDateXlsx15Yyyy'],
-        NumberFormat::FORMAT_DATE_XLSX16 => [self::class, 'formatDateXlsx16'],
-        NumberFormat::FORMAT_DATE_XLSX17 => [self::class, 'formatDateXlsx17'],
-        NumberFormat::FORMAT_DATE_XLSX22 => [self::class, 'formatDateXlsx22'],
-        NumberFormat::FORMAT_DATE_XLSX22_ACTUAL => [self::class, 'formatDateXlsx22Actual'],
-        NumberFormat::FORMAT_DATE_DATETIME => [self::class, 'formatDateDatetime'],
-        NumberFormat::FORMAT_DATE_DATETIME_BETTER => [self::class, 'formatDateDatetimeBetter'],
-        NumberFormat::FORMAT_DATE_TIME1 => [self::class, 'formatDateTime1'],
-        NumberFormat::FORMAT_DATE_TIME2 => [self::class, 'formatDateTime2'],
-        NumberFormat::FORMAT_DATE_TIME3 => [self::class, 'formatDateTime3'],
-        NumberFormat::FORMAT_DATE_TIME4 => [self::class, 'formatDateTime4'],
-        NumberFormat::FORMAT_DATE_TIME5 => [self::class, 'formatDateTime5'],
+        Number_Format::FORMAT_NUMBER => [self::class, 'formatNumber'],
+        Number_Format::FORMAT_NUMBER_0 => [self::class, 'formatNumber0'],
+        Number_Format::FORMAT_NUMBER_00 => [self::class, 'formatNumber00'],
+        Number_Format::FORMAT_NUMBER_COMMA_SEPARATED1 => [self::class, 'formatNumberCommaSeparated1'],
+        Number_Format::FORMAT_NUMBER_COMMA_SEPARATED2 => [self::class, 'formatNumberCommaSeparated2'],
+        Number_Format::FORMAT_PERCENTAGE => [self::class, 'formatPercentage'],
+        Number_Format::FORMAT_PERCENTAGE_0 => [self::class, 'formatPercentage0'],
+        Number_Format::FORMAT_PERCENTAGE_00 => [self::class, 'formatPercentage00'],
+        Number_Format::FORMAT_DATE_YYYYMMDD => [self::class, 'formatDateYyyymmdd'],
+        Number_Format::FORMAT_DATE_DDMMYYYY => [self::class, 'formatDateDdmmyyyy'],
+        Number_Format::FORMAT_DATE_DMYSLASH => [self::class, 'formatDateDmyslash'],
+        Number_Format::FORMAT_DATE_DMYMINUS => [self::class, 'formatDateDmyminus'],
+        Number_Format::FORMAT_DATE_DMMINUS => [self::class, 'formatDateDmminus'],
+        Number_Format::FORMAT_DATE_MYMINUS => [self::class, 'formatDateMyminus'],
+        Number_Format::FORMAT_DATE_XLSX14 => [self::class, 'formatDateXlsx14'],
+        Number_Format::FORMAT_DATE_XLSX14_ACTUAL => [self::class, 'formatDateXlsx14Actual'],
+        Number_Format::FORMAT_DATE_XLSX15 => [self::class, 'formatDateXlsx15'],
+        Number_Format::FORMAT_DATE_XLSX15_YYYY => [self::class, 'formatDateXlsx15Yyyy'],
+        Number_Format::FORMAT_DATE_XLSX16 => [self::class, 'formatDateXlsx16'],
+        Number_Format::FORMAT_DATE_XLSX17 => [self::class, 'formatDateXlsx17'],
+        Number_Format::FORMAT_DATE_XLSX22 => [self::class, 'formatDateXlsx22'],
+        Number_Format::FORMAT_DATE_XLSX22_ACTUAL => [self::class, 'formatDateXlsx22Actual'],
+        Number_Format::FORMAT_DATE_DATETIME => [self::class, 'formatDateDatetime'],
+        Number_Format::FORMAT_DATE_DATETIME_BETTER => [self::class, 'formatDateDatetimeBetter'],
+        Number_Format::FORMAT_DATE_TIME1 => [self::class, 'formatDateTime1'],
+        Number_Format::FORMAT_DATE_TIME2 => [self::class, 'formatDateTime2'],
+        Number_Format::FORMAT_DATE_TIME3 => [self::class, 'formatDateTime3'],
+        Number_Format::FORMAT_DATE_TIME4 => [self::class, 'formatDateTime4'],
+        Number_Format::FORMAT_DATE_TIME5 => [self::class, 'formatDateTime5'],
         //NumberFormat::FORMAT_DATE_TIME6 => [self::class, 'formatDateTime6'], // FORMAT_DATE_TIME6 is identical to TIME4
-        NumberFormat::FORMAT_DATE_TIME7 => [self::class, 'formatDateTime7'], // constant is probably mis-coded
-        NumberFormat::FORMAT_DATE_TIME8 => [self::class, 'formatDateTime8'],
-        NumberFormat::FORMAT_DATE_TIME_INTERVAL_HMS => [self::class, 'formatDateTimeIntervalHms'],
-        NumberFormat::FORMAT_DATE_YYYYMMDDSLASH => [self::class, 'formatDateYyyymmddslash'],
-        NumberFormat::FORMAT_DATE_LONG_DATE => [self::class, 'formatDateLongDate'],
-        NumberFormat::FORMAT_CURRENCY_USD_INTEGER => [self::class, 'formatCurrencyUsdInteger'],
-        NumberFormat::FORMAT_CURRENCY_USD => [self::class, 'formatCurrencyUsd'],
-        NumberFormat::FORMAT_ACCOUNTING_USD => [self::class, 'formatCurrencyUsd'], // ACCOUNTING and CURRENCY are same in Ods
-        NumberFormat::FORMAT_CURRENCY_EUR_INTEGER => [self::class, 'formatCurrencyEurInteger'],
-        NumberFormat::FORMAT_CURRENCY_EUR => [self::class, 'formatCurrencyEur'],
-        NumberFormat::FORMAT_ACCOUNTING_EUR => [self::class, 'formatCurrencyEur'], // ACCOUNTING and CURRENCY are same in Ods
-        NumberFormat::FORMAT_CURRENCY_GBP_INTEGER => [self::class, 'formatCurrencyGbpInteger'],
-        NumberFormat::FORMAT_CURRENCY_GBP => [self::class, 'formatCurrencyGbp'],
-        NumberFormat::FORMAT_CURRENCY_YEN_YUAN_INTEGER => [self::class, 'formatCurrencyYenYuanInteger'],
-        NumberFormat::FORMAT_CURRENCY_YEN_YUAN => [self::class, 'formatCurrencyYenYuan'],
+        Number_Format::FORMAT_DATE_TIME7 => [self::class, 'formatDateTime7'],
+        // constant is probably mis-coded
+        Number_Format::FORMAT_DATE_TIME8 => [self::class, 'formatDateTime8'],
+        Number_Format::FORMAT_DATE_TIME_INTERVAL_HMS => [self::class, 'formatDateTimeIntervalHms'],
+        Number_Format::FORMAT_DATE_YYYYMMDDSLASH => [self::class, 'formatDateYyyymmddslash'],
+        Number_Format::FORMAT_DATE_LONG_DATE => [self::class, 'formatDateLongDate'],
+        Number_Format::FORMAT_CURRENCY_USD_INTEGER => [self::class, 'formatCurrencyUsdInteger'],
+        Number_Format::FORMAT_CURRENCY_USD => [self::class, 'formatCurrencyUsd'],
+        Number_Format::FORMAT_ACCOUNTING_USD => [self::class, 'formatCurrencyUsd'],
+        // ACCOUNTING and CURRENCY are same in Ods
+        Number_Format::FORMAT_CURRENCY_EUR_INTEGER => [self::class, 'formatCurrencyEurInteger'],
+        Number_Format::FORMAT_CURRENCY_EUR => [self::class, 'formatCurrencyEur'],
+        Number_Format::FORMAT_ACCOUNTING_EUR => [self::class, 'formatCurrencyEur'],
+        // ACCOUNTING and CURRENCY are same in Ods
+        Number_Format::FORMAT_CURRENCY_GBP_INTEGER => [self::class, 'formatCurrencyGbpInteger'],
+        Number_Format::FORMAT_CURRENCY_GBP => [self::class, 'formatCurrencyGbp'],
+        Number_Format::FORMAT_CURRENCY_YEN_YUAN_INTEGER => [self::class, 'formatCurrencyYenYuanInteger'],
+        Number_Format::FORMAT_CURRENCY_YEN_YUAN => [self::class, 'formatCurrencyYenYuan'],
     ];
-
-    protected static function formatNumber(self $obj, string $name): void
+    protected static function format_number(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:number-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->endElement(); // number:number-style
+        $obj->writer->start_element('number:number-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->end_element();
+        // number:number-style
     }
-
-    protected static function formatNumber0(self $obj, string $name): void
+    protected static function format_number0(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:number-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '1');
-        $obj->writer->writeAttribute('number:min-decimal-places', '1');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->endElement(); // number:number-style
+        $obj->writer->start_element('number:number-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '1');
+        $obj->writer->write_attribute('number:min-decimal-places', '1');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->end_element();
+        // number:number-style
     }
-
-    protected static function formatNumber00(self $obj, string $name): void
+    protected static function format_number00(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:number-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->endElement(); // number:number-style
+        $obj->writer->start_element('number:number-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '2');
+        $obj->writer->write_attribute('number:min-decimal-places', '2');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->end_element();
+        // number:number-style
     }
-
-    protected static function formatNumberCommaSeparated1(self $obj, string $name): void
+    protected static function format_number_comma_separated1(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:number-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->writeAttribute('number:grouping', 'true');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->endElement(); // number:number-style
+        $obj->writer->start_element('number:number-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '2');
+        $obj->writer->write_attribute('number:min-decimal-places', '2');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->write_attribute('number:grouping', 'true');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->end_element();
+        // number:number-style
     }
-
-    protected static function formatNumberCommaSeparated2(self $obj, string $name): void
+    protected static function format_number_comma_separated2(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:number-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->writeAttribute('number:grouping', 'true');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->startElement('number:text');
+        $obj->writer->start_element('number:number-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '2');
+        $obj->writer->write_attribute('number:min-decimal-places', '2');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->write_attribute('number:grouping', 'true');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->start_element('number:text');
         //$obj->writer->writeAttribute('loext:blank-width-char', '-');
         $obj->writer->text(' ');
-        $obj->writer->endElement(); // number:text
-        $obj->writer->endElement(); // number:number-style
+        $obj->writer->end_element();
+        // number:text
+        $obj->writer->end_element();
+        // number:number-style
     }
-
-    protected static function formatPercentage(self $obj, string $name): void
+    protected static function format_percentage(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:percentage-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '0');
-        $obj->writer->writeAttribute('number:min-decimal-places', '0');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->writeElement('number:text', '%');
-        $obj->writer->endElement(); // number:percentage-style
+        $obj->writer->start_element('number:percentage-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '0');
+        $obj->writer->write_attribute('number:min-decimal-places', '0');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->write_element('number:text', '%');
+        $obj->writer->end_element();
+        // number:percentage-style
     }
-
-    protected static function formatPercentage0(self $obj, string $name): void
+    protected static function format_percentage0(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:percentage-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '1');
-        $obj->writer->writeAttribute('number:min-decimal-places', '1');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->writeElement('number:text', '%');
-        $obj->writer->endElement(); // number:percentage-style
+        $obj->writer->start_element('number:percentage-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '1');
+        $obj->writer->write_attribute('number:min-decimal-places', '1');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->write_element('number:text', '%');
+        $obj->writer->end_element();
+        // number:percentage-style
     }
-
-    protected static function formatPercentage00(self $obj, string $name): void
+    protected static function format_percentage00(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:percentage-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
-        $obj->writer->writeAttribute('number:decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-decimal-places', '2');
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->writeElement('number:text', '%');
-        $obj->writer->endElement(); // number:percentage-style
+        $obj->writer->start_element('number:percentage-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
+        $obj->writer->write_attribute('number:decimal-places', '2');
+        $obj->writer->write_attribute('number:min-decimal-places', '2');
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->write_element('number:text', '%');
+        $obj->writer->end_element();
+        // number:percentage-style
     }
-
-    protected static function formatDateYyyymmdd(self $obj, string $name): void
+    protected static function format_date_yyyymmdd(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateDdmmyyyy(self $obj, string $name): void
+    protected static function format_date_ddmmyyyy(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateDmyslash(self $obj, string $name): void
+    protected static function format_date_dmyslash(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->writeElement('number:year');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->write_element('number:year');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateDmyminus(self $obj, string $name): void
+    protected static function format_date_dmyminus(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:year');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:year');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateDmminus(self $obj, string $name): void
+    protected static function format_date_dmminus(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:month');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:month');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateMyminus(self $obj, string $name): void
+    protected static function format_date_myminus(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:year');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:year');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx14(self $obj, string $name): void
+    protected static function format_date_xlsx14(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:year');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:year');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx14Actual(self $obj, string $name): void
+    protected static function format_date_xlsx14actual(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx15(self $obj, string $name): void
+    protected static function format_date_xlsx15(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:textual', 'true');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:year');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:textual', 'true');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:year');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx15Yyyy(self $obj, string $name): void
+    protected static function format_date_xlsx15yyyy(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:textual', 'true');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:textual', 'true');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx16(self $obj, string $name): void
+    protected static function format_date_xlsx16(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:textual', 'true');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:textual', 'true');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx17(self $obj, string $name): void
+    protected static function format_date_xlsx17(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:textual', 'true');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->writeElement('number:year');
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:textual', 'true');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->write_element('number:year');
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx22(self $obj, string $name): void
+    protected static function format_date_xlsx22(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->startElement('number:year');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->start_element('number:year');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateXlsx22Actual(self $obj, string $name): void
+    protected static function format_date_xlsx22actual(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateDatetime(self $obj, string $name): void
+    protected static function format_date_datetime(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->writeElement('number:month');
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->startElement('number:year');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->write_element('number:month');
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->start_element('number:year');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateDatetimeBetter(self $obj, string $name): void
+    protected static function format_date_datetime_better(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '-');
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->startElement('number:hours');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:hours
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '-');
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->start_element('number:hours');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:hours
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatDateTime1(self $obj, string $name): void
+    protected static function format_date_time1(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->writeElement('number:am-pm');
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->write_element('number:am-pm');
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateTime2(self $obj, string $name): void
+    protected static function format_date_time2(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:seconds');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:seconds
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->writeElement('number:am-pm');
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:seconds');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:seconds
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->write_element('number:am-pm');
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateTime3(self $obj, string $name): void
+    protected static function format_date_time3(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateTime4(self $obj, string $name): void
+    protected static function format_date_time4(self $obj, string $name): void
     {
         // TIME4 and TIME6 are identical
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:seconds');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:seconds
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:seconds');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:seconds
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateTime5(self $obj, string $name): void
+    protected static function format_date_time5(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:seconds');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:seconds
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:seconds');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:seconds
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateTime7(self $obj, string $name): void
+    protected static function format_date_time7(self $obj, string $name): void
     {
         // constant is probably mis-coded
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:seconds');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:seconds
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:seconds');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:seconds
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateTime8(self $obj, string $name): void
+    protected static function format_date_time8(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name . 'P0');
-        $obj->writer->writeElement('number:hours');
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:seconds');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:seconds
-        $obj->writer->endElement(); // number:time-style
-        $obj->writer->startElement('number:text-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:text-content');
-        $obj->writer->startElement('style:map');
-        $obj->writer->writeAttribute('style:condition', 'value()>=0');
-        $obj->writer->writeAttribute('style:apply-style-name', $name . 'P0');
-        $obj->writer->endElement(); // number:style-map
-        $obj->writer->endElement(); // number:text-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name . 'P0');
+        $obj->writer->write_element('number:hours');
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:seconds');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:seconds
+        $obj->writer->end_element();
+        // number:time-style
+        $obj->writer->start_element('number:text-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:text-content');
+        $obj->writer->start_element('style:map');
+        $obj->writer->write_attribute('style:condition', 'value()>=0');
+        $obj->writer->write_attribute('style:apply-style-name', $name . 'P0');
+        $obj->writer->end_element();
+        // number:style-map
+        $obj->writer->end_element();
+        // number:text-style
     }
-
-    protected static function formatDateTimeIntervalHms(self $obj, string $name): void
+    protected static function format_date_time_interval_hms(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:time-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeAttribute(
-            'number:truncate-on-overflow',
-            'false'
-        );
-        $obj->writer->startElement('number:hours');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:hours
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:minutes');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:minutes
-        $obj->writer->writeElement('number:text', ':');
-        $obj->writer->startElement('number:seconds');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:seconds
-        $obj->writer->endElement(); // number:time-style
+        $obj->writer->start_element('number:time-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_attribute('number:truncate-on-overflow', 'false');
+        $obj->writer->start_element('number:hours');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:hours
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:minutes');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:minutes
+        $obj->writer->write_element('number:text', ':');
+        $obj->writer->start_element('number:seconds');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:seconds
+        $obj->writer->end_element();
+        // number:time-style
     }
-
-    protected static function formatDateYyyymmddslash(self $obj, string $name): void
+    protected static function format_date_yyyymmddslash(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name . 'P0');
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', '/');
-        $obj->writer->startElement('number:day');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day
-        $obj->writer->endElement(); // number:date-style
-        $obj->writer->startElement('number:text-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->writeElement('number:text-content');
-        $obj->writer->startElement('style:map');
-        $obj->writer->writeAttribute('style:condition', 'value()>=0');
-        $obj->writer->writeAttribute('style:apply-style-name', $name . 'P0');
-        $obj->writer->endElement(); // number:style-map
-        $obj->writer->endElement(); // number:text-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name . 'P0');
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', '/');
+        $obj->writer->start_element('number:day');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day
+        $obj->writer->end_element();
+        // number:date-style
+        $obj->writer->start_element('number:text-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:text-content');
+        $obj->writer->start_element('style:map');
+        $obj->writer->write_attribute('style:condition', 'value()>=0');
+        $obj->writer->write_attribute('style:apply-style-name', $name . 'P0');
+        $obj->writer->end_element();
+        // number:style-map
+        $obj->writer->end_element();
+        // number:text-style
     }
-
-    protected static function formatDateLongDate(self $obj, string $name): void
+    protected static function format_date_long_date(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:date-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:day-of-week');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:day-of-week
-        $obj->writer->writeElement('number:text', ', ');
-        $obj->writer->startElement('number:month');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->writeAttribute('number:textual', 'true');
-        $obj->writer->endElement(); // number:month
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->writeElement('number:day');
-        $obj->writer->writeElement('number:text', ', ');
-        $obj->writer->startElement('number:year');
-        $obj->writer->writeAttribute('number:style', 'long');
-        $obj->writer->endElement(); // number:year
-        $obj->writer->endElement(); // number:date-style
+        $obj->writer->start_element('number:date-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:day-of-week');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:day-of-week
+        $obj->writer->write_element('number:text', ', ');
+        $obj->writer->start_element('number:month');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->write_attribute('number:textual', 'true');
+        $obj->writer->end_element();
+        // number:month
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->write_element('number:day');
+        $obj->writer->write_element('number:text', ', ');
+        $obj->writer->start_element('number:year');
+        $obj->writer->write_attribute('number:style', 'long');
+        $obj->writer->end_element();
+        // number:year
+        $obj->writer->end_element();
+        // number:date-style
     }
-
-    protected static function formatCurrencyUsdInteger(self $obj, string $name, string $symbol = '$'): void
+    protected static function format_currency_usd_integer(self $obj, string $name, string $symbol = '$'): void
     {
-        $obj->writer->startElement('number:number-style'); // not currency-style
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->WriteElement('number:text', $symbol);
-        $obj->writer->startElement('number:number');
+        $obj->writer->start_element('number:number-style');
+        // not currency-style
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:text', $symbol);
+        $obj->writer->start_element('number:number');
         $decimals = '0';
-        $obj->writer->writeAttribute('number:decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->writeAttribute('number:grouping', 'true');
-        $obj->writer->startElement('number:embedded-text');
-        $obj->writer->writeAttribute('number-position', '0');
+        $obj->writer->write_attribute('number:decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->write_attribute('number:grouping', 'true');
+        $obj->writer->start_element('number:embedded-text');
+        $obj->writer->write_attribute('number-position', '0');
         $obj->writer->text(' ');
-        $obj->writer->endElement(); // number:embedded-text
-        $obj->writer->endElement(); // number:number
-        $obj->writer->endElement(); // number:number-style
+        $obj->writer->end_element();
+        // number:embedded-text
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->end_element();
+        // number:number-style
     }
-
-    protected static function formatCurrencyGbpInteger(self $obj, string $name): void
+    protected static function format_currency_gbp_integer(self $obj, string $name): void
     {
-        self::formatCurrencyUsdInteger($obj, $name, '£');
+        self::format_currency_usd_integer($obj, $name, '£');
     }
-
-    protected static function formatCurrencyYenYuanInteger(self $obj, string $name): void
+    protected static function format_currency_yen_yuan_integer(self $obj, string $name): void
     {
-        self::formatCurrencyUsdInteger($obj, $name, '￥');
+        self::format_currency_usd_integer($obj, $name, '￥');
     }
-
-    protected static function formatCurrencyUsd(self $obj, string $name, string $symbol = '$'): void
+    protected static function format_currency_usd(self $obj, string $name, string $symbol = '$'): void
     {
         // Ods uses same format for Currency and Accounting
-        $obj->writer->startElement('number:number-style'); // NOT currency-style
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->WriteElement('number:text', $symbol);
-        $obj->writer->startElement('number:number');
+        $obj->writer->start_element('number:number-style');
+        // NOT currency-style
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->write_element('number:text', $symbol);
+        $obj->writer->start_element('number:number');
         $decimals = '2';
-        $obj->writer->writeAttribute('number:decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->writeAttribute('number:grouping', 'true');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->writeElement('number:text', ' ');
-        $obj->writer->endElement(); // number:currency-style
+        $obj->writer->write_attribute('number:decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->write_attribute('number:grouping', 'true');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->write_element('number:text', ' ');
+        $obj->writer->end_element();
+        // number:currency-style
     }
-
-    protected static function formatCurrencyGbp(self $obj, string $name): void
+    protected static function format_currency_gbp(self $obj, string $name): void
     {
-        self::formatCurrencyUsd($obj, $name, '£');
+        self::format_currency_usd($obj, $name, '£');
     }
-
-    protected static function formatCurrencyYenYuan(self $obj, string $name): void
+    protected static function format_currency_yen_yuan(self $obj, string $name): void
     {
-        self::formatCurrencyUsd($obj, $name, '￥');
+        self::format_currency_usd($obj, $name, '￥');
     }
-
-    protected static function formatCurrencyEurInteger(self $obj, string $name): void
+    protected static function format_currency_eur_integer(self $obj, string $name): void
     {
-        $obj->writer->startElement('number:currency-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
+        $obj->writer->start_element('number:currency-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
         $decimals = '0';
-        $obj->writer->writeAttribute('number:decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->writeAttribute('number:grouping', 'true');
-        $obj->writer->startElement('number:embedded-text');
-        $obj->writer->writeAttribute('number:position', '0');
-        $obj->writer->endElement(); // number:embedded-text
-        $obj->writer->endElement(); // number:number
-        $obj->writer->startElement('number:text');
+        $obj->writer->write_attribute('number:decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->write_attribute('number:grouping', 'true');
+        $obj->writer->start_element('number:embedded-text');
+        $obj->writer->write_attribute('number:position', '0');
+        $obj->writer->end_element();
+        // number:embedded-text
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->start_element('number:text');
         // $obj->writer->writeAttribute('loext:blank-width-char', '-');
         $obj->writer->text(' ');
-        $obj->writer->endElement(); // number:text
-        $obj->writer->startElement('number:currency-symbol');
-        $obj->writer->writeAttribute('number:language', 'en');
-        $obj->writer->writeAttribute('number:country', 'us');
+        $obj->writer->end_element();
+        // number:text
+        $obj->writer->start_element('number:currency-symbol');
+        $obj->writer->write_attribute('number:language', 'en');
+        $obj->writer->write_attribute('number:country', 'us');
         $obj->writer->text('€');
-        $obj->writer->endElement(); // number:currency-symbol
-
-        $obj->writer->endElement(); // number:currency-style
+        $obj->writer->end_element();
+        // number:currency-symbol
+        $obj->writer->end_element();
+        // number:currency-style
     }
-
-    protected static function formatCurrencyEur(self $obj, string $name): void
+    protected static function format_currency_eur(self $obj, string $name): void
     {
         // Ods uses same format for Currency and Accounting
-        $obj->writer->startElement('number:currency-style');
-        $obj->writer->writeAttribute('style:name', $name);
-        $obj->writer->startElement('number:number');
+        $obj->writer->start_element('number:currency-style');
+        $obj->writer->write_attribute('style:name', $name);
+        $obj->writer->start_element('number:number');
         $decimals = '2';
-        $obj->writer->writeAttribute('number:decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-decimal-places', $decimals);
-        $obj->writer->writeAttribute('number:min-integer-digits', '1');
-        $obj->writer->writeAttribute('number:grouping', 'true');
-        $obj->writer->endElement(); // number:number
-        $obj->writer->startElement('number:text');
+        $obj->writer->write_attribute('number:decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-decimal-places', $decimals);
+        $obj->writer->write_attribute('number:min-integer-digits', '1');
+        $obj->writer->write_attribute('number:grouping', 'true');
+        $obj->writer->end_element();
+        // number:number
+        $obj->writer->start_element('number:text');
         // $obj->writer->writeAttribute('loext:blank-width-char', '-');
         $obj->writer->text(' ');
-        $obj->writer->endElement(); // number:text
-        $obj->writer->startElement('number:currency-symbol');
-        $obj->writer->writeAttribute('number:language', 'en');
-        $obj->writer->writeAttribute('number:country', 'us');
+        $obj->writer->end_element();
+        // number:text
+        $obj->writer->start_element('number:currency-symbol');
+        $obj->writer->write_attribute('number:language', 'en');
+        $obj->writer->write_attribute('number:country', 'us');
         $obj->writer->text('€');
-        $obj->writer->endElement(); // number:currency-symbol
-
-        $obj->writer->endElement(); // number:currency-style
+        $obj->writer->end_element();
+        // number:currency-symbol
+        $obj->writer->end_element();
+        // number:currency-style
     }
 }

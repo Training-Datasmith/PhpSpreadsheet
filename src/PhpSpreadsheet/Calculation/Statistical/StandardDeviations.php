@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-class StandardDeviations
+class Standard_Deviations
 {
     /**
      * STDEV.
@@ -25,10 +24,8 @@ class StandardDeviations
         if (!is_numeric($result)) {
             return $result;
         }
-
         return sqrt((float) $result);
     }
-
     /**
      * STDEVA.
      *
@@ -45,10 +42,8 @@ class StandardDeviations
         if (!is_numeric($result)) {
             return $result;
         }
-
         return sqrt((float) $result);
     }
-
     /**
      * STDEVP.
      *
@@ -65,10 +60,8 @@ class StandardDeviations
         if (!is_numeric($result)) {
             return $result;
         }
-
         return sqrt((float) $result);
     }
-
     /**
      * STDEVPA.
      *
@@ -85,7 +78,6 @@ class StandardDeviations
         if (!is_numeric($result)) {
             return $result;
         }
-
         return sqrt((float) $result);
     }
 }

@@ -1,21 +1,18 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Ods;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Ods;
-
-use PhpOffice\PhpSpreadsheet\Writer\Ods;
-
-abstract class WriterPart
+use Php_Office\Php_Spreadsheet\Writer\Ods;
+abstract class Writer_Part
 {
     /**
      * Get Ods writer.
      */
-    public function getParentWriter(): Ods
+    public function get_parent_writer(): Ods
     {
-        return $this->parentWriter;
+        return $this->parent_writer;
     }
-
     /**
      * Set parent Ods writer.
      */
@@ -23,9 +20,9 @@ abstract class WriterPart
         /**
          * Parent Ods object.
          */
-        private readonly Ods $parentWriter
-    ) {
+        private readonly Ods $parent_writer
+    )
+    {
     }
-
     abstract public function write(): string;
 }

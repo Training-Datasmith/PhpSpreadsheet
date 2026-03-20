@@ -1,58 +1,52 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Gnumeric;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Gnumeric;
-
-use PhpOffice\PhpSpreadsheet\Reader\Gnumeric;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageMargins;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup as WorksheetPageSetup;
-use SimpleXMLElement;
-
-class PageSetup
+use Php_Office\Php_Spreadsheet\Reader\Gnumeric;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Margins;
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Setup as WorksheetPageSetup;
+use Simple_Xml_Element;
+class Page_Setup
 {
     public function __construct(private readonly Spreadsheet $spreadsheet)
     {
     }
-
-    public function printInformation(SimpleXMLElement $sheet): self
+    public function print_information(Simple_Xml_Element $sheet): self
     {
-        if (isset($sheet->PrintInformation, $sheet->PrintInformation[0])) {
-            $printInformation = $sheet->PrintInformation[0];
-            $setup = $this->spreadsheet->getActiveSheet()->getPageSetup();
-
-            $attributes = $printInformation->Scale->attributes();
+        if (isset($sheet->print_information, $sheet->print_information[0])) {
+            $print_information = $sheet->print_information[0];
+            $setup = $this->spreadsheet->get_active_sheet()->get_page_setup();
+            $attributes = $print_information->Scale->attributes();
             if (isset($attributes['percentage'])) {
-                $setup->setScale((int) $attributes['percentage']);
+                $setup->set_scale((int) $attributes['percentage']);
             }
-            $pageOrder = (string) $printInformation->order;
-            if ($pageOrder === 'r_then_d') {
-                $setup->setPageOrder(WorksheetPageSetup::PAGEORDER_OVER_THEN_DOWN);
-            } elseif ($pageOrder === 'd_then_r') {
-                $setup->setPageOrder(WorksheetPageSetup::PAGEORDER_DOWN_THEN_OVER);
+            $page_order = (string) $print_information->order;
+            if ($page_order === 'r_then_d') {
+                $setup->set_page_order(Worksheet_Page_Setup::PAGEORDER_OVER_THEN_DOWN);
+            } elseif ($page_order === 'd_then_r') {
+                $setup->set_page_order(Worksheet_Page_Setup::PAGEORDER_DOWN_THEN_OVER);
             }
-            $orientation = (string) $printInformation->orientation;
+            $orientation = (string) $print_information->orientation;
             if ($orientation !== '') {
-                $setup->setOrientation($orientation);
+                $setup->set_orientation($orientation);
             }
-            $attributes = $printInformation->hcenter->attributes();
+            $attributes = $print_information->hcenter->attributes();
             if (isset($attributes['value'])) {
-                $setup->setHorizontalCentered((bool) (string) $attributes['value']);
+                $setup->set_horizontal_centered((bool) (string) $attributes['value']);
             }
-            $attributes = $printInformation->vcenter->attributes();
+            $attributes = $print_information->vcenter->attributes();
             if (isset($attributes['value'])) {
-                $setup->setVerticalCentered((bool) (string) $attributes['value']);
+                $setup->set_vertical_centered((bool) (string) $attributes['value']);
             }
         }
-
         return $this;
     }
-
-    public function sheetMargins(SimpleXMLElement $sheet): self
+    public function sheet_margins(Simple_Xml_Element $sheet): self
     {
-        if (isset($sheet->PrintInformation, $sheet->PrintInformation->Margins)) {
-            $marginSet = [
+        if (isset($sheet->print_information, $sheet->print_information->Margins)) {
+            $margin_set = [
                 // Default Settings
                 'top' => 0.75,
                 'header' => 0.3,
@@ -61,91 +55,75 @@ class PageSetup
                 'bottom' => 0.75,
                 'footer' => 0.3,
             ];
-
-            $marginSet = $this->buildMarginSet($sheet, $marginSet);
-            $this->adjustMargins($marginSet);
+            $margin_set = $this->build_margin_set($sheet, $margin_set);
+            $this->adjust_margins($margin_set);
         }
-
         return $this;
     }
-
     /**
      * @param float[] $marginSet
      *
      * @return float[]
      */
-    private function buildMarginSet(SimpleXMLElement $sheet, array $marginSet): array
+    private function build_margin_set(Simple_Xml_Element $sheet, array $margin_set): array
     {
-        foreach ($sheet->PrintInformation->Margins->children(Gnumeric::NAMESPACE_GNM) as $key => $margin) {
-            $marginAttributes = $margin->attributes();
-            $marginSize = ($marginAttributes['Points']) ?? 72; //    Default is 72pt
+        foreach ($sheet->print_information->Margins->children(Gnumeric::NAMESPACE_GNM) as $key => $margin) {
+            $margin_attributes = $margin->attributes();
+            $margin_size = $margin_attributes['Points'] ?? 72;
+            //    Default is 72pt
             // Convert value in points to inches
-            $marginSize = PageMargins::fromPoints((float) $marginSize);
-            $marginSet[$key] = $marginSize;
+            $margin_size = Page_Margins::from_points((float) $margin_size);
+            $margin_set[$key] = $margin_size;
         }
-
-        return $marginSet;
+        return $margin_set;
     }
-
     /** @param float[] $marginSet */
-    private function adjustMargins(array $marginSet): void
+    private function adjust_margins(array $margin_set): void
     {
-        foreach ($marginSet as $key => $marginSize) {
+        foreach ($margin_set as $key => $margin_size) {
             // Gnumeric is quirky in the way it displays the header/footer values:
             //    header is actually the sum of top and header; footer is actually the sum of bottom and footer
             //    then top is actually the header value, and bottom is actually the footer value
             switch ($key) {
                 case 'left':
                 case 'right':
-                    $this->sheetMargin($key, $marginSize);
-
+                    $this->sheet_margin($key, $margin_size);
                     break;
                 case 'top':
-                    $this->sheetMargin($key, $marginSet['header'] ?? 0);
-
+                    $this->sheet_margin($key, $margin_set['header'] ?? 0);
                     break;
                 case 'bottom':
-                    $this->sheetMargin($key, $marginSet['footer'] ?? 0);
-
+                    $this->sheet_margin($key, $margin_set['footer'] ?? 0);
                     break;
                 case 'header':
-                    $this->sheetMargin($key, ($marginSet['top'] ?? 0) - $marginSize);
-
+                    $this->sheet_margin($key, ($margin_set['top'] ?? 0) - $margin_size);
                     break;
                 case 'footer':
-                    $this->sheetMargin($key, ($marginSet['bottom'] ?? 0) - $marginSize);
-
+                    $this->sheet_margin($key, ($margin_set['bottom'] ?? 0) - $margin_size);
                     break;
             }
         }
     }
-
-    private function sheetMargin(string $key, float $marginSize): void
+    private function sheet_margin(string $key, float $margin_size): void
     {
         switch ($key) {
             case 'top':
-                $this->spreadsheet->getActiveSheet()->getPageMargins()->setTop($marginSize);
-
+                $this->spreadsheet->get_active_sheet()->get_page_margins()->set_top($margin_size);
                 break;
             case 'bottom':
-                $this->spreadsheet->getActiveSheet()->getPageMargins()->setBottom($marginSize);
-
+                $this->spreadsheet->get_active_sheet()->get_page_margins()->set_bottom($margin_size);
                 break;
             case 'left':
-                $this->spreadsheet->getActiveSheet()->getPageMargins()->setLeft($marginSize);
-
+                $this->spreadsheet->get_active_sheet()->get_page_margins()->set_left($margin_size);
                 break;
             case 'right':
-                $this->spreadsheet->getActiveSheet()->getPageMargins()->setRight($marginSize);
-
+                $this->spreadsheet->get_active_sheet()->get_page_margins()->set_right($margin_size);
                 break;
             case 'header':
-                $this->spreadsheet->getActiveSheet()->getPageMargins()->setHeader($marginSize);
-
+                $this->spreadsheet->get_active_sheet()->get_page_margins()->set_header($margin_size);
                 break;
             case 'footer':
-                $this->spreadsheet->getActiveSheet()->getPageMargins()->setFooter($marginSize);
-
+                $this->spreadsheet->get_active_sheet()->get_page_margins()->set_footer($margin_size);
                 break;
         }
     }

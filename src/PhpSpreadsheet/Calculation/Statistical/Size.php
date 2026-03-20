@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Size
 {
     /**
@@ -24,27 +22,22 @@ class Size
      */
     public static function large(mixed ...$args): string|float
     {
-        $aArgs = Functions::flattenArray($args);
-        $entry = array_pop($aArgs);
-
-        if ((is_numeric($entry)) && (!is_string($entry))) {
+        $a_args = Functions::flatten_array($args);
+        $entry = array_pop($a_args);
+        if (is_numeric($entry) && !is_string($entry)) {
             $entry = (int) floor($entry);
-
-            $mArgs = self::filter($aArgs);
-            $count = Counts::COUNT($mArgs);
+            $m_args = self::filter($a_args);
+            $count = Counts::COUNT($m_args);
             --$entry;
             if ($count === 0 || $entry < 0 || $entry >= $count) {
-                return ExcelError::NAN();
+                return Excel_Error::NAN();
             }
-            rsort($mArgs);
+            rsort($m_args);
             /** @var float[] $mArgs */
-
-            return $mArgs[$entry];
+            return $m_args[$entry];
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
-
     /**
      * SMALL.
      *
@@ -60,28 +53,22 @@ class Size
      */
     public static function small(mixed ...$args): string|float
     {
-        $aArgs = Functions::flattenArray($args);
-
-        $entry = array_pop($aArgs);
-
-        if ((is_numeric($entry)) && (!is_string($entry))) {
+        $a_args = Functions::flatten_array($args);
+        $entry = array_pop($a_args);
+        if (is_numeric($entry) && !is_string($entry)) {
             $entry = (int) floor($entry);
-
-            $mArgs = self::filter($aArgs);
-            $count = Counts::COUNT($mArgs);
+            $m_args = self::filter($a_args);
+            $count = Counts::COUNT($m_args);
             --$entry;
             if ($count === 0 || $entry < 0 || $entry >= $count) {
-                return ExcelError::NAN();
+                return Excel_Error::NAN();
             }
-            sort($mArgs);
+            sort($m_args);
             /** @var float[] $mArgs */
-
-            return $mArgs[$entry];
+            return $m_args[$entry];
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
-
     /**
      * @param mixed[] $args Data values
      *
@@ -89,15 +76,13 @@ class Size
      */
     protected static function filter(array $args): array
     {
-        $mArgs = [];
-
+        $m_args = [];
         foreach ($args as $arg) {
             // Is it a numeric value?
-            if ((is_numeric($arg)) && (!is_string($arg))) {
-                $mArgs[] = $arg;
+            if (is_numeric($arg) && !is_string($arg)) {
+                $m_args[] = $arg;
             }
         }
-
-        return $mArgs;
+        return $m_args;
     }
 }

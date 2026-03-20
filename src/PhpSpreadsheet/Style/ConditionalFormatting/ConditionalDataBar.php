@@ -1,78 +1,58 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
-
-class ConditionalDataBar
+class Conditional_Data_Bar
 {
-    private ?bool $showValue = null;
-
-    private ?ConditionalFormatValueObject $minimumConditionalFormatValueObject = null;
-
-    private ?ConditionalFormatValueObject $maximumConditionalFormatValueObject = null;
-
+    private ?bool $show_value = null;
+    private ?Conditional_Format_Value_Object $minimum_conditional_format_value_object = null;
+    private ?Conditional_Format_Value_Object $maximum_conditional_format_value_object = null;
     private string $color = '';
-
-    private ?ConditionalFormattingRuleExtension $conditionalFormattingRuleExt = null;
-
-    public function getShowValue(): ?bool
+    private ?Conditional_Formatting_Rule_Extension $conditional_formatting_rule_ext = null;
+    public function get_show_value(): ?bool
     {
-        return $this->showValue;
+        return $this->show_value;
     }
-
-    public function setShowValue(bool $showValue): self
+    public function set_show_value(bool $show_value): self
     {
-        $this->showValue = $showValue;
-
+        $this->show_value = $show_value;
         return $this;
     }
-
-    public function getMinimumConditionalFormatValueObject(): ?ConditionalFormatValueObject
+    public function get_minimum_conditional_format_value_object(): ?Conditional_Format_Value_Object
     {
-        return $this->minimumConditionalFormatValueObject;
+        return $this->minimum_conditional_format_value_object;
     }
-
-    public function setMinimumConditionalFormatValueObject(ConditionalFormatValueObject $minimumConditionalFormatValueObject): self
+    public function set_minimum_conditional_format_value_object(Conditional_Format_Value_Object $minimum_conditional_format_value_object): self
     {
-        $this->minimumConditionalFormatValueObject = $minimumConditionalFormatValueObject;
-
+        $this->minimum_conditional_format_value_object = $minimum_conditional_format_value_object;
         return $this;
     }
-
-    public function getMaximumConditionalFormatValueObject(): ?ConditionalFormatValueObject
+    public function get_maximum_conditional_format_value_object(): ?Conditional_Format_Value_Object
     {
-        return $this->maximumConditionalFormatValueObject;
+        return $this->maximum_conditional_format_value_object;
     }
-
-    public function setMaximumConditionalFormatValueObject(ConditionalFormatValueObject $maximumConditionalFormatValueObject): self
+    public function set_maximum_conditional_format_value_object(Conditional_Format_Value_Object $maximum_conditional_format_value_object): self
     {
-        $this->maximumConditionalFormatValueObject = $maximumConditionalFormatValueObject;
-
+        $this->maximum_conditional_format_value_object = $maximum_conditional_format_value_object;
         return $this;
     }
-
-    public function getColor(): string
+    public function get_color(): string
     {
         return $this->color;
     }
-
-    public function setColor(string $color): self
+    public function set_color(string $color): self
     {
         $this->color = $color;
-
         return $this;
     }
-
-    public function getConditionalFormattingRuleExt(): ?ConditionalFormattingRuleExtension
+    public function get_conditional_formatting_rule_ext(): ?Conditional_Formatting_Rule_Extension
     {
-        return $this->conditionalFormattingRuleExt;
+        return $this->conditional_formatting_rule_ext;
     }
-
-    public function setConditionalFormattingRuleExt(ConditionalFormattingRuleExtension $conditionalFormattingRuleExt): self
+    public function set_conditional_formatting_rule_ext(Conditional_Formatting_Rule_Extension $conditional_formatting_rule_ext): self
     {
-        $this->conditionalFormattingRuleExt = $conditionalFormattingRuleExt;
-
+        $this->conditional_formatting_rule_ext = $conditional_formatting_rule_ext;
         return $this;
     }
 }

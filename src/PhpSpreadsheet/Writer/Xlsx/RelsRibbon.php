@@ -1,49 +1,44 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-
-class RelsRibbon extends WriterPart
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+class Rels_Ribbon extends Writer_Part
 {
     /**
      * Write relationships for additional objects of custom UI (ribbon).
      *
      * @return string XML Output
      */
-    public function writeRibbonRelationships(Spreadsheet $spreadsheet): string
+    public function write_ribbon_relationships(Spreadsheet $spreadsheet): string
     {
         // Create XML writer
-        $objWriter = null;
-        if ($this->getParentWriter()->getUseDiskCaching()) {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_DISK, $this->getParentWriter()->getDiskCachingDirectory());
+        $obj_writer = null;
+        if ($this->get_parent_writer()->get_use_disk_caching()) {
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_DISK, $this->get_parent_writer()->get_disk_caching_directory());
         } else {
-            $objWriter = new XMLWriter(XMLWriter::STORAGE_MEMORY);
+            $obj_writer = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
         }
-
         // XML header
-        $objWriter->startDocument('1.0', 'UTF-8', 'yes');
-
+        $obj_writer->start_document('1.0', 'UTF-8', 'yes');
         // Relationships
-        $objWriter->startElement('Relationships');
-        $objWriter->writeAttribute('xmlns', Namespaces::RELATIONSHIPS);
-        $localRels = $spreadsheet->getRibbonBinObjects('names');
-        if (is_array($localRels)) {
-            foreach ($localRels as $aId => $aTarget) {
-                $objWriter->startElement('Relationship');
-                $objWriter->writeAttribute('Id', $aId);
-                $objWriter->writeAttribute('Type', Namespaces::IMAGE);
+        $obj_writer->start_element('Relationships');
+        $obj_writer->write_attribute('xmlns', Namespaces::RELATIONSHIPS);
+        $local_rels = $spreadsheet->get_ribbon_bin_objects('names');
+        if (is_array($local_rels)) {
+            foreach ($local_rels as $a_id => $a_target) {
+                $obj_writer->start_element('Relationship');
+                $obj_writer->write_attribute('Id', $a_id);
+                $obj_writer->write_attribute('Type', Namespaces::IMAGE);
                 /** @var string $aTarget */
-                $objWriter->writeAttribute('Target', $aTarget);
-                $objWriter->endElement();
+                $obj_writer->write_attribute('Target', $a_target);
+                $obj_writer->end_element();
             }
         }
-        $objWriter->endElement();
-
-        return $objWriter->getData();
+        $obj_writer->end_element();
+        return $obj_writer->get_data();
     }
 }

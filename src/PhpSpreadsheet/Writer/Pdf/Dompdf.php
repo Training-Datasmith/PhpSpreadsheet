@@ -1,29 +1,25 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Pdf;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Setup;
+use Php_Office\Php_Spreadsheet\Writer\Pdf;
 class Dompdf extends Pdf
 {
     /**
      * embed images, or link to images.
      */
-    protected bool $embedImages = true;
-
+    protected bool $embed_images = true;
     /**
      * Gets the implementation of external PDF library that should be used.
      *
      * @return \Dompdf\Dompdf implementation
      */
-    protected function createExternalWriterInstance(): \Dompdf\Dompdf
+    protected function create_external_writer_instance(): \Dompdf\Dompdf
     {
         return new \Dompdf\Dompdf();
     }
-
     /**
      * Save Spreadsheet to file.
      *
@@ -31,35 +27,28 @@ class Dompdf extends Pdf
      */
     public function save($filename, int $flags = 0): void
     {
-        $fileHandle = parent::prepareForSave($filename);
-
+        $file_handle = parent::prepare_for_save($filename);
         //  Check for paper size and page orientation
-        $setup = $this->spreadsheet->getSheet($this->getSheetIndex() ?? 0)->getPageSetup();
-        $orientation = $this->getOrientation() ?? $setup->getOrientation();
-        $orientation = ($orientation === PageSetup::ORIENTATION_LANDSCAPE) ? 'L' : 'P';
-        $printPaperSize = $this->getPaperSize() ?? $setup->getPaperSize();
-        $paperSize = self::$paperSizes[$printPaperSize] ?? self::$paperSizes[PageSetup::getPaperSizeDefault()] ?? 'LETTER';
-        if (is_array($paperSize) && count($paperSize) === 2) {
-            $paperSize = [0.0, 0.0, $paperSize[0], $paperSize[1]];
+        $setup = $this->spreadsheet->get_sheet($this->get_sheet_index() ?? 0)->get_page_setup();
+        $orientation = $this->get_orientation() ?? $setup->get_orientation();
+        $orientation = $orientation === Page_Setup::ORIENTATION_LANDSCAPE ? 'L' : 'P';
+        $print_paper_size = $this->get_paper_size() ?? $setup->get_paper_size();
+        $paper_size = self::$paper_sizes[$print_paper_size] ?? self::$paper_sizes[Page_Setup::get_paper_size_default()] ?? 'LETTER';
+        if (is_array($paper_size) && count($paper_size) === 2) {
+            $paper_size = [0.0, 0.0, $paper_size[0], $paper_size[1]];
         }
-
-        $orientation = ($orientation == 'L') ? 'landscape' : 'portrait';
-
+        $orientation = $orientation == 'L' ? 'landscape' : 'portrait';
         //  Create PDF
-        $pdf = $this->createExternalWriterInstance();
-        $pdf->setPaper($paperSize, $orientation);
-
-        $pdf->loadHtml($this->generateHTMLAll());
+        $pdf = $this->create_external_writer_instance();
+        $pdf->set_paper($paper_size, $orientation);
+        $pdf->load_html($this->generate_html_all());
         $pdf->render();
-        $this->callPageScript($pdf);
-
+        $this->call_page_script($pdf);
         //  Write to file
-        fwrite($fileHandle, $pdf->output());
-
-        parent::restoreStateAfterSave();
+        fwrite($file_handle, $pdf->output());
+        parent::restore_state_after_save();
     }
-
-    protected function callPageScript(\Dompdf\Dompdf $pdf): void
+    protected function call_page_script(\Dompdf\Dompdf $pdf): void
     {
     }
 }

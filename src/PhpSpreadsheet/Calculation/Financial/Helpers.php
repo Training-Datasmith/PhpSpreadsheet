@@ -1,14 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial;
 
 use DateTimeInterface;
-use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\Constants as FinancialConstants;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Constants as FinancialConstants;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Helpers
 {
     /**
@@ -26,29 +24,26 @@ class Helpers
      *
      * @return int|string Result, or a string containing an error
      */
-    public static function daysPerYear(mixed $year, $basis = 0): string|int
+    public static function days_per_year(mixed $year, $basis = 0): string|int
     {
         if (!is_int($year) && !is_string($year)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
         if (!is_numeric($basis)) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
         switch ($basis) {
-            case FinancialConstants::BASIS_DAYS_PER_YEAR_NASD:
-            case FinancialConstants::BASIS_DAYS_PER_YEAR_360:
-            case FinancialConstants::BASIS_DAYS_PER_YEAR_360_EUROPEAN:
+            case Financial_Constants::BASIS_DAYS_PER_YEAR_NASD:
+            case Financial_Constants::BASIS_DAYS_PER_YEAR_360:
+            case Financial_Constants::BASIS_DAYS_PER_YEAR_360_EUROPEAN:
                 return 360;
-            case FinancialConstants::BASIS_DAYS_PER_YEAR_365:
+            case Financial_Constants::BASIS_DAYS_PER_YEAR_365:
                 return 365;
-            case FinancialConstants::BASIS_DAYS_PER_YEAR_ACTUAL:
-                return (DateTimeExcel\Helpers::isLeapYear($year)) ? 366 : 365;
+            case Financial_Constants::BASIS_DAYS_PER_YEAR_ACTUAL:
+                return Date_Time_Excel\Helpers::is_leap_year($year) ? 366 : 365;
         }
-
-        return ExcelError::NAN();
+        return Excel_Error::NAN();
     }
-
     /**
      * isLastDayOfMonth.
      *
@@ -56,7 +51,7 @@ class Helpers
      *
      * @param DateTimeInterface $date The date for testing
      */
-    public static function isLastDayOfMonth(DateTimeInterface $date): bool
+    public static function is_last_day_of_month(DateTimeInterface $date): bool
     {
         return $date->format('d') === $date->format('t');
     }

@@ -1,18 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial\Cash_Flow\Variable;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Variable;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Periodic
 {
     public const FINANCIAL_MAX_ITERATIONS = 128;
-
-    public const FINANCIAL_PRECISION = 1.0e-08;
-
+    public const FINANCIAL_PRECISION = 1.0E-8;
     /**
      * IRR.
      *
@@ -34,34 +30,32 @@ class Periodic
     public static function rate(mixed $values, mixed $guess = 0.1): string|float
     {
         if (!is_array($values)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-        $values = Functions::flattenArray($values);
-        $guess = Functions::flattenSingleValue($guess);
+        $values = Functions::flatten_array($values);
+        $guess = Functions::flatten_single_value($guess);
         if (!is_numeric($guess)) {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-
         // create an initial range, with a root somewhere between 0 and guess
         $x1 = 0.0;
         $x2 = $guess;
-        $f1 = self::presentValue($x1, $values);
-        $f2 = self::presentValue($x2, $values);
+        $f1 = self::present_value($x1, $values);
+        $f2 = self::present_value($x2, $values);
         for ($i = 0; $i < self::FINANCIAL_MAX_ITERATIONS; ++$i) {
-            if (($f1 * $f2) < 0.0) {
+            if ($f1 * $f2 < 0.0) {
                 break;
             }
             if (abs($f1) < abs($f2)) {
-                $f1 = self::presentValue($x1 += 1.6 * ($x1 - $x2), $values);
+                $f1 = self::present_value($x1 += 1.6 * ($x1 - $x2), $values);
             } else {
-                $f2 = self::presentValue($x2 += 1.6 * ($x2 - $x1), $values);
+                $f2 = self::present_value($x2 += 1.6 * ($x2 - $x1), $values);
             }
         }
-        if (($f1 * $f2) > 0.0) {
-            return ExcelError::VALUE();
+        if ($f1 * $f2 > 0.0) {
+            return Excel_Error::VALUE();
         }
-
-        $f = self::presentValue($x1, $values);
+        $f = self::present_value($x1, $values);
         if ($f < 0.0) {
             $rtb = $x1;
             $dx = $x2 - $x1;
@@ -69,22 +63,19 @@ class Periodic
             $rtb = $x2;
             $dx = $x1 - $x2;
         }
-
         for ($i = 0; $i < self::FINANCIAL_MAX_ITERATIONS; ++$i) {
             $dx *= 0.5;
             $x_mid = $rtb + $dx;
-            $f_mid = self::presentValue($x_mid, $values);
+            $f_mid = self::present_value($x_mid, $values);
             if ($f_mid <= 0.0) {
                 $rtb = $x_mid;
             }
-            if ((abs($f_mid) < self::FINANCIAL_PRECISION) || (abs($dx) < self::FINANCIAL_PRECISION)) {
+            if (abs($f_mid) < self::FINANCIAL_PRECISION || abs($dx) < self::FINANCIAL_PRECISION) {
                 return $x_mid;
             }
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
-
     /**
      * MIRR.
      *
@@ -102,41 +93,34 @@ class Periodic
      *
      * @return float|string Result, or a string containing an error
      */
-    public static function modifiedRate(mixed $values, mixed $financeRate, mixed $reinvestmentRate): string|float
+    public static function modified_rate(mixed $values, mixed $finance_rate, mixed $reinvestment_rate): string|float
     {
         if (!is_array($values)) {
-            return ExcelError::DIV0();
+            return Excel_Error::DIV0();
         }
-        $values = Functions::flattenArray($values);
+        $values = Functions::flatten_array($values);
         /** @var float */
-        $financeRate = Functions::flattenSingleValue($financeRate);
+        $finance_rate = Functions::flatten_single_value($finance_rate);
         /** @var float */
-        $reinvestmentRate = Functions::flattenSingleValue($reinvestmentRate);
+        $reinvestment_rate = Functions::flatten_single_value($reinvestment_rate);
         $n = count($values);
-
-        $rr = 1.0 + $reinvestmentRate;
-        $fr = 1.0 + $financeRate;
-
-        $npvPos = $npvNeg = 0.0;
+        $rr = 1.0 + $reinvestment_rate;
+        $fr = 1.0 + $finance_rate;
+        $npv_pos = $npv_neg = 0.0;
         foreach ($values as $i => $v) {
             /** @var float $v */
             if ($v >= 0) {
-                $npvPos += $v / $rr ** $i;
+                $npv_pos += $v / $rr ** $i;
             } else {
-                $npvNeg += $v / $fr ** $i;
+                $npv_neg += $v / $fr ** $i;
             }
         }
-
-        if ($npvNeg === 0.0 || $npvPos === 0.0) {
-            return ExcelError::DIV0();
+        if ($npv_neg === 0.0 || $npv_pos === 0.0) {
+            return Excel_Error::DIV0();
         }
-
-        $mirr = ((-$npvPos * $rr ** $n)
-                / ($npvNeg * ($rr))) ** (1.0 / ($n - 1)) - 1.0;
-
-        return is_finite($mirr) ? $mirr : ExcelError::NAN();
+        $mirr = (-$npv_pos * $rr ** $n / ($npv_neg * $rr)) ** (1.0 / ($n - 1)) - 1.0;
+        return is_finite($mirr) ? $mirr : Excel_Error::NAN();
     }
-
     /**
      * NPV.
      *
@@ -144,23 +128,20 @@ class Periodic
      *
      * @param array<mixed> $args
      */
-    public static function presentValue(mixed $rate, ...$args): int|float
+    public static function present_value(mixed $rate, ...$args): int|float
     {
-        $returnValue = 0;
-
+        $return_value = 0;
         /** @var float */
-        $rate = Functions::flattenSingleValue($rate);
-        $aArgs = Functions::flattenArray($args);
-
+        $rate = Functions::flatten_single_value($rate);
+        $a_args = Functions::flatten_array($args);
         // Calculate
-        $countArgs = count($aArgs);
-        for ($i = 1; $i <= $countArgs; ++$i) {
+        $count_args = count($a_args);
+        for ($i = 1; $i <= $count_args; ++$i) {
             // Is it a numeric value?
-            if (is_numeric($aArgs[$i - 1])) {
-                $returnValue += $aArgs[$i - 1] / (1 + $rate) ** $i;
+            if (is_numeric($a_args[$i - 1])) {
+                $return_value += $a_args[$i - 1] / (1 + $rate) ** $i;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
 }

@@ -1,29 +1,24 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class EngineeringValidations
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Engineering_Validations
 {
-    public static function validateFloat(mixed $value): float
+    public static function validate_float(mixed $value): float
     {
         if (!is_numeric($value)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (float) $value;
     }
-
-    public static function validateInt(mixed $value): int
+    public static function validate_int(mixed $value): int
     {
         if (!is_numeric($value)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (int) floor((float) $value);
     }
 }

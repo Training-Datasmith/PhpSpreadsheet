@@ -1,51 +1,41 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format\Wizard;
 
 use Stringable;
-
-abstract class DateTimeWizard implements Stringable, Wizard
+abstract class Date_Time_Wizard implements Stringable, Wizard
 {
-    protected const NO_ESCAPING_NEEDED = "$+-/():!^&'~{}<>= ";
-
+    protected const NO_ESCAPING_NEEDED = "\$+-/():!^&'~{}<>= ";
     /**
      * @param array<?string> $separators
      *
      * @return array<?string>
      */
-    protected function padSeparatorArray(array $separators, int $count): array
+    protected function pad_separator_array(array $separators, int $count): array
     {
-        $lastSeparator = (string) array_pop($separators);
-
-        return $separators + array_fill(0, $count, $lastSeparator);
+        $last_separator = (string) array_pop($separators);
+        return $separators + array_fill(0, $count, $last_separator);
     }
-
-    protected function escapeSingleCharacter(string $value): string
+    protected function escape_single_character(string $value): string
     {
         if (str_contains(self::NO_ESCAPING_NEEDED, $value)) {
             return $value;
         }
-
         return "\\{$value}";
     }
-
-    protected function wrapLiteral(string $value): string
+    protected function wrap_literal(string $value): string
     {
         if (mb_strlen($value, 'UTF-8') === 1) {
-            return $this->escapeSingleCharacter($value);
+            return $this->escape_single_character($value);
         }
-
         // Wrap any other string literals in quotes, so that they're clearly defined as string literals
         return '"' . str_replace('"', '""', $value) . '"';
     }
-
-    protected function intersperse(string $formatBlock, ?string $separator): string
+    protected function intersperse(string $format_block, ?string $separator): string
     {
-        return "{$formatBlock}{$separator}";
+        return "{$format_block}{$separator}";
     }
-
     public function __toString(): string
     {
         return $this->format();

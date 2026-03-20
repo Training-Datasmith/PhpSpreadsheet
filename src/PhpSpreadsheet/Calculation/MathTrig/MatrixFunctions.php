@@ -1,49 +1,44 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
 use Matrix\Builder;
 use Matrix\Div0Exception as MatrixDiv0Exception;
 use Matrix\Exception as MatrixException;
 use Matrix\Matrix;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class MatrixFunctions
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Matrix_Functions
 {
     /**
      * Convert parameter to Matrix.
      *
      * @param mixed $matrixValues A matrix of values
      */
-    private static function getMatrix(mixed $matrixValues): Matrix
+    private static function get_matrix(mixed $matrix_values): Matrix
     {
-        $matrixData = [];
-        if (!is_array($matrixValues)) {
-            $matrixValues = [[$matrixValues]];
+        $matrix_data = [];
+        if (!is_array($matrix_values)) {
+            $matrix_values = [[$matrix_values]];
         }
-
         $row = 0;
-        foreach ($matrixValues as $matrixRow) {
-            if (!is_array($matrixRow)) {
-                $matrixRow = [$matrixRow];
+        foreach ($matrix_values as $matrix_row) {
+            if (!is_array($matrix_row)) {
+                $matrix_row = [$matrix_row];
             }
             $column = 0;
-            foreach ($matrixRow as $matrixCell) {
-                if ((is_string($matrixCell)) || ($matrixCell === null)) {
-                    throw new Exception(ExcelError::VALUE());
+            foreach ($matrix_row as $matrix_cell) {
+                if (is_string($matrix_cell) || $matrix_cell === null) {
+                    throw new Exception(Excel_Error::VALUE());
                 }
-                $matrixData[$row][$column] = $matrixCell;
+                $matrix_data[$row][$column] = $matrix_cell;
                 ++$column;
             }
             ++$row;
         }
-
-        return new Matrix($matrixData);
+        return new Matrix($matrix_data);
     }
-
     /**
      * SEQUENCE.
      *
@@ -62,29 +57,20 @@ class MatrixFunctions
     public static function sequence(mixed $rows = 1, mixed $columns = 1, mixed $start = 1, mixed $step = 1): string|array
     {
         try {
-            $rows = (int) Helpers::validateNumericNullSubstitution($rows, 1);
-            Helpers::validatePositive($rows);
-            $columns = (int) Helpers::validateNumericNullSubstitution($columns, 1);
-            Helpers::validatePositive($columns);
-            $start = Helpers::validateNumericNullSubstitution($start, 1);
-            $step = Helpers::validateNumericNullSubstitution($step, 1);
+            $rows = (int) Helpers::validate_numeric_null_substitution($rows, 1);
+            Helpers::validate_positive($rows);
+            $columns = (int) Helpers::validate_numeric_null_substitution($columns, 1);
+            Helpers::validate_positive($columns);
+            $start = Helpers::validate_numeric_null_substitution($start, 1);
+            $step = Helpers::validate_numeric_null_substitution($step, 1);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if ($step === 0) {
-            return array_chunk(
-                array_fill(0, $rows * $columns, $start),
-                max($columns, 1)
-            );
+            return array_chunk(array_fill(0, $rows * $columns, $start), max($columns, 1));
         }
-
-        return array_chunk(
-            range($start, $start + (($rows * $columns - 1) * $step), $step),
-            max($columns, 1)
-        );
+        return array_chunk(range($start, $start + ($rows * $columns - 1) * $step, $step), max($columns, 1));
     }
-
     /**
      * MDETERM.
      *
@@ -97,19 +83,17 @@ class MatrixFunctions
      *
      * @return float|string The result, or a string containing an error
      */
-    public static function determinant(mixed $matrixValues)
+    public static function determinant(mixed $matrix_values)
     {
         try {
-            $matrix = self::getMatrix($matrixValues);
-
+            $matrix = self::get_matrix($matrix_values);
             return $matrix->determinant();
-        } catch (MatrixException) {
-            return ExcelError::VALUE();
+        } catch (Matrix_Exception) {
+            return Excel_Error::VALUE();
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
     }
-
     /**
      * MINVERSE.
      *
@@ -122,21 +106,19 @@ class MatrixFunctions
      *
      * @return array<mixed>|string The result, or a string containing an error
      */
-    public static function inverse(mixed $matrixValues): array|string
+    public static function inverse(mixed $matrix_values): array|string
     {
         try {
-            $matrix = self::getMatrix($matrixValues);
-
-            return $matrix->inverse()->toArray();
-        } catch (MatrixDiv0Exception) {
-            return ExcelError::NAN();
-        } catch (MatrixException) {
-            return ExcelError::VALUE();
+            $matrix = self::get_matrix($matrix_values);
+            return $matrix->inverse()->to_array();
+        } catch (Matrix_Div0exception) {
+            return Excel_Error::NAN();
+        } catch (Matrix_Exception) {
+            return Excel_Error::VALUE();
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
     }
-
     /**
      * MMULT.
      *
@@ -145,20 +127,18 @@ class MatrixFunctions
      *
      * @return array<mixed>|string The result, or a string containing an error
      */
-    public static function multiply(mixed $matrixData1, mixed $matrixData2): array|string
+    public static function multiply(mixed $matrix_data1, mixed $matrix_data2): array|string
     {
         try {
-            $matrixA = self::getMatrix($matrixData1);
-            $matrixB = self::getMatrix($matrixData2);
-
-            return $matrixA->multiply($matrixB)->toArray();
-        } catch (MatrixException) {
-            return ExcelError::VALUE();
+            $matrix_a = self::get_matrix($matrix_data1);
+            $matrix_b = self::get_matrix($matrix_data2);
+            return $matrix_a->multiply($matrix_b)->to_array();
+        } catch (Matrix_Exception) {
+            return Excel_Error::VALUE();
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
     }
-
     /**
      * MUnit.
      *
@@ -169,12 +149,11 @@ class MatrixFunctions
     public static function identity(mixed $dimension)
     {
         try {
-            $dimension = (int) Helpers::validateNumericNullBool($dimension);
-            Helpers::validatePositive($dimension, ExcelError::VALUE());
-
-            return Builder::createIdentityMatrix($dimension, 0)->toArray();
+            $dimension = (int) Helpers::validate_numeric_null_bool($dimension);
+            Helpers::validate_positive($dimension, Excel_Error::VALUE());
+            return Builder::create_identity_matrix($dimension, 0)->to_array();
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
     }
 }

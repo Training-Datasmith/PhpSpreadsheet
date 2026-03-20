@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
-class SeriesSum
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+class Series_Sum
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * SERIESSUM.
      *
@@ -27,29 +24,26 @@ class SeriesSum
     public static function evaluate(mixed $x, mixed $n, mixed $m, ...$args): array|string|float|int
     {
         if (is_array($x) || is_array($n) || is_array($m)) {
-            return self::evaluateArrayArgumentsSubset([self::class, __FUNCTION__], 3, $x, $n, $m, ...$args);
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 3, $x, $n, $m, ...$args);
         }
-
         try {
-            $x = Helpers::validateNumericNullSubstitution($x, 0);
-            $n = Helpers::validateNumericNullSubstitution($n, 0);
-            $m = Helpers::validateNumericNullSubstitution($m, 0);
-
+            $x = Helpers::validate_numeric_null_substitution($x, 0);
+            $n = Helpers::validate_numeric_null_substitution($n, 0);
+            $m = Helpers::validate_numeric_null_substitution($m, 0);
             // Loop through arguments
-            $aArgs = Functions::flattenArray($args);
-            $returnValue = 0;
+            $a_args = Functions::flatten_array($args);
+            $return_value = 0;
             $i = 0;
-            foreach ($aArgs as $argx) {
+            foreach ($a_args as $argx) {
                 if ($argx !== null) {
-                    $arg = Helpers::validateNumericNullSubstitution($argx, 0);
-                    $returnValue += $arg * $x ** ($n + ($m * $i));
+                    $arg = Helpers::validate_numeric_null_substitution($argx, 0);
+                    $return_value += $arg * $x ** ($n + $m * $i);
                     ++$i;
                 }
             }
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return $returnValue;
+        return $return_value;
     }
 }

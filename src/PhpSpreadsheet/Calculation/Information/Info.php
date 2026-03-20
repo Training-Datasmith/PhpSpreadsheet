@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Information;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Information;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Cell\Cell;
 class Info
 {
     /**
      * @internal
      */
-    public static bool $infoSupported = true;
-
+    public static bool $info_supported = true;
     /**
      * INFO.
      *
@@ -25,22 +22,21 @@ class Info
      *
      * @return int|string The requested information about the current operating environment
      */
-    public static function getInfo(mixed $typeText = '', ?Cell $cell = null): int|string
+    public static function get_info(mixed $type_text = '', ?Cell $cell = null): int|string
     {
-        if (!self::$infoSupported) {
+        if (!self::$info_supported) {
             return Functions::DUMMY();
         }
-
-        return match (is_string($typeText) ? strtolower($typeText) : $typeText) {
+        return match (is_string($type_text) ? strtolower($type_text) : $type_text) {
             'directory' => '/',
-            'numfile' => $cell?->getWorksheetOrNull()?->getParent()?->getSheetCount() ?? 1,
+            'numfile' => $cell?->get_worksheet_or_null()?->get_parent()?->get_sheet_count() ?? 1,
             'origin' => '$A:$A$1',
             'osversion' => 'PHP ' . PHP_VERSION,
             'recalc' => 'Automatic',
             'release' => PHP_VERSION,
             'system' => 'PHP',
-            'memavail', 'memused', 'totmem' => ExcelError::NA(),
-            default => ExcelError::VALUE(),
+            'memavail', 'memused', 'totmem' => Excel_Error::NA(),
+            default => Excel_Error::VALUE(),
         };
     }
 }

@@ -1,71 +1,58 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-class FractionFormatter extends BaseFormatter
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
+class Fraction_Formatter extends Base_Formatter
 {
     /** @param null|bool|float|int|string $value  value to be formatted */
     public static function format(mixed $value, string $format): string
     {
-        $format = self::stripQuotes($format);
+        $format = self::strip_quotes($format);
         $value = (float) $value;
-        $absValue = abs($value);
-
-        $sign = ($value < 0.0) ? '-' : '';
-
-        $integerPart = floor($absValue);
-
-        $decimalPart = self::getDecimal((string) $absValue);
-        if ($decimalPart === '0') {
-            return "{$sign}{$integerPart}";
+        $abs_value = abs($value);
+        $sign = $value < 0.0 ? '-' : '';
+        $integer_part = floor($abs_value);
+        $decimal_part = self::get_decimal((string) $abs_value);
+        if ($decimal_part === '0') {
+            return "{$sign}{$integer_part}";
         }
-        $decimalLength = strlen($decimalPart);
-        $decimalDivisor = 10 ** $decimalLength;
-
+        $decimal_length = strlen($decimal_part);
+        $decimal_divisor = 10 ** $decimal_length;
         preg_match('/(#?.*\?)\/(\?+|\d+)/', $format, $matches);
-        $formatIntegerPart = $matches[1] ?? '0';
-
+        $format_integer_part = $matches[1] ?? '0';
         if (isset($matches[2]) && is_numeric($matches[2])) {
-            $fractionDivisor = 100 / (int) $matches[2];
+            $fraction_divisor = 100 / (int) $matches[2];
         } else {
             /** @var float $fractionDivisor */
-            $fractionDivisor = MathTrig\Gcd::evaluate((int) $decimalPart, $decimalDivisor);
+            $fraction_divisor = Math_Trig\Gcd::evaluate((int) $decimal_part, $decimal_divisor);
         }
-
-        $adjustedDecimalPart = (int) round((int) $decimalPart / $fractionDivisor, 0);
-        $adjustedDecimalDivisor = $decimalDivisor / $fractionDivisor;
-        if (str_contains($formatIntegerPart, '0')) {
-            return "{$sign}{$integerPart} {$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
+        $adjusted_decimal_part = (int) round((int) $decimal_part / $fraction_divisor, 0);
+        $adjusted_decimal_divisor = $decimal_divisor / $fraction_divisor;
+        if (str_contains($format_integer_part, '0')) {
+            return "{$sign}{$integer_part} {$adjusted_decimal_part}/{$adjusted_decimal_divisor}";
         }
-        if (str_contains($formatIntegerPart, '#')) {
-            if ($integerPart == 0) {
-                return "{$sign}{$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
+        if (str_contains($format_integer_part, '#')) {
+            if ($integer_part == 0) {
+                return "{$sign}{$adjusted_decimal_part}/{$adjusted_decimal_divisor}";
             }
-            return "{$sign}{$integerPart} {$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
+            return "{$sign}{$integer_part} {$adjusted_decimal_part}/{$adjusted_decimal_divisor}";
         }
-
-        if (str_starts_with($formatIntegerPart, '? ?')) {
-            if ($integerPart == 0) {
-                $integerPart = '';
+        if (str_starts_with($format_integer_part, '? ?')) {
+            if ($integer_part == 0) {
+                $integer_part = '';
             }
-            return "{$sign}{$integerPart} {$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
+            return "{$sign}{$integer_part} {$adjusted_decimal_part}/{$adjusted_decimal_divisor}";
         }
-
-        $adjustedDecimalPart += $integerPart * $adjustedDecimalDivisor;
-
-        return "{$sign}{$adjustedDecimalPart}/{$adjustedDecimalDivisor}";
+        $adjusted_decimal_part += $integer_part * $adjusted_decimal_divisor;
+        return "{$sign}{$adjusted_decimal_part}/{$adjusted_decimal_divisor}";
     }
-
-    private static function getDecimal(string $value): string
+    private static function get_decimal(string $value): string
     {
         if (preg_match('/^\d*[.](\d*[1-9])0*$/', $value, $matches) === 1) {
             return $matches[1];
         }
-
         return '0';
     }
 }

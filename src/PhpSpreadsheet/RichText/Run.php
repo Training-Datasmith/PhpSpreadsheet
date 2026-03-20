@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Rich_Text;
 
-namespace PhpOffice\PhpSpreadsheet\RichText;
-
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-
-class Run extends TextElement implements ITextElement
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+use Php_Office\Php_Spreadsheet\Style\Font;
+class Run extends Text_Element implements I_Text_Element
 {
     /**
      * Font.
      */
     private ?Font $font;
-
     /**
      * Create a new Run instance.
      *
@@ -25,24 +22,20 @@ class Run extends TextElement implements ITextElement
         // Initialise variables
         $this->font = new Font();
     }
-
     /**
      * Get font.
      */
-    public function getFont(): ?Font
+    public function get_font(): ?Font
     {
         return $this->font;
     }
-
-    public function getFontOrThrow(): Font
+    public function get_font_or_throw(): Font
     {
         if ($this->font === null) {
-            throw new SpreadsheetException('unexpected null font');
+            throw new Spreadsheet_Exception('unexpected null font');
         }
-
         return $this->font;
     }
-
     /**
      * Set font.
      *
@@ -50,24 +43,18 @@ class Run extends TextElement implements ITextElement
      *
      * @return $this
      */
-    public function setFont(?Font $font = null): static
+    public function set_font(?Font $font = null): static
     {
         $this->font = $font;
-
         return $this;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        return md5(
-            $this->getText()
-            . (($this->font === null) ? '' : $this->font->getHashCode())
-            . self::class
-        );
+        return md5($this->get_text() . ($this->font === null ? '' : $this->font->get_hash_code()) . self::class);
     }
 }

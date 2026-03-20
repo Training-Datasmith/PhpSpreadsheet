@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class Averages extends AggregateBase
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Averages extends Aggregate_Base
 {
     /**
      * AVEDEV.
@@ -22,46 +20,40 @@ class Averages extends AggregateBase
      *
      * @return float|string (string if result is an error)
      */
-    public static function averageDeviations(mixed ...$args): string|float
+    public static function average_deviations(mixed ...$args): string|float
     {
-        $aArgs = Functions::flattenArrayIndexed($args);
-
+        $a_args = Functions::flatten_array_indexed($args);
         // Return value
-        $returnValue = 0.0;
-
-        $aMean = self::average(...$args);
-        if ($aMean === ExcelError::DIV0()) {
-            return ExcelError::NAN();
+        $return_value = 0.0;
+        $a_mean = self::average(...$args);
+        if ($a_mean === Excel_Error::DIV0()) {
+            return Excel_Error::NAN();
         }
-        if ($aMean === ExcelError::VALUE()) {
-            return ExcelError::VALUE();
+        if ($a_mean === Excel_Error::VALUE()) {
+            return Excel_Error::VALUE();
         }
-
-        $aCount = 0;
-        foreach ($aArgs as $k => $arg) {
-            $arg = self::testAcceptedBoolean($arg, $k);
+        $a_count = 0;
+        foreach ($a_args as $k => $arg) {
+            $arg = self::test_accepted_boolean($arg, $k);
             // Is it a numeric value?
             // Strings containing numeric values are only counted if they are string literals (not cell values)
             //    and then only in MS Excel and in Open Office, not in Gnumeric
-            if ((is_string($arg)) && (!is_numeric($arg)) && (!Functions::isCellValue($k))) {
-                return ExcelError::VALUE();
+            if (is_string($arg) && !is_numeric($arg) && !Functions::is_cell_value($k)) {
+                return Excel_Error::VALUE();
             }
-            if (self::isAcceptedCountable($arg, $k)) {
+            if (self::is_accepted_countable($arg, $k)) {
                 /** @var float|int|numeric-string $arg */
                 /** @var float|int|numeric-string $aMean */
-                $returnValue += abs($arg - $aMean);
-                ++$aCount;
+                $return_value += abs($arg - $a_mean);
+                ++$a_count;
             }
         }
-
         // Return
-        if ($aCount === 0) {
-            return ExcelError::DIV0();
+        if ($a_count === 0) {
+            return Excel_Error::DIV0();
         }
-
-        return $returnValue / $aCount;
+        return $return_value / $a_count;
     }
-
     /**
      * AVERAGE.
      *
@@ -76,32 +68,28 @@ class Averages extends AggregateBase
      */
     public static function average(mixed ...$args): string|int|float
     {
-        $returnValue = $aCount = 0;
-
+        $return_value = $a_count = 0;
         // Loop through arguments
-        foreach (Functions::flattenArrayIndexed($args) as $k => $arg) {
-            $arg = self::testAcceptedBoolean($arg, $k);
+        foreach (Functions::flatten_array_indexed($args) as $k => $arg) {
+            $arg = self::test_accepted_boolean($arg, $k);
             // Is it a numeric value?
             // Strings containing numeric values are only counted if they are string literals (not cell values)
             //    and then only in MS Excel and in Open Office, not in Gnumeric
-            if ((is_string($arg)) && (!is_numeric($arg)) && (!Functions::isCellValue($k))) {
-                return ExcelError::VALUE();
+            if (is_string($arg) && !is_numeric($arg) && !Functions::is_cell_value($k)) {
+                return Excel_Error::VALUE();
             }
-            if (self::isAcceptedCountable($arg, $k)) {
+            if (self::is_accepted_countable($arg, $k)) {
                 /** @var float|int|numeric-string $arg */
-                $returnValue += $arg;
-                ++$aCount;
+                $return_value += $arg;
+                ++$a_count;
             }
         }
-
         // Return
-        if ($aCount > 0) {
-            return $returnValue / $aCount;
+        if ($a_count > 0) {
+            return $return_value / $a_count;
         }
-
-        return ExcelError::DIV0();
+        return Excel_Error::DIV0();
     }
-
     /**
      * AVERAGEA.
      *
@@ -114,33 +102,29 @@ class Averages extends AggregateBase
      *
      * @return float|int|string (string if result is an error)
      */
-    public static function averageA(mixed ...$args): string|int|float
+    public static function average_a(mixed ...$args): string|int|float
     {
-        $returnValue = null;
-
-        $aCount = 0;
+        $return_value = null;
+        $a_count = 0;
         // Loop through arguments
-        foreach (Functions::flattenArrayIndexed($args) as $k => $arg) {
+        foreach (Functions::flatten_array_indexed($args) as $k => $arg) {
             if (is_numeric($arg)) {
                 // do nothing
             } elseif (is_bool($arg)) {
                 $arg = (int) $arg;
-            } elseif (!Functions::isMatrixValue($k)) {
+            } elseif (!Functions::is_matrix_value($k)) {
                 $arg = 0;
             } else {
-                return ExcelError::VALUE();
+                return Excel_Error::VALUE();
             }
-            $returnValue += $arg;
-            ++$aCount;
+            $return_value += $arg;
+            ++$a_count;
         }
-
-        if ($aCount > 0) {
-            return $returnValue / $aCount;
+        if ($a_count > 0) {
+            return $return_value / $a_count;
         }
-
-        return ExcelError::DIV0();
+        return Excel_Error::DIV0();
     }
-
     /**
      * MEDIAN.
      *
@@ -155,27 +139,24 @@ class Averages extends AggregateBase
      */
     public static function median(mixed ...$args): float|string
     {
-        $aArgs = Functions::flattenArray($args);
-
-        $returnValue = ExcelError::NAN();
-
+        $a_args = Functions::flatten_array($args);
+        $return_value = Excel_Error::NAN();
         /** @var array<float|int> */
-        $aArgs = self::filterArguments($aArgs);
-        $valueCount = count($aArgs);
-        if ($valueCount > 0) {
-            sort($aArgs, SORT_NUMERIC);
-            $valueCount = $valueCount / 2;
-            if ($valueCount == floor($valueCount)) {
-                $returnValue = ($aArgs[$valueCount--] + $aArgs[$valueCount]) / 2; //* @phpstan-ignore-line
+        $a_args = self::filter_arguments($a_args);
+        $value_count = count($a_args);
+        if ($value_count > 0) {
+            sort($a_args, SORT_NUMERIC);
+            $value_count = $value_count / 2;
+            if ($value_count == floor($value_count)) {
+                $return_value = ($a_args[$value_count--] + $a_args[$value_count]) / 2;
+                //* @phpstan-ignore-line
             } else {
-                $valueCount = (int) floor($valueCount);
-                $returnValue = $aArgs[$valueCount];
+                $value_count = (int) floor($value_count);
+                $return_value = $a_args[$value_count];
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * MODE.
      *
@@ -190,43 +171,37 @@ class Averages extends AggregateBase
      */
     public static function mode(mixed ...$args): float|string
     {
-        $returnValue = ExcelError::NA();
-
+        $return_value = Excel_Error::NA();
         // Loop through arguments
-        $aArgs = Functions::flattenArray($args);
-        $aArgs = self::filterArguments($aArgs);
-
-        if (!empty($aArgs)) {
-            return self::modeCalc($aArgs);
+        $a_args = Functions::flatten_array($args);
+        $a_args = self::filter_arguments($a_args);
+        if (!empty($a_args)) {
+            return self::mode_calc($a_args);
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * @param mixed[] $args
      *
      * @return mixed[]
      */
-    protected static function filterArguments(array $args): array
+    protected static function filter_arguments(array $args): array
     {
         return array_filter(
             $args,
-
             // Is it a numeric value?
-            fn ($value): bool => is_numeric($value) && (!is_string($value))
+            fn($value): bool => is_numeric($value) && !is_string($value)
         );
     }
-
     /**
      * Special variant of array_count_values that isn't limited to strings and integers,
      * but can work with floating point numbers as values.
      *
      * @param mixed[] $data
      */
-    private static function modeCalc(array $data): float|string
+    private static function mode_calc(array $data): float|string
     {
-        $frequencyArray = [];
+        $frequency_array = [];
         $index = 0;
         $maxfreq = 0;
         $maxfreqkey = '';
@@ -235,40 +210,33 @@ class Averages extends AggregateBase
             /** @var float|string $datum */
             $found = false;
             ++$index;
-            foreach ($frequencyArray as $key => $value) {
+            foreach ($frequency_array as $key => $value) {
                 /** @var string[] $value */
                 if ($value['value'] == (string) $datum) {
-                    ++$frequencyArray[$key]['frequency'];
-                    $freq = $frequencyArray[$key]['frequency'];
+                    ++$frequency_array[$key]['frequency'];
+                    $freq = $frequency_array[$key]['frequency'];
                     if ($freq > $maxfreq) {
                         $maxfreq = $freq;
                         $maxfreqkey = $key;
                         $maxfreqdatum = $datum;
                     } elseif ($freq == $maxfreq) {
-                        if ($frequencyArray[$key]['index'] < $frequencyArray[$maxfreqkey]['index']) { //* @phpstan-ignore-line
+                        if ($frequency_array[$key]['index'] < $frequency_array[$maxfreqkey]['index']) {
+                            //* @phpstan-ignore-line
                             $maxfreqkey = $key;
                             $maxfreqdatum = $datum;
                         }
                     }
                     $found = true;
-
                     break;
                 }
             }
-
             if ($found === false) {
-                $frequencyArray[] = [
-                    'value' => $datum,
-                    'frequency' => 1,
-                    'index' => $index,
-                ];
+                $frequency_array[] = ['value' => $datum, 'frequency' => 1, 'index' => $index];
             }
         }
-
         if ($maxfreq <= 1) {
-            return ExcelError::NA();
+            return Excel_Error::NA();
         }
-
         return $maxfreqdatum;
     }
 }

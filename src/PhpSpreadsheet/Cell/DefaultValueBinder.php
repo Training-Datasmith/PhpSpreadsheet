@@ -1,147 +1,129 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Cell;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
 use Composer\Pcre\Preg;
 use DateTimeInterface;
-use PhpOffice\PhpSpreadsheet\Calculation\CalculationParserOnly;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
+use Php_Office\Php_Spreadsheet\Calculation\Calculation_Parser_Only;
+use Php_Office\Php_Spreadsheet\Calculation\Exception as CalculationException;
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+use Php_Office\Php_Spreadsheet\Worksheet\Base_Drawing;
 use Stringable;
-
-class DefaultValueBinder implements IValueBinder
+class Default_Value_Binder implements I_Value_Binder
 {
     //                            123 456 789 012 345
-    private const FIFTEEN_NINES = 999_999_999_999_999;
-
+    private const FIFTEEN_NINES = 999999999999999;
     /**
      * Bind value to a cell.
      *
      * @param Cell $cell Cell to bind value to
      * @param mixed $value Value to bind in cell
      */
-    public function bindValue(Cell $cell, mixed $value): bool
+    public function bind_value(Cell $cell, mixed $value): bool
     {
         // sanitize UTF-8 strings
         if (is_string($value)) {
-            $value = StringHelper::sanitizeUTF8($value);
-        } elseif ($value === null || is_scalar($value) || $value instanceof RichText) {
+            $value = String_Helper::sanitize_utf8($value);
+        } elseif ($value === null || is_scalar($value) || $value instanceof Rich_Text) {
             // No need to do anything
         } elseif ($value instanceof DateTimeInterface) {
             $value = $value->format('Y-m-d H:i:s');
         } elseif ($value instanceof Stringable) {
             $value = (string) $value;
-        } elseif ($value instanceof BaseDrawing) {
-            $value->setCoordinates($cell->getCoordinate());
-            $value->setResizeProportional(false);
-            $value->setInCell(true);
-            $value->setWorksheet($cell->getWorksheet(), true);
+        } elseif ($value instanceof Base_Drawing) {
+            $value->set_coordinates($cell->get_coordinate());
+            $value->set_resize_proportional(false);
+            $value->set_in_cell(true);
+            $value->set_worksheet($cell->get_worksheet(), true);
         } else {
-            throw new SpreadsheetException('Unable to bind unstringable ' . gettype($value));
+            throw new Spreadsheet_Exception('Unable to bind unstringable ' . gettype($value));
         }
-
         // Set value explicit
-        $cell->setValueExplicit($value, static::dataTypeForValue($value));
-
+        $cell->set_value_explicit($value, static::data_type_for_value($value));
         // Done!
         return true;
     }
-
     /**
      * DataType for value.
      */
-    public static function dataTypeForValue(mixed $value): string
+    public static function data_type_for_value(mixed $value): string
     {
         // Match the value against a few data types
         if ($value === null) {
-            return DataType::TYPE_NULL;
+            return Data_Type::TYPE_NULL;
         }
         if (is_int($value) && abs($value) > self::FIFTEEN_NINES) {
-            return DataType::TYPE_STRING;
+            return Data_Type::TYPE_STRING;
         }
         if (is_float($value) || is_int($value)) {
-            return DataType::TYPE_NUMERIC;
+            return Data_Type::TYPE_NUMERIC;
         }
         if (is_bool($value)) {
-            return DataType::TYPE_BOOL;
+            return Data_Type::TYPE_BOOL;
         }
         if ($value === '') {
-            return DataType::TYPE_STRING;
+            return Data_Type::TYPE_STRING;
         }
-        if ($value instanceof RichText) {
-            return DataType::TYPE_INLINE;
+        if ($value instanceof Rich_Text) {
+            return Data_Type::TYPE_INLINE;
         }
-        if ($value instanceof BaseDrawing) {
-            return DataType::TYPE_DRAWING_IN_CELL;
+        if ($value instanceof Base_Drawing) {
+            return Data_Type::TYPE_DRAWING_IN_CELL;
         }
         if ($value instanceof Stringable) {
             $value = (string) $value;
         }
         if (!is_string($value)) {
             $gettype = get_debug_type($value);
-
-            throw new SpreadsheetException("unusable type $gettype");
+            throw new Spreadsheet_Exception("unusable type {$gettype}");
         }
         if (strlen($value) > 1 && $value[0] === '=') {
-            $calculation = CalculationParserOnly::getParserInstance();
-
+            $calculation = Calculation_Parser_Only::get_parser_instance();
             try {
-                if (empty($calculation->parseFormula($value))) {
-                    return DataType::TYPE_STRING;
+                if (empty($calculation->parse_formula($value))) {
+                    return Data_Type::TYPE_STRING;
                 }
-            } catch (CalculationException $e) {
-                $message = $e->getMessage();
-                if (
-                    $message === 'Formula Error: An unexpected error occurred'
-                    || str_contains($message, 'has no operands')
-                ) {
-                    return DataType::TYPE_STRING;
+            } catch (Calculation_Exception $e) {
+                $message = $e->get_message();
+                if ($message === 'Formula Error: An unexpected error occurred' || str_contains($message, 'has no operands')) {
+                    return Data_Type::TYPE_STRING;
                 }
             }
-
-            return DataType::TYPE_FORMULA;
+            return Data_Type::TYPE_FORMULA;
         }
-        if (Preg::isMatch('/^[\+\-]?(\d+\.?\d*|\d*\.?\d+)([Ee][\-\+]?[0-2]?\d{1,3})?$/', $value)) {
-            $tValue = ltrim($value, '+-');
-            if (strlen($tValue) > 1 && $tValue[0] === '0' && $tValue[1] !== '.') {
-                return DataType::TYPE_STRING;
+        if (Preg::is_match('/^[\+\-]?(\d+\.?\d*|\d*\.?\d+)([Ee][\-\+]?[0-2]?\d{1,3})?$/', $value)) {
+            $t_value = ltrim($value, '+-');
+            if (strlen($t_value) > 1 && $t_value[0] === '0' && $t_value[1] !== '.') {
+                return Data_Type::TYPE_STRING;
             }
-            if (!Preg::isMatch('/[eE.]/', $value)) {
-                $aValue = abs((float) $value);
-                if ($aValue > self::FIFTEEN_NINES) {
-                    return DataType::TYPE_STRING;
+            if (!Preg::is_match('/[eE.]/', $value)) {
+                $a_value = abs((float) $value);
+                if ($a_value > self::FIFTEEN_NINES) {
+                    return Data_Type::TYPE_STRING;
                 }
             }
             if (!is_numeric($value) || !is_finite((float) $value)) {
-                return DataType::TYPE_STRING;
+                return Data_Type::TYPE_STRING;
             }
-
-            return DataType::TYPE_NUMERIC;
+            return Data_Type::TYPE_NUMERIC;
         }
-        $errorCodes = DataType::getErrorCodes();
-        if (isset($errorCodes[$value])) {
-            return DataType::TYPE_ERROR;
+        $error_codes = Data_Type::get_error_codes();
+        if (isset($error_codes[$value])) {
+            return Data_Type::TYPE_ERROR;
         }
-
-        return DataType::TYPE_STRING;
+        return Data_Type::TYPE_STRING;
     }
-
-    protected bool $preserveCr = false;
-
-    public function getPreserveCr(): bool
+    protected bool $preserve_cr = false;
+    public function get_preserve_cr(): bool
     {
-        return $this->preserveCr;
+        return $this->preserve_cr;
     }
-
-    public function setPreserveCr(bool $preserveCr): self
+    public function set_preserve_cr(bool $preserve_cr): self
     {
-        $this->preserveCr = $preserveCr;
-
+        $this->preserve_cr = $preserve_cr;
         return $this;
     }
 }

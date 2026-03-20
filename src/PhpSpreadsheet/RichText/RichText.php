@@ -1,45 +1,39 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Rich_Text;
 
-namespace PhpOffice\PhpSpreadsheet\RichText;
-
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\IComparable;
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Cell\Data_Type;
+use Php_Office\Php_Spreadsheet\I_Comparable;
 use Stringable;
-
-class RichText implements IComparable, Stringable
+class Rich_Text implements I_Comparable, Stringable
 {
     /**
      * Rich text elements.
      *
      * @var ITextElement[]
      */
-    private array $richTextElements;
-
+    private array $rich_text_elements;
     /**
      * Create a new RichText instance.
      */
     public function __construct(?Cell $cell = null)
     {
         // Initialise variables
-        $this->richTextElements = [];
-
+        $this->rich_text_elements = [];
         // Rich-Text string attached to cell?
         if ($cell !== null) {
             // Add cell text and style
-            if ($cell->getValueString() !== '') {
-                $objRun = new Run($cell->getValueString());
-                $objRun->setFont(clone $cell->getWorksheet()->getStyle($cell->getCoordinate())->getFont());
-                $this->addText($objRun);
+            if ($cell->get_value_string() !== '') {
+                $obj_run = new Run($cell->get_value_string());
+                $obj_run->set_font(clone $cell->get_worksheet()->get_style($cell->get_coordinate())->get_font());
+                $this->add_text($obj_run);
             }
-
             // Set parent value
-            $cell->setValueExplicit($this, DataType::TYPE_STRING);
+            $cell->set_value_explicit($this, Data_Type::TYPE_STRING);
         }
     }
-
     /**
      * Add text.
      *
@@ -47,73 +41,62 @@ class RichText implements IComparable, Stringable
      *
      * @return $this
      */
-    public function addText(ITextElement $text): static
+    public function add_text(I_Text_Element $text): static
     {
-        $this->richTextElements[] = $text;
-
+        $this->rich_text_elements[] = $text;
         return $this;
     }
-
     /**
      * Create text.
      *
      * @param string $text Text
      */
-    public function createText(string $text): TextElement
+    public function create_text(string $text): Text_Element
     {
-        $objText = new TextElement($text);
-        $this->addText($objText);
-
-        return $objText;
+        $obj_text = new Text_Element($text);
+        $this->add_text($obj_text);
+        return $obj_text;
     }
-
     /**
      * Create text run.
      *
      * @param string $text Text
      */
-    public function createTextRun(string $text): Run
+    public function create_text_run(string $text): Run
     {
-        $objText = new Run($text);
-        $this->addText($objText);
-
-        return $objText;
+        $obj_text = new Run($text);
+        $this->add_text($obj_text);
+        return $obj_text;
     }
-
     /**
      * Get plain text.
      */
-    public function getPlainText(): string
+    public function get_plain_text(): string
     {
         // Return value
-        $returnValue = '';
-
+        $return_value = '';
         // Loop through all ITextElements
-        foreach ($this->richTextElements as $text) {
-            $returnValue .= $text->getText();
+        foreach ($this->rich_text_elements as $text) {
+            $return_value .= $text->get_text();
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * Convert to string.
      */
     public function __toString(): string
     {
-        return $this->getPlainText();
+        return $this->get_plain_text();
     }
-
     /**
      * Get Rich Text elements.
      *
      * @return ITextElement[]
      */
-    public function getRichTextElements(): array
+    public function get_rich_text_elements(): array
     {
-        return $this->richTextElements;
+        return $this->rich_text_elements;
     }
-
     /**
      * Set Rich Text elements.
      *
@@ -121,31 +104,24 @@ class RichText implements IComparable, Stringable
      *
      * @return $this
      */
-    public function setRichTextElements(array $textElements): static
+    public function set_rich_text_elements(array $text_elements): static
     {
-        $this->richTextElements = $textElements;
-
+        $this->rich_text_elements = $text_elements;
         return $this;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        $hashElements = '';
-        foreach ($this->richTextElements as $element) {
-            $hashElements .= $element->getHashCode();
+        $hash_elements = '';
+        foreach ($this->rich_text_elements as $element) {
+            $hash_elements .= $element->get_hash_code();
         }
-
-        return md5(
-            $hashElements
-            . self::class
-        );
+        return md5($hash_elements . self::class);
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
@@ -153,14 +129,14 @@ class RichText implements IComparable, Stringable
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
-            $newValue = is_object($value) ? (clone $value) : $value;
+            $new_value = is_object($value) ? clone $value : $value;
             if (is_array($value)) {
-                $newValue = [];
+                $new_value = [];
                 foreach ($value as $key2 => $value2) {
-                    $newValue[$key2] = is_object($value2) ? (clone $value2) : $value2;
+                    $new_value[$key2] = is_object($value2) ? clone $value2 : $value2;
                 }
             }
-            $this->$key = $newValue;
+            $this->{$key} = $new_value;
         }
     }
 }

@@ -1,34 +1,31 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Cell;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalculationException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Collection\Cells;
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-use PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting\CellStyleAssessor;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Style\Protection;
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Calculation\Exception as CalculationException;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Collection\Cells;
+use Php_Office\Php_Spreadsheet\Exception as SpreadsheetException;
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDate;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+use Php_Office\Php_Spreadsheet\Style\Conditional_Formatting\Cell_Style_Assessor;
+use Php_Office\Php_Spreadsheet\Style\Number_Format;
+use Php_Office\Php_Spreadsheet\Style\Protection;
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Base_Drawing;
+use Php_Office\Php_Spreadsheet\Worksheet\Table;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 use Stringable;
-
 class Cell implements Stringable
 {
     /**
      * Value binder to use.
      */
-    private static ?IValueBinder $valueBinder = null;
-
+    private static ?I_Value_Binder $value_binder = null;
     /**
      *    Calculated value of the cell (used for caching)
      *    This returns the value last calculated by MS Excel or whichever spreadsheet program was used to
@@ -39,188 +36,162 @@ class Cell implements Stringable
      *
      * @var mixed
      */
-    private $calculatedValue;
-
+    private $calculated_value;
     /**
      * Type of the cell data.
      */
-    private string $dataType;
-
+    private string $data_type;
     /**
      * The collection of cells that this cell belongs to (i.e. The Cell Collection for the parent Worksheet).
      */
     private ?Cells $parent;
-
     /**
      * Index to the cellXf reference for the styling of this cell.
      */
-    private int $xfIndex = 0;
-
+    private int $xf_index = 0;
     /**
      * Attributes of the formula.
      *
      * @var null|array<string, string>
      */
-    private ?array $formulaAttributes = null;
-
-    private readonly IgnoredErrors $ignoredErrors;
-
+    private ?array $formula_attributes = null;
+    private readonly Ignored_Errors $ignored_errors;
     /**
      * Update the cell into the cell collection.
      *
      * @throws SpreadsheetException
      */
-    public function updateInCollection(): self
+    public function update_in_collection(): self
     {
         $parent = $this->parent;
         if ($parent === null) {
-            throw new SpreadsheetException('Cannot update when cell is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot update when cell is not bound to a worksheet');
         }
         $parent->update($this);
-
         return $this;
     }
-
     public function detach(): void
     {
         $this->parent = null;
     }
-
     public function attach(Cells $parent): void
     {
         $this->parent = $parent;
     }
-
     /**
      * Create a new Cell.
      *
      * @throws SpreadsheetException
      */
-    public function __construct(/**
-     * Value of the cell.
-     */
+    public function __construct(
+        /**
+         * Value of the cell.
+         */
         private mixed $value,
-        ?string $dataType,
+        ?string $data_type,
         Worksheet $worksheet
-    ) {
+    )
+    {
         // Set worksheet cache
-        $this->parent = $worksheet->getCellCollection();
-
+        $this->parent = $worksheet->get_cell_collection();
         // Set datatype?
-        if ($dataType !== null) {
-            if ($dataType == DataType::TYPE_STRING2) {
-                $dataType = DataType::TYPE_STRING;
+        if ($data_type !== null) {
+            if ($data_type == Data_Type::TYPE_STRING2) {
+                $data_type = Data_Type::TYPE_STRING;
             }
-            $this->dataType = $dataType;
+            $this->data_type = $data_type;
         } else {
-            $valueBinder = $worksheet->getParent()?->getValueBinder() ?? self::getValueBinder();
-            if ($valueBinder->bindValue($this, $this->value) === false) {
-                throw new SpreadsheetException('Value could not be bound to cell.');
+            $value_binder = $worksheet->get_parent()?->get_value_binder() ?? self::get_value_binder();
+            if ($value_binder->bind_value($this, $this->value) === false) {
+                throw new Spreadsheet_Exception('Value could not be bound to cell.');
             }
         }
-        $this->ignoredErrors = new IgnoredErrors();
+        $this->ignored_errors = new Ignored_Errors();
     }
-
     /**
      * Get cell coordinate column.
      *
      * @throws SpreadsheetException
      */
-    public function getColumn(): string
+    public function get_column(): string
     {
         $parent = $this->parent;
         if ($parent === null) {
-            throw new SpreadsheetException('Cannot get column when cell is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot get column when cell is not bound to a worksheet');
         }
-
-        return $parent->getCurrentColumn();
+        return $parent->get_current_column();
     }
-
     /**
      * Get cell coordinate row.
      *
      * @throws SpreadsheetException
      */
-    public function getRow(): int
+    public function get_row(): int
     {
         $parent = $this->parent;
         if ($parent === null) {
-            throw new SpreadsheetException('Cannot get row when cell is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot get row when cell is not bound to a worksheet');
         }
-
-        return $parent->getCurrentRow();
+        return $parent->get_current_row();
     }
-
     /**
      * Get cell coordinate.
      *
      * @throws SpreadsheetException
      */
-    public function getCoordinate(): string
+    public function get_coordinate(): string
     {
         $parent = $this->parent;
         if ($parent !== null) {
-            $coordinate = $parent->getCurrentCoordinate();
+            $coordinate = $parent->get_current_coordinate();
         } else {
             $coordinate = null;
         }
         if ($coordinate === null) {
-            throw new SpreadsheetException('Coordinate no longer exists');
+            throw new Spreadsheet_Exception('Coordinate no longer exists');
         }
-
         return $coordinate;
     }
-
     /**
      * Get cell value.
      */
-    public function getValue(): mixed
+    public function get_value(): mixed
     {
         return $this->value;
     }
-
-    public function getValueString(): string
+    public function get_value_string(): string
     {
-        return StringHelper::convertToString($this->value, false);
+        return String_Helper::convert_to_string($this->value, false);
     }
-
     /**
      * Get cell value with formatting.
      */
-    public function getFormattedValue(): string
+    public function get_formatted_value(): string
     {
-        $currentCalendar = SharedDate::getExcelCalendar();
-        SharedDate::setExcelCalendar($this->getWorksheet()->getParent()?->getExcelCalendar());
-        $formattedValue = NumberFormat::toFormattedString(
-            $this->getCalculatedValueString(),
-            (string) $this->getStyle()->getNumberFormat()->getFormatCode(true)
-        );
-        SharedDate::setExcelCalendar($currentCalendar);
-
-        return $formattedValue;
+        $current_calendar = Shared_Date::get_excel_calendar();
+        Shared_Date::set_excel_calendar($this->get_worksheet()->get_parent()?->get_excel_calendar());
+        $formatted_value = Number_Format::to_formatted_string($this->get_calculated_value_string(), (string) $this->get_style()->get_number_format()->get_format_code(true));
+        Shared_Date::set_excel_calendar($current_calendar);
+        return $formatted_value;
     }
-
-    protected static function updateIfCellIsTableHeader(?Worksheet $workSheet, self $cell, mixed $oldValue, mixed $newValue): void
+    protected static function update_if_cell_is_table_header(?Worksheet $work_sheet, self $cell, mixed $old_value, mixed $new_value): void
     {
-        $oldValue = StringHelper::convertToString($oldValue, false);
-        $newValue = StringHelper::convertToString($newValue, false);
-        if (StringHelper::strToLower($oldValue) === StringHelper::strToLower($newValue) || $workSheet === null) {
+        $old_value = String_Helper::convert_to_string($old_value, false);
+        $new_value = String_Helper::convert_to_string($new_value, false);
+        if (String_Helper::str_to_lower($old_value) === String_Helper::str_to_lower($new_value) || $work_sheet === null) {
             return;
         }
-
-        foreach ($workSheet->getTableCollection() as $table) {
+        foreach ($work_sheet->get_table_collection() as $table) {
             /** @var Table $table */
-            if ($cell->isInRange($table->getRange())) {
-                $rangeRowsColumns = Coordinate::getRangeBoundaries($table->getRange());
-                if ($cell->getRow() === (int) $rangeRowsColumns[0][1]) {
-                    Table\Column::updateStructuredReferences($workSheet, $oldValue, $newValue);
+            if ($cell->is_in_range($table->get_range())) {
+                $range_rows_columns = Coordinate::get_range_boundaries($table->get_range());
+                if ($cell->get_row() === (int) $range_rows_columns[0][1]) {
+                    Table\Column::update_structured_references($work_sheet, $old_value, $new_value);
                 }
-
                 return;
             }
         }
     }
-
     /**
      * Set cell value.
      *
@@ -231,38 +202,33 @@ class Cell implements Stringable
      *
      * @throws SpreadsheetException
      */
-    public function setValue(mixed $value, ?IValueBinder $binder = null): self
+    public function set_value(mixed $value, ?I_Value_Binder $binder = null): self
     {
-        if ($this->hadHyperlink) {
-            $this->clearHyperlink();
+        if ($this->had_hyperlink) {
+            $this->clear_hyperlink();
         }
         // Cells?->Worksheet?->Spreadsheet
-        $binder ??= $this->parent?->getParent()?->getParent()?->getValueBinder() ?? self::getValueBinder();
-        if (!$binder->bindValue($this, $value)) {
-            throw new SpreadsheetException('Value could not be bound to cell.');
+        $binder ??= $this->parent?->get_parent()?->get_parent()?->get_value_binder() ?? self::get_value_binder();
+        if (!$binder->bind_value($this, $value)) {
+            throw new Spreadsheet_Exception('Value could not be bound to cell.');
         }
-
         return $this;
     }
-
-    private bool $hadHyperlink = false;
-
+    private bool $had_hyperlink = false;
     /** @internal */
-    public function setHadHyperlink(bool $hadHyperlink): void
+    public function set_had_hyperlink(bool $had_hyperlink): void
     {
-        $this->hadHyperlink = $hadHyperlink;
+        $this->had_hyperlink = $had_hyperlink;
     }
-
-    private function clearHyperlink(): void
+    private function clear_hyperlink(): void
     {
-        $worksheet = $this->getWorksheetOrNull();
+        $worksheet = $this->get_worksheet_or_null();
         if ($worksheet !== null) {
-            $coordinate = $this->getCoordinate();
-            $worksheet->setHyperlink($coordinate);
+            $coordinate = $this->get_coordinate();
+            $worksheet->set_hyperlink($coordinate);
         }
-        $this->hadHyperlink = false;
+        $this->had_hyperlink = false;
     }
-
     /**
      * Set the value for a cell, with the explicit data type passed to the method (bypassing any use of the value binder).
      *
@@ -278,156 +244,135 @@ class Cell implements Stringable
      *
      * @throws SpreadsheetException
      */
-    public function setValueExplicit(mixed $value, string $dataType = DataType::TYPE_STRING): self
+    public function set_value_explicit(mixed $value, string $data_type = Data_Type::TYPE_STRING): self
     {
-        if ($this->hadHyperlink) {
-            $this->clearHyperlink();
+        if ($this->had_hyperlink) {
+            $this->clear_hyperlink();
         }
-        $oldValue = $this->value;
-        $quotePrefix = false;
-
+        $old_value = $this->value;
+        $quote_prefix = false;
         // set the value according to data type
-        switch ($dataType) {
-            case DataType::TYPE_NULL:
+        switch ($data_type) {
+            case Data_Type::TYPE_NULL:
                 $this->value = null;
-
                 break;
-            case DataType::TYPE_STRING2:
-                $dataType = DataType::TYPE_STRING;
-                // no break
-            case DataType::TYPE_STRING:
+            case Data_Type::TYPE_STRING2:
+                $data_type = Data_Type::TYPE_STRING;
+            // no break
+            case Data_Type::TYPE_STRING:
                 // Synonym for string
                 if (is_string($value) && strlen($value) > 1 && $value[0] === '=') {
-                    $quotePrefix = true;
+                    $quote_prefix = true;
                 }
-                // no break
-            case DataType::TYPE_INLINE:
+            // no break
+            case Data_Type::TYPE_INLINE:
                 // Rich text
-                $value2 = StringHelper::convertToString($value, true);
+                $value2 = String_Helper::convert_to_string($value, true);
                 // Cells?->Worksheet?->Spreadsheet
-                $binder = $this->parent?->getParent()?->getParent()?->getValueBinder();
-                $preserveCr = false;
+                $binder = $this->parent?->get_parent()?->get_parent()?->get_value_binder();
+                $preserve_cr = false;
                 if ($binder !== null && method_exists($binder, 'getPreserveCr')) {
                     /** @var bool */
-                    $preserveCr = $binder->getPreserveCr();
+                    $preserve_cr = $binder->get_preserve_cr();
                 }
-                $this->value = DataType::checkString(($value instanceof RichText) ? $value : $value2, $preserveCr);
-
+                $this->value = Data_Type::check_string($value instanceof Rich_Text ? $value : $value2, $preserve_cr);
                 break;
-            case DataType::TYPE_NUMERIC:
+            case Data_Type::TYPE_NUMERIC:
                 if ($value !== null && !is_bool($value) && !is_numeric($value)) {
-                    throw new SpreadsheetException('Invalid numeric value for datatype Numeric');
+                    throw new Spreadsheet_Exception('Invalid numeric value for datatype Numeric');
                 }
                 $this->value = 0 + $value;
-
                 break;
-            case DataType::TYPE_FORMULA:
-                $this->value = StringHelper::convertToString($value, true);
-
+            case Data_Type::TYPE_FORMULA:
+                $this->value = String_Helper::convert_to_string($value, true);
                 break;
-            case DataType::TYPE_BOOL:
+            case Data_Type::TYPE_BOOL:
                 $this->value = (bool) $value;
-
                 break;
-            case DataType::TYPE_ISO_DATE:
-                $this->value = SharedDate::convertIsoDate($value);
-                $dataType = DataType::TYPE_NUMERIC;
-
+            case Data_Type::TYPE_ISO_DATE:
+                $this->value = Shared_Date::convert_iso_date($value);
+                $data_type = Data_Type::TYPE_NUMERIC;
                 break;
-            case DataType::TYPE_DRAWING_IN_CELL:
-                if ($value instanceof BaseDrawing) {
+            case Data_Type::TYPE_DRAWING_IN_CELL:
+                if ($value instanceof Base_Drawing) {
                     $this->value = $value;
                 } else {
-                    throw new SpreadsheetException('Item is not a drawing');
+                    throw new Spreadsheet_Exception('Item is not a drawing');
                 }
-
                 break;
-            case DataType::TYPE_ERROR:
-                $this->value = DataType::checkErrorCode($value);
-
+            case Data_Type::TYPE_ERROR:
+                $this->value = Data_Type::check_error_code($value);
                 break;
             default:
-                throw new SpreadsheetException('Invalid datatype: ' . $dataType);
+                throw new Spreadsheet_Exception('Invalid datatype: ' . $data_type);
         }
-
         // set the datatype
-        $this->dataType = $dataType;
-
-        $this->updateInCollection();
-        $cellCoordinate = $this->getCoordinate();
-        self::updateIfCellIsTableHeader($this->getParent()?->getParent(), $this, $oldValue, $value);
-        $worksheet = $this->getWorksheet();
-        $spreadsheet = $worksheet->getParent();
-        if (isset($spreadsheet) && $spreadsheet->getIndex($worksheet, true) >= 0) {
-            $originalSelected = $worksheet->getSelectedCells();
-            $activeSheetIndex = $spreadsheet->getActiveSheetIndex();
-            $style = $this->getStyle();
-            $oldQuotePrefix = $style->getQuotePrefix();
-            if ($oldQuotePrefix !== $quotePrefix) {
-                $style->setQuotePrefix($quotePrefix);
+        $this->data_type = $data_type;
+        $this->update_in_collection();
+        $cell_coordinate = $this->get_coordinate();
+        self::update_if_cell_is_table_header($this->get_parent()?->get_parent(), $this, $old_value, $value);
+        $worksheet = $this->get_worksheet();
+        $spreadsheet = $worksheet->get_parent();
+        if (isset($spreadsheet) && $spreadsheet->get_index($worksheet, true) >= 0) {
+            $original_selected = $worksheet->get_selected_cells();
+            $active_sheet_index = $spreadsheet->get_active_sheet_index();
+            $style = $this->get_style();
+            $old_quote_prefix = $style->get_quote_prefix();
+            if ($old_quote_prefix !== $quote_prefix) {
+                $style->set_quote_prefix($quote_prefix);
             }
-            $worksheet->setSelectedCells($originalSelected);
-            if ($activeSheetIndex >= 0) {
-                $spreadsheet->setActiveSheetIndex($activeSheetIndex);
+            $worksheet->set_selected_cells($original_selected);
+            if ($active_sheet_index >= 0) {
+                $spreadsheet->set_active_sheet_index($active_sheet_index);
             }
         }
-
-        return $this->getParent()?->get($cellCoordinate) ?? $this;
+        return $this->get_parent()?->get($cell_coordinate) ?? $this;
     }
-
     public const CALCULATE_DATE_TIME_ASIS = 0;
     public const CALCULATE_DATE_TIME_FLOAT = 1;
     public const CALCULATE_TIME_FLOAT = 2;
-
-    private static int $calculateDateTimeType = self::CALCULATE_DATE_TIME_ASIS;
-
-    public static function getCalculateDateTimeType(): int
+    private static int $calculate_date_time_type = self::CALCULATE_DATE_TIME_ASIS;
+    public static function get_calculate_date_time_type(): int
     {
-        return self::$calculateDateTimeType;
+        return self::$calculate_date_time_type;
     }
-
     /** @throws CalculationException */
-    public static function setCalculateDateTimeType(int $calculateDateTimeType): void
+    public static function set_calculate_date_time_type(int $calculate_date_time_type): void
     {
-        self::$calculateDateTimeType = match ($calculateDateTimeType) {
-            self::CALCULATE_DATE_TIME_ASIS, self::CALCULATE_DATE_TIME_FLOAT, self::CALCULATE_TIME_FLOAT => $calculateDateTimeType,
-            default => throw new CalculationException("Invalid value $calculateDateTimeType for calculated date time type"),
+        self::$calculate_date_time_type = match ($calculate_date_time_type) {
+            self::CALCULATE_DATE_TIME_ASIS, self::CALCULATE_DATE_TIME_FLOAT, self::CALCULATE_TIME_FLOAT => $calculate_date_time_type,
+            default => throw new Calculation_Exception("Invalid value {$calculate_date_time_type} for calculated date time type"),
         };
     }
-
     /**
      * Convert date, time, or datetime from int to float if desired.
      */
-    private function convertDateTimeInt(mixed $result): mixed
+    private function convert_date_time_int(mixed $result): mixed
     {
         if (is_int($result)) {
-            if (self::$calculateDateTimeType === self::CALCULATE_TIME_FLOAT) {
-                if (SharedDate::isDateTime($this, $result, false)) {
+            if (self::$calculate_date_time_type === self::CALCULATE_TIME_FLOAT) {
+                if (Shared_Date::is_date_time($this, $result, false)) {
                     $result = (float) $result;
                 }
-            } elseif (self::$calculateDateTimeType === self::CALCULATE_DATE_TIME_FLOAT) {
-                if (SharedDate::isDateTime($this, $result, true)) {
+            } elseif (self::$calculate_date_time_type === self::CALCULATE_DATE_TIME_FLOAT) {
+                if (Shared_Date::is_date_time($this, $result, true)) {
                     $result = (float) $result;
                 }
             }
         }
-
         return $result;
     }
-
     /**
      * Get calculated cell value converted to string.
      */
-    public function getCalculatedValueString(): string
+    public function get_calculated_value_string(): string
     {
-        $value = $this->getCalculatedValue();
+        $value = $this->get_calculated_value();
         while (is_array($value)) {
             $value = array_shift($value);
         }
-
-        return StringHelper::convertToString($value, false);
+        return String_Helper::convert_to_string($value, false);
     }
-
     /**
      * Get calculated cell value.
      *
@@ -435,186 +380,171 @@ class Cell implements Stringable
      *
      * @throws CalculationException
      */
-    public function getCalculatedValue(bool $resetLog = true): mixed
+    public function get_calculated_value(bool $reset_log = true): mixed
     {
         $title = 'unknown';
-        $oldAttributes = $this->formulaAttributes;
-        $oldAttributesT = $oldAttributes['t'] ?? '';
-        $coordinate = $this->getCoordinate();
-        $oldAttributesRef = $oldAttributes['ref'] ?? $coordinate;
-        $originalValue = $this->value;
-        $originalDataType = $this->dataType;
-        $this->formulaAttributes = [];
+        $old_attributes = $this->formula_attributes;
+        $old_attributes_t = $old_attributes['t'] ?? '';
+        $coordinate = $this->get_coordinate();
+        $old_attributes_ref = $old_attributes['ref'] ?? $coordinate;
+        $original_value = $this->value;
+        $original_data_type = $this->data_type;
+        $this->formula_attributes = [];
         $spill = false;
-        if ($this->dataType === DataType::TYPE_FORMULA) {
+        if ($this->data_type === Data_Type::TYPE_FORMULA) {
             try {
-                $currentCalendar = SharedDate::getExcelCalendar();
-                SharedDate::setExcelCalendar($this->getWorksheet()->getParent()?->getExcelCalendar());
-                $thisworksheet = $this->getWorksheet();
-                $index = $thisworksheet->getParentOrThrow()->getActiveSheetIndex();
-                $selected = $thisworksheet->getSelectedCells();
-                $title = $thisworksheet->getTitle();
-                $calculation = Calculation::getInstance($thisworksheet->getParent());
-                $result = $calculation->calculateCellValue($this, $resetLog);
-                $result = $this->convertDateTimeInt($result);
-                $thisworksheet->setSelectedCells($selected);
-                $thisworksheet->getParentOrThrow()->setActiveSheetIndex($index);
-                if (is_array($result) && $calculation->getInstanceArrayReturnType() !== Calculation::RETURN_ARRAY_AS_ARRAY) {
+                $current_calendar = Shared_Date::get_excel_calendar();
+                Shared_Date::set_excel_calendar($this->get_worksheet()->get_parent()?->get_excel_calendar());
+                $thisworksheet = $this->get_worksheet();
+                $index = $thisworksheet->get_parent_or_throw()->get_active_sheet_index();
+                $selected = $thisworksheet->get_selected_cells();
+                $title = $thisworksheet->get_title();
+                $calculation = Calculation::get_instance($thisworksheet->get_parent());
+                $result = $calculation->calculate_cell_value($this, $reset_log);
+                $result = $this->convert_date_time_int($result);
+                $thisworksheet->set_selected_cells($selected);
+                $thisworksheet->get_parent_or_throw()->set_active_sheet_index($index);
+                if (is_array($result) && $calculation->get_instance_array_return_type() !== Calculation::RETURN_ARRAY_AS_ARRAY) {
                     while (is_array($result)) {
                         $result = array_shift($result);
                     }
                 }
-                if (
-                    !is_array($result)
-                    && $calculation->getInstanceArrayReturnType() === Calculation::RETURN_ARRAY_AS_ARRAY
-                    && $oldAttributesT === 'array'
-                    && ($oldAttributesRef === $coordinate || $oldAttributesRef === "$coordinate:$coordinate")
-                ) {
+                if (!is_array($result) && $calculation->get_instance_array_return_type() === Calculation::RETURN_ARRAY_AS_ARRAY && $old_attributes_t === 'array' && ($old_attributes_ref === $coordinate || $old_attributes_ref === "{$coordinate}:{$coordinate}")) {
                     $result = [$result];
                 }
                 // if return_as_array for formula like '=sheet!cell'
                 if (is_array($result) && count($result) === 1) {
-                    $resultKey = array_keys($result)[0];
-                    $resultValue = $result[$resultKey];
-                    if (is_int($resultKey) && is_array($resultValue) && count($resultValue) === 1) {
-                        $resultKey2 = array_keys($resultValue)[0];
-                        $resultValue2 = $resultValue[$resultKey2];
-                        if (is_string($resultKey2) && !is_array($resultValue2) && preg_match('/[a-zA-Z]{1,3}/', $resultKey2) === 1) {
-                            $result = $resultValue2;
+                    $result_key = array_keys($result)[0];
+                    $result_value = $result[$result_key];
+                    if (is_int($result_key) && is_array($result_value) && count($result_value) === 1) {
+                        $result_key2 = array_keys($result_value)[0];
+                        $result_value2 = $result_value[$result_key2];
+                        if (is_string($result_key2) && !is_array($result_value2) && preg_match('/[a-zA-Z]{1,3}/', $result_key2) === 1) {
+                            $result = $result_value2;
                         }
                     }
                 }
-                $newColumn = $this->getColumn();
+                $new_column = $this->get_column();
                 if (is_array($result)) {
-                    $result = self::convertSpecialArray($result);
-                    $this->formulaAttributes['t'] = 'array';
-                    $this->formulaAttributes['ref'] = $maxCoordinate = $coordinate;
-                    $newRow = $row = $this->getRow();
-                    $column = $this->getColumn();
-                    foreach ($result as $resultRow) {
-                        if (is_array($resultRow)) {
-                            $newColumn = $column;
-                            foreach ($resultRow as $resultValue) {
-                                if ($row !== $newRow || $column !== $newColumn) {
-                                    $maxCoordinate = $newColumn . $newRow;
-                                    if ($thisworksheet->getCell($newColumn . $newRow)->getValue() !== null) {
-                                        if (!Coordinate::coordinateIsInsideRange($oldAttributesRef, $newColumn . $newRow)) {
+                    $result = self::convert_special_array($result);
+                    $this->formula_attributes['t'] = 'array';
+                    $this->formula_attributes['ref'] = $max_coordinate = $coordinate;
+                    $new_row = $row = $this->get_row();
+                    $column = $this->get_column();
+                    foreach ($result as $result_row) {
+                        if (is_array($result_row)) {
+                            $new_column = $column;
+                            foreach ($result_row as $result_value) {
+                                if ($row !== $new_row || $column !== $new_column) {
+                                    $max_coordinate = $new_column . $new_row;
+                                    if ($thisworksheet->get_cell($new_column . $new_row)->get_value() !== null) {
+                                        if (!Coordinate::coordinate_is_inside_range($old_attributes_ref, $new_column . $new_row)) {
                                             $spill = true;
-
                                             break;
                                         }
                                     }
                                 }
                                 /** @var string $newColumn */
-                                StringHelper::stringIncrement($newColumn);
+                                String_Helper::string_increment($new_column);
                             }
-                            ++$newRow;
+                            ++$new_row;
                         } else {
-                            if ($row !== $newRow || $column !== $newColumn) {
-                                $maxCoordinate = $newColumn . $newRow;
-                                if ($thisworksheet->getCell($newColumn . $newRow)->getValue() !== null) {
-                                    if (!Coordinate::coordinateIsInsideRange($oldAttributesRef, $newColumn . $newRow)) {
+                            if ($row !== $new_row || $column !== $new_column) {
+                                $max_coordinate = $new_column . $new_row;
+                                if ($thisworksheet->get_cell($new_column . $new_row)->get_value() !== null) {
+                                    if (!Coordinate::coordinate_is_inside_range($old_attributes_ref, $new_column . $new_row)) {
                                         $spill = true;
                                     }
                                 }
                             }
-                            StringHelper::stringIncrement($newColumn);
+                            String_Helper::string_increment($new_column);
                         }
                         if ($spill) {
                             break;
                         }
                     }
                     if (!$spill) {
-                        $this->formulaAttributes['ref'] .= ":$maxCoordinate";
+                        $this->formula_attributes['ref'] .= ":{$max_coordinate}";
                     }
-                    $thisworksheet->getCell($column . $row);
+                    $thisworksheet->get_cell($column . $row);
                 }
                 if (is_array($result)) {
-                    if ($oldAttributes !== null && $calculation->getInstanceArrayReturnType() === Calculation::RETURN_ARRAY_AS_ARRAY) {
-                        if (($oldAttributesT) === 'array') {
-                            $thisworksheet = $this->getWorksheet();
-                            $coordinate = $this->getCoordinate();
-                            $ref = $oldAttributesRef;
+                    if ($old_attributes !== null && $calculation->get_instance_array_return_type() === Calculation::RETURN_ARRAY_AS_ARRAY) {
+                        if ($old_attributes_t === 'array') {
+                            $thisworksheet = $this->get_worksheet();
+                            $coordinate = $this->get_coordinate();
+                            $ref = $old_attributes_ref;
                             if (preg_match('/^([A-Z]{1,3})([0-9]{1,7})(:([A-Z]{1,3})([0-9]{1,7}))?$/', $ref, $matches) === 1) {
                                 if (isset($matches[3])) {
-                                    $minCol = $matches[1];
-                                    $minRow = (int) $matches[2];
-                                    $maxCol = $matches[4];
-                                    StringHelper::stringIncrement($maxCol);
-                                    $maxRow = (int) $matches[5];
-                                    for ($row = $minRow; $row <= $maxRow; ++$row) {
-                                        for ($col = $minCol; $col !== $maxCol; StringHelper::stringIncrement($col)) {
+                                    $min_col = $matches[1];
+                                    $min_row = (int) $matches[2];
+                                    $max_col = $matches[4];
+                                    String_Helper::string_increment($max_col);
+                                    $max_row = (int) $matches[5];
+                                    for ($row = $min_row; $row <= $max_row; ++$row) {
+                                        for ($col = $min_col; $col !== $max_col; String_Helper::string_increment($col)) {
                                             /** @var string $col */
-                                            if ("$col$row" !== $coordinate) {
-                                                $thisworksheet->getCell("$col$row")->setValue(null);
+                                            if ("{$col}{$row}" !== $coordinate) {
+                                                $thisworksheet->get_cell("{$col}{$row}")->set_value(null);
                                             }
                                         }
                                     }
                                 }
                             }
-                            $thisworksheet->getCell($coordinate);
+                            $thisworksheet->get_cell($coordinate);
                         }
                     }
                 }
                 if ($spill) {
-                    $result = ExcelError::SPILL();
+                    $result = Excel_Error::SPILL();
                 }
                 if (is_array($result)) {
-                    $newRow = $row = $this->getRow();
-                    $newColumn = $column = $this->getColumn();
-                    foreach ($result as $resultRow) {
-                        if (is_array($resultRow)) {
-                            $newColumn = $column;
-                            foreach ($resultRow as $resultValue) {
-                                if ($row !== $newRow || $column !== $newColumn) {
-                                    $thisworksheet
-                                        ->getCell($newColumn . $newRow)
-                                        ->setValue($resultValue);
+                    $new_row = $row = $this->get_row();
+                    $new_column = $column = $this->get_column();
+                    foreach ($result as $result_row) {
+                        if (is_array($result_row)) {
+                            $new_column = $column;
+                            foreach ($result_row as $result_value) {
+                                if ($row !== $new_row || $column !== $new_column) {
+                                    $thisworksheet->get_cell($new_column . $new_row)->set_value($result_value);
                                 }
-                                StringHelper::stringIncrement($newColumn);
+                                String_Helper::string_increment($new_column);
                             }
-                            ++$newRow;
+                            ++$new_row;
                         } else {
-                            if ($row !== $newRow || $column !== $newColumn) {
-                                $thisworksheet->getCell($newColumn . $newRow)->setValue($resultRow);
+                            if ($row !== $new_row || $column !== $new_column) {
+                                $thisworksheet->get_cell($new_column . $new_row)->set_value($result_row);
                             }
-                            StringHelper::stringIncrement($newColumn);
+                            String_Helper::string_increment($new_column);
                         }
                     }
-                    $thisworksheet->getCell($column . $row);
-                    $this->value = $originalValue;
-                    $this->dataType = $originalDataType;
+                    $thisworksheet->get_cell($column . $row);
+                    $this->value = $original_value;
+                    $this->data_type = $original_data_type;
                 }
-            } catch (SpreadsheetException $ex) {
-                SharedDate::setExcelCalendar($currentCalendar);
-                if (($ex->getMessage() === 'Unable to access External Workbook') && ($this->calculatedValue !== null)) {
-                    return $this->calculatedValue; // Fallback for calculations referencing external files.
-                } elseif (preg_match('/[Uu]ndefined (name|offset: 2|array key 2)/', $ex->getMessage()) === 1) {
-                    return ExcelError::NAME();
+            } catch (Spreadsheet_Exception $ex) {
+                Shared_Date::set_excel_calendar($current_calendar);
+                if ($ex->get_message() === 'Unable to access External Workbook' && $this->calculated_value !== null) {
+                    return $this->calculated_value;
+                    // Fallback for calculations referencing external files.
+                } elseif (preg_match('/[Uu]ndefined (name|offset: 2|array key 2)/', $ex->get_message()) === 1) {
+                    return Excel_Error::NAME();
                 }
-
-                throw new CalculationException(
-                    $title . '!' . $this->getCoordinate() . ' -> ' . $ex->getMessage(),
-                    $ex->getCode(),
-                    $ex
-                );
+                throw new Calculation_Exception($title . '!' . $this->get_coordinate() . ' -> ' . $ex->get_message(), $ex->get_code(), $ex);
             }
-            SharedDate::setExcelCalendar($currentCalendar);
+            Shared_Date::set_excel_calendar($current_calendar);
             if ($result === Functions::NOT_YET_IMPLEMENTED) {
-                $this->formulaAttributes = $oldAttributes;
-
-                return $this->calculatedValue; // Fallback if calculation engine does not support the formula.
+                $this->formula_attributes = $old_attributes;
+                return $this->calculated_value;
+                // Fallback if calculation engine does not support the formula.
             }
             return $result;
         }
-
-        if ($this->value instanceof RichText) {
-            return $this->value->getPlainText();
+        if ($this->value instanceof Rich_Text) {
+            return $this->value->get_plain_text();
         }
-
-        return $this->convertDateTimeInt($this->value);
+        return $this->convert_date_time_int($this->value);
     }
-
     /**
      * Convert array like the following (preserve values, lose indexes):
      * [
@@ -627,11 +557,11 @@ class Cell implements Stringable
      *
      * @return mixed[]
      */
-    private static function convertSpecialArray(array $array): array
+    private static function convert_special_array(array $array): array
     {
-        $newArray = [];
-        foreach ($array as $rowIndex => $row) {
-            if (!is_int($rowIndex) || $rowIndex <= 0 || !is_array($row)) {
+        $new_array = [];
+        foreach ($array as $row_index => $row) {
+            if (!is_int($row_index) || $row_index <= 0 || !is_array($row)) {
                 return $array;
             }
             $keys = array_keys($row);
@@ -639,26 +569,22 @@ class Cell implements Stringable
             if (!is_string($key0)) {
                 return $array;
             }
-            $newArray[] = array_values($row);
+            $new_array[] = array_values($row);
         }
-
-        return $newArray;
+        return $new_array;
     }
-
     /**
      * Set old calculated value (cached).
      *
      * @param mixed $originalValue Value
      */
-    public function setCalculatedValue(mixed $originalValue, bool $tryNumeric = true): self
+    public function set_calculated_value(mixed $original_value, bool $try_numeric = true): self
     {
-        if ($originalValue !== null) {
-            $this->calculatedValue = ($tryNumeric && is_numeric($originalValue)) ? (0 + $originalValue) : $originalValue;
+        if ($original_value !== null) {
+            $this->calculated_value = $try_numeric && is_numeric($original_value) ? 0 + $original_value : $original_value;
         }
-
-        return $this->updateInCollection();
+        return $this->update_in_collection();
     }
-
     /**
      *    Get old calculated value (cached)
      *    This returns the value last calculated by MS Excel or whichever spreadsheet program was used to
@@ -667,271 +593,226 @@ class Cell implements Stringable
      *        possible that auto-calculation was disabled in the original spreadsheet, and underlying data
      *        values used by the formula have changed since it was last calculated.
      */
-    public function getOldCalculatedValue(): mixed
+    public function get_old_calculated_value(): mixed
     {
-        return $this->calculatedValue;
+        return $this->calculated_value;
     }
-
     /**
      * Get cell data type.
      */
-    public function getDataType(): string
+    public function get_data_type(): string
     {
-        return $this->dataType;
+        return $this->data_type;
     }
-
     /**
      * Set cell data type.
      *
      * @param string $dataType see DataType::TYPE_*
      */
-    public function setDataType(string $dataType): self
+    public function set_data_type(string $data_type): self
     {
-        $this->setValueExplicit($this->value, $dataType);
-
+        $this->set_value_explicit($this->value, $data_type);
         return $this;
     }
-
     /**
      * Identify if the cell contains a formula.
      */
-    public function isFormula(): bool
+    public function is_formula(): bool
     {
-        return $this->dataType === DataType::TYPE_FORMULA && $this->getStyle()->getQuotePrefix() === false;
+        return $this->data_type === Data_Type::TYPE_FORMULA && $this->get_style()->get_quote_prefix() === false;
     }
-
     /**
      *    Does this cell contain Data validation rules?
      *
      * @throws SpreadsheetException
      */
-    public function hasDataValidation(): bool
+    public function has_data_validation(): bool
     {
         if (!isset($this->parent)) {
-            throw new SpreadsheetException('Cannot check for data validation when cell is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot check for data validation when cell is not bound to a worksheet');
         }
-
-        return $this->getWorksheet()->dataValidationExists($this->getCoordinate());
+        return $this->get_worksheet()->data_validation_exists($this->get_coordinate());
     }
-
     /**
      * Get Data validation rules.
      *
      * @throws SpreadsheetException
      */
-    public function getDataValidation(): DataValidation
+    public function get_data_validation(): Data_Validation
     {
         if (!isset($this->parent)) {
-            throw new SpreadsheetException('Cannot get data validation for cell that is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot get data validation for cell that is not bound to a worksheet');
         }
-
-        return $this->getWorksheet()->getDataValidation($this->getCoordinate());
+        return $this->get_worksheet()->get_data_validation($this->get_coordinate());
     }
-
     /**
      * Set Data validation rules.
      *
      * @throws SpreadsheetException
      */
-    public function setDataValidation(?DataValidation $dataValidation = null): self
+    public function set_data_validation(?Data_Validation $data_validation = null): self
     {
         if (!isset($this->parent)) {
-            throw new SpreadsheetException('Cannot set data validation for cell that is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot set data validation for cell that is not bound to a worksheet');
         }
-
-        $this->getWorksheet()->setDataValidation($this->getCoordinate(), $dataValidation);
-
-        return $this->updateInCollection();
+        $this->get_worksheet()->set_data_validation($this->get_coordinate(), $data_validation);
+        return $this->update_in_collection();
     }
-
     /**
      * Does this cell contain valid value?
      */
-    public function hasValidValue(): bool
+    public function has_valid_value(): bool
     {
-        $validator = new DataValidator();
-
-        return $validator->isValid($this);
+        $validator = new Data_Validator();
+        return $validator->is_valid($this);
     }
-
     /**
      * Does this cell contain a Hyperlink?
      *
      * @throws SpreadsheetException
      */
-    public function hasHyperlink(): bool
+    public function has_hyperlink(): bool
     {
         if (!isset($this->parent)) {
-            throw new SpreadsheetException('Cannot check for hyperlink when cell is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot check for hyperlink when cell is not bound to a worksheet');
         }
-
-        return $this->getWorksheet()->hyperlinkExists($this->getCoordinate());
+        return $this->get_worksheet()->hyperlink_exists($this->get_coordinate());
     }
-
     /**
      * Get Hyperlink.
      *
      * @throws SpreadsheetException
      */
-    public function getHyperlink(): Hyperlink
+    public function get_hyperlink(): Hyperlink
     {
         if (!isset($this->parent)) {
-            throw new SpreadsheetException('Cannot get hyperlink for cell that is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot get hyperlink for cell that is not bound to a worksheet');
         }
-
-        return $this->getWorksheet()
-            ->getHyperlink($this->getCoordinate());
+        return $this->get_worksheet()->get_hyperlink($this->get_coordinate());
     }
-
     /**
      * Set Hyperlink.
      *
      * @throws SpreadsheetException
      */
-    public function setHyperlink(?Hyperlink $hyperlink = null): self
+    public function set_hyperlink(?Hyperlink $hyperlink = null): self
     {
         if (!isset($this->parent)) {
-            throw new SpreadsheetException('Cannot set hyperlink for cell that is not bound to a worksheet');
+            throw new Spreadsheet_Exception('Cannot set hyperlink for cell that is not bound to a worksheet');
         }
-
-        $this->getWorksheet()
-            ->setHyperlink($this->getCoordinate(), $hyperlink);
-
-        return $this->updateInCollection();
+        $this->get_worksheet()->set_hyperlink($this->get_coordinate(), $hyperlink);
+        return $this->update_in_collection();
     }
-
     /**
      * Get cell collection.
      */
-    public function getParent(): ?Cells
+    public function get_parent(): ?Cells
     {
         return $this->parent;
     }
-
     /**
      * Get parent worksheet.
      *
      * @throws SpreadsheetException
      */
-    public function getWorksheet(): Worksheet
+    public function get_worksheet(): Worksheet
     {
         $parent = $this->parent;
         if ($parent !== null) {
-            $worksheet = $parent->getParent();
+            $worksheet = $parent->get_parent();
         } else {
             $worksheet = null;
         }
-
         if ($worksheet === null) {
-            throw new SpreadsheetException('Worksheet no longer exists');
+            throw new Spreadsheet_Exception('Worksheet no longer exists');
         }
-
         return $worksheet;
     }
-
-    public function getWorksheetOrNull(): ?Worksheet
+    public function get_worksheet_or_null(): ?Worksheet
     {
         $parent = $this->parent;
         if ($parent !== null) {
-            return $parent->getParent();
+            return $parent->get_parent();
         }
-
         return null;
     }
-
     /**
      * Is this cell in a merge range.
      */
-    public function isInMergeRange(): bool
+    public function is_in_merge_range(): bool
     {
-        return (bool) $this->getMergeRange();
+        return (bool) $this->get_merge_range();
     }
-
     /**
      * Is this cell the master (top left cell) in a merge range (that holds the actual data value).
      */
-    public function isMergeRangeValueCell(): bool
+    public function is_merge_range_value_cell(): bool
     {
-        if ($mergeRange = $this->getMergeRange()) {
-            $mergeRange = Coordinate::splitRange($mergeRange);
-            [$startCell] = $mergeRange[0];
-
-            return $this->getCoordinate() === $startCell;
+        if ($merge_range = $this->get_merge_range()) {
+            $merge_range = Coordinate::split_range($merge_range);
+            [$start_cell] = $merge_range[0];
+            return $this->get_coordinate() === $start_cell;
         }
-
         return false;
     }
-
     /**
      * If this cell is in a merge range, then return the range.
      *
      * @return false|string
      */
-    public function getMergeRange()
+    public function get_merge_range()
     {
-        foreach ($this->getWorksheet()->getMergeCells() as $mergeRange) {
-            if ($this->isInRange($mergeRange)) {
-                return $mergeRange;
+        foreach ($this->get_worksheet()->get_merge_cells() as $merge_range) {
+            if ($this->is_in_range($merge_range)) {
+                return $merge_range;
             }
         }
-
         return false;
     }
-
     /**
      * Get cell style.
      */
-    public function getStyle(): Style
+    public function get_style(): Style
     {
-        return $this->getWorksheet()->getStyle($this->getCoordinate());
+        return $this->get_worksheet()->get_style($this->get_coordinate());
     }
-
     /**
      * Get cell style.
      */
-    public function getAppliedStyle(): Style
+    public function get_applied_style(): Style
     {
-        if ($this->getWorksheet()->conditionalStylesExists($this->getCoordinate()) === false) {
-            return $this->getStyle();
+        if ($this->get_worksheet()->conditional_styles_exists($this->get_coordinate()) === false) {
+            return $this->get_style();
         }
-        $range = $this->getWorksheet()->getConditionalRange($this->getCoordinate());
+        $range = $this->get_worksheet()->get_conditional_range($this->get_coordinate());
         if ($range === null) {
-            return $this->getStyle();
+            return $this->get_style();
         }
-
-        $matcher = new CellStyleAssessor($this, $range);
-
-        return $matcher->matchConditions($this->getWorksheet()->getConditionalStyles($this->getCoordinate()));
+        $matcher = new Cell_Style_Assessor($this, $range);
+        return $matcher->match_conditions($this->get_worksheet()->get_conditional_styles($this->get_coordinate()));
     }
-
     /**
      * Re-bind parent.
      */
-    public function rebindParent(Worksheet $parent): self
+    public function rebind_parent(Worksheet $parent): self
     {
-        $this->parent = $parent->getCellCollection();
-
-        return $this->updateInCollection();
+        $this->parent = $parent->get_cell_collection();
+        return $this->update_in_collection();
     }
-
     /**
      *    Is cell in a specific range?
      *
      * @param string $range Cell range (e.g. A1:A1)
      */
-    public function isInRange(string $range): bool
+    public function is_in_range(string $range): bool
     {
-        [$rangeStart, $rangeEnd] = Coordinate::rangeBoundaries($range);
-
+        [$range_start, $range_end] = Coordinate::range_boundaries($range);
         // Translate properties
-        $myColumn = Coordinate::columnIndexFromString($this->getColumn());
-        $myRow = $this->getRow();
-
+        $my_column = Coordinate::column_index_from_string($this->get_column());
+        $my_row = $this->get_row();
         // Verify if cell is in range
-        return ($rangeStart[0] <= $myColumn) && ($rangeEnd[0] >= $myColumn)
-            && ($rangeStart[1] <= $myRow) && ($rangeEnd[1] >= $myRow);
+        return $range_start[0] <= $my_column && $range_end[0] >= $my_column && $range_start[1] <= $my_row && $range_end[1] >= $my_row;
     }
-
     /**
      * Compare 2 cells.
      *
@@ -940,133 +821,115 @@ class Cell implements Stringable
      *
      * @return int Result of comparison (always -1 or 1, never zero!)
      */
-    public static function compareCells(self $a, self $b): int
+    public static function compare_cells(self $a, self $b): int
     {
-        if ($a->getRow() < $b->getRow()) {
+        if ($a->get_row() < $b->get_row()) {
             return -1;
         }
-        if ($a->getRow() > $b->getRow()) {
+        if ($a->get_row() > $b->get_row()) {
             return 1;
         }
-        if (Coordinate::columnIndexFromString($a->getColumn()) < Coordinate::columnIndexFromString($b->getColumn())) {
+        if (Coordinate::column_index_from_string($a->get_column()) < Coordinate::column_index_from_string($b->get_column())) {
             return -1;
         }
-
         return 1;
     }
-
     /**
      * Get value binder to use.
      */
-    public static function getValueBinder(): IValueBinder
+    public static function get_value_binder(): I_Value_Binder
     {
-        if (self::$valueBinder === null) {
-            self::$valueBinder = new DefaultValueBinder();
+        if (self::$value_binder === null) {
+            self::$value_binder = new Default_Value_Binder();
         }
-
-        return self::$valueBinder;
+        return self::$value_binder;
     }
-
     /**
      * Set value binder to use.
      */
-    public static function setValueBinder(IValueBinder $binder): void
+    public static function set_value_binder(I_Value_Binder $binder): void
     {
-        self::$valueBinder = $binder;
+        self::$value_binder = $binder;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
     public function __clone()
     {
         $vars = get_object_vars($this);
-        foreach ($vars as $propertyName => $propertyValue) {
-            if ((is_object($propertyValue)) && ($propertyName !== 'parent')) {
-                $this->$propertyName = clone $propertyValue;
+        foreach ($vars as $property_name => $property_value) {
+            if (is_object($property_value) && $property_name !== 'parent') {
+                $this->{$property_name} = clone $property_value;
             } else {
-                $this->$propertyName = $propertyValue;
+                $this->{$property_name} = $property_value;
             }
         }
     }
-
     /**
      * Get index to cellXf.
      */
-    public function getXfIndex(): int
+    public function get_xf_index(): int
     {
-        return $this->xfIndex;
+        return $this->xf_index;
     }
-
     /**
      * Set index to cellXf.
      */
-    public function setXfIndex(int $indexValue): self
+    public function set_xf_index(int $index_value): self
     {
-        $this->xfIndex = $indexValue;
-
-        return $this->updateInCollection();
+        $this->xf_index = $index_value;
+        return $this->update_in_collection();
     }
-
     /**
      * Set the formula attributes.
      *
      * @param null|array<string, string> $attributes
      */
-    public function setFormulaAttributes(?array $attributes): self
+    public function set_formula_attributes(?array $attributes): self
     {
-        $this->formulaAttributes = $attributes;
-
+        $this->formula_attributes = $attributes;
         return $this;
     }
-
     /**
      * Get the formula attributes.
      *
      * @return null|array<string, string>
      */
-    public function getFormulaAttributes(): mixed
+    public function get_formula_attributes(): mixed
     {
-        return $this->formulaAttributes;
+        return $this->formula_attributes;
     }
-
     /**
      * Convert to string.
      */
     public function __toString(): string
     {
-        $retVal = $this->value;
-
-        return StringHelper::convertToString($retVal, false);
+        $ret_val = $this->value;
+        return String_Helper::convert_to_string($ret_val, false);
     }
-
-    public function getIgnoredErrors(): IgnoredErrors
+    public function get_ignored_errors(): Ignored_Errors
     {
-        return $this->ignoredErrors;
+        return $this->ignored_errors;
     }
-
-    public function isLocked(): bool
+    public function is_locked(): bool
     {
-        $protected = $this->parent?->getParent()?->getProtection()?->getSheet();
+        $protected = $this->parent?->get_parent()?->get_protection()?->get_sheet();
         if ($protected !== true) {
             return false;
         }
-        $locked = $this->getStyle()->getProtection()->getLocked();
-
+        $locked = $this->get_style()->get_protection()->get_locked();
         return $locked !== Protection::PROTECTION_UNPROTECTED;
     }
-
-    public function isHiddenOnFormulaBar(): bool
+    public function is_hidden_on_formula_bar(): bool
     {
-        if ($this->getDataType() !== DataType::TYPE_FORMULA) {
+        if ($this->get_data_type() !== Data_Type::TYPE_FORMULA) {
             return false;
         }
-        $protected = $this->parent?->getParent()?->getProtection()?->getSheet();
+        $protected = $this->parent?->get_parent()?->get_protection()?->get_sheet();
         if ($protected !== true) {
             return false;
         }
-        $hidden = $this->getStyle()->getProtection()->getHidden();
-
+        $hidden = $this->get_style()->get_protection()->get_hidden();
         return $hidden !== Protection::PROTECTION_UNPROTECTED;
     }
 }

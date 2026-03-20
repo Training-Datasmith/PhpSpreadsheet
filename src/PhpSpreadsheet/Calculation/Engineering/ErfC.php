@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ErfC
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Erf_C
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * ERFC.
      *
@@ -34,33 +31,29 @@ class ErfC
     public static function ERFC(mixed $value): array|float|int|string
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         if (is_numeric($value)) {
-            return self::erfcValue($value);
+            return self::erfc_value($value);
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
-
-    private const ONE_SQRT_PI = 0.564189583547756287;
-
+    private const ONE_SQRT_PI = 0.5641895835477563;
     /**
      * Method to calculate the erfc value.
      */
-    private static function erfcValue(float|int|string $value): float|int
+    private static function erfc_value(float|int|string $value): float|int
     {
         $value = (float) $value;
         if (abs($value) < 2.2) {
-            return 1 - Erf::erfValue($value);
+            return 1 - Erf::erf_value($value);
         }
         if ($value < 0) {
-            return 2 - self::erfcValue(-$value);
+            return 2 - self::erfc_value(-$value);
         }
         $a = $n = 1;
         $b = $c = $value;
-        $d = ($value * $value) + 0.5;
+        $d = $value * $value + 0.5;
         $q2 = $b / $d;
         do {
             $t = $a * $n + $b * $value;
@@ -72,8 +65,7 @@ class ErfC
             $n += 0.5;
             $q1 = $q2;
             $q2 = $b / $d;
-        } while ((abs($q1 - $q2) / $q2) > Functions::PRECISION);
-
+        } while (abs($q1 - $q2) / $q2 > Functions::PRECISION);
         return self::ONE_SQRT_PI * exp(-$value * $value) * $q2;
     }
 }

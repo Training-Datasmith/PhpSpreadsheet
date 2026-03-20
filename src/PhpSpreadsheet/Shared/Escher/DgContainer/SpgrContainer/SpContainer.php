@@ -1,285 +1,246 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared\Escher\Dg_Container\Spgr_Container;
 
-namespace PhpOffice\PhpSpreadsheet\Shared\Escher\DgContainer\SpgrContainer;
-
-use PhpOffice\PhpSpreadsheet\Shared\Escher\DgContainer\SpgrContainer;
-
-class SpContainer
+use Php_Office\Php_Spreadsheet\Shared\Escher\Dg_Container\Spgr_Container;
+class Sp_Container
 {
     /**
      * Parent Shape Group Container.
      */
-    private SpgrContainer $parent;
-
+    private Spgr_Container $parent;
     /**
      * Is this a group shape?
      */
     private bool $spgr = false;
-
     /**
      * Shape type.
      */
-    private int $spType;
-
+    private int $sp_type;
     /**
      * Shape flag.
      */
-    private int $spFlag;
-
+    private int $sp_flag;
     /**
      * Shape index (usually group shape has index 0, and the rest: 1,2,3...).
      */
-    private int $spId;
-
+    private int $sp_id;
     /**
      * Array of options.
      *
      * @var mixed[]
      */
     private array $OPT = [];
-
     /**
      * Cell coordinates of upper-left corner of shape, e.g. 'A1'.
      */
-    private string $startCoordinates = '';
-
+    private string $start_coordinates = '';
     /**
      * Horizontal offset of upper-left corner of shape measured in 1/1024 of column width.
      */
-    private int|float $startOffsetX;
-
+    private int|float $start_offset_x;
     /**
      * Vertical offset of upper-left corner of shape measured in 1/256 of row height.
      */
-    private int|float $startOffsetY;
-
+    private int|float $start_offset_y;
     /**
      * Cell coordinates of bottom-right corner of shape, e.g. 'B2'.
      */
-    private string $endCoordinates;
-
+    private string $end_coordinates;
     /**
      * Horizontal offset of bottom-right corner of shape measured in 1/1024 of column width.
      */
-    private int|float $endOffsetX;
-
+    private int|float $end_offset_x;
     /**
      * Vertical offset of bottom-right corner of shape measured in 1/256 of row height.
      */
-    private int|float $endOffsetY;
-
+    private int|float $end_offset_y;
     /**
      * Set parent Shape Group Container.
      */
-    public function setParent(SpgrContainer $parent): void
+    public function set_parent(Spgr_Container $parent): void
     {
         $this->parent = $parent;
     }
-
     /**
      * Get the parent Shape Group Container.
      */
-    public function getParent(): SpgrContainer
+    public function get_parent(): Spgr_Container
     {
         return $this->parent;
     }
-
     /**
      * Set whether this is a group shape.
      */
-    public function setSpgr(bool $value): void
+    public function set_spgr(bool $value): void
     {
         $this->spgr = $value;
     }
-
     /**
      * Get whether this is a group shape.
      */
-    public function getSpgr(): bool
+    public function get_spgr(): bool
     {
         return $this->spgr;
     }
-
     /**
      * Set the shape type.
      */
-    public function setSpType(int $value): void
+    public function set_sp_type(int $value): void
     {
-        $this->spType = $value;
+        $this->sp_type = $value;
     }
-
     /**
      * Get the shape type.
      */
-    public function getSpType(): int
+    public function get_sp_type(): int
     {
-        return $this->spType;
+        return $this->sp_type;
     }
-
     /**
      * Set the shape flag.
      */
-    public function setSpFlag(int $value): void
+    public function set_sp_flag(int $value): void
     {
-        $this->spFlag = $value;
+        $this->sp_flag = $value;
     }
-
     /**
      * Get the shape flag.
      */
-    public function getSpFlag(): int
+    public function get_sp_flag(): int
     {
-        return $this->spFlag;
+        return $this->sp_flag;
     }
-
     /**
      * Set the shape index.
      */
-    public function setSpId(int $value): void
+    public function set_sp_id(int $value): void
     {
-        $this->spId = $value;
+        $this->sp_id = $value;
     }
-
     /**
      * Get the shape index.
      */
-    public function getSpId(): int
+    public function get_sp_id(): int
     {
-        return $this->spId;
+        return $this->sp_id;
     }
-
     /**
      * Set an option for the Shape Group Container.
      *
      * @param int $property The number specifies the option
      */
-    public function setOPT(int $property, mixed $value): void
+    public function set_opt(int $property, mixed $value): void
     {
         $this->OPT[$property] = $value;
     }
-
     /**
      * Get an option for the Shape Group Container.
      *
      * @param int $property The number specifies the option
      */
-    public function getOPT(int $property): mixed
+    public function get_opt(int $property): mixed
     {
         return $this->OPT[$property] ?? null;
     }
-
     /**
      * Get the collection of options.
      *
      * @return mixed[]
      */
-    public function getOPTCollection(): array
+    public function get_opt_collection(): array
     {
         return $this->OPT;
     }
-
     /**
      * Set cell coordinates of upper-left corner of shape.
      *
      * @param string $value eg: 'A1'
      */
-    public function setStartCoordinates(string $value): void
+    public function set_start_coordinates(string $value): void
     {
-        $this->startCoordinates = $value;
+        $this->start_coordinates = $value;
     }
-
     /**
      * Get cell coordinates of upper-left corner of shape.
      */
-    public function getStartCoordinates(): string
+    public function get_start_coordinates(): string
     {
-        return $this->startCoordinates;
+        return $this->start_coordinates;
     }
-
     /**
      * Set offset in x-direction of upper-left corner of shape measured in 1/1024 of column width.
      */
-    public function setStartOffsetX(int|float $startOffsetX): void
+    public function set_start_offset_x(int|float $start_offset_x): void
     {
-        $this->startOffsetX = $startOffsetX;
+        $this->start_offset_x = $start_offset_x;
     }
-
     /**
      * Get offset in x-direction of upper-left corner of shape measured in 1/1024 of column width.
      */
-    public function getStartOffsetX(): int|float
+    public function get_start_offset_x(): int|float
     {
-        return $this->startOffsetX;
+        return $this->start_offset_x;
     }
-
     /**
      * Set offset in y-direction of upper-left corner of shape measured in 1/256 of row height.
      */
-    public function setStartOffsetY(int|float $startOffsetY): void
+    public function set_start_offset_y(int|float $start_offset_y): void
     {
-        $this->startOffsetY = $startOffsetY;
+        $this->start_offset_y = $start_offset_y;
     }
-
     /**
      * Get offset in y-direction of upper-left corner of shape measured in 1/256 of row height.
      */
-    public function getStartOffsetY(): int|float
+    public function get_start_offset_y(): int|float
     {
-        return $this->startOffsetY;
+        return $this->start_offset_y;
     }
-
     /**
      * Set cell coordinates of bottom-right corner of shape.
      *
      * @param string $value eg: 'A1'
      */
-    public function setEndCoordinates(string $value): void
+    public function set_end_coordinates(string $value): void
     {
-        $this->endCoordinates = $value;
+        $this->end_coordinates = $value;
     }
-
     /**
      * Get cell coordinates of bottom-right corner of shape.
      */
-    public function getEndCoordinates(): string
+    public function get_end_coordinates(): string
     {
-        return $this->endCoordinates;
+        return $this->end_coordinates;
     }
-
     /**
      * Set offset in x-direction of bottom-right corner of shape measured in 1/1024 of column width.
      */
-    public function setEndOffsetX(int|float $endOffsetX): void
+    public function set_end_offset_x(int|float $end_offset_x): void
     {
-        $this->endOffsetX = $endOffsetX;
+        $this->end_offset_x = $end_offset_x;
     }
-
     /**
      * Get offset in x-direction of bottom-right corner of shape measured in 1/1024 of column width.
      */
-    public function getEndOffsetX(): int|float
+    public function get_end_offset_x(): int|float
     {
-        return $this->endOffsetX;
+        return $this->end_offset_x;
     }
-
     /**
      * Set offset in y-direction of bottom-right corner of shape measured in 1/256 of row height.
      */
-    public function setEndOffsetY(int|float $endOffsetY): void
+    public function set_end_offset_y(int|float $end_offset_y): void
     {
-        $this->endOffsetY = $endOffsetY;
+        $this->end_offset_y = $end_offset_y;
     }
-
     /**
      * Get offset in y-direction of bottom-right corner of shape measured in 1/256 of row height.
      */
-    public function getEndOffsetY(): int|float
+    public function get_end_offset_y(): int|float
     {
-        return $this->endOffsetY;
+        return $this->end_offset_y;
     }
-
     /**
      * Get the nesting level of this spContainer. This is the number of spgrContainers between this spContainer and
      * the dgContainer. A value of 1 = immediately within first spgrContainer
@@ -287,16 +248,14 @@ class SpContainer
      *
      * @return int Nesting level
      */
-    public function getNestingLevel(): int
+    public function get_nesting_level(): int
     {
-        $nestingLevel = 0;
-
-        $parent = $this->getParent();
-        while ($parent instanceof SpgrContainer) {
-            ++$nestingLevel;
-            $parent = $parent->getParent();
+        $nesting_level = 0;
+        $parent = $this->get_parent();
+        while ($parent instanceof Spgr_Container) {
+            ++$nesting_level;
+            $parent = $parent->get_parent();
         }
-
-        return $nestingLevel;
+        return $nesting_level;
     }
 }

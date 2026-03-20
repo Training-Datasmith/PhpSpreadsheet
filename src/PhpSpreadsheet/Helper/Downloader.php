@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Helper;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Helper;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use PhpOffice\PhpSpreadsheet\Exception;
-
+use Php_Office\Php_Spreadsheet\Exception;
 /**
  * Assist downloading files when samples are run in browser.
  * Never run as part of unit tests, which are command line.
@@ -17,47 +15,32 @@ use PhpOffice\PhpSpreadsheet\Exception;
 class Downloader
 {
     protected string $filepath;
-
     protected string $filename;
-
     protected string $filetype;
-
-    protected const CONTENT_TYPES = [
-        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'xls' => 'application/vnd.ms-excel',
-        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-        'csv' => 'text/csv',
-        'html' => 'text/html',
-        'pdf' => 'application/pdf',
-    ];
-
+    protected const CONTENT_TYPES = ['xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xls' => 'application/vnd.ms-excel', 'ods' => 'application/vnd.oasis.opendocument.spreadsheet', 'csv' => 'text/csv', 'html' => 'text/html', 'pdf' => 'application/pdf'];
     public function __construct(string $folder, string $filename, ?string $filetype = null)
     {
-        if ((is_dir($folder) === false) || (is_readable($folder) === false)) {
+        if (is_dir($folder) === false || is_readable($folder) === false) {
             throw new Exception('Folder is not accessible');
         }
         $filepath = "{$folder}/{$filename}";
         $this->filepath = (string) realpath($filepath);
         $this->filename = basename($filepath);
         clearstatcache();
-        if ((is_file($this->filepath) === false) || (is_readable($this->filepath) === false)) {
+        if (is_file($this->filepath) === false || is_readable($this->filepath) === false) {
             throw new Exception('File not found, or not a regular file, or cannot be read');
         }
-
         $filetype ??= pathinfo($filename, PATHINFO_EXTENSION);
         if (array_key_exists(strtolower($filetype), self::CONTENT_TYPES) === false) {
             throw new Exception('Invalid filetype: file cannot be downloaded');
         }
         $this->filetype = strtolower($filetype);
     }
-
     public function download(): void
     {
         $this->headers();
-
         readfile($this->filepath);
     }
-
     public function headers(): void
     {
         // I cannot tell what this ob_clean is paired with.
@@ -67,40 +50,37 @@ class Downloader
         if ((int) ob_get_length() > 0) {
             ob_clean();
         }
-
-        $this->contentType();
-        $this->contentDisposition();
-        $this->cacheHeaders();
-        $this->fileSize();
-
+        $this->content_type();
+        $this->content_disposition();
+        $this->cache_headers();
+        $this->file_size();
         flush();
     }
-
-    protected function contentType(): void
+    protected function content_type(): void
     {
         header('Content-Type: ' . self::CONTENT_TYPES[$this->filetype]);
     }
-
-    protected function contentDisposition(): void
+    protected function content_disposition(): void
     {
         header('Content-Disposition: attachment;filename="' . $this->filename . '"');
     }
-
-    protected function cacheHeaders(): void
+    protected function cache_headers(): void
     {
         header('Cache-Control: max-age=0');
         // If you're serving to IE 9, then the following may be needed
         header('Cache-Control: max-age=1');
-
         // If you're serving to IE over SSL, then the following may be needed
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        // Date in the past
         $dt = new DateTimeImmutable(timezone: new DateTimeZone('UTC'));
-        header('Last-Modified: ' . $dt->format('D, d M Y H:i:s') . ' GMT'); // always modified
-        header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
-        header('Pragma: public'); // HTTP/1.0
+        header('Last-Modified: ' . $dt->format('D, d M Y H:i:s') . ' GMT');
+        // always modified
+        header('Cache-Control: cache, must-revalidate');
+        // HTTP/1.1
+        header('Pragma: public');
+        // HTTP/1.0
     }
-
-    protected function fileSize(): void
+    protected function file_size(): void
     {
         header('Content-Length: ' . filesize($this->filepath));
     }

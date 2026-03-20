@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception as CalcException;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
-class Counts extends AggregateBase
+use Php_Office\Php_Spreadsheet\Calculation\Exception as CalcException;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+class Counts extends Aggregate_Base
 {
     /**
      * COUNT.
@@ -21,23 +19,20 @@ class Counts extends AggregateBase
      */
     public static function COUNT(mixed ...$args): int
     {
-        $returnValue = 0;
-
+        $return_value = 0;
         // Loop through arguments
-        $aArgs = Functions::flattenArrayIndexed($args);
-        foreach ($aArgs as $k => $arg) {
-            $arg = self::testAcceptedBoolean($arg, $k);
+        $a_args = Functions::flatten_array_indexed($args);
+        foreach ($a_args as $k => $arg) {
+            $arg = self::test_accepted_boolean($arg, $k);
             // Is it a numeric value?
             // Strings containing numeric values are only counted if they are string literals (not cell values)
             //    and then only in MS Excel and in Open Office, not in Gnumeric
-            if (self::isAcceptedCountable($arg, $k, true)) {
-                ++$returnValue;
+            if (self::is_accepted_countable($arg, $k, true)) {
+                ++$return_value;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * COUNTA.
      *
@@ -50,20 +45,17 @@ class Counts extends AggregateBase
      */
     public static function COUNTA(mixed ...$args): int
     {
-        $returnValue = 0;
-
+        $return_value = 0;
         // Loop through arguments
-        $aArgs = Functions::flattenArrayIndexed($args);
-        foreach ($aArgs as $k => $arg) {
+        $a_args = Functions::flatten_array_indexed($args);
+        foreach ($a_args as $k => $arg) {
             // Nulls are counted if literals, but not if cell values
-            if ($arg !== null || (!Functions::isCellValue($k))) {
-                ++$returnValue;
+            if ($arg !== null || !Functions::is_cell_value($k)) {
+                ++$return_value;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * COUNTBLANK.
      *
@@ -80,19 +72,17 @@ class Counts extends AggregateBase
             return 1;
         }
         if (!is_array($range) || array_key_exists(0, $range)) {
-            throw new CalcException('Must specify range of cells, not any kind of literal');
+            throw new Calc_Exception('Must specify range of cells, not any kind of literal');
         }
-        $returnValue = 0;
-
+        $return_value = 0;
         // Loop through arguments
-        $aArgs = Functions::flattenArray($range);
-        foreach ($aArgs as $arg) {
+        $a_args = Functions::flatten_array($range);
+        foreach ($a_args as $arg) {
             // Is it a blank cell?
-            if (($arg === null) || ((is_string($arg)) && ($arg == ''))) {
-                ++$returnValue;
+            if ($arg === null || is_string($arg) && $arg == '') {
+                ++$return_value;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
 }

@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Selection
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * CHOOSE.
      *
@@ -26,28 +23,24 @@ class Selection
      *
      * @return mixed The selected value
      */
-    public static function choose(mixed $chosenEntry, mixed ...$chooseArgs): mixed
+    public static function choose(mixed $chosen_entry, mixed ...$choose_args): mixed
     {
-        if (is_array($chosenEntry)) {
-            return self::evaluateArrayArgumentsSubset([self::class, __FUNCTION__], 1, $chosenEntry, ...$chooseArgs);
+        if (is_array($chosen_entry)) {
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 1, $chosen_entry, ...$choose_args);
         }
-
-        $entryCount = count($chooseArgs) - 1;
-
-        if (is_numeric($chosenEntry)) {
-            --$chosenEntry;
+        $entry_count = count($choose_args) - 1;
+        if (is_numeric($chosen_entry)) {
+            --$chosen_entry;
         } else {
-            return ExcelError::VALUE();
+            return Excel_Error::VALUE();
         }
-        $chosenEntry = (int) floor($chosenEntry);
-        if (($chosenEntry < 0) || ($chosenEntry > $entryCount)) {
-            return ExcelError::VALUE();
+        $chosen_entry = (int) floor($chosen_entry);
+        if ($chosen_entry < 0 || $chosen_entry > $entry_count) {
+            return Excel_Error::VALUE();
         }
-
-        if (is_array($chooseArgs[$chosenEntry])) {
-            return Functions::flattenArray($chooseArgs[$chosenEntry]);
+        if (is_array($choose_args[$chosen_entry])) {
+            return Functions::flatten_array($choose_args[$chosen_entry]);
         }
-
-        return $chooseArgs[$chosenEntry];
+        return $choose_args[$chosen_entry];
     }
 }

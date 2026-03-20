@@ -1,124 +1,97 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial;
-
-use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\Constants as FinancialConstants;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class FinancialValidations
+use Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Constants as FinancialConstants;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Financial_Validations
 {
-    public static function validateDate(mixed $date): float
+    public static function validate_date(mixed $date): float
     {
-        return DateTimeExcel\Helpers::getDateValue($date);
+        return Date_Time_Excel\Helpers::get_date_value($date);
     }
-
-    public static function validateSettlementDate(mixed $settlement): float
+    public static function validate_settlement_date(mixed $settlement): float
     {
-        return self::validateDate($settlement);
+        return self::validate_date($settlement);
     }
-
-    public static function validateMaturityDate(mixed $maturity): float
+    public static function validate_maturity_date(mixed $maturity): float
     {
-        return self::validateDate($maturity);
+        return self::validate_date($maturity);
     }
-
-    public static function validateFloat(mixed $value): float
+    public static function validate_float(mixed $value): float
     {
         if (!is_numeric($value)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (float) $value;
     }
-
-    public static function validateInt(mixed $value): int
+    public static function validate_int(mixed $value): int
     {
         if (!is_numeric($value)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (int) floor((float) $value);
     }
-
-    public static function validateRate(mixed $rate): float
+    public static function validate_rate(mixed $rate): float
     {
-        $rate = self::validateFloat($rate);
+        $rate = self::validate_float($rate);
         if ($rate < 0.0) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $rate;
     }
-
-    public static function validateFrequency(mixed $frequency): int
+    public static function validate_frequency(mixed $frequency): int
     {
-        $frequency = self::validateInt($frequency);
-        if (
-            ($frequency !== FinancialConstants::FREQUENCY_ANNUAL)
-            && ($frequency !== FinancialConstants::FREQUENCY_SEMI_ANNUAL)
-            && ($frequency !== FinancialConstants::FREQUENCY_QUARTERLY)
-        ) {
-            throw new Exception(ExcelError::NAN());
+        $frequency = self::validate_int($frequency);
+        if ($frequency !== Financial_Constants::FREQUENCY_ANNUAL && $frequency !== Financial_Constants::FREQUENCY_SEMI_ANNUAL && $frequency !== Financial_Constants::FREQUENCY_QUARTERLY) {
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $frequency;
     }
-
-    public static function validateBasis(mixed $basis): int
+    public static function validate_basis(mixed $basis): int
     {
         if (!is_numeric($basis)) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         $basis = (int) $basis;
-        if (($basis < 0) || ($basis > 4)) {
-            throw new Exception(ExcelError::NAN());
+        if ($basis < 0 || $basis > 4) {
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $basis;
     }
-
-    public static function validatePrice(mixed $price): float
+    public static function validate_price(mixed $price): float
     {
-        $price = self::validateFloat($price);
+        $price = self::validate_float($price);
         if ($price < 0.0) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $price;
     }
-
-    public static function validateParValue(mixed $parValue): float
+    public static function validate_par_value(mixed $par_value): float
     {
-        $parValue = self::validateFloat($parValue);
-        if ($parValue < 0.0) {
-            throw new Exception(ExcelError::NAN());
+        $par_value = self::validate_float($par_value);
+        if ($par_value < 0.0) {
+            throw new Exception(Excel_Error::NAN());
         }
-
-        return $parValue;
+        return $par_value;
     }
-
-    public static function validateYield(mixed $yield): float
+    public static function validate_yield(mixed $yield): float
     {
-        $yield = self::validateFloat($yield);
+        $yield = self::validate_float($yield);
         if ($yield < 0.0) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $yield;
     }
-
-    public static function validateDiscount(mixed $discount): float
+    public static function validate_discount(mixed $discount): float
     {
-        $discount = self::validateFloat($discount);
+        $discount = self::validate_float($discount);
         if ($discount <= 0.0) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $discount;
     }
 }

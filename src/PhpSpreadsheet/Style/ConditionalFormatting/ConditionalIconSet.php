@@ -1,20 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
-
-class ConditionalIconSet
+class Conditional_Icon_Set
 {
     /** The icon set to display. */
-    private ?IconSetValues $iconSetType = null;
-
+    private ?Icon_Set_Values $icon_set_type = null;
     /**  If true, reverses the default order of the icons in this icon set. */
     private ?bool $reverse = null;
-
     /** Indicates whether to show the values of the cells on which this icon set is applied. */
-    private ?bool $showValue = null;
-
+    private ?bool $show_value = null;
     /**
      * If true, indicates that the icon set is a custom icon set.
      * If this value is "true", there MUST be the same number of cfIcon elements
@@ -22,77 +18,61 @@ class ConditionalIconSet
      * If this value is "false", there MUST be 0 cfIcon elements.
      */
     private ?bool $custom = null;
-
     /** @var ConditionalFormatValueObject[] */
     private array $cfvos = [];
-
-    public function getIconSetType(): ?IconSetValues
+    public function get_icon_set_type(): ?Icon_Set_Values
     {
-        return $this->iconSetType;
+        return $this->icon_set_type;
     }
-
-    public function setIconSetType(IconSetValues $type): self
+    public function set_icon_set_type(Icon_Set_Values $type): self
     {
-        $this->iconSetType = $type;
-
+        $this->icon_set_type = $type;
         return $this;
     }
-
-    public function getReverse(): ?bool
+    public function get_reverse(): ?bool
     {
         return $this->reverse;
     }
-
-    public function setReverse(bool $reverse): self
+    public function set_reverse(bool $reverse): self
     {
         $this->reverse = $reverse;
-
         return $this;
     }
-
-    public function getShowValue(): ?bool
+    public function get_show_value(): ?bool
     {
-        return $this->showValue;
+        return $this->show_value;
     }
-
-    public function setShowValue(bool $showValue): self
+    public function set_show_value(bool $show_value): self
     {
-        $this->showValue = $showValue;
-
+        $this->show_value = $show_value;
         return $this;
     }
-
-    public function getCustom(): ?bool
+    public function get_custom(): ?bool
     {
         return $this->custom;
     }
-
-    public function setCustom(bool $custom): self
+    public function set_custom(bool $custom): self
     {
         $this->custom = $custom;
-
         return $this;
     }
-
     /**
      * Get the conditional format value objects.
      *
      * @return ConditionalFormatValueObject[]
      */
-    public function getCfvos(): array
+    public function get_cfvos(): array
     {
         return $this->cfvos;
     }
-
     /**
      * Set the conditional format value objects.
      *
      * @param ConditionalFormatValueObject[] $cfvos
      */
-    public function setCfvos(array $cfvos): self
+    public function set_cfvos(array $cfvos): self
     {
         $this->cfvos = $cfvos;
-
         return $this;
     }
 }

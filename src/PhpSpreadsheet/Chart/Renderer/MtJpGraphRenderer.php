@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Chart\Renderer;
 
-namespace PhpOffice\PhpSpreadsheet\Chart\Renderer;
-
-use mitoteam\jpgraph\MtJpGraph;
-
+use mitoteam\jpgraph\Mt_Jp_Graph;
 /**
  * Jpgraph is not officially maintained by Composer at packagist.org.
  *
@@ -14,7 +12,7 @@ use mitoteam\jpgraph\MtJpGraph;
  *
  * This package is up to date for June 2023 and has PHP 8.2 support.
  */
-class MtJpGraphRenderer extends JpGraphRendererBase
+class Mt_Jp_Graph_Renderer extends Jp_Graph_Renderer_Base
 {
     protected static function init(): void
     {
@@ -22,19 +20,8 @@ class MtJpGraphRenderer extends JpGraphRendererBase
         if ($loaded) {
             return;
         }
-
-        MtJpGraph::load([
-            'bar',
-            'contour',
-            'line',
-            'pie',
-            'pie3d',
-            'radar',
-            'regstat',
-            'scatter',
-            'stock',
-        ], true); // enable Extended mode
-
+        Mt_Jp_Graph::load(['bar', 'contour', 'line', 'pie', 'pie3d', 'radar', 'regstat', 'scatter', 'stock'], true);
+        // enable Extended mode
         $loaded = true;
     }
 }

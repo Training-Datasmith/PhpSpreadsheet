@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical\Distributions;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class Gamma extends GammaBase
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Gamma extends Gamma_Base
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * GAMMA.
      *
@@ -27,22 +24,18 @@ class Gamma extends GammaBase
     public static function gamma(mixed $value): array|string|float
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
+            $value = Distribution_Validations::validate_float($value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if ((((int) $value) == ($value)) && $value <= 0.0) {
-            return ExcelError::NAN();
+        if ((int) $value == $value && $value <= 0.0) {
+            return Excel_Error::NAN();
         }
-
-        return self::gammaValue($value);
+        return self::gamma_value($value);
     }
-
     /**
      * GAMMADIST.
      *
@@ -63,25 +56,21 @@ class Gamma extends GammaBase
     public static function distribution(mixed $value, mixed $a, mixed $b, mixed $cumulative): array|string|float
     {
         if (is_array($value) || is_array($a) || is_array($b) || is_array($cumulative)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $a, $b, $cumulative);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $a, $b, $cumulative);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
-            $a = DistributionValidations::validateFloat($a);
-            $b = DistributionValidations::validateFloat($b);
-            $cumulative = DistributionValidations::validateBool($cumulative);
+            $value = Distribution_Validations::validate_float($value);
+            $a = Distribution_Validations::validate_float($a);
+            $b = Distribution_Validations::validate_float($b);
+            $cumulative = Distribution_Validations::validate_bool($cumulative);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($value < 0) || ($a <= 0) || ($b <= 0)) {
-            return ExcelError::NAN();
+        if ($value < 0 || $a <= 0 || $b <= 0) {
+            return Excel_Error::NAN();
         }
-
-        return self::calculateDistribution($value, $a, $b, $cumulative);
+        return self::calculate_distribution($value, $a, $b, $cumulative);
     }
-
     /**
      * GAMMAINV.
      *
@@ -100,24 +89,20 @@ class Gamma extends GammaBase
     public static function inverse(mixed $probability, mixed $alpha, mixed $beta)
     {
         if (is_array($probability) || is_array($alpha) || is_array($beta)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $probability, $alpha, $beta);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $probability, $alpha, $beta);
         }
-
         try {
-            $probability = DistributionValidations::validateProbability($probability);
-            $alpha = DistributionValidations::validateFloat($alpha);
-            $beta = DistributionValidations::validateFloat($beta);
+            $probability = Distribution_Validations::validate_probability($probability);
+            $alpha = Distribution_Validations::validate_float($alpha);
+            $beta = Distribution_Validations::validate_float($beta);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($alpha <= 0.0) || ($beta <= 0.0)) {
-            return ExcelError::NAN();
+        if ($alpha <= 0.0 || $beta <= 0.0) {
+            return Excel_Error::NAN();
         }
-
-        return self::calculateInverse($probability, $alpha, $beta);
+        return self::calculate_inverse($probability, $alpha, $beta);
     }
-
     /**
      * GAMMALN.
      *
@@ -132,19 +117,16 @@ class Gamma extends GammaBase
     public static function ln(mixed $value): array|string|float
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         try {
-            $value = DistributionValidations::validateFloat($value);
+            $value = Distribution_Validations::validate_float($value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if ($value <= 0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
-        return log(self::gammaValue($value));
+        return log(self::gamma_value($value));
     }
 }

@@ -1,54 +1,38 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Arabic
 {
-    use ArrayEnabled;
-
-    private const ROMAN_LOOKUP = [
-        'M' => 1000,
-        'D' => 500,
-        'C' => 100,
-        'L' => 50,
-        'X' => 10,
-        'V' => 5,
-        'I' => 1,
-    ];
-
+    use Array_Enabled;
+    private const ROMAN_LOOKUP = ['M' => 1000, 'D' => 500, 'C' => 100, 'L' => 50, 'X' => 10, 'V' => 5, 'I' => 1];
     /**
      * Recursively calculate the arabic value of a roman numeral.
      *
      * @param string[] $roman
      */
-    private static function calculateArabic(array $roman, int &$sum = 0, int $subtract = 0): int
+    private static function calculate_arabic(array $roman, int &$sum = 0, int $subtract = 0): int
     {
         $numeral = array_shift($roman);
         if (!isset(self::ROMAN_LOOKUP[$numeral])) {
             throw new Exception('Invalid character detected');
         }
-
         $arabic = self::ROMAN_LOOKUP[$numeral];
         if (count($roman) > 0 && isset(self::ROMAN_LOOKUP[$roman[0]]) && $arabic < self::ROMAN_LOOKUP[$roman[0]]) {
             $subtract += $arabic;
         } else {
-            $sum += ($arabic - $subtract);
+            $sum += $arabic - $subtract;
             $subtract = 0;
         }
-
         if (count($roman) > 0) {
-            self::calculateArabic($roman, $sum, $subtract);
+            self::calculate_arabic($roman, $sum, $subtract);
         }
-
         return $sum;
     }
-
     /**
      * ARABIC.
      *
@@ -66,34 +50,31 @@ class Arabic
     public static function evaluate(mixed $roman): array|int|string
     {
         if (is_array($roman)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $roman);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $roman);
         }
-
         // An empty string should return 0
         $roman = substr(trim(strtoupper((string) $roman)), 0, 255);
         if ($roman === '') {
             return 0;
         }
-
         // Convert the roman numeral to an arabic number
-        $negativeNumber = $roman[0] === '-';
-        if ($negativeNumber) {
+        $negative_number = $roman[0] === '-';
+        if ($negative_number) {
             $roman = trim(substr($roman, 1));
             if ($roman === '') {
-                return ExcelError::NAN();
+                return Excel_Error::NAN();
             }
         }
-
         try {
-            $arabic = self::calculateArabic(mb_str_split($roman, 1, 'UTF-8'));
+            $arabic = self::calculate_arabic(mb_str_split($roman, 1, 'UTF-8'));
         } catch (Exception) {
-            return ExcelError::VALUE(); // Invalid character detected
+            return Excel_Error::VALUE();
+            // Invalid character detected
         }
-
-        if ($negativeNumber) {
-            $arabic *= -1; // The number should be negative
+        if ($negative_number) {
+            $arabic *= -1;
+            // The number should be negative
         }
-
         return $arabic;
     }
 }

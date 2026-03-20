@@ -1,44 +1,36 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet\Table;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet\Table;
-
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table;
-
-class TableDxfsStyle
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Table;
+class Table_Dxfs_Style
 {
     /**
      * Header row dxfs index.
      */
-    private ?int $headerRow = null;
-
+    private ?int $header_row = null;
     /**
      * First row stripe dxfs index.
      */
-    private ?int $firstRowStripe = null;
-
+    private ?int $first_row_stripe = null;
     /**
      * second row stripe dxfs index.
      */
-    private ?int $secondRowStripe = null;
-
+    private ?int $second_row_stripe = null;
     /**
      * Header row Style.
      */
-    private ?Style $headerRowStyle = null;
-
+    private ?Style $header_row_style = null;
     /**
      * First row stripe Style.
      */
-    private ?Style $firstRowStripeStyle = null;
-
+    private ?Style $first_row_stripe_style = null;
     /**
      * Second row stripe Style.
      */
-    private ?Style $secondRowStripeStyle = null;
-
+    private ?Style $second_row_stripe_style = null;
     /**
      * Create a new Table Style.
      *
@@ -47,120 +39,101 @@ class TableDxfsStyle
     public function __construct(private readonly string $name)
     {
     }
-
     /**
      * Get name.
      */
-    public function getName(): string
+    public function get_name(): string
     {
         return $this->name;
     }
-
     /**
      * Set header row dxfs index.
      */
-    public function setHeaderRow(int $row): self
+    public function set_header_row(int $row): self
     {
-        $this->headerRow = $row;
-
+        $this->header_row = $row;
         return $this;
     }
-
     /**
      * Get header row dxfs index.
      */
-    public function getHeaderRow(): ?int
+    public function get_header_row(): ?int
     {
-        return $this->headerRow;
+        return $this->header_row;
     }
-
     /**
      * Set first row stripe dxfs index.
      */
-    public function setFirstRowStripe(int $row): self
+    public function set_first_row_stripe(int $row): self
     {
-        $this->firstRowStripe = $row;
-
+        $this->first_row_stripe = $row;
         return $this;
     }
-
     /**
      * Get first row stripe dxfs index.
      */
-    public function getFirstRowStripe(): ?int
+    public function get_first_row_stripe(): ?int
     {
-        return $this->firstRowStripe;
+        return $this->first_row_stripe;
     }
-
     /**
      * Set second row stripe dxfs index.
      */
-    public function setSecondRowStripe(int $row): self
+    public function set_second_row_stripe(int $row): self
     {
-        $this->secondRowStripe = $row;
-
+        $this->second_row_stripe = $row;
         return $this;
     }
-
     /**
      * Get second row stripe dxfs index.
      */
-    public function getSecondRowStripe(): ?int
+    public function get_second_row_stripe(): ?int
     {
-        return $this->secondRowStripe;
+        return $this->second_row_stripe;
     }
-
     /**
      * Set Header row Style.
      */
-    public function setHeaderRowStyle(Style $style): self
+    public function set_header_row_style(Style $style): self
     {
-        $this->headerRowStyle = $style;
-
+        $this->header_row_style = $style;
         return $this;
     }
-
     /**
      * Get Header row Style.
      */
-    public function getHeaderRowStyle(): ?Style
+    public function get_header_row_style(): ?Style
     {
-        return $this->headerRowStyle;
+        return $this->header_row_style;
     }
-
     /**
      * Set first row stripe Style.
      */
-    public function setFirstRowStripeStyle(Style $style): self
+    public function set_first_row_stripe_style(Style $style): self
     {
-        $this->firstRowStripeStyle = $style;
-
+        $this->first_row_stripe_style = $style;
         return $this;
     }
-
     /**
      * Get first row stripe Style.
      */
-    public function getFirstRowStripeStyle(): ?Style
+    public function get_first_row_stripe_style(): ?Style
     {
-        return $this->firstRowStripeStyle;
+        return $this->first_row_stripe_style;
     }
-
     /**
      * Set second row stripe Style.
      */
-    public function setSecondRowStripeStyle(Style $style): self
+    public function set_second_row_stripe_style(Style $style): self
     {
-        $this->secondRowStripeStyle = $style;
-
+        $this->second_row_stripe_style = $style;
         return $this;
     }
-
     /**
      * Get second row stripe Style.
      */
-    public function getSecondRowStripeStyle(): ?Style
+    public function get_second_row_stripe_style(): ?Style
     {
-        return $this->secondRowStripeStyle;
+        return $this->second_row_stripe_style;
     }
 }

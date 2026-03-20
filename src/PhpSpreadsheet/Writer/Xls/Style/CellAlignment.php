@@ -1,61 +1,38 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xls\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xls\Style;
-
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-
-class CellAlignment
+use Php_Office\Php_Spreadsheet\Style\Alignment;
+class Cell_Alignment
 {
     /**
      * @var array<string, int>
      */
-    private static array $horizontalMap = [
-        Alignment::HORIZONTAL_GENERAL => 0,
-        Alignment::HORIZONTAL_LEFT => 1,
-        Alignment::HORIZONTAL_RIGHT => 3,
-        Alignment::HORIZONTAL_CENTER => 2,
-        Alignment::HORIZONTAL_CENTER_CONTINUOUS => 6,
-        Alignment::HORIZONTAL_JUSTIFY => 5,
-    ];
-
+    private static array $horizontal_map = [Alignment::HORIZONTAL_GENERAL => 0, Alignment::HORIZONTAL_LEFT => 1, Alignment::HORIZONTAL_RIGHT => 3, Alignment::HORIZONTAL_CENTER => 2, Alignment::HORIZONTAL_CENTER_CONTINUOUS => 6, Alignment::HORIZONTAL_JUSTIFY => 5];
     /**
      * @var array<string, int>
      */
-    private static array $verticalMap = [
-        Alignment::VERTICAL_BOTTOM => 2,
-        Alignment::VERTICAL_TOP => 0,
-        Alignment::VERTICAL_CENTER => 1,
-        Alignment::VERTICAL_JUSTIFY => 3,
-    ];
-
+    private static array $vertical_map = [Alignment::VERTICAL_BOTTOM => 2, Alignment::VERTICAL_TOP => 0, Alignment::VERTICAL_CENTER => 1, Alignment::VERTICAL_JUSTIFY => 3];
     public static function horizontal(Alignment $alignment): int
     {
-        $horizontalAlignment = $alignment->getHorizontal();
-
-        if (is_string($horizontalAlignment) && array_key_exists($horizontalAlignment, self::$horizontalMap)) {
-            return self::$horizontalMap[$horizontalAlignment];
+        $horizontal_alignment = $alignment->get_horizontal();
+        if (is_string($horizontal_alignment) && array_key_exists($horizontal_alignment, self::$horizontal_map)) {
+            return self::$horizontal_map[$horizontal_alignment];
         }
-
-        return self::$horizontalMap[Alignment::HORIZONTAL_GENERAL];
+        return self::$horizontal_map[Alignment::HORIZONTAL_GENERAL];
     }
-
     public static function wrap(Alignment $alignment): int
     {
-        $wrap = $alignment->getWrapText();
-
-        return ($wrap === true) ? 1 : 0;
+        $wrap = $alignment->get_wrap_text();
+        return $wrap === true ? 1 : 0;
     }
-
     public static function vertical(Alignment $alignment): int
     {
-        $verticalAlignment = $alignment->getVertical();
-
-        if (is_string($verticalAlignment) && array_key_exists($verticalAlignment, self::$verticalMap)) {
-            return self::$verticalMap[$verticalAlignment];
+        $vertical_alignment = $alignment->get_vertical();
+        if (is_string($vertical_alignment) && array_key_exists($vertical_alignment, self::$vertical_map)) {
+            return self::$vertical_map[$vertical_alignment];
         }
-
-        return self::$verticalMap[Alignment::VERTICAL_BOTTOM];
+        return self::$vertical_map[Alignment::VERTICAL_BOTTOM];
     }
 }

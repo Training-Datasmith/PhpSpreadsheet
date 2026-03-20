@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
 class Constants
 {
@@ -24,17 +23,5 @@ class Constants
     public const DOW_FRIDAY = 6;
     public const DOW_SATURDAY = 7;
     public const STARTWEEK_MONDAY_ISO = 21;
-
-    public const METHODARR = [
-        self::STARTWEEK_SUNDAY => self::DOW_SUNDAY,
-        self::DOW_MONDAY,
-        self::STARTWEEK_MONDAY_ALT => self::DOW_MONDAY,
-        self::DOW_TUESDAY,
-        self::DOW_WEDNESDAY,
-        self::DOW_THURSDAY,
-        self::DOW_FRIDAY,
-        self::DOW_SATURDAY,
-        self::DOW_SUNDAY,
-        self::STARTWEEK_MONDAY_ISO => self::STARTWEEK_MONDAY_ISO,
-    ];
+    public const METHODARR = [self::STARTWEEK_SUNDAY => self::DOW_SUNDAY, self::DOW_MONDAY, self::STARTWEEK_MONDAY_ALT => self::DOW_MONDAY, self::DOW_TUESDAY, self::DOW_WEDNESDAY, self::DOW_THURSDAY, self::DOW_FRIDAY, self::DOW_SATURDAY, self::DOW_SUNDAY, self::STARTWEEK_MONDAY_ISO => self::STARTWEEK_MONDAY_ISO];
 }

@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xls;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xls;
-
-use PhpOffice\PhpSpreadsheet\Reader\Xls;
-
+use Php_Office\Php_Spreadsheet\Reader\Xls;
 class Color
 {
     /**
@@ -18,11 +16,10 @@ class Color
      */
     public static function map(int $color, array $palette, int $version): array
     {
-        if ($color <= 0x07 || $color >= 0x40) {
+        if ($color <= 0x7 || $color >= 0x40) {
             // special built-in color
-            return Color\BuiltIn::lookup($color);
+            return Color\Built_In::lookup($color);
         }
-
-        return $palette[$color - 8] ?? (($version === Xls::XLS_BIFF8) ? Color\BIFF8::lookup($color) : Color\BIFF5::lookup($color));
+        return $palette[$color - 8] ?? ($version === Xls::XLS_BIFF8 ? Color\BIFF8::lookup($color) : Color\BIFF5::lookup($color));
     }
 }

@@ -1,19 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Erf
 {
-    use ArrayEnabled;
-
-    private const TWO_SQRT_PI = 1.128379167095512574;
-
+    use Array_Enabled;
+    private const TWO_SQRT_PI = 1.1283791670955126;
     /**
      * ERF.
      *
@@ -39,21 +35,18 @@ class Erf
     public static function ERF(mixed $lower, mixed $upper = null): array|float|string
     {
         if (is_array($lower) || is_array($upper)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $lower, $upper);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $lower, $upper);
         }
-
         if (is_numeric($lower)) {
             if ($upper === null) {
-                return self::erfValue($lower);
+                return self::erf_value($lower);
             }
             if (is_numeric($upper)) {
-                return self::erfValue($upper) - self::erfValue($lower);
+                return self::erf_value($upper) - self::erf_value($lower);
             }
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
-
     /**
      * ERFPRECISE.
      *
@@ -71,28 +64,25 @@ class Erf
     public static function ERFPRECISE(mixed $limit): array|float|string
     {
         if (is_array($limit)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $limit);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $limit);
         }
-
         return self::ERF($limit);
     }
-
-    private static function makeFloat(mixed $value): float
+    private static function make_float(mixed $value): float
     {
-        return is_numeric($value) ? ((float) $value) : 0.0;
+        return is_numeric($value) ? (float) $value : 0.0;
     }
-
     /**
      * Method to calculate the erf value.
      */
-    public static function erfValue(float|int|string $value): float
+    public static function erf_value(float|int|string $value): float
     {
         $value = (float) $value;
         if (abs($value) > 2.2) {
-            return 1 - self::makeFloat(ErfC::ERFC($value));
+            return 1 - self::make_float(Erf_C::ERFC($value));
         }
         $sum = $term = $value;
-        $xsqr = ($value * $value);
+        $xsqr = $value * $value;
         $j = 1;
         do {
             $term *= $xsqr / $j;
@@ -105,7 +95,6 @@ class Erf
                 break;
             }
         } while (abs($term / $sum) > Functions::PRECISION);
-
         return self::TWO_SQRT_PI * $sum;
     }
 }

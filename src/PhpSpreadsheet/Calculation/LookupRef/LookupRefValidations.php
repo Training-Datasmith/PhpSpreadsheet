@@ -1,36 +1,29 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class LookupRefValidations
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Error_Value;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Lookup_Ref_Validations
 {
-    public static function validateInt(mixed $value): int
+    public static function validate_int(mixed $value): int
     {
         if (!is_numeric($value)) {
-            if (is_string($value) && ErrorValue::isError($value, true)) {
+            if (is_string($value) && Error_Value::is_error($value, true)) {
                 throw new Exception($value);
             }
-
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return (int) floor((float) $value);
     }
-
-    public static function validatePositiveInt(mixed $value, bool $allowZero = true): int
+    public static function validate_positive_int(mixed $value, bool $allow_zero = true): int
     {
-        $value = self::validateInt($value);
-
-        if (($allowZero === false && $value <= 0) || $value < 0) {
-            throw new Exception(ExcelError::VALUE());
+        $value = self::validate_int($value);
+        if ($allow_zero === false && $value <= 0 || $value < 0) {
+            throw new Exception(Excel_Error::VALUE());
         }
-
         return $value;
     }
 }

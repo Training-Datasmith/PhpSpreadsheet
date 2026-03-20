@@ -1,27 +1,23 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format;
 
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
-abstract class BaseFormatter
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+abstract class Base_Formatter
 {
-    protected static function stripQuotes(string $format): string
+    protected static function strip_quotes(string $format): string
     {
         // Some non-number strings are quoted, so we'll get rid of the quotes, likewise any positional * symbols
         return str_replace(['"', '*'], '', $format);
     }
-
-    protected static function adjustSeparators(string $value): string
+    protected static function adjust_separators(string $value): string
     {
-        $thousandsSeparator = StringHelper::getThousandsSeparator();
-        $decimalSeparator = StringHelper::getDecimalSeparator();
-        if ($thousandsSeparator !== ',' || $decimalSeparator !== '.') {
-            return str_replace(['.', ',', "\u{fffd}"], ["\u{fffd}", $thousandsSeparator, $decimalSeparator], $value);
+        $thousands_separator = String_Helper::get_thousands_separator();
+        $decimal_separator = String_Helper::get_decimal_separator();
+        if ($thousands_separator !== ',' || $decimal_separator !== '.') {
+            return str_replace(['.', ',', "�"], ["�", $thousands_separator, $decimal_separator], $value);
         }
-
         return $value;
     }
 }

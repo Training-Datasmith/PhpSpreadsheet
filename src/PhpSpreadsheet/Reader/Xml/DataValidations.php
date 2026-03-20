@@ -1,180 +1,139 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xml;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xml;
-
-use PhpOffice\PhpSpreadsheet\Cell\AddressHelper;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use SimpleXMLElement;
-
-class DataValidations
+use Php_Office\Php_Spreadsheet\Cell\Address_Helper;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Cell\Data_Validation;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Simple_Xml_Element;
+class Data_Validations
 {
-    private const OPERATOR_MAPPINGS = [
-        'between' => DataValidation::OPERATOR_BETWEEN,
-        'equal' => DataValidation::OPERATOR_EQUAL,
-        'greater' => DataValidation::OPERATOR_GREATERTHAN,
-        'greaterorequal' => DataValidation::OPERATOR_GREATERTHANOREQUAL,
-        'less' => DataValidation::OPERATOR_LESSTHAN,
-        'lessorequal' => DataValidation::OPERATOR_LESSTHANOREQUAL,
-        'notbetween' => DataValidation::OPERATOR_NOTBETWEEN,
-        'notequal' => DataValidation::OPERATOR_NOTEQUAL,
-    ];
-
-    private const TYPE_MAPPINGS = [
-        'textlength' => DataValidation::TYPE_TEXTLENGTH,
-    ];
-
-    private int $thisRow = 0;
-
-    private int $thisColumn = 0;
-
+    private const OPERATOR_MAPPINGS = ['between' => Data_Validation::OPERATOR_BETWEEN, 'equal' => Data_Validation::OPERATOR_EQUAL, 'greater' => Data_Validation::OPERATOR_GREATERTHAN, 'greaterorequal' => Data_Validation::OPERATOR_GREATERTHANOREQUAL, 'less' => Data_Validation::OPERATOR_LESSTHAN, 'lessorequal' => Data_Validation::OPERATOR_LESSTHANOREQUAL, 'notbetween' => Data_Validation::OPERATOR_NOTBETWEEN, 'notequal' => Data_Validation::OPERATOR_NOTEQUAL];
+    private const TYPE_MAPPINGS = ['textlength' => Data_Validation::TYPE_TEXTLENGTH];
+    private int $this_row = 0;
+    private int $this_column = 0;
     /** @param string[] $matches */
-    private function replaceR1C1(array $matches): string
+    private function replace_r1c1(array $matches): string
     {
-        return AddressHelper::convertToA1($matches[0], $this->thisRow, $this->thisColumn, false);
+        return Address_Helper::convert_to_a1($matches[0], $this->this_row, $this->this_column, false);
     }
-
-    public function loadDataValidations(SimpleXMLElement $worksheet, Spreadsheet $spreadsheet): void
+    public function load_data_validations(Simple_Xml_Element $worksheet, Spreadsheet $spreadsheet): void
     {
-        $xmlX = $worksheet->children(Namespaces::URN_EXCEL);
-        $sheet = $spreadsheet->getActiveSheet();
+        $xml_x = $worksheet->children(Namespaces::URN_EXCEL);
+        $sheet = $spreadsheet->get_active_sheet();
         /** @var callable $pregCallback */
-        $pregCallback = $this->replaceR1C1(...);
-        foreach ($xmlX->DataValidation as $dataValidation) {
-            $combinedCells = '';
+        $preg_callback = $this->replace_r1c1(...);
+        foreach ($xml_x->data_validation as $data_validation) {
+            $combined_cells = '';
             $separator = '';
-            $validation = new DataValidation();
-
+            $validation = new Data_Validation();
             // set defaults
-            $validation->setShowDropDown(true);
-            $validation->setShowInputMessage(true);
-            $validation->setShowErrorMessage(true);
-            $validation->setShowDropDown(true);
-            $this->thisRow = 1;
-            $this->thisColumn = 1;
-
-            foreach ($dataValidation as $tagName => $tagValue) {
-                $tagValue = (string) $tagValue;
-                $tagValueLower = strtolower($tagValue);
-                switch ($tagName) {
+            $validation->set_show_drop_down(true);
+            $validation->set_show_input_message(true);
+            $validation->set_show_error_message(true);
+            $validation->set_show_drop_down(true);
+            $this->this_row = 1;
+            $this->this_column = 1;
+            foreach ($data_validation as $tag_name => $tag_value) {
+                $tag_value = (string) $tag_value;
+                $tag_value_lower = strtolower($tag_value);
+                switch ($tag_name) {
                     case 'Range':
-                        foreach (explode(',', $tagValue) as $range) {
+                        foreach (explode(',', $tag_value) as $range) {
                             $cell = '';
-                            if (preg_match('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', $range, $selectionMatches) === 1) {
+                            if (preg_match('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', $range, $selection_matches) === 1) {
                                 // range
-                                $firstCell = Coordinate::stringFromColumnIndex((int) $selectionMatches[2])
-                                    . $selectionMatches[1];
-                                $cell = $firstCell
-                                    . ':'
-                                    . Coordinate::stringFromColumnIndex((int) $selectionMatches[4])
-                                    . $selectionMatches[3];
-                                $this->thisRow = (int) $selectionMatches[1];
-                                $this->thisColumn = (int) $selectionMatches[2];
-                                $sheet->getCell($firstCell);
-                                $combinedCells .= "$separator$cell";
+                                $first_cell = Coordinate::string_from_column_index((int) $selection_matches[2]) . $selection_matches[1];
+                                $cell = $first_cell . ':' . Coordinate::string_from_column_index((int) $selection_matches[4]) . $selection_matches[3];
+                                $this->this_row = (int) $selection_matches[1];
+                                $this->this_column = (int) $selection_matches[2];
+                                $sheet->get_cell($first_cell);
+                                $combined_cells .= "{$separator}{$cell}";
                                 $separator = ' ';
-                            } elseif (preg_match('/^R(\d+)C(\d+)$/', $range, $selectionMatches) === 1) {
+                            } elseif (preg_match('/^R(\d+)C(\d+)$/', $range, $selection_matches) === 1) {
                                 // cell
-                                $cell = Coordinate::stringFromColumnIndex((int) $selectionMatches[2])
-                                    . $selectionMatches[1];
-                                $sheet->getCell($cell);
-                                $this->thisRow = (int) $selectionMatches[1];
-                                $this->thisColumn = (int) $selectionMatches[2];
-                                $combinedCells .= "$separator$cell";
+                                $cell = Coordinate::string_from_column_index((int) $selection_matches[2]) . $selection_matches[1];
+                                $sheet->get_cell($cell);
+                                $this->this_row = (int) $selection_matches[1];
+                                $this->this_column = (int) $selection_matches[2];
+                                $combined_cells .= "{$separator}{$cell}";
                                 $separator = ' ';
-                            } elseif (preg_match('/^C(\d+)(:C(]\d+))?$/', $range, $selectionMatches) === 1) {
+                            } elseif (preg_match('/^C(\d+)(:C(]\d+))?$/', $range, $selection_matches) === 1) {
                                 // column
-                                $firstCol = $selectionMatches[1];
-                                $firstColString = Coordinate::stringFromColumnIndex((int) $firstCol);
-                                $lastCol = $selectionMatches[3] ?? $firstCol;
-                                $lastColString = Coordinate::stringFromColumnIndex((int) $lastCol);
-                                $firstCell = "{$firstColString}1";
-                                $cell = "$firstColString:$lastColString";
-                                $this->thisColumn = (int) $firstCol;
-                                $sheet->getCell($firstCell);
-                                $combinedCells .= "$separator$cell";
+                                $first_col = $selection_matches[1];
+                                $first_col_string = Coordinate::string_from_column_index((int) $first_col);
+                                $last_col = $selection_matches[3] ?? $first_col;
+                                $last_col_string = Coordinate::string_from_column_index((int) $last_col);
+                                $first_cell = "{$first_col_string}1";
+                                $cell = "{$first_col_string}:{$last_col_string}";
+                                $this->this_column = (int) $first_col;
+                                $sheet->get_cell($first_cell);
+                                $combined_cells .= "{$separator}{$cell}";
                                 $separator = ' ';
-                            } elseif (preg_match('/^R(\d+)(:R(]\d+))?$/', $range, $selectionMatches)) {
+                            } elseif (preg_match('/^R(\d+)(:R(]\d+))?$/', $range, $selection_matches)) {
                                 // row
-                                $firstRow = $selectionMatches[1];
-                                $lastRow = $selectionMatches[3] ?? $firstRow;
-                                $firstCell = "A$firstRow";
-                                $cell = "$firstRow:$lastRow";
-                                $this->thisRow = (int) $firstRow;
-                                $sheet->getCell($firstCell);
-                                $combinedCells .= "$separator$cell";
+                                $first_row = $selection_matches[1];
+                                $last_row = $selection_matches[3] ?? $first_row;
+                                $first_cell = "A{$first_row}";
+                                $cell = "{$first_row}:{$last_row}";
+                                $this->this_row = (int) $first_row;
+                                $sheet->get_cell($first_cell);
+                                $combined_cells .= "{$separator}{$cell}";
                                 $separator = ' ';
                             }
                         }
-
                         break;
                     case 'Type':
-                        $validation->setType(self::TYPE_MAPPINGS[$tagValueLower] ?? $tagValueLower);
-
+                        $validation->set_type(self::TYPE_MAPPINGS[$tag_value_lower] ?? $tag_value_lower);
                         break;
                     case 'Qualifier':
-                        $validation->setOperator(self::OPERATOR_MAPPINGS[$tagValueLower] ?? $tagValueLower);
-
+                        $validation->set_operator(self::OPERATOR_MAPPINGS[$tag_value_lower] ?? $tag_value_lower);
                         break;
                     case 'InputTitle':
-                        $validation->setPromptTitle($tagValue);
-
+                        $validation->set_prompt_title($tag_value);
                         break;
                     case 'InputMessage':
-                        $validation->setPrompt($tagValue);
-
+                        $validation->set_prompt($tag_value);
                         break;
                     case 'InputHide':
-                        $validation->setShowInputMessage(false);
-
+                        $validation->set_show_input_message(false);
                         break;
                     case 'ErrorStyle':
-                        $validation->setErrorStyle($tagValueLower);
-
+                        $validation->set_error_style($tag_value_lower);
                         break;
                     case 'ErrorTitle':
-                        $validation->setErrorTitle($tagValue);
-
+                        $validation->set_error_title($tag_value);
                         break;
                     case 'ErrorMessage':
-                        $validation->setError($tagValue);
-
+                        $validation->set_error($tag_value);
                         break;
                     case 'ErrorHide':
-                        $validation->setShowErrorMessage(false);
-
+                        $validation->set_show_error_message(false);
                         break;
                     case 'ComboHide':
-                        $validation->setShowDropDown(false);
-
+                        $validation->set_show_drop_down(false);
                         break;
                     case 'UseBlank':
-                        $validation->setAllowBlank(true);
-
+                        $validation->set_allow_blank(true);
                         break;
                     case 'CellRangeList':
                         // FIXME missing FIXME
-
                         break;
                     case 'Min':
                     case 'Value':
-                        $tagValue = (string) preg_replace_callback(AddressHelper::R1C1_COORDINATE_REGEX, $pregCallback, $tagValue);
-                        $validation->setFormula1($tagValue);
-
+                        $tag_value = (string) preg_replace_callback(Address_Helper::R1C1_COORDINATE_REGEX, $preg_callback, $tag_value);
+                        $validation->set_formula1($tag_value);
                         break;
                     case 'Max':
-                        $tagValue = (string) preg_replace_callback(AddressHelper::R1C1_COORDINATE_REGEX, $pregCallback, $tagValue);
-                        $validation->setFormula2($tagValue);
-
+                        $tag_value = (string) preg_replace_callback(Address_Helper::R1C1_COORDINATE_REGEX, $preg_callback, $tag_value);
+                        $validation->set_formula2($tag_value);
                         break;
                 }
             }
-
-            $sheet->setDataValidation($combinedCells, $validation);
+            $sheet->set_data_validation($combined_cells, $validation);
         }
     }
 }

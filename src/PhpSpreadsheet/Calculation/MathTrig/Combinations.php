@@ -1,16 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
 class Combinations
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * COMBIN.
      *
@@ -27,31 +24,27 @@ class Combinations
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function withoutRepetition(mixed $numObjs, mixed $numInSet): array|string|float
+    public static function without_repetition(mixed $num_objs, mixed $num_in_set): array|string|float
     {
-        if (is_array($numObjs) || is_array($numInSet)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $numObjs, $numInSet);
+        if (is_array($num_objs) || is_array($num_in_set)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $num_objs, $num_in_set);
         }
-
         try {
-            $numObjs = Helpers::validateNumericNullSubstitution($numObjs, null);
-            $numInSet = Helpers::validateNumericNullSubstitution($numInSet, null);
-            Helpers::validateNotNegative($numInSet);
-            Helpers::validateNotNegative($numObjs - $numInSet);
+            $num_objs = Helpers::validate_numeric_null_substitution($num_objs, null);
+            $num_in_set = Helpers::validate_numeric_null_substitution($num_in_set, null);
+            Helpers::validate_not_negative($num_in_set);
+            Helpers::validate_not_negative($num_objs - $num_in_set);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         /** @var float */
-        $quotient = Factorial::fact($numObjs);
+        $quotient = Factorial::fact($num_objs);
         /** @var float */
-        $divisor1 = Factorial::fact($numObjs - $numInSet);
+        $divisor1 = Factorial::fact($num_objs - $num_in_set);
         /** @var float */
-        $divisor2 = Factorial::fact($numInSet);
-
+        $divisor2 = Factorial::fact($num_in_set);
         return round($quotient / ($divisor1 * $divisor2));
     }
-
     /**
      * COMBINA.
      *
@@ -68,38 +61,34 @@ class Combinations
      *         If an array of numbers is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function withRepetition(mixed $numObjs, mixed $numInSet): array|int|string|float
+    public static function with_repetition(mixed $num_objs, mixed $num_in_set): array|int|string|float
     {
-        if (is_array($numObjs) || is_array($numInSet)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $numObjs, $numInSet);
+        if (is_array($num_objs) || is_array($num_in_set)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $num_objs, $num_in_set);
         }
-
         try {
-            $numObjs = Helpers::validateNumericNullSubstitution($numObjs, null);
-            $numInSet = Helpers::validateNumericNullSubstitution($numInSet, null);
-            Helpers::validateNotNegative($numInSet);
-            Helpers::validateNotNegative($numObjs);
-            $numObjs = (int) $numObjs;
-            $numInSet = (int) $numInSet;
+            $num_objs = Helpers::validate_numeric_null_substitution($num_objs, null);
+            $num_in_set = Helpers::validate_numeric_null_substitution($num_in_set, null);
+            Helpers::validate_not_negative($num_in_set);
+            Helpers::validate_not_negative($num_objs);
+            $num_objs = (int) $num_objs;
+            $num_in_set = (int) $num_in_set;
             // Microsoft documentation says following is true, but Excel
             //  does not enforce this restriction.
             //Helpers::validateNotNegative($numObjs - $numInSet);
-            if ($numObjs === 0) {
-                Helpers::validateNotNegative(-$numInSet);
-
+            if ($num_objs === 0) {
+                Helpers::validate_not_negative(-$num_in_set);
                 return 1;
             }
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         /** @var float */
-        $quotient = Factorial::fact($numObjs + $numInSet - 1);
+        $quotient = Factorial::fact($num_objs + $num_in_set - 1);
         /** @var float */
-        $divisor1 = Factorial::fact($numObjs - 1);
+        $divisor1 = Factorial::fact($num_objs - 1);
         /** @var float */
-        $divisor2 = Factorial::fact($numInSet);
-
+        $divisor2 = Factorial::fact($num_in_set);
         return round($quotient / ($divisor1 * $divisor2));
     }
 }

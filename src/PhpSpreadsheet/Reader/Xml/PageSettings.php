@@ -1,136 +1,94 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xml;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xml;
-
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use SimpleXMLElement;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx\Namespaces;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Setup;
+use Simple_Xml_Element;
 use stdClass;
-
-class PageSettings
+class Page_Settings
 {
     /** @var (object{orientation: string, scale: ?int, printOrder: ?string,
      * paperSize: int,
      * horizontalCentered: bool, verticalCentered: bool, leftMargin: float, rightMargin: float, topMargin: float,
      * bottomMargin: float, headerMargin: float, footerMargin: float}&stdClass) */
-    private readonly stdClass $printSettings;
-
-    public function __construct(SimpleXMLElement $xmlX)
+    private readonly stdClass $print_settings;
+    public function __construct(Simple_Xml_Element $xml_x)
     {
-        $printSettings = $this->pageSetup($xmlX, $this->getPrintDefaults());
-        $this->printSettings = $this->printSetup($xmlX, $printSettings); //* @phpstan-ignore-line
+        $print_settings = $this->page_setup($xml_x, $this->get_print_defaults());
+        $this->print_settings = $this->print_setup($xml_x, $print_settings);
+        //* @phpstan-ignore-line
     }
-
-    public function loadPageSettings(Spreadsheet $spreadsheet): void
+    public function load_page_settings(Spreadsheet $spreadsheet): void
     {
-        $spreadsheet->getActiveSheet()->getPageSetup()
-            ->setPaperSize($this->printSettings->paperSize)
-            ->setOrientation($this->printSettings->orientation)
-            ->setScale($this->printSettings->scale)
-            ->setVerticalCentered($this->printSettings->verticalCentered)
-            ->setHorizontalCentered($this->printSettings->horizontalCentered)
-            ->setPageOrder($this->printSettings->printOrder);
-        $spreadsheet->getActiveSheet()->getPageMargins()
-            ->setTop($this->printSettings->topMargin)
-            ->setHeader($this->printSettings->headerMargin)
-            ->setLeft($this->printSettings->leftMargin)
-            ->setRight($this->printSettings->rightMargin)
-            ->setBottom($this->printSettings->bottomMargin)
-            ->setFooter($this->printSettings->footerMargin);
+        $spreadsheet->get_active_sheet()->get_page_setup()->set_paper_size($this->print_settings->paper_size)->set_orientation($this->print_settings->orientation)->set_scale($this->print_settings->scale)->set_vertical_centered($this->print_settings->vertical_centered)->set_horizontal_centered($this->print_settings->horizontal_centered)->set_page_order($this->print_settings->print_order);
+        $spreadsheet->get_active_sheet()->get_page_margins()->set_top($this->print_settings->top_margin)->set_header($this->print_settings->header_margin)->set_left($this->print_settings->left_margin)->set_right($this->print_settings->right_margin)->set_bottom($this->print_settings->bottom_margin)->set_footer($this->print_settings->footer_margin);
     }
-
-    private function getPrintDefaults(): stdClass
+    private function get_print_defaults(): stdClass
     {
-        return (object) [
-            'paperSize' => 9,
-            'orientation' => PageSetup::ORIENTATION_DEFAULT,
-            'scale' => 100,
-            'horizontalCentered' => false,
-            'verticalCentered' => false,
-            'printOrder' => PageSetup::PAGEORDER_DOWN_THEN_OVER,
-            'topMargin' => 0.75,
-            'headerMargin' => 0.3,
-            'leftMargin' => 0.7,
-            'rightMargin' => 0.7,
-            'bottomMargin' => 0.75,
-            'footerMargin' => 0.3,
-        ];
+        return (object) ['paperSize' => 9, 'orientation' => Page_Setup::ORIENTATION_DEFAULT, 'scale' => 100, 'horizontalCentered' => false, 'verticalCentered' => false, 'printOrder' => Page_Setup::PAGEORDER_DOWN_THEN_OVER, 'topMargin' => 0.75, 'headerMargin' => 0.3, 'leftMargin' => 0.7, 'rightMargin' => 0.7, 'bottomMargin' => 0.75, 'footerMargin' => 0.3];
     }
-
-    private function pageSetup(SimpleXMLElement $xmlX, stdClass $printDefaults): stdClass
+    private function page_setup(Simple_Xml_Element $xml_x, stdClass $print_defaults): stdClass
     {
-        if (isset($xmlX->WorksheetOptions->PageSetup)) {
-            foreach ($xmlX->WorksheetOptions->PageSetup as $pageSetupData) {
-                foreach ($pageSetupData as $pageSetupKey => $pageSetupValue) {
-                    $pageSetupAttributes = $pageSetupValue->attributes(Namespaces::URN_EXCEL);
-                    if ($pageSetupAttributes !== null) {
-                        switch ($pageSetupKey) {
+        if (isset($xml_x->worksheet_options->page_setup)) {
+            foreach ($xml_x->worksheet_options->page_setup as $page_setup_data) {
+                foreach ($page_setup_data as $page_setup_key => $page_setup_value) {
+                    $page_setup_attributes = $page_setup_value->attributes(Namespaces::URN_EXCEL);
+                    if ($page_setup_attributes !== null) {
+                        switch ($page_setup_key) {
                             case 'Layout':
-                                $this->setLayout($printDefaults, $pageSetupAttributes);
-
+                                $this->set_layout($print_defaults, $page_setup_attributes);
                                 break;
                             case 'Header':
-                                $printDefaults->headerMargin = (float) $pageSetupAttributes->Margin ?: 1.0;
-
+                                $print_defaults->header_margin = (float) $page_setup_attributes->Margin ?: 1.0;
                                 break;
                             case 'Footer':
-                                $printDefaults->footerMargin = (float) $pageSetupAttributes->Margin ?: 1.0;
-
+                                $print_defaults->footer_margin = (float) $page_setup_attributes->Margin ?: 1.0;
                                 break;
                             case 'PageMargins':
-                                $this->setMargins($printDefaults, $pageSetupAttributes);
-
+                                $this->set_margins($print_defaults, $page_setup_attributes);
                                 break;
                         }
                     }
                 }
             }
         }
-
-        return $printDefaults;
+        return $print_defaults;
     }
-
-    private function printSetup(SimpleXMLElement $xmlX, stdClass $printDefaults): stdClass
+    private function print_setup(Simple_Xml_Element $xml_x, stdClass $print_defaults): stdClass
     {
-        if (isset($xmlX->WorksheetOptions->Print)) {
-            foreach ($xmlX->WorksheetOptions->Print as $printData) {
-                foreach ($printData as $printKey => $printValue) {
-                    switch ($printKey) {
+        if (isset($xml_x->worksheet_options->Print)) {
+            foreach ($xml_x->worksheet_options->Print as $print_data) {
+                foreach ($print_data as $print_key => $print_value) {
+                    switch ($print_key) {
                         case 'LeftToRight':
-                            $printDefaults->printOrder = PageSetup::PAGEORDER_OVER_THEN_DOWN;
-
+                            $print_defaults->print_order = Page_Setup::PAGEORDER_OVER_THEN_DOWN;
                             break;
                         case 'PaperSizeIndex':
-                            $printDefaults->paperSize = (int) $printValue ?: 9;
-
+                            $print_defaults->paper_size = (int) $print_value ?: 9;
                             break;
                         case 'Scale':
-                            $printDefaults->scale = (int) $printValue ?: 100;
-
+                            $print_defaults->scale = (int) $print_value ?: 100;
                             break;
                     }
                 }
             }
         }
-
-        return $printDefaults;
+        return $print_defaults;
     }
-
-    private function setLayout(stdClass $printDefaults, SimpleXMLElement $pageSetupAttributes): void
+    private function set_layout(stdClass $print_defaults, Simple_Xml_Element $page_setup_attributes): void
     {
-        $printDefaults->orientation = (string) strtolower($pageSetupAttributes->Orientation ?? '') ?: PageSetup::ORIENTATION_PORTRAIT;
-        $printDefaults->horizontalCentered = (bool) $pageSetupAttributes->CenterHorizontal ?: false;
-        $printDefaults->verticalCentered = (bool) $pageSetupAttributes->CenterVertical ?: false;
+        $print_defaults->orientation = (string) strtolower($page_setup_attributes->Orientation ?? '') ?: Page_Setup::ORIENTATION_PORTRAIT;
+        $print_defaults->horizontal_centered = (bool) $page_setup_attributes->center_horizontal ?: false;
+        $print_defaults->vertical_centered = (bool) $page_setup_attributes->center_vertical ?: false;
     }
-
-    private function setMargins(stdClass $printDefaults, SimpleXMLElement $pageSetupAttributes): void
+    private function set_margins(stdClass $print_defaults, Simple_Xml_Element $page_setup_attributes): void
     {
-        $printDefaults->leftMargin = (float) $pageSetupAttributes->Left ?: 1.0;
-        $printDefaults->rightMargin = (float) $pageSetupAttributes->Right ?: 1.0;
-        $printDefaults->topMargin = (float) $pageSetupAttributes->Top ?: 1.0;
-        $printDefaults->bottomMargin = (float) $pageSetupAttributes->Bottom ?: 1.0;
+        $print_defaults->left_margin = (float) $page_setup_attributes->Left ?: 1.0;
+        $print_defaults->right_margin = (float) $page_setup_attributes->Right ?: 1.0;
+        $print_defaults->top_margin = (float) $page_setup_attributes->Top ?: 1.0;
+        $print_defaults->bottom_margin = (float) $page_setup_attributes->Bottom ?: 1.0;
     }
 }

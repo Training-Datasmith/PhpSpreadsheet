@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Style;
-
-use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-
+use Php_Office\Php_Spreadsheet\Exception as PhpSpreadsheetException;
 class Borders extends Supervisor
 {
     // Diagonal directions
@@ -13,62 +11,50 @@ class Borders extends Supervisor
     public const DIAGONAL_UP = 1;
     public const DIAGONAL_DOWN = 2;
     public const DIAGONAL_BOTH = 3;
-
     /**
      * Left.
      */
     protected Border $left;
-
     /**
      * Right.
      */
     protected Border $right;
-
     /**
      * Top.
      */
     protected Border $top;
-
     /**
      * Bottom.
      */
     protected Border $bottom;
-
     /**
      * Diagonal.
      */
     protected Border $diagonal;
-
     /**
      * DiagonalDirection.
      */
-    protected int $diagonalDirection;
-
+    protected int $diagonal_direction;
     /**
      * All borders pseudo-border. Only applies to supervisor.
      */
-    protected Border $allBorders;
-
+    protected Border $all_borders;
     /**
      * Outline pseudo-border. Only applies to supervisor.
      */
     protected Border $outline;
-
     /**
      * Inside pseudo-border. Only applies to supervisor.
      */
     protected Border $inside;
-
     /**
      * Vertical pseudo-border. Only applies to supervisor.
      */
     protected Border $vertical;
-
     /**
      * Horizontal pseudo-border. Only applies to supervisor.
      */
     protected Border $horizontal;
-
     /**
      * Create a new Borders.
      *
@@ -76,54 +62,48 @@ class Borders extends Supervisor
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
      */
-    public function __construct(bool $isSupervisor = false, bool $isConditional = false)
+    public function __construct(bool $is_supervisor = false, bool $is_conditional = false)
     {
         // Supervisor?
-        parent::__construct($isSupervisor);
-
+        parent::__construct($is_supervisor);
         // Initialise values
-        $this->left = new Border($isSupervisor, $isConditional);
-        $this->right = new Border($isSupervisor, $isConditional);
-        $this->top = new Border($isSupervisor, $isConditional);
-        $this->bottom = new Border($isSupervisor, $isConditional);
-        $this->diagonal = new Border($isSupervisor, $isConditional);
-        $this->diagonalDirection = self::DIAGONAL_NONE;
-
+        $this->left = new Border($is_supervisor, $is_conditional);
+        $this->right = new Border($is_supervisor, $is_conditional);
+        $this->top = new Border($is_supervisor, $is_conditional);
+        $this->bottom = new Border($is_supervisor, $is_conditional);
+        $this->diagonal = new Border($is_supervisor, $is_conditional);
+        $this->diagonal_direction = self::DIAGONAL_NONE;
         // Specially for supervisor
-        if ($isSupervisor) {
+        if ($is_supervisor) {
             // Initialize pseudo-borders
-            $this->allBorders = new Border(true, $isConditional);
-            $this->outline = new Border(true, $isConditional);
-            $this->inside = new Border(true, $isConditional);
-            $this->vertical = new Border(true, $isConditional);
-            $this->horizontal = new Border(true, $isConditional);
-
+            $this->all_borders = new Border(true, $is_conditional);
+            $this->outline = new Border(true, $is_conditional);
+            $this->inside = new Border(true, $is_conditional);
+            $this->vertical = new Border(true, $is_conditional);
+            $this->horizontal = new Border(true, $is_conditional);
             // bind parent if we are a supervisor
-            $this->left->bindParent($this, 'left');
-            $this->right->bindParent($this, 'right');
-            $this->top->bindParent($this, 'top');
-            $this->bottom->bindParent($this, 'bottom');
-            $this->diagonal->bindParent($this, 'diagonal');
-            $this->allBorders->bindParent($this, 'allBorders');
-            $this->outline->bindParent($this, 'outline');
-            $this->inside->bindParent($this, 'inside');
-            $this->vertical->bindParent($this, 'vertical');
-            $this->horizontal->bindParent($this, 'horizontal');
+            $this->left->bind_parent($this, 'left');
+            $this->right->bind_parent($this, 'right');
+            $this->top->bind_parent($this, 'top');
+            $this->bottom->bind_parent($this, 'bottom');
+            $this->diagonal->bind_parent($this, 'diagonal');
+            $this->all_borders->bind_parent($this, 'allBorders');
+            $this->outline->bind_parent($this, 'outline');
+            $this->inside->bind_parent($this, 'inside');
+            $this->vertical->bind_parent($this, 'vertical');
+            $this->horizontal->bind_parent($this, 'horizontal');
         }
     }
-
     /**
      * Get the shared style component for the currently active cell in currently active sheet.
      * Only used for style supervisor.
      */
-    public function getSharedComponent(): self
+    public function get_shared_component(): self
     {
         /** @var Style $parent */
         $parent = $this->parent;
-
-        return $parent->getSharedComponent()->getBorders();
+        return $parent->get_shared_component()->get_borders();
     }
-
     /**
      * Build style array from subcomponents.
      *
@@ -131,11 +111,10 @@ class Borders extends Supervisor
      *
      * @return array{borders: mixed[]}
      */
-    public function getStyleArray(array $array): array
+    public function get_style_array(array $array): array
     {
         return ['borders' => $array];
     }
-
     /**
      * Apply styles from array.
      *
@@ -175,153 +154,134 @@ class Borders extends Supervisor
      *
      * @return $this
      */
-    public function applyFromArray(array $styleArray): static
+    public function apply_from_array(array $style_array): static
     {
-        if ($this->isSupervisor) {
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($this->getStyleArray($styleArray));
+        if ($this->is_supervisor) {
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($this->get_style_array($style_array));
         } else {
             /** @var array{left?: float[], right?: float[], top?: float[], bottom?: float[], diagonal?: mixed[], diagonalDirection?: int, allBorders?: mixed[][]} $styleArray */
-            if (isset($styleArray['left'])) {
-                $this->getLeft()->applyFromArray($styleArray['left']);
+            if (isset($style_array['left'])) {
+                $this->get_left()->apply_from_array($style_array['left']);
             }
-            if (isset($styleArray['right'])) {
-                $this->getRight()->applyFromArray($styleArray['right']);
+            if (isset($style_array['right'])) {
+                $this->get_right()->apply_from_array($style_array['right']);
             }
-            if (isset($styleArray['top'])) {
-                $this->getTop()->applyFromArray($styleArray['top']);
+            if (isset($style_array['top'])) {
+                $this->get_top()->apply_from_array($style_array['top']);
             }
-            if (isset($styleArray['bottom'])) {
-                $this->getBottom()->applyFromArray($styleArray['bottom']);
+            if (isset($style_array['bottom'])) {
+                $this->get_bottom()->apply_from_array($style_array['bottom']);
             }
-            if (isset($styleArray['diagonal'])) {
-                $this->getDiagonal()->applyFromArray($styleArray['diagonal']);
+            if (isset($style_array['diagonal'])) {
+                $this->get_diagonal()->apply_from_array($style_array['diagonal']);
             }
-            if (isset($styleArray['diagonalDirection'])) {
-                $this->setDiagonalDirection($styleArray['diagonalDirection']);
+            if (isset($style_array['diagonalDirection'])) {
+                $this->set_diagonal_direction($style_array['diagonalDirection']);
             }
-            if (isset($styleArray['allBorders'])) {
-                $this->getLeft()->applyFromArray($styleArray['allBorders']);
-                $this->getRight()->applyFromArray($styleArray['allBorders']);
-                $this->getTop()->applyFromArray($styleArray['allBorders']);
-                $this->getBottom()->applyFromArray($styleArray['allBorders']);
+            if (isset($style_array['allBorders'])) {
+                $this->get_left()->apply_from_array($style_array['allBorders']);
+                $this->get_right()->apply_from_array($style_array['allBorders']);
+                $this->get_top()->apply_from_array($style_array['allBorders']);
+                $this->get_bottom()->apply_from_array($style_array['allBorders']);
             }
         }
-
         return $this;
     }
-
     /**
      * Get Left.
      */
-    public function getLeft(): Border
+    public function get_left(): Border
     {
         return $this->left;
     }
-
     /**
      * Get Right.
      */
-    public function getRight(): Border
+    public function get_right(): Border
     {
         return $this->right;
     }
-
     /**
      * Get Top.
      */
-    public function getTop(): Border
+    public function get_top(): Border
     {
         return $this->top;
     }
-
     /**
      * Get Bottom.
      */
-    public function getBottom(): Border
+    public function get_bottom(): Border
     {
         return $this->bottom;
     }
-
     /**
      * Get Diagonal.
      */
-    public function getDiagonal(): Border
+    public function get_diagonal(): Border
     {
         return $this->diagonal;
     }
-
     /**
      * Get AllBorders (pseudo-border). Only applies to supervisor.
      */
-    public function getAllBorders(): Border
+    public function get_all_borders(): Border
     {
-        if (!$this->isSupervisor) {
-            throw new PhpSpreadsheetException('Can only get pseudo-border for supervisor.');
+        if (!$this->is_supervisor) {
+            throw new Php_Spreadsheet_Exception('Can only get pseudo-border for supervisor.');
         }
-
-        return $this->allBorders;
+        return $this->all_borders;
     }
-
     /**
      * Get Outline (pseudo-border). Only applies to supervisor.
      */
-    public function getOutline(): Border
+    public function get_outline(): Border
     {
-        if (!$this->isSupervisor) {
-            throw new PhpSpreadsheetException('Can only get pseudo-border for supervisor.');
+        if (!$this->is_supervisor) {
+            throw new Php_Spreadsheet_Exception('Can only get pseudo-border for supervisor.');
         }
-
         return $this->outline;
     }
-
     /**
      * Get Inside (pseudo-border). Only applies to supervisor.
      */
-    public function getInside(): Border
+    public function get_inside(): Border
     {
-        if (!$this->isSupervisor) {
-            throw new PhpSpreadsheetException('Can only get pseudo-border for supervisor.');
+        if (!$this->is_supervisor) {
+            throw new Php_Spreadsheet_Exception('Can only get pseudo-border for supervisor.');
         }
-
         return $this->inside;
     }
-
     /**
      * Get Vertical (pseudo-border). Only applies to supervisor.
      */
-    public function getVertical(): Border
+    public function get_vertical(): Border
     {
-        if (!$this->isSupervisor) {
-            throw new PhpSpreadsheetException('Can only get pseudo-border for supervisor.');
+        if (!$this->is_supervisor) {
+            throw new Php_Spreadsheet_Exception('Can only get pseudo-border for supervisor.');
         }
-
         return $this->vertical;
     }
-
     /**
      * Get Horizontal (pseudo-border). Only applies to supervisor.
      */
-    public function getHorizontal(): Border
+    public function get_horizontal(): Border
     {
-        if (!$this->isSupervisor) {
-            throw new PhpSpreadsheetException('Can only get pseudo-border for supervisor.');
+        if (!$this->is_supervisor) {
+            throw new Php_Spreadsheet_Exception('Can only get pseudo-border for supervisor.');
         }
-
         return $this->horizontal;
     }
-
     /**
      * Get DiagonalDirection.
      */
-    public function getDiagonalDirection(): int
+    public function get_diagonal_direction(): int
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getDiagonalDirection();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_diagonal_direction();
         }
-
-        return $this->diagonalDirection;
+        return $this->diagonal_direction;
     }
-
     /**
      * Set DiagonalDirection.
      *
@@ -329,52 +289,39 @@ class Borders extends Supervisor
      *
      * @return $this
      */
-    public function setDiagonalDirection(int $direction): static
+    public function set_diagonal_direction(int $direction): static
     {
-        if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(['diagonalDirection' => $direction]);
-            $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
+        if ($this->is_supervisor) {
+            $style_array = $this->get_style_array(['diagonalDirection' => $direction]);
+            $this->get_active_sheet()->get_style($this->get_selected_cells())->apply_from_array($style_array);
         } else {
-            $this->diagonalDirection = $direction;
+            $this->diagonal_direction = $direction;
         }
-
         return $this;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getHashcode();
+        if ($this->is_supervisor) {
+            return $this->get_shared_component()->get_hashcode();
         }
-
-        return md5(
-            $this->getLeft()->getHashCode()
-            . $this->getRight()->getHashCode()
-            . $this->getTop()->getHashCode()
-            . $this->getBottom()->getHashCode()
-            . $this->getDiagonal()->getHashCode()
-            . $this->getDiagonalDirection()
-            . self::class
-        );
+        return md5($this->get_left()->get_hash_code() . $this->get_right()->get_hash_code() . $this->get_top()->get_hash_code() . $this->get_bottom()->get_hash_code() . $this->get_diagonal()->get_hash_code() . $this->get_diagonal_direction() . self::class);
     }
-
     /** @return mixed[][] */
-    protected function exportArray1(): array
+    protected function export_array1(): array
     {
-        $exportedArray = [];
-        $this->exportArray2($exportedArray, 'bottom', $this->getBottom());
-        $this->exportArray2($exportedArray, 'diagonal', $this->getDiagonal());
-        $this->exportArray2($exportedArray, 'diagonalDirection', $this->getDiagonalDirection());
-        $this->exportArray2($exportedArray, 'left', $this->getLeft());
-        $this->exportArray2($exportedArray, 'right', $this->getRight());
-        $this->exportArray2($exportedArray, 'top', $this->getTop());
+        $exported_array = [];
+        $this->export_array2($exported_array, 'bottom', $this->get_bottom());
+        $this->export_array2($exported_array, 'diagonal', $this->get_diagonal());
+        $this->export_array2($exported_array, 'diagonalDirection', $this->get_diagonal_direction());
+        $this->export_array2($exported_array, 'left', $this->get_left());
+        $this->export_array2($exported_array, 'right', $this->get_right());
+        $this->export_array2($exported_array, 'top', $this->get_top());
         /** @var mixed[][] $exportedArray */
-
-        return $exportedArray;
+        return $exported_array;
     }
 }

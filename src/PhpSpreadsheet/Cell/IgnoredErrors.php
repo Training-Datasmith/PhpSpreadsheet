@@ -1,78 +1,58 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
-namespace PhpOffice\PhpSpreadsheet\Cell;
-
-class IgnoredErrors
+class Ignored_Errors
 {
-    private bool $numberStoredAsText = false;
-
+    private bool $number_stored_as_text = false;
     private bool $formula = false;
-
-    private bool $formulaRange = false;
-
-    private bool $twoDigitTextYear = false;
-
-    private bool $evalError = false;
-
-    public function setNumberStoredAsText(bool $value): self
+    private bool $formula_range = false;
+    private bool $two_digit_text_year = false;
+    private bool $eval_error = false;
+    public function set_number_stored_as_text(bool $value): self
     {
-        $this->numberStoredAsText = $value;
-
+        $this->number_stored_as_text = $value;
         return $this;
     }
-
-    public function getNumberStoredAsText(): bool
+    public function get_number_stored_as_text(): bool
     {
-        return $this->numberStoredAsText;
+        return $this->number_stored_as_text;
     }
-
-    public function setFormula(bool $value): self
+    public function set_formula(bool $value): self
     {
         $this->formula = $value;
-
         return $this;
     }
-
-    public function getFormula(): bool
+    public function get_formula(): bool
     {
         return $this->formula;
     }
-
-    public function setFormulaRange(bool $value): self
+    public function set_formula_range(bool $value): self
     {
-        $this->formulaRange = $value;
-
+        $this->formula_range = $value;
         return $this;
     }
-
-    public function getFormulaRange(): bool
+    public function get_formula_range(): bool
     {
-        return $this->formulaRange;
+        return $this->formula_range;
     }
-
-    public function setTwoDigitTextYear(bool $value): self
+    public function set_two_digit_text_year(bool $value): self
     {
-        $this->twoDigitTextYear = $value;
-
+        $this->two_digit_text_year = $value;
         return $this;
     }
-
-    public function getTwoDigitTextYear(): bool
+    public function get_two_digit_text_year(): bool
     {
-        return $this->twoDigitTextYear;
+        return $this->two_digit_text_year;
     }
-
-    public function setEvalError(bool $value): self
+    public function set_eval_error(bool $value): self
     {
-        $this->evalError = $value;
-
+        $this->eval_error = $value;
         return $this;
     }
-
-    public function getEvalError(): bool
+    public function get_eval_error(): bool
     {
-        return $this->evalError;
+        return $this->eval_error;
     }
 }

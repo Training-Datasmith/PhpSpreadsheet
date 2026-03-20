@@ -1,131 +1,100 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Writer\Ods;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Ods;
 
 use Composer\Pcre\Preg;
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\DefinedName;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-class NamedExpressions
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Defined_Name;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+class Named_Expressions
 {
-    public function __construct(private readonly XMLWriter $objWriter, private readonly Spreadsheet $spreadsheet, private readonly Formula $formulaConvertor)
+    public function __construct(private readonly Xml_Writer $obj_writer, private readonly Spreadsheet $spreadsheet, private readonly Formula $formula_convertor)
     {
     }
-
     public function write(): string
     {
-        $this->objWriter->startElement('table:named-expressions');
-        $this->writeExpressions();
-        $this->objWriter->endElement();
-
+        $this->obj_writer->start_element('table:named-expressions');
+        $this->write_expressions();
+        $this->obj_writer->end_element();
         return '';
     }
-
-    private function writeExpressions(): void
+    private function write_expressions(): void
     {
-        $definedNames = $this->spreadsheet->getDefinedNames();
-
-        foreach ($definedNames as $definedName) {
-            if ($definedName->isFormula()) {
-                $this->objWriter->startElement('table:named-expression');
-                $this->writeNamedFormula($definedName, $this->spreadsheet->getActiveSheet());
+        $defined_names = $this->spreadsheet->get_defined_names();
+        foreach ($defined_names as $defined_name) {
+            if ($defined_name->is_formula()) {
+                $this->obj_writer->start_element('table:named-expression');
+                $this->write_named_formula($defined_name, $this->spreadsheet->get_active_sheet());
             } else {
-                $this->objWriter->startElement('table:named-range');
-                $this->writeNamedRange($definedName);
+                $this->obj_writer->start_element('table:named-range');
+                $this->write_named_range($defined_name);
             }
-
-            $this->objWriter->endElement();
+            $this->obj_writer->end_element();
         }
     }
-
-    private function writeNamedFormula(DefinedName $definedName, Worksheet $defaultWorksheet): void
+    private function write_named_formula(Defined_Name $defined_name, Worksheet $default_worksheet): void
     {
-        $title = ($definedName->getWorksheet() !== null) ? $definedName->getWorksheet()->getTitle() : $defaultWorksheet->getTitle();
-        $this->objWriter->writeAttribute('table:name', $definedName->getName());
-        $this->objWriter->writeAttribute(
-            'table:expression',
-            $this->formulaConvertor->convertFormula($definedName->getValue(), $title)
-        );
-        $this->objWriter->writeAttribute('table:base-cell-address', $this->convertAddress(
-            $definedName,
-            "'" . $title . "'!\$A\$1"
-        ));
+        $title = $defined_name->get_worksheet() !== null ? $defined_name->get_worksheet()->get_title() : $default_worksheet->get_title();
+        $this->obj_writer->write_attribute('table:name', $defined_name->get_name());
+        $this->obj_writer->write_attribute('table:expression', $this->formula_convertor->convert_formula($defined_name->get_value(), $title));
+        $this->obj_writer->write_attribute('table:base-cell-address', $this->convert_address($defined_name, "'" . $title . "'!\$A\$1"));
     }
-
-    private function writeNamedRange(DefinedName $definedName): void
+    private function write_named_range(Defined_Name $defined_name): void
     {
-        $baseCell = '$A$1';
-        $ws = $definedName->getWorksheet();
+        $base_cell = '$A$1';
+        $ws = $defined_name->get_worksheet();
         if ($ws !== null) {
-            $baseCell = "'" . $ws->getTitle() . "'!$baseCell";
+            $base_cell = "'" . $ws->get_title() . "'!{$base_cell}";
         }
-        $this->objWriter->writeAttribute('table:name', $definedName->getName());
-        $this->objWriter->writeAttribute('table:base-cell-address', $this->convertAddress(
-            $definedName,
-            $baseCell
-        ));
-        $this->objWriter->writeAttribute('table:cell-range-address', $this->convertAddress($definedName, $definedName->getValue()));
+        $this->obj_writer->write_attribute('table:name', $defined_name->get_name());
+        $this->obj_writer->write_attribute('table:base-cell-address', $this->convert_address($defined_name, $base_cell));
+        $this->obj_writer->write_attribute('table:cell-range-address', $this->convert_address($defined_name, $defined_name->get_value()));
     }
-
-    private function convertAddress(DefinedName $definedName, string $address): string
+    private function convert_address(Defined_Name $defined_name, string $address): string
     {
-        $splitCount = Preg::matchAllWithOffsets(
-            '/' . Calculation::CALCULATION_REGEXP_CELLREF_RELATIVE . '/mui',
-            $address,
-            $splitRanges
-        );
-
-        $lengths = array_map(StringHelper::strlenAllowNull(...), array_column($splitRanges[0], 0));
-        $offsets = array_column($splitRanges[0], 1);
-
-        $worksheets = $splitRanges[2];
-        $columns = $splitRanges[6];
-        $rows = $splitRanges[7];
-
-        while ($splitCount > 0) {
-            --$splitCount;
-            $length = $lengths[$splitCount];
-            $offset = $offsets[$splitCount];
-            $worksheet = $worksheets[$splitCount][0];
-            $column = $columns[$splitCount][0];
-            $row = $rows[$splitCount][0];
-
-            $newRange = '';
+        $split_count = Preg::match_all_with_offsets('/' . Calculation::CALCULATION_REGEXP_CELLREF_RELATIVE . '/mui', $address, $split_ranges);
+        $lengths = array_map(String_Helper::strlen_allow_null(...), array_column($split_ranges[0], 0));
+        $offsets = array_column($split_ranges[0], 1);
+        $worksheets = $split_ranges[2];
+        $columns = $split_ranges[6];
+        $rows = $split_ranges[7];
+        while ($split_count > 0) {
+            --$split_count;
+            $length = $lengths[$split_count];
+            $offset = $offsets[$split_count];
+            $worksheet = $worksheets[$split_count][0];
+            $column = $columns[$split_count][0];
+            $row = $rows[$split_count][0];
+            $new_range = '';
             if (empty($worksheet)) {
-                if (($offset === 0) || ($address[$offset - 1] !== ':')) {
+                if ($offset === 0 || $address[$offset - 1] !== ':') {
                     // We need a worksheet
-                    $ws = $definedName->getWorksheet();
+                    $ws = $defined_name->get_worksheet();
                     if ($ws !== null) {
-                        $worksheet = $ws->getTitle();
+                        $worksheet = $ws->get_title();
                     }
                 }
             } else {
                 $worksheet = str_replace("''", "'", trim($worksheet, "'"));
             }
             if (!empty($worksheet)) {
-                $newRange = "'" . str_replace("'", "''", $worksheet) . "'.";
+                $new_range = "'" . str_replace("'", "''", $worksheet) . "'.";
             }
-
             //if (!empty($column)) { // phpstan says always true
-            $newRange .= $column;
+            $new_range .= $column;
             //}
             if (!empty($row)) {
-                $newRange .= $row;
+                $new_range .= $row;
             }
-
-            $address = substr($address, 0, $offset) . $newRange . substr($address, $offset + $length);
+            $address = substr($address, 0, $offset) . $new_range . substr($address, $offset + $length);
         }
-
         if (str_starts_with($address, '=')) {
             return substr($address, 1);
         }
-
         return $address;
     }
 }

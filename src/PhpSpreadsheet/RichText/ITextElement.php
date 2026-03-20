@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Rich_Text;
 
-namespace PhpOffice\PhpSpreadsheet\RichText;
-
-use PhpOffice\PhpSpreadsheet\Style\Font;
-
-interface ITextElement
+use Php_Office\Php_Spreadsheet\Style\Font;
+interface I_Text_Element
 {
     /**
      * Get text.
      */
-    public function getText(): string;
-
+    public function get_text(): string;
     /**
      * Set text.
      *
@@ -20,17 +17,15 @@ interface ITextElement
      *
      * @return $this
      */
-    public function setText(string $text): self;
-
+    public function set_text(string $text): self;
     /**
      * Get font.
      */
-    public function getFont(): ?Font;
-
+    public function get_font(): ?Font;
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string;
+    public function get_hash_code(): string;
 }

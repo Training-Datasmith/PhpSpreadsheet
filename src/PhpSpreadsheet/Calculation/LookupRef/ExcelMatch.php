@@ -1,24 +1,20 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Internal\WildcardMatch;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
-class ExcelMatch
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Internal\Wildcard_Match;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+class Excel_Match
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     public const MATCHTYPE_SMALLEST_VALUE = -1;
     public const MATCHTYPE_FIRST_VALUE = 0;
     public const MATCHTYPE_LARGEST_VALUE = 1;
-
     /**
      * MATCH.
      *
@@ -34,230 +30,202 @@ class ExcelMatch
      *
      * @return array<mixed>|float|int|string The relative position of the found item
      */
-    public static function MATCH(mixed $lookupValue, mixed $lookupArray, mixed $matchType = self::MATCHTYPE_LARGEST_VALUE): array|string|int|float
+    public static function MATCH(mixed $lookup_value, mixed $lookup_array, mixed $match_type = self::MATCHTYPE_LARGEST_VALUE): array|string|int|float
     {
-        if (is_array($lookupValue)) {
-            return self::evaluateArrayArgumentsIgnore([self::class, __FUNCTION__], 1, $lookupValue, $lookupArray, $matchType);
+        if (is_array($lookup_value)) {
+            return self::evaluate_array_arguments_ignore([self::class, __FUNCTION__], 1, $lookup_value, $lookup_array, $match_type);
         }
-
-        $lookupArray = Functions::flattenArray($lookupArray);
-
+        $lookup_array = Functions::flatten_array($lookup_array);
         try {
             // Input validation
-            self::validateLookupValue($lookupValue);
-            $matchType = self::validateMatchType($matchType);
-            self::validateLookupArray($lookupArray);
-
-            $keySet = array_keys($lookupArray);
-            if ($matchType == self::MATCHTYPE_LARGEST_VALUE) {
+            self::validate_lookup_value($lookup_value);
+            $match_type = self::validate_match_type($match_type);
+            self::validate_lookup_array($lookup_array);
+            $key_set = array_keys($lookup_array);
+            if ($match_type == self::MATCHTYPE_LARGEST_VALUE) {
                 // If match_type is 1 the list has to be processed from last to first
-                $lookupArray = array_reverse($lookupArray);
-                $keySet = array_reverse($keySet);
+                $lookup_array = array_reverse($lookup_array);
+                $key_set = array_reverse($key_set);
             }
-
-            $lookupArray = self::prepareLookupArray($lookupArray, $matchType);
+            $lookup_array = self::prepare_lookup_array($lookup_array, $match_type);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // MATCH() is not case-sensitive, so we convert lookup value to be lower cased if it's a string type.
-        if (is_string($lookupValue)) {
-            $lookupValue = StringHelper::strToLower($lookupValue);
+        if (is_string($lookup_value)) {
+            $lookup_value = String_Helper::str_to_lower($lookup_value);
         }
-
-        $valueKey = match ($matchType) {
-            self::MATCHTYPE_LARGEST_VALUE => self::matchLargestValue($lookupArray, $lookupValue, $keySet),
-            self::MATCHTYPE_FIRST_VALUE => self::matchFirstValue($lookupArray, $lookupValue),
-            default => self::matchSmallestValue($lookupArray, $lookupValue),
+        $value_key = match ($match_type) {
+            self::MATCHTYPE_LARGEST_VALUE => self::match_largest_value($lookup_array, $lookup_value, $key_set),
+            self::MATCHTYPE_FIRST_VALUE => self::match_first_value($lookup_array, $lookup_value),
+            default => self::match_smallest_value($lookup_array, $lookup_value),
         };
-
-        if ($valueKey !== null) {
-            return ++$valueKey; //* @phpstan-ignore-line
+        if ($value_key !== null) {
+            return ++$value_key;
+            //* @phpstan-ignore-line
         }
-
         // Unsuccessful in finding a match, return #N/A error value
-        return ExcelError::NA();
+        return Excel_Error::NA();
     }
-
     /** @param mixed[] $lookupArray */
-    private static function matchFirstValue(array $lookupArray, mixed $lookupValue): int|string|null
+    private static function match_first_value(array $lookup_array, mixed $lookup_value): int|string|null
     {
-        if (is_string($lookupValue)) {
-            $valueIsString = true;
-            $wildcard = WildcardMatch::wildcard($lookupValue);
+        if (is_string($lookup_value)) {
+            $value_is_string = true;
+            $wildcard = Wildcard_Match::wildcard($lookup_value);
         } else {
-            $valueIsString = false;
+            $value_is_string = false;
             $wildcard = '';
         }
-
-        $valueIsNumeric = is_int($lookupValue) || is_float($lookupValue);
-        foreach ($lookupArray as $i => $lookupArrayValue) {
-            if (
-                $valueIsString
-                && is_string($lookupArrayValue)
-            ) {
-                if (WildcardMatch::compare($lookupArrayValue, $wildcard)) {
-                    return $i; // wildcard match
+        $value_is_numeric = is_int($lookup_value) || is_float($lookup_value);
+        foreach ($lookup_array as $i => $lookup_array_value) {
+            if ($value_is_string && is_string($lookup_array_value)) {
+                if (Wildcard_Match::compare($lookup_array_value, $wildcard)) {
+                    return $i;
+                    // wildcard match
                 }
             } else {
-                if ($lookupArrayValue === $lookupValue) {
-                    return $i; // exact match
+                if ($lookup_array_value === $lookup_value) {
+                    return $i;
+                    // exact match
                 }
-                if (
-                    $valueIsNumeric
-                    && (is_float($lookupArrayValue) || is_int($lookupArrayValue))
-                    && $lookupArrayValue == $lookupValue
-                ) {
-                    return $i; // exact match
+                if ($value_is_numeric && (is_float($lookup_array_value) || is_int($lookup_array_value)) && $lookup_array_value == $lookup_value) {
+                    return $i;
+                    // exact match
                 }
             }
         }
-
         return null;
     }
-
     /**
      * @param mixed[] $lookupArray
      * @param mixed[] $keySet
      */
-    private static function matchLargestValue(array $lookupArray, mixed $lookupValue, array $keySet): mixed
+    private static function match_largest_value(array $lookup_array, mixed $lookup_value, array $key_set): mixed
     {
-        if (is_string($lookupValue)) {
-            if (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
-                $wildcard = WildcardMatch::wildcard($lookupValue);
-                foreach (array_reverse($lookupArray) as $i => $lookupArrayValue) {
-                    if (is_string($lookupArrayValue) && WildcardMatch::compare($lookupArrayValue, $wildcard)) {
+        if (is_string($lookup_value)) {
+            if (Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE) {
+                $wildcard = Wildcard_Match::wildcard($lookup_value);
+                foreach (array_reverse($lookup_array) as $i => $lookup_array_value) {
+                    if (is_string($lookup_array_value) && Wildcard_Match::compare($lookup_array_value, $wildcard)) {
                         return $i;
                     }
                 }
             } else {
-                foreach ($lookupArray as $i => $lookupArrayValue) {
-                    if ($lookupArrayValue === $lookupValue) {
-                        return $keySet[$i];
+                foreach ($lookup_array as $i => $lookup_array_value) {
+                    if ($lookup_array_value === $lookup_value) {
+                        return $key_set[$i];
                     }
                 }
             }
         }
-        $valueIsNumeric = is_int($lookupValue) || is_float($lookupValue);
-        foreach ($lookupArray as $i => $lookupArrayValue) {
-            if ($valueIsNumeric && (is_int($lookupArrayValue) || is_float($lookupArrayValue))) {
-                if ($lookupArrayValue <= $lookupValue) {
-                    return array_search($i, $keySet);
+        $value_is_numeric = is_int($lookup_value) || is_float($lookup_value);
+        foreach ($lookup_array as $i => $lookup_array_value) {
+            if ($value_is_numeric && (is_int($lookup_array_value) || is_float($lookup_array_value))) {
+                if ($lookup_array_value <= $lookup_value) {
+                    return array_search($i, $key_set);
                 }
             }
-            $typeMatch = gettype($lookupValue) === gettype($lookupArrayValue);
-            if ($typeMatch && ($lookupArrayValue <= $lookupValue)) {
-                return array_search($i, $keySet);
+            $type_match = gettype($lookup_value) === gettype($lookup_array_value);
+            if ($type_match && $lookup_array_value <= $lookup_value) {
+                return array_search($i, $key_set);
             }
         }
-
         return null;
     }
-
     /** @param mixed[] $lookupArray */
-    private static function matchSmallestValue(array $lookupArray, mixed $lookupValue): int|string|null
+    private static function match_smallest_value(array $lookup_array, mixed $lookup_value): int|string|null
     {
-        $valueKey = null;
-        if (is_string($lookupValue)) {
-            if (Functions::getCompatibilityMode() === Functions::COMPATIBILITY_OPENOFFICE) {
-                $wildcard = WildcardMatch::wildcard($lookupValue);
-                foreach ($lookupArray as $i => $lookupArrayValue) {
-                    if (is_string($lookupArrayValue) && WildcardMatch::compare($lookupArrayValue, $wildcard)) {
+        $value_key = null;
+        if (is_string($lookup_value)) {
+            if (Functions::get_compatibility_mode() === Functions::COMPATIBILITY_OPENOFFICE) {
+                $wildcard = Wildcard_Match::wildcard($lookup_value);
+                foreach ($lookup_array as $i => $lookup_array_value) {
+                    if (is_string($lookup_array_value) && Wildcard_Match::compare($lookup_array_value, $wildcard)) {
                         return $i;
                     }
                 }
             }
         }
-
-        $valueIsNumeric = is_int($lookupValue) || is_float($lookupValue);
+        $value_is_numeric = is_int($lookup_value) || is_float($lookup_value);
         // The basic algorithm is:
         // Iterate and keep the highest match until the next element is smaller than the searched value.
         // Return immediately if perfect match is found
-        foreach ($lookupArray as $i => $lookupArrayValue) {
-            $typeMatch = gettype($lookupValue) === gettype($lookupArrayValue);
-            $bothNumeric = $valueIsNumeric && (is_int($lookupArrayValue) || is_float($lookupArrayValue));
-
-            if ($lookupArrayValue === $lookupValue) {
+        foreach ($lookup_array as $i => $lookup_array_value) {
+            $type_match = gettype($lookup_value) === gettype($lookup_array_value);
+            $both_numeric = $value_is_numeric && (is_int($lookup_array_value) || is_float($lookup_array_value));
+            if ($lookup_array_value === $lookup_value) {
                 // Another "special" case. If a perfect match is found,
                 // the algorithm gives up immediately
                 return $i;
             }
-            if ($bothNumeric && $lookupValue == $lookupArrayValue) {
-                return $i; // exact match, as above
+            if ($both_numeric && $lookup_value == $lookup_array_value) {
+                return $i;
+                // exact match, as above
             }
-            if (($typeMatch || $bothNumeric) && $lookupArrayValue >= $lookupValue) {
-                $valueKey = $i;
-            } elseif ($typeMatch && $lookupArrayValue < $lookupValue) {
+            if (($type_match || $both_numeric) && $lookup_array_value >= $lookup_value) {
+                $value_key = $i;
+            } elseif ($type_match && $lookup_array_value < $lookup_value) {
                 //Excel algorithm gives up immediately if the first element is smaller than the searched value
                 break;
             }
         }
-
-        return $valueKey;
+        return $value_key;
     }
-
-    private static function validateLookupValue(mixed $lookupValue): void
+    private static function validate_lookup_value(mixed $lookup_value): void
     {
         // Lookup_value type has to be number, text, or logical values
-        if ((!is_numeric($lookupValue)) && (!is_string($lookupValue)) && (!is_bool($lookupValue))) {
-            throw new Exception(ExcelError::NA());
+        if (!is_numeric($lookup_value) && !is_string($lookup_value) && !is_bool($lookup_value)) {
+            throw new Exception(Excel_Error::NA());
         }
     }
-
-    private static function validateMatchType(mixed $matchType): int
+    private static function validate_match_type(mixed $match_type): int
     {
         // Match_type is 0, 1 or -1
         // However Excel accepts other numeric values,
         //  including numeric strings and floats.
         //  It seems to just be interested in the sign.
-        if (!is_numeric($matchType)) {
-            throw new Exception(ExcelError::Value());
+        if (!is_numeric($match_type)) {
+            throw new Exception(Excel_Error::Value());
         }
-        if ($matchType > 0) {
+        if ($match_type > 0) {
             return self::MATCHTYPE_LARGEST_VALUE;
         }
-        if ($matchType < 0) {
+        if ($match_type < 0) {
             return self::MATCHTYPE_SMALLEST_VALUE;
         }
-
         return self::MATCHTYPE_FIRST_VALUE;
     }
-
     /** @param mixed[] $lookupArray */
-    private static function validateLookupArray(array $lookupArray): void
+    private static function validate_lookup_array(array $lookup_array): void
     {
         // Lookup_array should not be empty
-        $lookupArraySize = count($lookupArray);
-        if ($lookupArraySize <= 0) {
-            throw new Exception(ExcelError::NA());
+        $lookup_array_size = count($lookup_array);
+        if ($lookup_array_size <= 0) {
+            throw new Exception(Excel_Error::NA());
         }
     }
-
     /**
      * @param mixed[] $lookupArray
      *
      * @return mixed[]
      */
-    private static function prepareLookupArray(array $lookupArray, mixed $matchType): array
+    private static function prepare_lookup_array(array $lookup_array, mixed $match_type): array
     {
         // Lookup_array should contain only number, text, or logical values, or empty (null) cells
-        foreach ($lookupArray as $i => $value) {
+        foreach ($lookup_array as $i => $value) {
             //    check the type of the value
-            if ((!is_numeric($value)) && (!is_string($value)) && (!is_bool($value)) && ($value !== null)) {
-                throw new Exception(ExcelError::NA());
+            if (!is_numeric($value) && !is_string($value) && !is_bool($value) && $value !== null) {
+                throw new Exception(Excel_Error::NA());
             }
             // Convert strings to lowercase for case-insensitive testing
             if (is_string($value)) {
-                $lookupArray[$i] = StringHelper::strToLower($value);
+                $lookup_array[$i] = String_Helper::str_to_lower($value);
             }
-            if (
-                ($value === null)
-                && (($matchType == self::MATCHTYPE_LARGEST_VALUE) || ($matchType == self::MATCHTYPE_SMALLEST_VALUE))
-            ) {
-                unset($lookupArray[$i]);
+            if ($value === null && ($match_type == self::MATCHTYPE_LARGEST_VALUE || $match_type == self::MATCHTYPE_SMALLEST_VALUE)) {
+                unset($lookup_array[$i]);
             }
         }
-
-        return $lookupArray;
+        return $lookup_array;
     }
 }

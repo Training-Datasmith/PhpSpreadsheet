@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Chart;
 
-namespace PhpOffice\PhpSpreadsheet\Chart;
-
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-class PlotArea
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+class Plot_Area
 {
     /**
      * No fill in plot area (show Excel gridlines through chart).
      */
-    private bool $noFill = false;
-
+    private bool $no_fill = false;
     /**
      * PlotArea Gradient Stop list.
      * Each entry is a 2-element array.
@@ -21,13 +18,11 @@ class PlotArea
      *
      * @var array<array{float, ChartColor}>
      */
-    private array $gradientFillStops = [];
-
+    private array $gradient_fill_stops = [];
     /**
      * PlotArea Gradient Angle.
      */
-    private ?float $gradientFillAngle = null;
-
+    private ?float $gradient_fill_angle = null;
     /**
      * Create a new PlotArea.
      *
@@ -41,54 +36,48 @@ class PlotArea
         /**
          * Plot Series.
          */
-        private array $plotSeries = []
-    ) {
+        private array $plot_series = []
+    )
+    {
     }
-
-    public function getLayout(): ?Layout
+    public function get_layout(): ?Layout
     {
         return $this->layout;
     }
-
     /**
      * Get Number of Plot Groups.
      */
-    public function getPlotGroupCount(): int
+    public function get_plot_group_count(): int
     {
-        return count($this->plotSeries);
+        return count($this->plot_series);
     }
-
     /**
      * Get Number of Plot Series.
      */
-    public function getPlotSeriesCount(): int|float
+    public function get_plot_series_count(): int|float
     {
-        $seriesCount = 0;
-        foreach ($this->plotSeries as $plot) {
-            $seriesCount += $plot->getPlotSeriesCount();
+        $series_count = 0;
+        foreach ($this->plot_series as $plot) {
+            $series_count += $plot->get_plot_series_count();
         }
-
-        return $seriesCount;
+        return $series_count;
     }
-
     /**
      * Get Plot Series.
      *
      * @return DataSeries[]
      */
-    public function getPlotGroup(): array
+    public function get_plot_group(): array
     {
-        return $this->plotSeries;
+        return $this->plot_series;
     }
-
     /**
      * Get Plot Series by Index.
      */
-    public function getPlotGroupByIndex(int $index): DataSeries
+    public function get_plot_group_by_index(int $index): Data_Series
     {
-        return $this->plotSeries[$index];
+        return $this->plot_series[$index];
     }
-
     /**
      * Set Plot Series.
      *
@@ -96,111 +85,89 @@ class PlotArea
      *
      * @return $this
      */
-    public function setPlotSeries(array $plotSeries): static
+    public function set_plot_series(array $plot_series): static
     {
-        $this->plotSeries = $plotSeries;
-
+        $this->plot_series = $plot_series;
         return $this;
     }
-
     public function refresh(Worksheet $worksheet): void
     {
-        foreach ($this->plotSeries as $plotSeries) {
-            $plotSeries->refresh($worksheet);
+        foreach ($this->plot_series as $plot_series) {
+            $plot_series->refresh($worksheet);
         }
     }
-
-    public function setNoFill(bool $noFill): self
+    public function set_no_fill(bool $no_fill): self
     {
-        $this->noFill = $noFill;
-
+        $this->no_fill = $no_fill;
         return $this;
     }
-
-    public function getNoFill(): bool
+    public function get_no_fill(): bool
     {
-        return $this->noFill;
+        return $this->no_fill;
     }
-
     /** @param array<array{float, ChartColor}> $gradientFillStops */
-    public function setGradientFillProperties(array $gradientFillStops, ?float $gradientFillAngle): self
+    public function set_gradient_fill_properties(array $gradient_fill_stops, ?float $gradient_fill_angle): self
     {
-        $this->gradientFillStops = $gradientFillStops;
-        $this->gradientFillAngle = $gradientFillAngle;
-
+        $this->gradient_fill_stops = $gradient_fill_stops;
+        $this->gradient_fill_angle = $gradient_fill_angle;
         return $this;
     }
-
     /**
      * Get gradientFillAngle.
      */
-    public function getGradientFillAngle(): ?float
+    public function get_gradient_fill_angle(): ?float
     {
-        return $this->gradientFillAngle;
+        return $this->gradient_fill_angle;
     }
-
     /**
      * Get gradientFillStops.
      *
      * @return array<array{float, ChartColor}>
      */
-    public function getGradientFillStops(): array
+    public function get_gradient_fill_stops(): array
     {
-        return $this->gradientFillStops;
+        return $this->gradient_fill_stops;
     }
-
-    private ?int $gapWidth = null;
-
-    private bool $useUpBars = false;
-
-    private bool $useDownBars = false;
-
-    public function getGapWidth(): ?int
+    private ?int $gap_width = null;
+    private bool $use_up_bars = false;
+    private bool $use_down_bars = false;
+    public function get_gap_width(): ?int
     {
-        return $this->gapWidth;
+        return $this->gap_width;
     }
-
-    public function setGapWidth(?int $gapWidth): self
+    public function set_gap_width(?int $gap_width): self
     {
-        $this->gapWidth = $gapWidth;
-
+        $this->gap_width = $gap_width;
         return $this;
     }
-
-    public function getUseUpBars(): bool
+    public function get_use_up_bars(): bool
     {
-        return $this->useUpBars;
+        return $this->use_up_bars;
     }
-
-    public function setUseUpBars(bool $useUpBars): self
+    public function set_use_up_bars(bool $use_up_bars): self
     {
-        $this->useUpBars = $useUpBars;
-
+        $this->use_up_bars = $use_up_bars;
         return $this;
     }
-
-    public function getUseDownBars(): bool
+    public function get_use_down_bars(): bool
     {
-        return $this->useDownBars;
+        return $this->use_down_bars;
     }
-
-    public function setUseDownBars(bool $useDownBars): self
+    public function set_use_down_bars(bool $use_down_bars): self
     {
-        $this->useDownBars = $useDownBars;
-
+        $this->use_down_bars = $use_down_bars;
         return $this;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
     public function __clone()
     {
-        $this->layout = ($this->layout === null) ? null : clone $this->layout;
-        $plotSeries = $this->plotSeries;
-        $this->plotSeries = [];
-        foreach ($plotSeries as $series) {
-            $this->plotSeries[] = clone $series;
+        $this->layout = $this->layout === null ? null : clone $this->layout;
+        $plot_series = $this->plot_series;
+        $this->plot_series = [];
+        foreach ($plot_series as $series) {
+            $this->plot_series[] = clone $series;
         }
     }
 }

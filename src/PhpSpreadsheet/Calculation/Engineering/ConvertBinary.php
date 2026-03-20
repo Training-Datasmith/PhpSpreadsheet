@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ConvertBinary extends ConvertBase
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Convert_Binary extends Convert_Base
 {
     /**
      * toDecimal.
@@ -29,29 +27,24 @@ class ConvertBinary extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toDecimal($value): array|string|float|int
+    public static function to_decimal($value): array|string|float|int
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateBinary($value);
+            $value = self::validate_value($value);
+            $value = self::validate_binary($value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if (strlen($value) == 10 && $value[0] === '1') {
             //    Two's Complement
             $value = substr($value, -9);
-
             return -(512 - bindec($value));
         }
-
         return bindec($value);
     }
-
     /**
      * toHex.
      *
@@ -79,32 +72,27 @@ class ConvertBinary extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toHex($value, $places = null): array|string
+    public static function to_hex($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateBinary($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_binary($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if (strlen($value) == 10 && $value[0] === '1') {
             $high2 = substr($value, 0, 2);
             $low8 = substr($value, 2);
             $xarr = ['00' => '00000000', '01' => '00000001', '10' => 'FFFFFFFE', '11' => 'FFFFFFFF'];
-
             return $xarr[$high2] . strtoupper(substr('0' . dechex((int) bindec($low8)), -2));
         }
-        $hexVal = (string) strtoupper(dechex((int) bindec($value)));
-
-        return self::nbrConversionFormat($hexVal, $places);
+        $hex_val = (string) strtoupper(dechex((int) bindec($value)));
+        return self::nbr_conversion_format($hex_val, $places);
     }
-
     /**
      * toOctal.
      *
@@ -132,34 +120,30 @@ class ConvertBinary extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toOctal($value, $places = null): array|string
+    public static function to_octal($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateBinary($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_binary($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (strlen($value) == 10 && $value[0] === '1') { //    Two's Complement
-            return str_repeat('7', 6) . strtoupper(decoct((int) bindec("11$value")));
+        if (strlen($value) == 10 && $value[0] === '1') {
+            //    Two's Complement
+            return str_repeat('7', 6) . strtoupper(decoct((int) bindec("11{$value}")));
         }
-        $octVal = decoct((int) bindec($value));
-
-        return self::nbrConversionFormat($octVal, $places);
+        $oct_val = decoct((int) bindec($value));
+        return self::nbr_conversion_format($oct_val, $places);
     }
-
-    protected static function validateBinary(string $value): string
+    protected static function validate_binary(string $value): string
     {
-        if ((strlen($value) > preg_match_all('/[01]/', $value)) || (strlen($value) > 10)) {
-            throw new Exception(ExcelError::NAN());
+        if (strlen($value) > preg_match_all('/[01]/', $value) || strlen($value) > 10) {
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $value;
     }
 }

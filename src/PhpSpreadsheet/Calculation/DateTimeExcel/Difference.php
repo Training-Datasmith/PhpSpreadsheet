@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
 use DateInterval;
 use DateTime;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDateHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Shared\Date as SharedDateHelper;
 class Difference
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * DATEDIF.
      *
@@ -30,126 +27,105 @@ class Difference
      *         If an array of values is passed for the $startDate or $endDays,arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function interval(mixed $startDate, mixed $endDate, array|string $unit = 'D'): array|string|int
+    public static function interval(mixed $start_date, mixed $end_date, array|string $unit = 'D'): array|string|int
     {
-        if (is_array($startDate) || is_array($endDate) || is_array($unit)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $startDate, $endDate, $unit);
+        if (is_array($start_date) || is_array($end_date) || is_array($unit)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $start_date, $end_date, $unit);
         }
-
         try {
-            $startDate = Helpers::getDateValue($startDate);
-            $endDate = Helpers::getDateValue($endDate);
-            $difference = self::initialDiff($startDate, $endDate);
+            $start_date = Helpers::get_date_value($start_date);
+            $end_date = Helpers::get_date_value($end_date);
+            $difference = self::initial_diff($start_date, $end_date);
             $unit = strtoupper($unit);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
-        $PHPStartDateObject = SharedDateHelper::excelToDateTimeObject($startDate);
-        $startDays = (int) $PHPStartDateObject->format('j');
+        $php_start_date_object = Shared_Date_Helper::excel_to_date_time_object($start_date);
+        $start_days = (int) $php_start_date_object->format('j');
         //$startMonths = (int) $PHPStartDateObject->format('n');
-        $startYears = (int) $PHPStartDateObject->format('Y');
-
-        $PHPEndDateObject = SharedDateHelper::excelToDateTimeObject($endDate);
-        $endDays = (int) $PHPEndDateObject->format('j');
+        $start_years = (int) $php_start_date_object->format('Y');
+        $php_end_date_object = Shared_Date_Helper::excel_to_date_time_object($end_date);
+        $end_days = (int) $php_end_date_object->format('j');
         //$endMonths = (int) $PHPEndDateObject->format('n');
-        $endYears = (int) $PHPEndDateObject->format('Y');
-
-        $PHPDiffDateObject = $PHPEndDateObject->diff($PHPStartDateObject);
-
-        $retVal = false;
-        $retVal = self::replaceRetValue($retVal, $unit, 'D') ?? self::datedifD($difference);
-        $retVal = self::replaceRetValue($retVal, $unit, 'M') ?? self::datedifM($PHPDiffDateObject);
-        $retVal = self::replaceRetValue($retVal, $unit, 'MD') ?? self::datedifMD($startDays, $endDays, $PHPEndDateObject, $PHPDiffDateObject);
-        $retVal = self::replaceRetValue($retVal, $unit, 'Y') ?? self::datedifY($PHPDiffDateObject);
-        $retVal = self::replaceRetValue($retVal, $unit, 'YD') ?? self::datedifYD($difference, $startYears, $endYears, $PHPStartDateObject, $PHPEndDateObject);
-        $retVal = self::replaceRetValue($retVal, $unit, 'YM') ?? self::datedifYM($PHPDiffDateObject);
-
-        return is_bool($retVal) ? ExcelError::VALUE() : $retVal;
+        $end_years = (int) $php_end_date_object->format('Y');
+        $php_diff_date_object = $php_end_date_object->diff($php_start_date_object);
+        $ret_val = false;
+        $ret_val = self::replace_ret_value($ret_val, $unit, 'D') ?? self::datedif_d($difference);
+        $ret_val = self::replace_ret_value($ret_val, $unit, 'M') ?? self::datedif_m($php_diff_date_object);
+        $ret_val = self::replace_ret_value($ret_val, $unit, 'MD') ?? self::datedif_md($start_days, $end_days, $php_end_date_object, $php_diff_date_object);
+        $ret_val = self::replace_ret_value($ret_val, $unit, 'Y') ?? self::datedif_y($php_diff_date_object);
+        $ret_val = self::replace_ret_value($ret_val, $unit, 'YD') ?? self::datedif_yd($difference, $start_years, $end_years, $php_start_date_object, $php_end_date_object);
+        $ret_val = self::replace_ret_value($ret_val, $unit, 'YM') ?? self::datedif_ym($php_diff_date_object);
+        return is_bool($ret_val) ? Excel_Error::VALUE() : $ret_val;
     }
-
-    private static function initialDiff(float $startDate, float $endDate): float
+    private static function initial_diff(float $start_date, float $end_date): float
     {
         // Validate parameters
-        if ($startDate > $endDate) {
-            throw new Exception(ExcelError::NAN());
+        if ($start_date > $end_date) {
+            throw new Exception(Excel_Error::NAN());
         }
-
-        return $endDate - $startDate;
+        return $end_date - $start_date;
     }
-
     /**
      * Decide whether it's time to set retVal.
      */
-    private static function replaceRetValue(bool|int $retVal, string $unit, string $compare): null|bool|int
+    private static function replace_ret_value(bool|int $ret_val, string $unit, string $compare): null|bool|int
     {
-        if ($retVal !== false || $unit !== $compare) {
-            return $retVal;
+        if ($ret_val !== false || $unit !== $compare) {
+            return $ret_val;
         }
-
         return null;
     }
-
-    private static function datedifD(float $difference): int
+    private static function datedif_d(float $difference): int
     {
         return (int) $difference;
     }
-
-    private static function datedifM(DateInterval $PHPDiffDateObject): int
+    private static function datedif_m(DateInterval $php_diff_date_object): int
     {
-        return 12 * (int) $PHPDiffDateObject->format('%y') + (int) $PHPDiffDateObject->format('%m');
+        return 12 * (int) $php_diff_date_object->format('%y') + (int) $php_diff_date_object->format('%m');
     }
-
-    private static function datedifMD(int $startDays, int $endDays, DateTime $PHPEndDateObject, DateInterval $PHPDiffDateObject): int
+    private static function datedif_md(int $start_days, int $end_days, DateTime $php_end_date_object, DateInterval $php_diff_date_object): int
     {
-        if ($endDays < $startDays) {
-            $retVal = $endDays;
-            $PHPEndDateObject->modify('-' . $endDays . ' days');
-            $adjustDays = (int) $PHPEndDateObject->format('j');
-            $retVal += ($adjustDays - $startDays);
+        if ($end_days < $start_days) {
+            $ret_val = $end_days;
+            $php_end_date_object->modify('-' . $end_days . ' days');
+            $adjust_days = (int) $php_end_date_object->format('j');
+            $ret_val += $adjust_days - $start_days;
         } else {
-            $retVal = (int) $PHPDiffDateObject->format('%d');
+            $ret_val = (int) $php_diff_date_object->format('%d');
         }
-
-        return $retVal;
+        return $ret_val;
     }
-
-    private static function datedifY(DateInterval $PHPDiffDateObject): int
+    private static function datedif_y(DateInterval $php_diff_date_object): int
     {
-        return (int) $PHPDiffDateObject->format('%y');
+        return (int) $php_diff_date_object->format('%y');
     }
-
-    private static function datedifYD(float $difference, int $startYears, int $endYears, DateTime $PHPStartDateObject, DateTime $PHPEndDateObject): int
+    private static function datedif_yd(float $difference, int $start_years, int $end_years, DateTime $php_start_date_object, DateTime $php_end_date_object): int
     {
-        $retVal = (int) $difference;
-        if ($endYears > $startYears) {
-            $isLeapStartYear = $PHPStartDateObject->format('L');
-            $wasLeapEndYear = $PHPEndDateObject->format('L');
-
+        $ret_val = (int) $difference;
+        if ($end_years > $start_years) {
+            $is_leap_start_year = $php_start_date_object->format('L');
+            $was_leap_end_year = $php_end_date_object->format('L');
             // Adjust end year to be as close as possible as start year
-            while ($PHPEndDateObject >= $PHPStartDateObject) {
-                $PHPEndDateObject->modify('-1 year');
+            while ($php_end_date_object >= $php_start_date_object) {
+                $php_end_date_object->modify('-1 year');
                 //$endYears = $PHPEndDateObject->format('Y');
             }
-            $PHPEndDateObject->modify('+1 year');
-
+            $php_end_date_object->modify('+1 year');
             // Get the result
-            $retVal = (int) $PHPEndDateObject->diff($PHPStartDateObject)->days;
-
+            $ret_val = (int) $php_end_date_object->diff($php_start_date_object)->days;
             // Adjust for leap years cases
-            $isLeapEndYear = $PHPEndDateObject->format('L');
-            $limit = new DateTime($PHPEndDateObject->format('Y-02-29'));
-            if (!$isLeapStartYear && !$wasLeapEndYear && $isLeapEndYear && $PHPEndDateObject >= $limit) {
-                --$retVal;
+            $is_leap_end_year = $php_end_date_object->format('L');
+            $limit = new DateTime($php_end_date_object->format('Y-02-29'));
+            if (!$is_leap_start_year && !$was_leap_end_year && $is_leap_end_year && $php_end_date_object >= $limit) {
+                --$ret_val;
             }
         }
-
-        return $retVal;
+        return $ret_val;
     }
-
-    private static function datedifYM(DateInterval $PHPDiffDateObject): int
+    private static function datedif_ym(DateInterval $php_diff_date_object): int
     {
-        return (int) $PHPDiffDateObject->format('%m');
+        return (int) $php_diff_date_object->format('%m');
     }
 }

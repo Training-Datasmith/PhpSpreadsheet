@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Chart;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Chart;
 
 /**
  * Created by PhpStorm.
@@ -15,68 +14,37 @@ class Axis extends Properties
     public const AXIS_TYPE_CATEGORY = 'catAx';
     public const AXIS_TYPE_DATE = 'dateAx';
     public const AXIS_TYPE_VALUE = 'valAx';
-
     public const TIME_UNIT_DAYS = 'days';
     public const TIME_UNIT_MONTHS = 'months';
     public const TIME_UNIT_YEARS = 'years';
-
     public function __construct()
     {
         parent::__construct();
-        $this->fillColor = new ChartColor();
+        $this->fill_color = new Chart_Color();
     }
-
     /**
      * Chart Major Gridlines as.
      */
-    private ?GridLines $majorGridlines = null;
-
+    private ?Grid_Lines $major_gridlines = null;
     /**
      * Chart Minor Gridlines as.
      */
-    private ?GridLines $minorGridlines = null;
-
+    private ?Grid_Lines $minor_gridlines = null;
     /**
      * Axis Number.
      *
      * @var array{format: string, source_linked: int, numeric: ?bool}
      */
-    private array $axisNumber = [
-        'format' => self::FORMAT_CODE_GENERAL,
-        'source_linked' => 1,
-        'numeric' => null,
-    ];
-
-    private string $axisType = '';
-
-    private ?AxisText $axisText = null;
-
-    private ?Title $dispUnitsTitle = null;
-
+    private array $axis_number = ['format' => self::FORMAT_CODE_GENERAL, 'source_linked' => 1, 'numeric' => null];
+    private string $axis_type = '';
+    private ?Axis_Text $axis_text = null;
+    private ?Title $disp_units_title = null;
     /**
      * Axis Options.
      *
      * @var array<string, null|string>
      */
-    private array $axisOptions = [
-        'minimum' => null,
-        'maximum' => null,
-        'major_unit' => null,
-        'minor_unit' => null,
-        'orientation' => self::ORIENTATION_NORMAL,
-        'minor_tick_mark' => self::TICK_MARK_NONE,
-        'major_tick_mark' => self::TICK_MARK_NONE,
-        'axis_labels' => self::AXIS_LABELS_NEXT_TO,
-        'horizontal_crosses' => self::HORIZONTAL_CROSSES_AUTOZERO,
-        'horizontal_crosses_value' => null,
-        'textRotation' => null,
-        'hidden' => null,
-        'majorTimeUnit' => self::TIME_UNIT_YEARS,
-        'minorTimeUnit' => self::TIME_UNIT_MONTHS,
-        'baseTimeUnit' => self::TIME_UNIT_DAYS,
-        'logBase' => null,
-        'dispUnitsBuiltIn' => null,
-    ];
+    private array $axis_options = ['minimum' => null, 'maximum' => null, 'major_unit' => null, 'minor_unit' => null, 'orientation' => self::ORIENTATION_NORMAL, 'minor_tick_mark' => self::TICK_MARK_NONE, 'major_tick_mark' => self::TICK_MARK_NONE, 'axis_labels' => self::AXIS_LABELS_NEXT_TO, 'horizontal_crosses' => self::HORIZONTAL_CROSSES_AUTOZERO, 'horizontal_crosses_value' => null, 'textRotation' => null, 'hidden' => null, 'majorTimeUnit' => self::TIME_UNIT_YEARS, 'minorTimeUnit' => self::TIME_UNIT_MONTHS, 'baseTimeUnit' => self::TIME_UNIT_DAYS, 'logBase' => null, 'dispUnitsBuiltIn' => null];
     public const DISP_UNITS_HUNDREDS = 'hundreds';
     public const DISP_UNITS_THOUSANDS = 'thousands';
     public const DISP_UNITS_TEN_THOUSANDS = 'tenThousands';
@@ -86,262 +54,194 @@ class Axis extends Properties
     public const DISP_UNITS_HUNDRED_MILLIONS = 'hundredMillions';
     public const DISP_UNITS_BILLIONS = 'billions';
     public const DISP_UNITS_TRILLIONS = 'trillions';
-    public const TRILLION_INDEX = (PHP_INT_SIZE > 4) ? 1000000000000 : '1000000000000';
-    public const DISP_UNITS_BUILTIN_INT = [
-        100 => self::DISP_UNITS_HUNDREDS,
-        1000 => self::DISP_UNITS_THOUSANDS,
-        10000 => self::DISP_UNITS_TEN_THOUSANDS,
-        100000 => self::DISP_UNITS_HUNDRED_THOUSANDS,
-        1000000 => self::DISP_UNITS_MILLIONS,
-        10000000 => self::DISP_UNITS_TEN_MILLIONS,
-        100000000 => self::DISP_UNITS_HUNDRED_MILLIONS,
-        1000000000 => self::DISP_UNITS_BILLIONS,
-        self::TRILLION_INDEX => self::DISP_UNITS_TRILLIONS, // overflow for 32-bit
-    ];
-
+    public const TRILLION_INDEX = PHP_INT_SIZE > 4 ? 1000000000000 : '1000000000000';
+    public const DISP_UNITS_BUILTIN_INT = [100 => self::DISP_UNITS_HUNDREDS, 1000 => self::DISP_UNITS_THOUSANDS, 10000 => self::DISP_UNITS_TEN_THOUSANDS, 100000 => self::DISP_UNITS_HUNDRED_THOUSANDS, 1000000 => self::DISP_UNITS_MILLIONS, 10000000 => self::DISP_UNITS_TEN_MILLIONS, 100000000 => self::DISP_UNITS_HUNDRED_MILLIONS, 1000000000 => self::DISP_UNITS_BILLIONS, self::TRILLION_INDEX => self::DISP_UNITS_TRILLIONS];
     /**
      * Fill Properties.
      */
-    private ChartColor $fillColor;
-
-    private const NUMERIC_FORMAT = [
-        Properties::FORMAT_CODE_NUMBER,
-        Properties::FORMAT_CODE_DATE,
-        Properties::FORMAT_CODE_DATE_ISO8601,
-    ];
-
-    private bool $noFill = false;
-
+    private Chart_Color $fill_color;
+    private const NUMERIC_FORMAT = [Properties::FORMAT_CODE_NUMBER, Properties::FORMAT_CODE_DATE, Properties::FORMAT_CODE_DATE_ISO8601];
+    private bool $no_fill = false;
     /**
      * Get Series Data Type.
      */
-    public function setAxisNumberProperties(string $format_code, ?bool $numeric = null, int $sourceLinked = 0): void
+    public function set_axis_number_properties(string $format_code, ?bool $numeric = null, int $source_linked = 0): void
     {
         $format = $format_code;
-        $this->axisNumber['format'] = $format;
-        $this->axisNumber['source_linked'] = $sourceLinked;
+        $this->axis_number['format'] = $format;
+        $this->axis_number['source_linked'] = $source_linked;
         if (is_bool($numeric)) {
-            $this->axisNumber['numeric'] = $numeric;
+            $this->axis_number['numeric'] = $numeric;
         } elseif (in_array($format, self::NUMERIC_FORMAT, true)) {
-            $this->axisNumber['numeric'] = true;
+            $this->axis_number['numeric'] = true;
         }
     }
-
     /**
      * Get Axis Number Format Data Type.
      */
-    public function getAxisNumberFormat(): string
+    public function get_axis_number_format(): string
     {
-        return $this->axisNumber['format'];
+        return $this->axis_number['format'];
     }
-
     /**
      * Get Axis Number Source Linked.
      */
-    public function getAxisNumberSourceLinked(): string
+    public function get_axis_number_source_linked(): string
     {
-        return (string) $this->axisNumber['source_linked'];
+        return (string) $this->axis_number['source_linked'];
     }
-
-    public function getAxisIsNumericFormat(): bool
+    public function get_axis_is_numeric_format(): bool
     {
-        return $this->axisType === self::AXIS_TYPE_DATE || (bool) $this->axisNumber['numeric'];
+        return $this->axis_type === self::AXIS_TYPE_DATE || (bool) $this->axis_number['numeric'];
     }
-
-    public function setAxisOption(string $key, null|float|int|string $value): void
+    public function set_axis_option(string $key, null|float|int|string $value): void
     {
         if ($value !== null && $value !== '') {
-            $this->axisOptions[$key] = (string) $value;
+            $this->axis_options[$key] = (string) $value;
         }
     }
-
     /**
      * Set Axis Options Properties.
      */
-    public function setAxisOptionsProperties(
-        string $axisLabels,
-        ?string $horizontalCrossesValue = null,
-        ?string $horizontalCrosses = null,
-        ?string $axisOrientation = null,
-        ?string $majorTmt = null,
-        ?string $minorTmt = null,
-        null|float|int|string $minimum = null,
-        null|float|int|string $maximum = null,
-        null|float|int|string $majorUnit = null,
-        null|float|int|string $minorUnit = null,
-        null|float|int|string $textRotation = null,
-        ?string $hidden = null,
-        ?string $baseTimeUnit = null,
-        ?string $majorTimeUnit = null,
-        ?string $minorTimeUnit = null,
-        null|float|int|string $logBase = null,
-        ?string $dispUnitsBuiltIn = null
-    ): void {
-        $this->axisOptions['axis_labels'] = $axisLabels;
-        $this->setAxisOption('horizontal_crosses_value', $horizontalCrossesValue);
-        $this->setAxisOption('horizontal_crosses', $horizontalCrosses);
-        $this->setAxisOption('orientation', $axisOrientation);
-        $this->setAxisOption('major_tick_mark', $majorTmt);
-        $this->setAxisOption('minor_tick_mark', $minorTmt);
-        $this->setAxisOption('minimum', $minimum);
-        $this->setAxisOption('maximum', $maximum);
-        $this->setAxisOption('major_unit', $majorUnit);
-        $this->setAxisOption('minor_unit', $minorUnit);
-        $this->setAxisOption('textRotation', $textRotation);
-        $this->setAxisOption('hidden', $hidden);
-        $this->setAxisOption('baseTimeUnit', $baseTimeUnit);
-        $this->setAxisOption('majorTimeUnit', $majorTimeUnit);
-        $this->setAxisOption('minorTimeUnit', $minorTimeUnit);
-        $this->setAxisOption('logBase', $logBase);
-        $this->setAxisOption('dispUnitsBuiltIn', $dispUnitsBuiltIn);
+    public function set_axis_options_properties(string $axis_labels, ?string $horizontal_crosses_value = null, ?string $horizontal_crosses = null, ?string $axis_orientation = null, ?string $major_tmt = null, ?string $minor_tmt = null, null|float|int|string $minimum = null, null|float|int|string $maximum = null, null|float|int|string $major_unit = null, null|float|int|string $minor_unit = null, null|float|int|string $text_rotation = null, ?string $hidden = null, ?string $base_time_unit = null, ?string $major_time_unit = null, ?string $minor_time_unit = null, null|float|int|string $log_base = null, ?string $disp_units_built_in = null): void
+    {
+        $this->axis_options['axis_labels'] = $axis_labels;
+        $this->set_axis_option('horizontal_crosses_value', $horizontal_crosses_value);
+        $this->set_axis_option('horizontal_crosses', $horizontal_crosses);
+        $this->set_axis_option('orientation', $axis_orientation);
+        $this->set_axis_option('major_tick_mark', $major_tmt);
+        $this->set_axis_option('minor_tick_mark', $minor_tmt);
+        $this->set_axis_option('minimum', $minimum);
+        $this->set_axis_option('maximum', $maximum);
+        $this->set_axis_option('major_unit', $major_unit);
+        $this->set_axis_option('minor_unit', $minor_unit);
+        $this->set_axis_option('textRotation', $text_rotation);
+        $this->set_axis_option('hidden', $hidden);
+        $this->set_axis_option('baseTimeUnit', $base_time_unit);
+        $this->set_axis_option('majorTimeUnit', $major_time_unit);
+        $this->set_axis_option('minorTimeUnit', $minor_time_unit);
+        $this->set_axis_option('logBase', $log_base);
+        $this->set_axis_option('dispUnitsBuiltIn', $disp_units_built_in);
     }
-
     /**
      * Get Axis Options Property.
      */
-    public function getAxisOptionsProperty(string $property): ?string
+    public function get_axis_options_property(string $property): ?string
     {
         if ($property !== 'textRotation') {
-            return $this->axisOptions[$property];
+            return $this->axis_options[$property];
         }
-        if ($this->axisText === null) {
-            return $this->axisOptions[$property];
+        if ($this->axis_text === null) {
+            return $this->axis_options[$property];
         }
-        if ($this->axisText->getRotation() !== null) {
-            return (string) $this->axisText->getRotation();
+        if ($this->axis_text->get_rotation() !== null) {
+            return (string) $this->axis_text->get_rotation();
         }
-
-        return $this->axisOptions[$property];
+        return $this->axis_options[$property];
     }
-
     /**
      * Set Axis Orientation Property.
      */
-    public function setAxisOrientation(string $orientation): void
+    public function set_axis_orientation(string $orientation): void
     {
-        $this->axisOptions['orientation'] = $orientation;
+        $this->axis_options['orientation'] = $orientation;
     }
-
-    public function getAxisType(): string
+    public function get_axis_type(): string
     {
-        return $this->axisType;
+        return $this->axis_type;
     }
-
-    public function setAxisType(string $type): self
+    public function set_axis_type(string $type): self
     {
         if ($type === self::AXIS_TYPE_CATEGORY || $type === self::AXIS_TYPE_VALUE || $type === self::AXIS_TYPE_DATE) {
-            $this->axisType = $type;
+            $this->axis_type = $type;
         } else {
-            $this->axisType = '';
+            $this->axis_type = '';
         }
-
         return $this;
     }
-
     /**
      * Set Fill Property.
      */
-    public function setFillParameters(?string $color, ?int $alpha = null, ?string $AlphaType = ChartColor::EXCEL_COLOR_TYPE_RGB): void
+    public function set_fill_parameters(?string $color, ?int $alpha = null, ?string $alpha_type = Chart_Color::EXCEL_COLOR_TYPE_RGB): void
     {
-        $this->fillColor->setColorProperties($color, $alpha, $AlphaType);
+        $this->fill_color->set_color_properties($color, $alpha, $alpha_type);
     }
-
     /**
      * Get Fill Property.
      */
-    public function getFillProperty(string $property): string
+    public function get_fill_property(string $property): string
     {
-        return (string) $this->fillColor->getColorProperty($property);
+        return (string) $this->fill_color->get_color_property($property);
     }
-
-    public function getFillColorObject(): ChartColor
+    public function get_fill_color_object(): Chart_Color
     {
-        return $this->fillColor;
+        return $this->fill_color;
     }
-
-    private string $crossBetween = ''; // 'between' or 'midCat' might be better
-
-    public function setCrossBetween(string $crossBetween): self
+    private string $cross_between = '';
+    // 'between' or 'midCat' might be better
+    public function set_cross_between(string $cross_between): self
     {
-        $this->crossBetween = $crossBetween;
-
+        $this->cross_between = $cross_between;
         return $this;
     }
-
-    public function getCrossBetween(): string
+    public function get_cross_between(): string
     {
-        return $this->crossBetween;
+        return $this->cross_between;
     }
-
-    public function getMajorGridlines(): ?GridLines
+    public function get_major_gridlines(): ?Grid_Lines
     {
-        return $this->majorGridlines;
+        return $this->major_gridlines;
     }
-
-    public function getMinorGridlines(): ?GridLines
+    public function get_minor_gridlines(): ?Grid_Lines
     {
-        return $this->minorGridlines;
+        return $this->minor_gridlines;
     }
-
-    public function setMajorGridlines(?GridLines $gridlines): self
+    public function set_major_gridlines(?Grid_Lines $gridlines): self
     {
-        $this->majorGridlines = $gridlines;
-
+        $this->major_gridlines = $gridlines;
         return $this;
     }
-
-    public function setMinorGridlines(?GridLines $gridlines): self
+    public function set_minor_gridlines(?Grid_Lines $gridlines): self
     {
-        $this->minorGridlines = $gridlines;
-
+        $this->minor_gridlines = $gridlines;
         return $this;
     }
-
-    public function getAxisText(): ?AxisText
+    public function get_axis_text(): ?Axis_Text
     {
-        return $this->axisText;
+        return $this->axis_text;
     }
-
-    public function setAxisText(?AxisText $axisText): self
+    public function set_axis_text(?Axis_Text $axis_text): self
     {
-        $this->axisText = $axisText;
-
+        $this->axis_text = $axis_text;
         return $this;
     }
-
-    public function setNoFill(bool $noFill): self
+    public function set_no_fill(bool $no_fill): self
     {
-        $this->noFill = $noFill;
-
+        $this->no_fill = $no_fill;
         return $this;
     }
-
-    public function getNoFill(): bool
+    public function get_no_fill(): bool
     {
-        return $this->noFill;
+        return $this->no_fill;
     }
-
-    public function setDispUnitsTitle(?Title $dispUnitsTitle): self
+    public function set_disp_units_title(?Title $disp_units_title): self
     {
-        $this->dispUnitsTitle = $dispUnitsTitle;
-
+        $this->disp_units_title = $disp_units_title;
         return $this;
     }
-
-    public function getDispUnitsTitle(): ?Title
+    public function get_disp_units_title(): ?Title
     {
-        return $this->dispUnitsTitle;
+        return $this->disp_units_title;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
     public function __clone()
     {
         parent::__clone();
-        $this->majorGridlines = ($this->minorGridlines === null) ? null : clone $this->minorGridlines;
-        $this->axisText = ($this->axisText === null) ? null : clone $this->axisText;
-        $this->dispUnitsTitle = ($this->dispUnitsTitle === null) ? null : clone $this->dispUnitsTitle;
-        $this->fillColor = clone $this->fillColor;
+        $this->major_gridlines = $this->minor_gridlines === null ? null : clone $this->minor_gridlines;
+        $this->axis_text = $this->axis_text === null ? null : clone $this->axis_text;
+        $this->disp_units_title = $this->disp_units_title === null ? null : clone $this->disp_units_title;
+        $this->fill_color = clone $this->fill_color;
     }
 }

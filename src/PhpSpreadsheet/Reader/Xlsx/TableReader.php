@@ -1,133 +1,117 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table\TableDxfsStyle;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table\TableStyle;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use SimpleXMLElement;
-
-class TableReader
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Table;
+use Php_Office\Php_Spreadsheet\Worksheet\Table\Table_Dxfs_Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Table\Table_Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+use Simple_Xml_Element;
+class Table_Reader
 {
     /** @var mixed[]|SimpleXMLElement */
-    private $tableAttributes;
-
-    public function __construct(private readonly Worksheet $worksheet, private readonly SimpleXMLElement $tableXml)
+    private $table_attributes;
+    public function __construct(private readonly Worksheet $worksheet, private readonly Simple_Xml_Element $table_xml)
     {
     }
-
     /**
      * Loads Table into the Worksheet.
      *
      * @param TableDxfsStyle[] $tableStyles
      * @param Style[] $dxfs
      */
-    public function load(array $tableStyles, array $dxfs): void
+    public function load(array $table_styles, array $dxfs): void
     {
-        $this->tableAttributes = $this->tableXml->attributes() ?? [];
+        $this->table_attributes = $this->table_xml->attributes() ?? [];
         // Remove all "$" in the table range
-        $tableRange = (string) preg_replace('/\$/', '', $this->tableAttributes['ref'] ?? '');
-        if (str_contains($tableRange, ':')) {
-            $this->readTable($tableRange, $tableStyles, $dxfs);
+        $table_range = (string) preg_replace('/\$/', '', $this->table_attributes['ref'] ?? '');
+        if (str_contains($table_range, ':')) {
+            $this->read_table($table_range, $table_styles, $dxfs);
         }
     }
-
     /**
      * Read Table from xml.
      *
      * @param TableDxfsStyle[] $tableStyles
      * @param Style[] $dxfs
      */
-    private function readTable(string $tableRange, array $tableStyles, array $dxfs): void
+    private function read_table(string $table_range, array $table_styles, array $dxfs): void
     {
-        $table = new Table($tableRange);
+        $table = new Table($table_range);
         /** @var string[] */
-        $attributes = $this->tableAttributes;
-        $table->setName((string) ($attributes['displayName'] ?? ''));
-        $table->setShowHeaderRow(((string) ($attributes['headerRowCount'] ?? '')) !== '0');
-        $table->setShowTotalsRow(((string) ($attributes['totalsRowCount'] ?? '')) === '1');
-
-        $this->readTableAutoFilter($table, $this->tableXml->autoFilter);
-        $this->readTableColumns($table, $this->tableXml->tableColumns);
-        $this->readTableStyle($table, $this->tableXml->tableStyleInfo, $tableStyles, $dxfs);
-
-        (new AutoFilter($table, $this->tableXml))->load();
-        $this->worksheet->addTable($table);
+        $attributes = $this->table_attributes;
+        $table->set_name((string) ($attributes['displayName'] ?? ''));
+        $table->set_show_header_row((string) ($attributes['headerRowCount'] ?? '') !== '0');
+        $table->set_show_totals_row((string) ($attributes['totalsRowCount'] ?? '') === '1');
+        $this->read_table_auto_filter($table, $this->table_xml->auto_filter);
+        $this->read_table_columns($table, $this->table_xml->table_columns);
+        $this->read_table_style($table, $this->table_xml->table_style_info, $table_styles, $dxfs);
+        (new Auto_Filter($table, $this->table_xml))->load();
+        $this->worksheet->add_table($table);
     }
-
     /**
      * Reads TableAutoFilter from xml.
      */
-    private function readTableAutoFilter(Table $table, SimpleXMLElement $autoFilterXml): void
+    private function read_table_auto_filter(Table $table, Simple_Xml_Element $auto_filter_xml): void
     {
-        if ($autoFilterXml->filterColumn === null) {
-            $table->setAllowFilter(false);
-
+        if ($auto_filter_xml->filter_column === null) {
+            $table->set_allow_filter(false);
             return;
         }
-
-        foreach ($autoFilterXml->filterColumn as $filterColumn) {
+        foreach ($auto_filter_xml->filter_column as $filter_column) {
             /** @var SimpleXMLElement */
-            $attributes = $filterColumn->attributes() ?? ['colId' => 0, 'hiddenButton' => 0];
-            $column = $table->getColumnByOffset((int) $attributes['colId']);
-            $column->setShowFilterButton(((string) $attributes['hiddenButton']) !== '1');
+            $attributes = $filter_column->attributes() ?? ['colId' => 0, 'hiddenButton' => 0];
+            $column = $table->get_column_by_offset((int) $attributes['colId']);
+            $column->set_show_filter_button((string) $attributes['hiddenButton'] !== '1');
         }
     }
-
     /**
      * Reads TableColumns from xml.
      */
-    private function readTableColumns(Table $table, SimpleXMLElement $tableColumnsXml): void
+    private function read_table_columns(Table $table, Simple_Xml_Element $table_columns_xml): void
     {
         $offset = 0;
-        foreach ($tableColumnsXml->tableColumn as $tableColumn) {
+        foreach ($table_columns_xml->table_column as $table_column) {
             /** @var SimpleXMLElement */
-            $attributes = $tableColumn->attributes() ?? ['totalsRowLabel' => 0, 'totalsRowFunction' => 0];
-            $column = $table->getColumnByOffset($offset++);
-
-            if ($table->getShowTotalsRow()) {
+            $attributes = $table_column->attributes() ?? ['totalsRowLabel' => 0, 'totalsRowFunction' => 0];
+            $column = $table->get_column_by_offset($offset++);
+            if ($table->get_show_totals_row()) {
                 if ($attributes['totalsRowLabel']) {
-                    $column->setTotalsRowLabel((string) $attributes['totalsRowLabel']);
+                    $column->set_totals_row_label((string) $attributes['totalsRowLabel']);
                 }
-
                 if ($attributes['totalsRowFunction']) {
-                    $column->setTotalsRowFunction((string) $attributes['totalsRowFunction']);
+                    $column->set_totals_row_function((string) $attributes['totalsRowFunction']);
                 }
             }
-
-            if ($tableColumn->calculatedColumnFormula) {
-                $column->setColumnFormula((string) $tableColumn->calculatedColumnFormula);
+            if ($table_column->calculated_column_formula) {
+                $column->set_column_formula((string) $table_column->calculated_column_formula);
             }
         }
     }
-
     /**
      * Reads TableStyle from xml.
      *
      * @param TableDxfsStyle[] $tableStyles
      * @param Style[] $dxfs
      */
-    private function readTableStyle(Table $table, SimpleXMLElement $tableStyleInfoXml, array $tableStyles, array $dxfs): void
+    private function read_table_style(Table $table, Simple_Xml_Element $table_style_info_xml, array $table_styles, array $dxfs): void
     {
-        $tableStyle = new TableStyle();
-        $attributes = $tableStyleInfoXml->attributes();
+        $table_style = new Table_Style();
+        $attributes = $table_style_info_xml->attributes();
         if ($attributes !== null) {
-            $tableStyle->setTheme((string) $attributes['name']);
-            $tableStyle->setShowRowStripes((string) $attributes['showRowStripes'] === '1');
-            $tableStyle->setShowColumnStripes((string) $attributes['showColumnStripes'] === '1');
-            $tableStyle->setShowFirstColumn((string) $attributes['showFirstColumn'] === '1');
-            $tableStyle->setShowLastColumn((string) $attributes['showLastColumn'] === '1');
-
-            foreach ($tableStyles as $style) {
-                if ($style->getName() === (string) $attributes['name']) {
-                    $tableStyle->setTableDxfsStyle($style, $dxfs);
+            $table_style->set_theme((string) $attributes['name']);
+            $table_style->set_show_row_stripes((string) $attributes['showRowStripes'] === '1');
+            $table_style->set_show_column_stripes((string) $attributes['showColumnStripes'] === '1');
+            $table_style->set_show_first_column((string) $attributes['showFirstColumn'] === '1');
+            $table_style->set_show_last_column((string) $attributes['showLastColumn'] === '1');
+            foreach ($table_styles as $style) {
+                if ($style->get_name() === (string) $attributes['name']) {
+                    $table_style->set_table_dxfs_style($style, $dxfs);
                 }
             }
         }
-        $table->setStyle($tableStyle);
+        $table->set_style($table_style);
     }
 }

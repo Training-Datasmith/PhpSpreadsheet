@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Error_Value;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Sum
 {
     /**
@@ -20,24 +18,21 @@ class Sum
      *
      * @param mixed ...$args Data values
      */
-    public static function sumIgnoringStrings(mixed ...$args): float|int|string
+    public static function sum_ignoring_strings(mixed ...$args): float|int|string
     {
-        $returnValue = 0;
-
+        $return_value = 0;
         // Loop through the arguments
-        foreach (Functions::flattenArray($args) as $arg) {
+        foreach (Functions::flatten_array($args) as $arg) {
             // Is it a numeric value?
             if (is_numeric($arg)) {
-                $returnValue += $arg;
-            } elseif (ErrorValue::isError($arg)) {
+                $return_value += $arg;
+            } elseif (Error_Value::is_error($arg)) {
                 /** @var string $arg */
                 return $arg;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * SUM, returning error for non-numeric strings. This is used by Excel SUM function.
      *
@@ -50,29 +45,27 @@ class Sum
      *
      * @return array<mixed>|float|int|string
      */
-    public static function sumErroringStrings(mixed ...$args): float|int|string|array
+    public static function sum_erroring_strings(mixed ...$args): float|int|string|array
     {
-        $returnValue = 0;
+        $return_value = 0;
         // Loop through the arguments
-        $aArgs = Functions::flattenArrayIndexed($args);
-        foreach ($aArgs as $k => $arg) {
+        $a_args = Functions::flatten_array_indexed($args);
+        foreach ($a_args as $k => $arg) {
             // Is it a numeric value?
             if (is_numeric($arg)) {
-                $returnValue += $arg;
+                $return_value += $arg;
             } elseif (is_bool($arg)) {
-                $returnValue += (int) $arg;
-            } elseif (ErrorValue::isError($arg, true)) {
+                $return_value += (int) $arg;
+            } elseif (Error_Value::is_error($arg, true)) {
                 /** @var string $arg */
                 return $arg;
-            } elseif ($arg !== null && !Functions::isCellValue($k)) {
+            } elseif ($arg !== null && !Functions::is_cell_value($k)) {
                 // ignore non-numerics from cell, but fail as literals (except null)
-                return ExcelError::VALUE();
+                return Excel_Error::VALUE();
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * SUMPRODUCT.
      *
@@ -85,34 +78,29 @@ class Sum
      */
     public static function product(mixed ...$args): string|int|float
     {
-        $arrayList = $args;
-
-        $wrkArray = Functions::flattenArray(array_shift($arrayList));
-        $wrkCellCount = count($wrkArray);
-
-        for ($i = 0; $i < $wrkCellCount; ++$i) {
-            if ((!is_numeric($wrkArray[$i])) || (is_string($wrkArray[$i]))) {
-                $wrkArray[$i] = 0;
+        $array_list = $args;
+        $wrk_array = Functions::flatten_array(array_shift($array_list));
+        $wrk_cell_count = count($wrk_array);
+        for ($i = 0; $i < $wrk_cell_count; ++$i) {
+            if (!is_numeric($wrk_array[$i]) || is_string($wrk_array[$i])) {
+                $wrk_array[$i] = 0;
             }
         }
-
-        foreach ($arrayList as $matrixData) {
-            $array2 = Functions::flattenArray($matrixData);
+        foreach ($array_list as $matrix_data) {
+            $array2 = Functions::flatten_array($matrix_data);
             $count = count($array2);
-            if ($wrkCellCount != $count) {
-                return ExcelError::VALUE();
+            if ($wrk_cell_count != $count) {
+                return Excel_Error::VALUE();
             }
-
             foreach ($array2 as $i => $val) {
-                if ((!is_numeric($val)) || (is_string($val))) {
+                if (!is_numeric($val) || is_string($val)) {
                     $val = 0;
                 }
                 /** @var array<float|int> $wrkArray */
-                $wrkArray[$i] *= $val;
+                $wrk_array[$i] *= $val;
             }
         }
-
         /** @var array<float|int> $wrkArray */
-        return array_sum($wrkArray);
+        return array_sum($wrk_array);
     }
 }

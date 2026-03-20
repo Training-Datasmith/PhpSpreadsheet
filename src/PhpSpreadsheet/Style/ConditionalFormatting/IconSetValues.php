@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Conditional_Formatting;
 
-namespace PhpOffice\PhpSpreadsheet\Style\ConditionalFormatting;
-
-enum IconSetValues: string
+enum Icon_Set_Values : string
 {
     case ThreeArrows = '3Arrows';
     case ThreeArrowsGray = '3ArrowsGray';

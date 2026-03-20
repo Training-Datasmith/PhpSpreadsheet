@@ -1,229 +1,194 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet\Table;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet\Table;
-
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
+use Php_Office\Php_Spreadsheet\Cell\Data_Type;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Table;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 class Column
 {
     /**
      * Show Filter Button.
      */
-    private bool $showFilterButton = true;
-
+    private bool $show_filter_button = true;
     /**
      * Total Row Label.
      */
-    private ?string $totalsRowLabel = null;
-
+    private ?string $totals_row_label = null;
     /**
      * Total Row Function.
      */
-    private ?string $totalsRowFunction = null;
-
+    private ?string $totals_row_function = null;
     /**
      * Total Row Formula.
      */
-    private ?string $totalsRowFormula = null;
-
+    private ?string $totals_row_formula = null;
     /**
      * Column Formula.
      */
-    private ?string $columnFormula = null;
-
+    private ?string $column_formula = null;
     /**
      * Create a new Column.
      *
      * @param string $columnIndex Column (e.g. A)
      * @param ?Table $table Table for this column
      */
-    public function __construct(private string $columnIndex, private ?Table $table = null)
+    public function __construct(private string $column_index, private ?Table $table = null)
     {
     }
-
     /**
      * Get Table column index as string eg: 'A'.
      */
-    public function getColumnIndex(): string
+    public function get_column_index(): string
     {
-        return $this->columnIndex;
+        return $this->column_index;
     }
-
     /**
      * Set Table column index as string eg: 'A'.
      *
      * @param string $column Column (e.g. A)
      */
-    public function setColumnIndex(string $column): self
+    public function set_column_index(string $column): self
     {
         // Uppercase coordinate
         $column = strtoupper($column);
         if ($this->table !== null) {
-            $this->table->isColumnInRange($column);
+            $this->table->is_column_in_range($column);
         }
-
-        $this->columnIndex = $column;
-
+        $this->column_index = $column;
         return $this;
     }
-
     /**
      * Get show Filter Button.
      */
-    public function getShowFilterButton(): bool
+    public function get_show_filter_button(): bool
     {
-        return $this->showFilterButton;
+        return $this->show_filter_button;
     }
-
     /**
      * Set show Filter Button.
      */
-    public function setShowFilterButton(bool $showFilterButton): self
+    public function set_show_filter_button(bool $show_filter_button): self
     {
-        $this->showFilterButton = $showFilterButton;
-
+        $this->show_filter_button = $show_filter_button;
         return $this;
     }
-
     /**
      * Get total Row Label.
      */
-    public function getTotalsRowLabel(): ?string
+    public function get_totals_row_label(): ?string
     {
-        return $this->totalsRowLabel;
+        return $this->totals_row_label;
     }
-
     /**
      * Set total Row Label.
      */
-    public function setTotalsRowLabel(string $totalsRowLabel): self
+    public function set_totals_row_label(string $totals_row_label): self
     {
-        $this->totalsRowLabel = $totalsRowLabel;
-
+        $this->totals_row_label = $totals_row_label;
         return $this;
     }
-
     /**
      * Get total Row Function.
      */
-    public function getTotalsRowFunction(): ?string
+    public function get_totals_row_function(): ?string
     {
-        return $this->totalsRowFunction;
+        return $this->totals_row_function;
     }
-
     /**
      * Set total Row Function.
      */
-    public function setTotalsRowFunction(string $totalsRowFunction): self
+    public function set_totals_row_function(string $totals_row_function): self
     {
-        $this->totalsRowFunction = $totalsRowFunction;
-
+        $this->totals_row_function = $totals_row_function;
         return $this;
     }
-
     /**
      * Get total Row Formula.
      */
-    public function getTotalsRowFormula(): ?string
+    public function get_totals_row_formula(): ?string
     {
-        return $this->totalsRowFormula;
+        return $this->totals_row_formula;
     }
-
     /**
      * Set total Row Formula.
      */
-    public function setTotalsRowFormula(string $totalsRowFormula): self
+    public function set_totals_row_formula(string $totals_row_formula): self
     {
-        $this->totalsRowFormula = $totalsRowFormula;
-
+        $this->totals_row_formula = $totals_row_formula;
         return $this;
     }
-
     /**
      * Get column Formula.
      */
-    public function getColumnFormula(): ?string
+    public function get_column_formula(): ?string
     {
-        return $this->columnFormula;
+        return $this->column_formula;
     }
-
     /**
      * Set column Formula.
      */
-    public function setColumnFormula(string $columnFormula): self
+    public function set_column_formula(string $column_formula): self
     {
-        $this->columnFormula = $columnFormula;
-
+        $this->column_formula = $column_formula;
         return $this;
     }
-
     /**
      * Get this Column's Table.
      */
-    public function getTable(): ?Table
+    public function get_table(): ?Table
     {
         return $this->table;
     }
-
     /**
      * Set this Column's Table.
      */
-    public function setTable(?Table $table = null): self
+    public function set_table(?Table $table = null): self
     {
         $this->table = $table;
-
         return $this;
     }
-
-    public static function updateStructuredReferences(?Worksheet $workSheet, ?string $oldTitle, ?string $newTitle): void
+    public static function update_structured_references(?Worksheet $work_sheet, ?string $old_title, ?string $new_title): void
     {
-        if ($workSheet === null || $oldTitle === null || $oldTitle === '' || $newTitle === null) {
+        if ($work_sheet === null || $old_title === null || $old_title === '' || $new_title === null) {
             return;
         }
-
         // Remember that table headings are case-insensitive
-        if (StringHelper::strToLower($oldTitle) !== StringHelper::strToLower($newTitle)) {
+        if (String_Helper::str_to_lower($old_title) !== String_Helper::str_to_lower($new_title)) {
             // We need to check all formula cells that might contain Structured References that refer
             //    to this column, and update those formulae to reference the new column text
-            $spreadsheet = $workSheet->getParentOrThrow();
-            foreach ($spreadsheet->getWorksheetIterator() as $sheet) {
-                self::updateStructuredReferencesInCells($sheet, $oldTitle, $newTitle);
+            $spreadsheet = $work_sheet->get_parent_or_throw();
+            foreach ($spreadsheet->get_worksheet_iterator() as $sheet) {
+                self::update_structured_references_in_cells($sheet, $old_title, $new_title);
             }
-            self::updateStructuredReferencesInNamedFormulae($spreadsheet, $oldTitle, $newTitle);
+            self::update_structured_references_in_named_formulae($spreadsheet, $old_title, $new_title);
         }
     }
-
-    private static function updateStructuredReferencesInCells(Worksheet $worksheet, string $oldTitle, string $newTitle): void
+    private static function update_structured_references_in_cells(Worksheet $worksheet, string $old_title, string $new_title): void
     {
-        $pattern = '/\[(@?)' . preg_quote($oldTitle, '/') . '\]/mui';
-
-        foreach ($worksheet->getCoordinates(false) as $coordinate) {
-            $cell = $worksheet->getCell($coordinate);
-            if ($cell->getDataType() === DataType::TYPE_FORMULA) {
-                $formula = $cell->getValueString();
+        $pattern = '/\[(@?)' . preg_quote($old_title, '/') . '\]/mui';
+        foreach ($worksheet->get_coordinates(false) as $coordinate) {
+            $cell = $worksheet->get_cell($coordinate);
+            if ($cell->get_data_type() === Data_Type::TYPE_FORMULA) {
+                $formula = $cell->get_value_string();
                 if (preg_match($pattern, $formula) === 1) {
-                    $formula = preg_replace($pattern, "[$1{$newTitle}]", $formula);
-                    $cell->setValueExplicit($formula, DataType::TYPE_FORMULA);
+                    $formula = preg_replace($pattern, "[\$1{$new_title}]", $formula);
+                    $cell->set_value_explicit($formula, Data_Type::TYPE_FORMULA);
                 }
             }
         }
     }
-
-    private static function updateStructuredReferencesInNamedFormulae(Spreadsheet $spreadsheet, string $oldTitle, string $newTitle): void
+    private static function update_structured_references_in_named_formulae(Spreadsheet $spreadsheet, string $old_title, string $new_title): void
     {
-        $pattern = '/\[(@?)' . preg_quote($oldTitle, '/') . '\]/mui';
-
-        foreach ($spreadsheet->getNamedFormulae() as $namedFormula) {
-            $formula = $namedFormula->getValue();
+        $pattern = '/\[(@?)' . preg_quote($old_title, '/') . '\]/mui';
+        foreach ($spreadsheet->get_named_formulae() as $named_formula) {
+            $formula = $named_formula->get_value();
             if (preg_match($pattern, $formula) === 1) {
-                $formula = preg_replace($pattern, "[$1{$newTitle}]", $formula) ?? '';
-                $namedFormula->setValue($formula);
+                $formula = preg_replace($pattern, "[\$1{$new_title}]", $formula) ?? '';
+                $named_formula->set_value($formula);
             }
         }
     }

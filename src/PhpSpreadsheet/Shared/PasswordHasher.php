@@ -1,46 +1,28 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared;
 
-namespace PhpOffice\PhpSpreadsheet\Shared;
-
-use PhpOffice\PhpSpreadsheet\Exception as SpException;
-use PhpOffice\PhpSpreadsheet\Worksheet\Protection;
-
-class PasswordHasher
+use Php_Office\Php_Spreadsheet\Exception as SpException;
+use Php_Office\Php_Spreadsheet\Worksheet\Protection;
+class Password_Hasher
 {
     public const MAX_PASSWORD_LENGTH = 255;
-
     /**
      * Get algorithm name for PHP.
      */
-    private static function getAlgorithm(string $algorithmName): string
+    private static function get_algorithm(string $algorithm_name): string
     {
-        if (!$algorithmName) {
+        if (!$algorithm_name) {
             return '';
         }
-
         // Mapping between algorithm name in Excel and algorithm name in PHP
-        $mapping = [
-            Protection::ALGORITHM_MD2 => 'md2',
-            Protection::ALGORITHM_MD4 => 'md4',
-            Protection::ALGORITHM_MD5 => 'md5',
-            Protection::ALGORITHM_SHA_1 => 'sha1',
-            Protection::ALGORITHM_SHA_256 => 'sha256',
-            Protection::ALGORITHM_SHA_384 => 'sha384',
-            Protection::ALGORITHM_SHA_512 => 'sha512',
-            Protection::ALGORITHM_RIPEMD_128 => 'ripemd128',
-            Protection::ALGORITHM_RIPEMD_160 => 'ripemd160',
-            Protection::ALGORITHM_WHIRLPOOL => 'whirlpool',
-        ];
-
-        if (array_key_exists($algorithmName, $mapping)) {
-            return $mapping[$algorithmName];
+        $mapping = [Protection::ALGORITHM_MD2 => 'md2', Protection::ALGORITHM_MD4 => 'md4', Protection::ALGORITHM_MD5 => 'md5', Protection::ALGORITHM_SHA_1 => 'sha1', Protection::ALGORITHM_SHA_256 => 'sha256', Protection::ALGORITHM_SHA_384 => 'sha384', Protection::ALGORITHM_SHA_512 => 'sha512', Protection::ALGORITHM_RIPEMD_128 => 'ripemd128', Protection::ALGORITHM_RIPEMD_160 => 'ripemd160', Protection::ALGORITHM_WHIRLPOOL => 'whirlpool'];
+        if (array_key_exists($algorithm_name, $mapping)) {
+            return $mapping[$algorithm_name];
         }
-
-        throw new SpException('Unsupported password algorithm: ' . $algorithmName);
+        throw new Sp_Exception('Unsupported password algorithm: ' . $algorithm_name);
     }
-
     /**
      * Create a password hash from a given string.
      *
@@ -54,23 +36,21 @@ class PasswordHasher
      *
      * @param string $password Password to hash
      */
-    private static function defaultHashPassword(string $password): string
+    private static function default_hash_password(string $password): string
     {
         $verifier = 0;
         $pwlen = strlen($password);
-        $passwordArray = pack('c', $pwlen) . $password;
+        $password_array = pack('c', $pwlen) . $password;
         for ($i = $pwlen; $i >= 0; --$i) {
-            $intermediate1 = (($verifier & 0x4000) === 0) ? 0 : 1;
+            $intermediate1 = ($verifier & 0x4000) === 0 ? 0 : 1;
             $intermediate2 = 2 * $verifier;
-            $intermediate2 = $intermediate2 & 0x7FFF;
+            $intermediate2 = $intermediate2 & 0x7fff;
             $intermediate3 = $intermediate1 | $intermediate2;
-            $verifier = $intermediate3 ^ ord($passwordArray[$i]);
+            $verifier = $intermediate3 ^ ord($password_array[$i]);
         }
-        $verifier ^= 0xCE4B;
-
+        $verifier ^= 0xce4b;
         return strtoupper(dechex($verifier));
     }
-
     /**
      * Create a password hash from a given string by a specific algorithm.
      *
@@ -85,24 +65,21 @@ class PasswordHasher
      *
      * @return string Hashed password
      */
-    public static function hashPassword(string $password, string $algorithm = '', string $salt = '', int $spinCount = 10000): string
+    public static function hash_password(string $password, string $algorithm = '', string $salt = '', int $spin_count = 10000): string
     {
         if (strlen($password) > self::MAX_PASSWORD_LENGTH) {
-            throw new SpException('Password exceeds ' . self::MAX_PASSWORD_LENGTH . ' characters');
+            throw new Sp_Exception('Password exceeds ' . self::MAX_PASSWORD_LENGTH . ' characters');
         }
-        $phpAlgorithm = self::getAlgorithm($algorithm);
-        if (!$phpAlgorithm) {
-            return self::defaultHashPassword($password);
+        $php_algorithm = self::get_algorithm($algorithm);
+        if (!$php_algorithm) {
+            return self::default_hash_password($password);
         }
-
-        $saltValue = base64_decode($salt);
-        $encodedPassword = mb_convert_encoding($password, 'UCS-2LE', 'UTF-8');
-
-        $hashValue = hash($phpAlgorithm, $saltValue . $encodedPassword, true);
-        for ($i = 0; $i < $spinCount; ++$i) {
-            $hashValue = hash($phpAlgorithm, $hashValue . pack('L', $i), true);
+        $salt_value = base64_decode($salt);
+        $encoded_password = mb_convert_encoding($password, 'UCS-2LE', 'UTF-8');
+        $hash_value = hash($php_algorithm, $salt_value . $encoded_password, true);
+        for ($i = 0; $i < $spin_count; ++$i) {
+            $hash_value = hash($php_algorithm, $hash_value . pack('L', $i), true);
         }
-
-        return base64_encode($hashValue);
+        return base64_encode($hash_value);
     }
 }

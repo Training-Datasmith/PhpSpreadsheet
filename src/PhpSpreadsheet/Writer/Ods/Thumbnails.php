@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Ods;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Ods;
-
-class Thumbnails extends WriterPart
+class Thumbnails extends Writer_Part
 {
     /**
      * Write Thumbnails/thumbnail.png to PNG format.

@@ -1,17 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared\Trend;
 
-namespace PhpOffice\PhpSpreadsheet\Shared\Trend;
-
-class LogarithmicBestFit extends BestFit
+class Logarithmic_Best_Fit extends Best_Fit
 {
     /**
      * Algorithm type to use for best-fit
      * (Name of this Trend class).
      */
-    protected string $bestFitType = 'logarithmic';
-
+    protected string $best_fit_type = 'logarithmic';
     /**
      * Return the Y-Value for a specified value of X.
      *
@@ -19,11 +17,10 @@ class LogarithmicBestFit extends BestFit
      *
      * @return float Y-Value
      */
-    public function getValueOfYForX(float $xValue): float
+    public function get_value_of_y_for_x(float $x_value): float
     {
-        return $this->getIntersect() + $this->getSlope() * log($xValue - $this->xOffset);
+        return $this->get_intersect() + $this->get_slope() * log($x_value - $this->x_offset);
     }
-
     /**
      * Return the X-Value for a specified value of Y.
      *
@@ -31,52 +28,43 @@ class LogarithmicBestFit extends BestFit
      *
      * @return float X-Value
      */
-    public function getValueOfXForY(float $yValue): float
+    public function get_value_of_x_for_y(float $y_value): float
     {
-        return exp(($yValue - $this->getIntersect()) / $this->getSlope());
+        return exp(($y_value - $this->get_intersect()) / $this->get_slope());
     }
-
     /**
      * Return the Equation of the best-fit line.
      *
      * @param int $dp Number of places of decimal precision to display
      */
-    public function getEquation(int $dp = 0): string
+    public function get_equation(int $dp = 0): string
     {
-        $slope = $this->getSlope($dp);
-        $intersect = $this->getIntersect($dp);
-
+        $slope = $this->get_slope($dp);
+        $intersect = $this->get_intersect($dp);
         return 'Y = ' . $slope . ' * log(' . $intersect . ' * X)';
     }
-
     /**
      * Execute the regression and calculate the goodness of fit for a set of X and Y data values.
      *
      * @param float[] $yValues The set of Y-values for this regression
      * @param float[] $xValues The set of X-values for this regression
      */
-    private function logarithmicRegression(array $yValues, array $xValues, bool $const): void
+    private function logarithmic_regression(array $y_values, array $x_values, bool $const): void
     {
-        $adjustedYValues = array_map(
-            fn (float $value): float => ($value < 0.0) ? -log(abs($value)) : log($value),
-            $yValues
-        );
-
-        $this->leastSquareFit($adjustedYValues, $xValues, $const);
+        $adjusted_y_values = array_map(fn(float $value): float => $value < 0.0 ? -log(abs($value)) : log($value), $y_values);
+        $this->least_square_fit($adjusted_y_values, $x_values, $const);
     }
-
     /**
      * Define the regression and calculate the goodness of fit for a set of X and Y data values.
      *
      * @param float[] $yValues The set of Y-values for this regression
      * @param float[] $xValues The set of X-values for this regression
      */
-    public function __construct(array $yValues, array $xValues = [], bool $const = true)
+    public function __construct(array $y_values, array $x_values = [], bool $const = true)
     {
-        parent::__construct($yValues, $xValues);
-
+        parent::__construct($y_values, $x_values);
         if (!$this->error) {
-            $this->logarithmicRegression($yValues, $xValues, $const);
+            $this->logarithmic_regression($y_values, $x_values, $const);
         }
     }
 }

@@ -1,19 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Percentiles
 {
     public const RANK_SORT_DESCENDING = 0;
-
     public const RANK_SORT_ASCENDING = 1;
-
     /**
      * PERCENTILE.
      *
@@ -28,42 +24,35 @@ class Percentiles
      */
     public static function PERCENTILE(mixed ...$args): string|float
     {
-        $aArgs = Functions::flattenArray($args);
-
+        $a_args = Functions::flatten_array($args);
         // Calculate
-        $entry = array_pop($aArgs);
-
+        $entry = array_pop($a_args);
         try {
-            $entry = StatisticalValidations::validateFloat($entry);
+            $entry = Statistical_Validations::validate_float($entry);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($entry < 0) || ($entry > 1)) {
-            return ExcelError::NAN();
+        if ($entry < 0 || $entry > 1) {
+            return Excel_Error::NAN();
         }
-
-        $mArgs = self::percentileFilterValues($aArgs);
-        $mValueCount = count($mArgs);
-        if ($mValueCount > 0) {
-            sort($mArgs);
+        $m_args = self::percentile_filter_values($a_args);
+        $m_value_count = count($m_args);
+        if ($m_value_count > 0) {
+            sort($m_args);
             /** @var float[] $mArgs */
-            $count = Counts::COUNT($mArgs);
+            $count = Counts::COUNT($m_args);
             $index = $entry * ($count - 1);
-            $indexFloor = floor($index);
-            $iBase = (int) $indexFloor;
-            if ($index == $indexFloor) {
-                return $mArgs[$iBase];
+            $index_floor = floor($index);
+            $i_base = (int) $index_floor;
+            if ($index == $index_floor) {
+                return $m_args[$i_base];
             }
-            $iNext = $iBase + 1;
-            $iProportion = $index - $iBase;
-
-            return $mArgs[$iBase] + (($mArgs[$iNext] - $mArgs[$iBase]) * $iProportion);
+            $i_next = $i_base + 1;
+            $i_proportion = $index - $i_base;
+            return $m_args[$i_base] + ($m_args[$i_next] - $m_args[$i_base]) * $i_proportion;
         }
-
-        return ExcelError::NAN();
+        return Excel_Error::NAN();
     }
-
     /**
      * PERCENTRANK.
      *
@@ -78,46 +67,40 @@ class Percentiles
      *
      * @return float|string (string if result is an error)
      */
-    public static function PERCENTRANK(mixed $valueSet, mixed $value, mixed $significance = 3): string|float
+    public static function PERCENTRANK(mixed $value_set, mixed $value, mixed $significance = 3): string|float
     {
-        $valueSet = Functions::flattenArray($valueSet);
-        $value = Functions::flattenSingleValue($value);
-        $significance = ($significance === null) ? 3 : Functions::flattenSingleValue($significance);
-
+        $value_set = Functions::flatten_array($value_set);
+        $value = Functions::flatten_single_value($value);
+        $significance = $significance === null ? 3 : Functions::flatten_single_value($significance);
         try {
-            $value = StatisticalValidations::validateFloat($value);
-            $significance = StatisticalValidations::validateInt($significance);
+            $value = Statistical_Validations::validate_float($value);
+            $significance = Statistical_Validations::validate_int($significance);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $valueSet = self::rankFilterValues($valueSet);
-        $valueCount = count($valueSet);
-        if ($valueCount == 0) {
-            return ExcelError::NA();
+        $value_set = self::rank_filter_values($value_set);
+        $value_count = count($value_set);
+        if ($value_count == 0) {
+            return Excel_Error::NA();
         }
-        sort($valueSet, SORT_NUMERIC);
-
-        $valueAdjustor = $valueCount - 1;
-        if (($value < $valueSet[0]) || ($value > $valueSet[$valueAdjustor])) {
-            return ExcelError::NA();
+        sort($value_set, SORT_NUMERIC);
+        $value_adjustor = $value_count - 1;
+        if ($value < $value_set[0] || $value > $value_set[$value_adjustor]) {
+            return Excel_Error::NA();
         }
-
-        $pos = array_search($value, $valueSet);
+        $pos = array_search($value, $value_set);
         if ($pos === false) {
             /** @var float[] $valueSet */
             $pos = 0;
-            $testValue = $valueSet[0];
-            while ($testValue < $value) {
-                $testValue = $valueSet[++$pos];
+            $test_value = $value_set[0];
+            while ($test_value < $value) {
+                $test_value = $value_set[++$pos];
             }
             --$pos;
-            $pos += (($value - $valueSet[$pos]) / ($testValue - $valueSet[$pos]));
+            $pos += ($value - $value_set[$pos]) / ($test_value - $value_set[$pos]);
         }
-
-        return round(((float) $pos) / $valueAdjustor, $significance);
+        return round((float) $pos / $value_adjustor, $significance);
     }
-
     /**
      * QUARTILE.
      *
@@ -132,24 +115,20 @@ class Percentiles
      */
     public static function QUARTILE(mixed ...$args)
     {
-        $aArgs = Functions::flattenArray($args);
-        $entry = array_pop($aArgs);
-
+        $a_args = Functions::flatten_array($args);
+        $entry = array_pop($a_args);
         try {
-            $entry = StatisticalValidations::validateFloat($entry);
+            $entry = Statistical_Validations::validate_float($entry);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         $entry = floor($entry);
         $entry /= 4;
-        if (($entry < 0) || ($entry > 1)) {
-            return ExcelError::NAN();
+        if ($entry < 0 || $entry > 1) {
+            return Excel_Error::NAN();
         }
-
-        return self::PERCENTILE($aArgs, $entry);
+        return self::PERCENTILE($a_args, $entry);
     }
-
     /**
      * RANK.
      *
@@ -161,57 +140,45 @@ class Percentiles
      *
      * @return float|string The result, or a string containing an error (0 = Descending, 1 = Ascending)
      */
-    public static function RANK(mixed $value, mixed $valueSet, mixed $order = self::RANK_SORT_DESCENDING)
+    public static function RANK(mixed $value, mixed $value_set, mixed $order = self::RANK_SORT_DESCENDING)
     {
-        $value = Functions::flattenSingleValue($value);
-        $valueSet = Functions::flattenArray($valueSet);
-        $order = ($order === null) ? self::RANK_SORT_DESCENDING : Functions::flattenSingleValue($order);
-
+        $value = Functions::flatten_single_value($value);
+        $value_set = Functions::flatten_array($value_set);
+        $order = $order === null ? self::RANK_SORT_DESCENDING : Functions::flatten_single_value($order);
         try {
-            $value = StatisticalValidations::validateFloat($value);
-            $order = StatisticalValidations::validateInt($order);
+            $value = Statistical_Validations::validate_float($value);
+            $order = Statistical_Validations::validate_int($order);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $valueSet = self::rankFilterValues($valueSet);
+        $value_set = self::rank_filter_values($value_set);
         if ($order === self::RANK_SORT_DESCENDING) {
-            rsort($valueSet, SORT_NUMERIC);
+            rsort($value_set, SORT_NUMERIC);
         } else {
-            sort($valueSet, SORT_NUMERIC);
+            sort($value_set, SORT_NUMERIC);
         }
-
-        $pos = array_search($value, $valueSet);
+        $pos = array_search($value, $value_set);
         if ($pos === false) {
-            return ExcelError::NA();
+            return Excel_Error::NA();
         }
-
         return ++$pos;
     }
-
     /**
      * @param mixed[] $dataSet
      *
      * @return mixed[]
      */
-    protected static function percentileFilterValues(array $dataSet): array
+    protected static function percentile_filter_values(array $data_set): array
     {
-        return array_filter(
-            $dataSet,
-            fn ($value): bool => is_numeric($value) && !is_string($value)
-        );
+        return array_filter($data_set, fn($value): bool => is_numeric($value) && !is_string($value));
     }
-
     /**
      * @param mixed[] $dataSet
      *
      * @return mixed[]
      */
-    protected static function rankFilterValues(array $dataSet): array
+    protected static function rank_filter_values(array $data_set): array
     {
-        return array_filter(
-            $dataSet,
-            is_numeric(...)
-        );
+        return array_filter($data_set, is_numeric(...));
     }
 }

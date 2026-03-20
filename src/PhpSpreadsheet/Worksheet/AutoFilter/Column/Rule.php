@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet\Auto_Filter\Column;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column;
-
-use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column;
-
+use Php_Office\Php_Spreadsheet\Exception as PhpSpreadsheetException;
+use Php_Office\Php_Spreadsheet\Worksheet\Auto_Filter\Column;
 class Rule
 {
     public const AUTOFILTER_RULETYPE_FILTER = 'filter';
@@ -14,7 +12,6 @@ class Rule
     public const AUTOFILTER_RULETYPE_CUSTOMFILTER = 'customFilter';
     public const AUTOFILTER_RULETYPE_DYNAMICFILTER = 'dynamicFilter';
     public const AUTOFILTER_RULETYPE_TOPTENFILTER = 'top10Filter';
-
     private const RULE_TYPES = [
         //    Currently we're not handling
         //        colorFilter
@@ -26,23 +23,13 @@ class Rule
         self::AUTOFILTER_RULETYPE_DYNAMICFILTER,
         self::AUTOFILTER_RULETYPE_TOPTENFILTER,
     ];
-
     public const AUTOFILTER_RULETYPE_DATEGROUP_YEAR = 'year';
     public const AUTOFILTER_RULETYPE_DATEGROUP_MONTH = 'month';
     public const AUTOFILTER_RULETYPE_DATEGROUP_DAY = 'day';
     public const AUTOFILTER_RULETYPE_DATEGROUP_HOUR = 'hour';
     public const AUTOFILTER_RULETYPE_DATEGROUP_MINUTE = 'minute';
     public const AUTOFILTER_RULETYPE_DATEGROUP_SECOND = 'second';
-
-    private const DATE_TIME_GROUPS = [
-        self::AUTOFILTER_RULETYPE_DATEGROUP_YEAR,
-        self::AUTOFILTER_RULETYPE_DATEGROUP_MONTH,
-        self::AUTOFILTER_RULETYPE_DATEGROUP_DAY,
-        self::AUTOFILTER_RULETYPE_DATEGROUP_HOUR,
-        self::AUTOFILTER_RULETYPE_DATEGROUP_MINUTE,
-        self::AUTOFILTER_RULETYPE_DATEGROUP_SECOND,
-    ];
-
+    private const DATE_TIME_GROUPS = [self::AUTOFILTER_RULETYPE_DATEGROUP_YEAR, self::AUTOFILTER_RULETYPE_DATEGROUP_MONTH, self::AUTOFILTER_RULETYPE_DATEGROUP_DAY, self::AUTOFILTER_RULETYPE_DATEGROUP_HOUR, self::AUTOFILTER_RULETYPE_DATEGROUP_MINUTE, self::AUTOFILTER_RULETYPE_DATEGROUP_SECOND];
     public const AUTOFILTER_RULETYPE_DYNAMIC_YESTERDAY = 'yesterday';
     public const AUTOFILTER_RULETYPE_DYNAMIC_TODAY = 'today';
     public const AUTOFILTER_RULETYPE_DYNAMIC_TOMORROW = 'tomorrow';
@@ -89,44 +76,7 @@ class Rule
     public const AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_4 = 'Q4';
     public const AUTOFILTER_RULETYPE_DYNAMIC_ABOVEAVERAGE = 'aboveAverage';
     public const AUTOFILTER_RULETYPE_DYNAMIC_BELOWAVERAGE = 'belowAverage';
-
-    private const DYNAMIC_TYPES = [
-        self::AUTOFILTER_RULETYPE_DYNAMIC_YESTERDAY,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_TODAY,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_TOMORROW,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_YEARTODATE,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_THISYEAR,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_THISQUARTER,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_THISMONTH,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_THISWEEK,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_LASTYEAR,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_LASTQUARTER,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_LASTMONTH,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_LASTWEEK,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTYEAR,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTQUARTER,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTMONTH,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTWEEK,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_1,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_2,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_3,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_4,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_5,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_6,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_7,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_8,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_9,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_10,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_11,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_12,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_1,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_2,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_3,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_4,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_ABOVEAVERAGE,
-        self::AUTOFILTER_RULETYPE_DYNAMIC_BELOWAVERAGE,
-    ];
-
+    private const DYNAMIC_TYPES = [self::AUTOFILTER_RULETYPE_DYNAMIC_YESTERDAY, self::AUTOFILTER_RULETYPE_DYNAMIC_TODAY, self::AUTOFILTER_RULETYPE_DYNAMIC_TOMORROW, self::AUTOFILTER_RULETYPE_DYNAMIC_YEARTODATE, self::AUTOFILTER_RULETYPE_DYNAMIC_THISYEAR, self::AUTOFILTER_RULETYPE_DYNAMIC_THISQUARTER, self::AUTOFILTER_RULETYPE_DYNAMIC_THISMONTH, self::AUTOFILTER_RULETYPE_DYNAMIC_THISWEEK, self::AUTOFILTER_RULETYPE_DYNAMIC_LASTYEAR, self::AUTOFILTER_RULETYPE_DYNAMIC_LASTQUARTER, self::AUTOFILTER_RULETYPE_DYNAMIC_LASTMONTH, self::AUTOFILTER_RULETYPE_DYNAMIC_LASTWEEK, self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTYEAR, self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTQUARTER, self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTMONTH, self::AUTOFILTER_RULETYPE_DYNAMIC_NEXTWEEK, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_1, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_2, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_3, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_4, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_5, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_6, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_7, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_8, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_9, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_10, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_11, self::AUTOFILTER_RULETYPE_DYNAMIC_MONTH_12, self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_1, self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_2, self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_3, self::AUTOFILTER_RULETYPE_DYNAMIC_QUARTER_4, self::AUTOFILTER_RULETYPE_DYNAMIC_ABOVEAVERAGE, self::AUTOFILTER_RULETYPE_DYNAMIC_BELOWAVERAGE];
     // Filter rule operators for filter and customFilter types.
     public const AUTOFILTER_COLUMN_RULE_EQUAL = 'equal';
     public const AUTOFILTER_COLUMN_RULE_NOTEQUAL = 'notEqual';
@@ -134,54 +84,31 @@ class Rule
     public const AUTOFILTER_COLUMN_RULE_GREATERTHANOREQUAL = 'greaterThanOrEqual';
     public const AUTOFILTER_COLUMN_RULE_LESSTHAN = 'lessThan';
     public const AUTOFILTER_COLUMN_RULE_LESSTHANOREQUAL = 'lessThanOrEqual';
-
-    private const OPERATORS = [
-        self::AUTOFILTER_COLUMN_RULE_EQUAL,
-        self::AUTOFILTER_COLUMN_RULE_NOTEQUAL,
-        self::AUTOFILTER_COLUMN_RULE_GREATERTHAN,
-        self::AUTOFILTER_COLUMN_RULE_GREATERTHANOREQUAL,
-        self::AUTOFILTER_COLUMN_RULE_LESSTHAN,
-        self::AUTOFILTER_COLUMN_RULE_LESSTHANOREQUAL,
-    ];
-
+    private const OPERATORS = [self::AUTOFILTER_COLUMN_RULE_EQUAL, self::AUTOFILTER_COLUMN_RULE_NOTEQUAL, self::AUTOFILTER_COLUMN_RULE_GREATERTHAN, self::AUTOFILTER_COLUMN_RULE_GREATERTHANOREQUAL, self::AUTOFILTER_COLUMN_RULE_LESSTHAN, self::AUTOFILTER_COLUMN_RULE_LESSTHANOREQUAL];
     public const AUTOFILTER_COLUMN_RULE_TOPTEN_BY_VALUE = 'byValue';
     public const AUTOFILTER_COLUMN_RULE_TOPTEN_PERCENT = 'byPercent';
-
-    private const TOP_TEN_VALUE = [
-        self::AUTOFILTER_COLUMN_RULE_TOPTEN_BY_VALUE,
-        self::AUTOFILTER_COLUMN_RULE_TOPTEN_PERCENT,
-    ];
-
+    private const TOP_TEN_VALUE = [self::AUTOFILTER_COLUMN_RULE_TOPTEN_BY_VALUE, self::AUTOFILTER_COLUMN_RULE_TOPTEN_PERCENT];
     public const AUTOFILTER_COLUMN_RULE_TOPTEN_TOP = 'top';
     public const AUTOFILTER_COLUMN_RULE_TOPTEN_BOTTOM = 'bottom';
-
-    private const TOP_TEN_TYPE = [
-        self::AUTOFILTER_COLUMN_RULE_TOPTEN_TOP,
-        self::AUTOFILTER_COLUMN_RULE_TOPTEN_BOTTOM,
-    ];
-
+    private const TOP_TEN_TYPE = [self::AUTOFILTER_COLUMN_RULE_TOPTEN_TOP, self::AUTOFILTER_COLUMN_RULE_TOPTEN_BOTTOM];
     /**
      * Autofilter Rule Type.
      */
-    private string $ruleType = self::AUTOFILTER_RULETYPE_FILTER;
-
+    private string $rule_type = self::AUTOFILTER_RULETYPE_FILTER;
     /**
      * Autofilter Rule Value.
      *
      * @var int|int[]|string|string[]
      */
     private $value = '';
-
     /**
      * Autofilter Rule Operator.
      */
     private string $operator = self::AUTOFILTER_COLUMN_RULE_EQUAL;
-
     /**
      * DateTimeGrouping Group Value.
      */
     private string $grouping = '';
-
     /**
      * Create a new Rule.
      */
@@ -190,24 +117,22 @@ class Rule
          * Autofilter Column.
          */
         private ?Column $parent = null
-    ) {
+    )
+    {
     }
-
-    private function setEvaluatedFalse(): void
+    private function set_evaluated_false(): void
     {
         if ($this->parent !== null) {
-            $this->parent->setEvaluatedFalse();
+            $this->parent->set_evaluated_false();
         }
     }
-
     /**
      * Get AutoFilter Rule Type.
      */
-    public function getRuleType(): string
+    public function get_rule_type(): string
     {
-        return $this->ruleType;
+        return $this->rule_type;
     }
-
     /**
      * Set AutoFilter Rule Type.
      *
@@ -215,28 +140,24 @@ class Rule
      *
      * @return $this
      */
-    public function setRuleType(string $ruleType): static
+    public function set_rule_type(string $rule_type): static
     {
-        $this->setEvaluatedFalse();
-        if (!in_array($ruleType, self::RULE_TYPES)) {
-            throw new PhpSpreadsheetException('Invalid rule type for column AutoFilter Rule.');
+        $this->set_evaluated_false();
+        if (!in_array($rule_type, self::RULE_TYPES)) {
+            throw new Php_Spreadsheet_Exception('Invalid rule type for column AutoFilter Rule.');
         }
-
-        $this->ruleType = $ruleType;
-
+        $this->rule_type = $rule_type;
         return $this;
     }
-
     /**
      * Get AutoFilter Rule Value.
      *
      * @return int|int[]|string|string[]
      */
-    public function getValue()
+    public function get_value()
     {
         return $this->value;
     }
-
     /**
      * Set AutoFilter Rule Value.
      *
@@ -244,9 +165,9 @@ class Rule
      *
      * @return $this
      */
-    public function setValue($value): static
+    public function set_value($value): static
     {
-        $this->setEvaluatedFalse();
+        $this->set_evaluated_false();
         if (is_array($value)) {
             $grouping = -1;
             foreach ($value as $key => $v) {
@@ -260,25 +181,23 @@ class Rule
                 }
             }
             if (count($value) == 0) {
-                throw new PhpSpreadsheetException('Invalid rule value for column AutoFilter Rule.');
+                throw new Php_Spreadsheet_Exception('Invalid rule value for column AutoFilter Rule.');
             }
             //    Set the dateTime grouping that we've anticipated
             //    I have no idea what Phpstan is complaining about below
-            $this->setGrouping(self::DATE_TIME_GROUPS[$grouping]); // @phpstan-ignore-line
+            $this->set_grouping(self::DATE_TIME_GROUPS[$grouping]);
+            // @phpstan-ignore-line
         }
         $this->value = $value;
-
         return $this;
     }
-
     /**
      * Get AutoFilter Rule Operator.
      */
-    public function getOperator(): string
+    public function get_operator(): string
     {
         return $this->operator;
     }
-
     /**
      * Set AutoFilter Rule Operator.
      *
@@ -286,51 +205,39 @@ class Rule
      *
      * @return $this
      */
-    public function setOperator(string $operator): static
+    public function set_operator(string $operator): static
     {
-        $this->setEvaluatedFalse();
+        $this->set_evaluated_false();
         if (empty($operator)) {
             $operator = self::AUTOFILTER_COLUMN_RULE_EQUAL;
         }
-        if (
-            (!in_array($operator, self::OPERATORS))
-            && (!in_array($operator, self::TOP_TEN_VALUE))
-        ) {
-            throw new PhpSpreadsheetException('Invalid operator for column AutoFilter Rule.');
+        if (!in_array($operator, self::OPERATORS) && !in_array($operator, self::TOP_TEN_VALUE)) {
+            throw new Php_Spreadsheet_Exception('Invalid operator for column AutoFilter Rule.');
         }
         $this->operator = $operator;
-
         return $this;
     }
-
     /**
      * Get AutoFilter Rule Grouping.
      */
-    public function getGrouping(): string
+    public function get_grouping(): string
     {
         return $this->grouping;
     }
-
     /**
      * Set AutoFilter Rule Grouping.
      *
      * @return $this
      */
-    public function setGrouping(string $grouping): static
+    public function set_grouping(string $grouping): static
     {
-        $this->setEvaluatedFalse();
-        if (
-            (!in_array($grouping, self::DATE_TIME_GROUPS))
-            && (!in_array($grouping, self::DYNAMIC_TYPES))
-            && (!in_array($grouping, self::TOP_TEN_TYPE))
-        ) {
-            throw new PhpSpreadsheetException('Invalid grouping for column AutoFilter Rule.');
+        $this->set_evaluated_false();
+        if (!in_array($grouping, self::DATE_TIME_GROUPS) && !in_array($grouping, self::DYNAMIC_TYPES) && !in_array($grouping, self::TOP_TEN_TYPE)) {
+            throw new Php_Spreadsheet_Exception('Invalid grouping for column AutoFilter Rule.');
         }
         $this->grouping = $grouping;
-
         return $this;
     }
-
     /**
      * Set AutoFilter Rule.
      *
@@ -339,42 +246,37 @@ class Rule
      *
      * @return $this
      */
-    public function setRule(string $operator, $value, ?string $grouping = null): static
+    public function set_rule(string $operator, $value, ?string $grouping = null): static
     {
-        $this->setEvaluatedFalse();
-        $this->setOperator($operator);
-        $this->setValue($value);
+        $this->set_evaluated_false();
+        $this->set_operator($operator);
+        $this->set_value($value);
         //  Only set grouping if it's been passed in as a user-supplied argument,
         //      otherwise we're calculating it when we setValue() and don't want to overwrite that
         //      If the user supplies an argument for grouping, then on their own head be it
         if ($grouping !== null) {
-            $this->setGrouping($grouping);
+            $this->set_grouping($grouping);
         }
-
         return $this;
     }
-
     /**
      * Get this Rule's AutoFilter Column Parent.
      */
-    public function getParent(): ?Column
+    public function get_parent(): ?Column
     {
         return $this->parent;
     }
-
     /**
      * Set this Rule's AutoFilter Column Parent.
      *
      * @return $this
      */
-    public function setParent(?Column $parent = null): static
+    public function set_parent(?Column $parent = null): static
     {
-        $this->setEvaluatedFalse();
+        $this->set_evaluated_false();
         $this->parent = $parent;
-
         return $this;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
@@ -383,12 +285,13 @@ class Rule
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
             if (is_object($value)) {
-                if ($key == 'parent') { // this is only object
+                if ($key == 'parent') {
+                    // this is only object
                     //    Detach from autofilter column parent
-                    $this->$key = null;
+                    $this->{$key} = null;
                 }
             } else {
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

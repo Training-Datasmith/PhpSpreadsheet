@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Chart\Renderer;
 
-namespace PhpOffice\PhpSpreadsheet\Chart\Renderer;
-
-use PhpOffice\PhpSpreadsheet\Chart\Chart;
-
-interface IRenderer
+use Php_Office\Php_Spreadsheet\Chart\Chart;
+interface I_Renderer
 {
     /**
      * IRenderer constructor.
      */
     public function __construct(Chart $chart);
-
     /**
      * Render the chart to given file (or stream).
      *

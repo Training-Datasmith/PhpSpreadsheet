@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Trig;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Helpers;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig\Helpers;
 class Cosecant
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * CSC.
      *
@@ -26,18 +23,15 @@ class Cosecant
     public static function csc($angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::verySmallDenominator(1.0, sin($angle));
+        return Helpers::very_small_denominator(1.0, sin($angle));
     }
-
     /**
      * CSCH.
      *
@@ -52,15 +46,13 @@ class Cosecant
     public static function csch($angle): array|string|float
     {
         if (is_array($angle)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $angle);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $angle);
         }
-
         try {
-            $angle = Helpers::validateNumericNullBool($angle);
+            $angle = Helpers::validate_numeric_null_bool($angle);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        return Helpers::verySmallDenominator(1.0, sinh($angle));
+        return Helpers::very_small_denominator(1.0, sinh($angle));
     }
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Cell;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Cell;
 
 class Hyperlink
 {
     private string $display = '';
-
     /**
      * Create a new Hyperlink.
      *
@@ -17,15 +15,13 @@ class Hyperlink
     public function __construct(private string $url = '', private string $tooltip = '')
     {
     }
-
     /**
      * Get URL.
      */
-    public function getUrl(): string
+    public function get_url(): string
     {
         return $this->url;
     }
-
     /**
      * Set URL.
      *
@@ -35,85 +31,64 @@ class Hyperlink
      * @throws \InvalidArgumentException if the URL uses a forbidden scheme
      * @return $this
      */
-    public function setUrl(string $url): static
+    public function set_url(string $url): static
     {
         $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
         if (in_array($scheme, ['javascript', 'data'], true)) {
-            throw new \InvalidArgumentException(
-                "URL scheme '{$scheme}:' is not permitted in a hyperlink."
-            );
+            throw new \InvalidArgumentException("URL scheme '{$scheme}:' is not permitted in a hyperlink.");
         }
-
         $this->url = $url;
-
         return $this;
     }
-
     /**
      * Get tooltip.
      */
-    public function getTooltip(): string
+    public function get_tooltip(): string
     {
         return $this->tooltip;
     }
-
     /**
      * Set tooltip.
      *
      * @return $this
      */
-    public function setTooltip(string $tooltip): static
+    public function set_tooltip(string $tooltip): static
     {
         $this->tooltip = $tooltip;
-
         return $this;
     }
-
     /**
      * Is this hyperlink internal? (to another worksheet or a cell in this worksheet).
      */
-    public function isInternal(): bool
+    public function is_internal(): bool
     {
         return str_starts_with($this->url, 'sheet://') || str_starts_with($this->url, '#');
     }
-
-    public function getTypeHyperlink(): string
+    public function get_type_hyperlink(): string
     {
-        return $this->isInternal() ? '' : 'External';
+        return $this->is_internal() ? '' : 'External';
     }
-
-    public function getDisplay(): string
+    public function get_display(): string
     {
         return $this->display;
     }
-
     /**
      * This can be displayed in cell rather than actual cell contents.
      * It seems to be ignored by Excel.
      * It may be used by Google Sheets.
      */
-    public function setDisplay(string $display): self
+    public function set_display(string $display): self
     {
         $this->display = $display;
-
         return $this;
     }
-
     /**
      * Get hash code.
      *
      * @return string Hash code
      */
-    public function getHashCode(): string
+    public function get_hash_code(): string
     {
-        return md5(
-            $this->url
-            . ','
-            . $this->tooltip
-            . ','
-            . $this->display
-            . ','
-            . self::class
-        );
+        return md5($this->url . ',' . $this->tooltip . ',' . $this->display . ',' . self::class);
     }
 }

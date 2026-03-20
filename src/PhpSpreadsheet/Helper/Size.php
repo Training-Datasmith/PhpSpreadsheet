@@ -1,21 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Helper;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Helper;
 
 use Stringable;
-
 class Size implements Stringable
 {
     public const REGEXP_SIZE_VALIDATION = '/^(?P<size>\d*\.?\d+)(?P<unit>pt|px|em)?$/i';
-
     protected bool $valid = false;
-
     protected string $size = '';
-
     protected string $unit = '';
-
     public function __construct(string $size)
     {
         if (1 === preg_match(self::REGEXP_SIZE_VALIDATION, $size, $matches)) {
@@ -24,22 +18,18 @@ class Size implements Stringable
             $this->unit = $matches['unit'] ?? 'pt';
         }
     }
-
     public function valid(): bool
     {
         return $this->valid;
     }
-
     public function size(): string
     {
         return $this->size;
     }
-
     public function unit(): string
     {
         return $this->unit;
     }
-
     public function __toString(): string
     {
         return $this->size . $this->unit;

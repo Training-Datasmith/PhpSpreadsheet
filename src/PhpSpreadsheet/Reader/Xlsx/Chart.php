@@ -1,1581 +1,1388 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Chart\Axis;
-use PhpOffice\PhpSpreadsheet\Chart\AxisText;
-use PhpOffice\PhpSpreadsheet\Chart\ChartColor;
-use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
-use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
-use PhpOffice\PhpSpreadsheet\Chart\GridLines;
-use PhpOffice\PhpSpreadsheet\Chart\Layout;
-use PhpOffice\PhpSpreadsheet\Chart\Legend;
-use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
-use PhpOffice\PhpSpreadsheet\Chart\Properties as ChartProperties;
-use PhpOffice\PhpSpreadsheet\Chart\Title;
-use PhpOffice\PhpSpreadsheet\Chart\TrendLine;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use SimpleXMLElement;
-
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Chart\Axis;
+use Php_Office\Php_Spreadsheet\Chart\Axis_Text;
+use Php_Office\Php_Spreadsheet\Chart\Chart_Color;
+use Php_Office\Php_Spreadsheet\Chart\Data_Series;
+use Php_Office\Php_Spreadsheet\Chart\Data_Series_Values;
+use Php_Office\Php_Spreadsheet\Chart\Grid_Lines;
+use Php_Office\Php_Spreadsheet\Chart\Layout;
+use Php_Office\Php_Spreadsheet\Chart\Legend;
+use Php_Office\Php_Spreadsheet\Chart\Plot_Area;
+use Php_Office\Php_Spreadsheet\Chart\Properties as ChartProperties;
+use Php_Office\Php_Spreadsheet\Chart\Title;
+use Php_Office\Php_Spreadsheet\Chart\Trend_Line;
+use Php_Office\Php_Spreadsheet\Reader\Xlsx;
+use Php_Office\Php_Spreadsheet\Rich_Text\Rich_Text;
+use Php_Office\Php_Spreadsheet\Style\Font;
+use Simple_Xml_Element;
 class Chart
 {
-    public function __construct(private readonly string $cNamespace = Namespaces::CHART, private readonly string $aNamespace = Namespaces::DRAWINGML)
+    public function __construct(private readonly string $c_namespace = Namespaces::CHART, private readonly string $a_namespace = Namespaces::DRAWINGML)
     {
     }
-
-    private static function getAttributeString(SimpleXMLElement $component, string $name): string|null
+    private static function get_attribute_string(Simple_Xml_Element $component, string $name): string|null
     {
         $attributes = $component->attributes();
         if (@isset($attributes[$name])) {
             return (string) $attributes[$name];
         }
-
         return null;
     }
-
-    private static function getAttributeInteger(SimpleXMLElement $component, string $name): int|null
+    private static function get_attribute_integer(Simple_Xml_Element $component, string $name): int|null
     {
         $attributes = $component->attributes();
         if (@isset($attributes[$name])) {
             return (int) $attributes[$name];
         }
-
         return null;
     }
-
-    private static function getAttributeBoolean(SimpleXMLElement $component, string $name): bool|null
+    private static function get_attribute_boolean(Simple_Xml_Element $component, string $name): bool|null
     {
         $attributes = $component->attributes();
         if (@isset($attributes[$name])) {
             $value = (string) $attributes[$name];
-
             return $value === 'true' || $value === '1';
         }
-
         return null;
     }
-
-    private static function getAttributeFloat(SimpleXMLElement $component, string $name): float|null
+    private static function get_attribute_float(Simple_Xml_Element $component, string $name): float|null
     {
         $attributes = $component->attributes();
         if (@isset($attributes[$name])) {
             return (float) $attributes[$name];
         }
-
         return null;
     }
-
-    public function readChart(SimpleXMLElement $chartElements, string $chartName): \PhpOffice\PhpSpreadsheet\Chart\Chart
+    public function read_chart(Simple_Xml_Element $chart_elements, string $chart_name): \Php_Office\Php_Spreadsheet\Chart\Chart
     {
-        $chartElementsC = $chartElements->children($this->cNamespace);
-
-        $XaxisLabel = $YaxisLabel = $legend = $title = null;
-        $dispBlanksAs = null;
-        $plotVisOnly = false;
-        $plotArea = null;
-        $rotX = $rotY = $rAngAx = $perspective = null;
-        $xAxis = new Axis();
-        $yAxis = new Axis();
-        $autoTitleDeleted = null;
-        $chartNoFill = false;
-        $chartBorderLines = null;
-        $chartFillColor = null;
-        $gradientArray = [];
-        $gradientLin = null;
-        $roundedCorners = false;
-        $gapWidth = null;
-        $useUpBars = null;
-        $useDownBars = null;
-        $noBorder = false;
-        foreach ($chartElementsC as $chartElementKey => $chartElement) {
-            switch ($chartElementKey) {
+        $chart_elements_c = $chart_elements->children($this->c_namespace);
+        $xaxis_label = $yaxis_label = $legend = $title = null;
+        $disp_blanks_as = null;
+        $plot_vis_only = false;
+        $plot_area = null;
+        $rot_x = $rot_y = $r_ang_ax = $perspective = null;
+        $x_axis = new Axis();
+        $y_axis = new Axis();
+        $auto_title_deleted = null;
+        $chart_no_fill = false;
+        $chart_border_lines = null;
+        $chart_fill_color = null;
+        $gradient_array = [];
+        $gradient_lin = null;
+        $rounded_corners = false;
+        $gap_width = null;
+        $use_up_bars = null;
+        $use_down_bars = null;
+        $no_border = false;
+        foreach ($chart_elements_c as $chart_element_key => $chart_element) {
+            switch ($chart_element_key) {
                 case 'spPr':
-                    $children = $chartElementsC->spPr->children($this->aNamespace);
-                    if (isset($children->noFill)) {
-                        $chartNoFill = true;
+                    $children = $chart_elements_c->sp_pr->children($this->a_namespace);
+                    if (isset($children->no_fill)) {
+                        $chart_no_fill = true;
                     }
-                    if (isset($children->solidFill)) {
-                        $chartFillColor = $this->readColor($children->solidFill);
+                    if (isset($children->solid_fill)) {
+                        $chart_fill_color = $this->read_color($children->solid_fill);
                     }
                     if (isset($children->ln)) {
-                        $chartBorderLines = new GridLines();
-                        $this->readLineStyle($chartElementsC, $chartBorderLines);
-                        if (isset($children->ln->noFill)) {
-                            $noBorder = true;
+                        $chart_border_lines = new Grid_Lines();
+                        $this->read_line_style($chart_elements_c, $chart_border_lines);
+                        if (isset($children->ln->no_fill)) {
+                            $no_border = true;
                         }
                     }
-
                     break;
                 case 'roundedCorners':
                     /** @var bool $roundedCorners */
-                    $roundedCorners = self::getAttributeBoolean($chartElementsC->roundedCorners, 'val');
-
+                    $rounded_corners = self::get_attribute_boolean($chart_elements_c->rounded_corners, 'val');
                     break;
                 case 'chart':
-                    foreach ($chartElement as $chartDetailsKey => $chartDetails) {
-                        $chartDetails = Xlsx::testSimpleXml($chartDetails);
-                        switch ($chartDetailsKey) {
+                    foreach ($chart_element as $chart_details_key => $chart_details) {
+                        $chart_details = Xlsx::test_simple_xml($chart_details);
+                        switch ($chart_details_key) {
                             case 'autoTitleDeleted':
                                 /** @var bool $autoTitleDeleted */
-                                $autoTitleDeleted = self::getAttributeBoolean($chartElementsC->chart->autoTitleDeleted, 'val');
-
+                                $auto_title_deleted = self::get_attribute_boolean($chart_elements_c->chart->auto_title_deleted, 'val');
                                 break;
                             case 'view3D':
-                                $rotX = self::getAttributeInteger($chartDetails->rotX, 'val');
-                                $rotY = self::getAttributeInteger($chartDetails->rotY, 'val');
-                                $rAngAx = self::getAttributeInteger($chartDetails->rAngAx, 'val');
-                                $perspective = self::getAttributeInteger($chartDetails->perspective, 'val');
-
+                                $rot_x = self::get_attribute_integer($chart_details->rot_x, 'val');
+                                $rot_y = self::get_attribute_integer($chart_details->rot_y, 'val');
+                                $r_ang_ax = self::get_attribute_integer($chart_details->r_ang_ax, 'val');
+                                $perspective = self::get_attribute_integer($chart_details->perspective, 'val');
                                 break;
                             case 'plotArea':
-                                $plotAreaLayout = $XaxisLabel = $YaxisLabel = null;
-                                $plotSeries = $plotAttributes = [];
-                                $catAxRead = false;
-                                $plotNoFill = false;
-                                foreach ($chartDetails as $chartDetailKey => $chartDetail) {
-                                    $chartDetail = Xlsx::testSimpleXml($chartDetail);
-                                    switch ($chartDetailKey) {
+                                $plot_area_layout = $xaxis_label = $yaxis_label = null;
+                                $plot_series = $plot_attributes = [];
+                                $cat_ax_read = false;
+                                $plot_no_fill = false;
+                                foreach ($chart_details as $chart_detail_key => $chart_detail) {
+                                    $chart_detail = Xlsx::test_simple_xml($chart_detail);
+                                    switch ($chart_detail_key) {
                                         case 'spPr':
-                                            $possibleNoFill = $chartDetails->spPr->children($this->aNamespace);
-                                            if (isset($possibleNoFill->noFill)) {
-                                                $plotNoFill = true;
+                                            $possible_no_fill = $chart_details->sp_pr->children($this->a_namespace);
+                                            if (isset($possible_no_fill->no_fill)) {
+                                                $plot_no_fill = true;
                                             }
-                                            if (isset($possibleNoFill->gradFill->gsLst)) {
-                                                foreach ($possibleNoFill->gradFill->gsLst->gs as $gradient) {
-                                                    $gradient = Xlsx::testSimpleXml($gradient);
+                                            if (isset($possible_no_fill->grad_fill->gs_lst)) {
+                                                foreach ($possible_no_fill->grad_fill->gs_lst->gs as $gradient) {
+                                                    $gradient = Xlsx::test_simple_xml($gradient);
                                                     /** @var float $pos */
-                                                    $pos = self::getAttributeFloat($gradient, 'pos');
-                                                    $gradientArray[] = [
-                                                        $pos / ChartProperties::PERCENTAGE_MULTIPLIER,
-                                                        new ChartColor($this->readColor($gradient)),
-                                                    ];
+                                                    $pos = self::get_attribute_float($gradient, 'pos');
+                                                    $gradient_array[] = [$pos / Chart_Properties::PERCENTAGE_MULTIPLIER, new Chart_Color($this->read_color($gradient))];
                                                 }
                                             }
-                                            if (isset($possibleNoFill->gradFill->lin)) {
-                                                $gradientLin = ChartProperties::XmlToAngle((string) self::getAttributeString($possibleNoFill->gradFill->lin, 'ang'));
+                                            if (isset($possible_no_fill->grad_fill->lin)) {
+                                                $gradient_lin = Chart_Properties::xml_to_angle((string) self::get_attribute_string($possible_no_fill->grad_fill->lin, 'ang'));
                                             }
-
                                             break;
                                         case 'layout':
-                                            $plotAreaLayout = $this->chartLayoutDetails($chartDetail);
-
+                                            $plot_area_layout = $this->chart_layout_details($chart_detail);
                                             break;
                                         case Axis::AXIS_TYPE_CATEGORY:
                                         case Axis::AXIS_TYPE_DATE:
-                                            $catAxRead = true;
-                                            if (isset($chartDetail->title)) {
-                                                $XaxisLabel = $this->chartTitle($chartDetail->title->children($this->cNamespace));
+                                            $cat_ax_read = true;
+                                            if (isset($chart_detail->title)) {
+                                                $xaxis_label = $this->chart_title($chart_detail->title->children($this->c_namespace));
                                             }
-                                            $xAxis->setAxisType($chartDetailKey);
-                                            $this->readEffects($chartDetail, $xAxis);
-                                            $this->readLineStyle($chartDetail, $xAxis);
-                                            if (isset($chartDetail->spPr)) {
-                                                $sppr = $chartDetail->spPr->children($this->aNamespace);
-                                                if (isset($sppr->solidFill)) {
-                                                    $axisColorArray = $this->readColor($sppr->solidFill);
-                                                    $xAxis->setFillParameters($axisColorArray['value'], $axisColorArray['alpha'], $axisColorArray['type']);
+                                            $x_axis->set_axis_type($chart_detail_key);
+                                            $this->read_effects($chart_detail, $x_axis);
+                                            $this->read_line_style($chart_detail, $x_axis);
+                                            if (isset($chart_detail->sp_pr)) {
+                                                $sppr = $chart_detail->sp_pr->children($this->a_namespace);
+                                                if (isset($sppr->solid_fill)) {
+                                                    $axis_color_array = $this->read_color($sppr->solid_fill);
+                                                    $x_axis->set_fill_parameters($axis_color_array['value'], $axis_color_array['alpha'], $axis_color_array['type']);
                                                 }
-                                                if (isset($chartDetail->spPr->ln->noFill)) {
-                                                    $xAxis->setNoFill(true);
+                                                if (isset($chart_detail->sp_pr->ln->no_fill)) {
+                                                    $x_axis->set_no_fill(true);
                                                 }
                                             }
-                                            if (isset($chartDetail->majorGridlines)) {
-                                                $majorGridlines = new GridLines();
-                                                if (isset($chartDetail->majorGridlines->spPr)) {
-                                                    $this->readEffects($chartDetail->majorGridlines, $majorGridlines);
-                                                    $this->readLineStyle($chartDetail->majorGridlines, $majorGridlines);
+                                            if (isset($chart_detail->major_gridlines)) {
+                                                $major_gridlines = new Grid_Lines();
+                                                if (isset($chart_detail->major_gridlines->sp_pr)) {
+                                                    $this->read_effects($chart_detail->major_gridlines, $major_gridlines);
+                                                    $this->read_line_style($chart_detail->major_gridlines, $major_gridlines);
                                                 }
-                                                $xAxis->setMajorGridlines($majorGridlines);
+                                                $x_axis->set_major_gridlines($major_gridlines);
                                             }
-                                            if (isset($chartDetail->minorGridlines)) {
-                                                $minorGridlines = new GridLines();
-                                                $minorGridlines->activateObject();
-                                                if (isset($chartDetail->minorGridlines->spPr)) {
-                                                    $this->readEffects($chartDetail->minorGridlines, $minorGridlines);
-                                                    $this->readLineStyle($chartDetail->minorGridlines, $minorGridlines);
+                                            if (isset($chart_detail->minor_gridlines)) {
+                                                $minor_gridlines = new Grid_Lines();
+                                                $minor_gridlines->activate_object();
+                                                if (isset($chart_detail->minor_gridlines->sp_pr)) {
+                                                    $this->read_effects($chart_detail->minor_gridlines, $minor_gridlines);
+                                                    $this->read_line_style($chart_detail->minor_gridlines, $minor_gridlines);
                                                 }
-                                                $xAxis->setMinorGridlines($minorGridlines);
+                                                $x_axis->set_minor_gridlines($minor_gridlines);
                                             }
-                                            $this->setAxisProperties($chartDetail, $xAxis);
-
+                                            $this->set_axis_properties($chart_detail, $x_axis);
                                             break;
                                         case Axis::AXIS_TYPE_VALUE:
-                                            $whichAxis = null;
-                                            $axPos = null;
-                                            if (isset($chartDetail->axPos)) {
-                                                $axPos = self::getAttributeString($chartDetail->axPos, 'val');
+                                            $which_axis = null;
+                                            $ax_pos = null;
+                                            if (isset($chart_detail->ax_pos)) {
+                                                $ax_pos = self::get_attribute_string($chart_detail->ax_pos, 'val');
                                             }
-                                            if ($catAxRead) {
-                                                $whichAxis = $yAxis;
-                                                $yAxis->setAxisType($chartDetailKey);
-                                            } elseif (!empty($axPos)) {
-                                                switch ($axPos) {
+                                            if ($cat_ax_read) {
+                                                $which_axis = $y_axis;
+                                                $y_axis->set_axis_type($chart_detail_key);
+                                            } elseif (!empty($ax_pos)) {
+                                                switch ($ax_pos) {
                                                     case 't':
                                                     case 'b':
-                                                        $whichAxis = $xAxis;
-                                                        $xAxis->setAxisType($chartDetailKey);
-
+                                                        $which_axis = $x_axis;
+                                                        $x_axis->set_axis_type($chart_detail_key);
                                                         break;
                                                     case 'r':
                                                     case 'l':
-                                                        $whichAxis = $yAxis;
-                                                        $yAxis->setAxisType($chartDetailKey);
-
+                                                        $which_axis = $y_axis;
+                                                        $y_axis->set_axis_type($chart_detail_key);
                                                         break;
                                                 }
                                             }
-                                            if (isset($chartDetail->title)) {
-                                                $axisLabel = $this->chartTitle($chartDetail->title->children($this->cNamespace));
-
-                                                switch ($axPos) {
+                                            if (isset($chart_detail->title)) {
+                                                $axis_label = $this->chart_title($chart_detail->title->children($this->c_namespace));
+                                                switch ($ax_pos) {
                                                     case 't':
                                                     case 'b':
-                                                        $XaxisLabel = $axisLabel;
-
+                                                        $xaxis_label = $axis_label;
                                                         break;
                                                     case 'r':
                                                     case 'l':
-                                                        $YaxisLabel = $axisLabel;
-
+                                                        $yaxis_label = $axis_label;
                                                         break;
                                                 }
                                             }
-                                            $this->readEffects($chartDetail, $whichAxis);
-                                            $this->readLineStyle($chartDetail, $whichAxis);
-                                            if ($whichAxis !== null && isset($chartDetail->spPr)) {
-                                                $sppr = $chartDetail->spPr->children($this->aNamespace);
-                                                if (isset($sppr->solidFill)) {
-                                                    $axisColorArray = $this->readColor($sppr->solidFill);
-                                                    $whichAxis->setFillParameters($axisColorArray['value'], $axisColorArray['alpha'], $axisColorArray['type']);
+                                            $this->read_effects($chart_detail, $which_axis);
+                                            $this->read_line_style($chart_detail, $which_axis);
+                                            if ($which_axis !== null && isset($chart_detail->sp_pr)) {
+                                                $sppr = $chart_detail->sp_pr->children($this->a_namespace);
+                                                if (isset($sppr->solid_fill)) {
+                                                    $axis_color_array = $this->read_color($sppr->solid_fill);
+                                                    $which_axis->set_fill_parameters($axis_color_array['value'], $axis_color_array['alpha'], $axis_color_array['type']);
                                                 }
-                                                if (isset($sppr->ln->noFill)) {
-                                                    $whichAxis->setNoFill(true);
+                                                if (isset($sppr->ln->no_fill)) {
+                                                    $which_axis->set_no_fill(true);
                                                 }
                                             }
-                                            if ($whichAxis !== null && isset($chartDetail->majorGridlines)) {
-                                                $majorGridlines = new GridLines();
-                                                if (isset($chartDetail->majorGridlines->spPr)) {
-                                                    $this->readEffects($chartDetail->majorGridlines, $majorGridlines);
-                                                    $this->readLineStyle($chartDetail->majorGridlines, $majorGridlines);
+                                            if ($which_axis !== null && isset($chart_detail->major_gridlines)) {
+                                                $major_gridlines = new Grid_Lines();
+                                                if (isset($chart_detail->major_gridlines->sp_pr)) {
+                                                    $this->read_effects($chart_detail->major_gridlines, $major_gridlines);
+                                                    $this->read_line_style($chart_detail->major_gridlines, $major_gridlines);
                                                 }
-                                                $whichAxis->setMajorGridlines($majorGridlines);
+                                                $which_axis->set_major_gridlines($major_gridlines);
                                             }
-                                            if ($whichAxis !== null && isset($chartDetail->minorGridlines)) {
-                                                $minorGridlines = new GridLines();
-                                                $minorGridlines->activateObject();
-                                                if (isset($chartDetail->minorGridlines->spPr)) {
-                                                    $this->readEffects($chartDetail->minorGridlines, $minorGridlines);
-                                                    $this->readLineStyle($chartDetail->minorGridlines, $minorGridlines);
+                                            if ($which_axis !== null && isset($chart_detail->minor_gridlines)) {
+                                                $minor_gridlines = new Grid_Lines();
+                                                $minor_gridlines->activate_object();
+                                                if (isset($chart_detail->minor_gridlines->sp_pr)) {
+                                                    $this->read_effects($chart_detail->minor_gridlines, $minor_gridlines);
+                                                    $this->read_line_style($chart_detail->minor_gridlines, $minor_gridlines);
                                                 }
-                                                $whichAxis->setMinorGridlines($minorGridlines);
+                                                $which_axis->set_minor_gridlines($minor_gridlines);
                                             }
-                                            $this->setAxisProperties($chartDetail, $whichAxis);
-
+                                            $this->set_axis_properties($chart_detail, $which_axis);
                                             break;
                                         case 'barChart':
                                         case 'bar3DChart':
-                                            $barDirection = self::getAttributeString($chartDetail->barDir, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotSer->setPlotDirection("$barDirection");
-                                            $plotSeries[] = $plotSer;
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $bar_direction = self::get_attribute_string($chart_detail->bar_dir, 'val');
+                                            $plot_ser = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_ser->set_plot_direction("{$bar_direction}");
+                                            $plot_series[] = $plot_ser;
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'lineChart':
                                         case 'line3DChart':
                                         case 'areaChart':
                                         case 'area3DChart':
-                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $plot_series[] = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'doughnutChart':
                                         case 'pieChart':
                                         case 'pie3DChart':
-                                            $explosion = self::getAttributeString($chartDetail->ser->explosion, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotSer->setPlotStyle("$explosion");
-                                            $plotSeries[] = $plotSer;
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $explosion = self::get_attribute_string($chart_detail->ser->explosion, 'val');
+                                            $plot_ser = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_ser->set_plot_style("{$explosion}");
+                                            $plot_series[] = $plot_ser;
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'scatterChart':
-                                            $scatterStyle = self::getAttributeString($chartDetail->scatterStyle, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotSer->setPlotStyle($scatterStyle);
-                                            $plotSeries[] = $plotSer;
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $scatter_style = self::get_attribute_string($chart_detail->scatter_style, 'val');
+                                            $plot_ser = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_ser->set_plot_style($scatter_style);
+                                            $plot_series[] = $plot_ser;
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'bubbleChart':
-                                            $bubbleScale = self::getAttributeInteger($chartDetail->bubbleScale, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotSer->setPlotStyle("$bubbleScale");
-                                            $plotSeries[] = $plotSer;
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $bubble_scale = self::get_attribute_integer($chart_detail->bubble_scale, 'val');
+                                            $plot_ser = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_ser->set_plot_style("{$bubble_scale}");
+                                            $plot_series[] = $plot_ser;
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'radarChart':
-                                            $radarStyle = self::getAttributeString($chartDetail->radarStyle, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotSer->setPlotStyle($radarStyle);
-                                            $plotSeries[] = $plotSer;
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $radar_style = self::get_attribute_string($chart_detail->radar_style, 'val');
+                                            $plot_ser = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_ser->set_plot_style($radar_style);
+                                            $plot_series[] = $plot_ser;
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'surfaceChart':
                                         case 'surface3DChart':
-                                            $wireFrame = self::getAttributeBoolean($chartDetail->wireframe, 'val');
-                                            $plotSer = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            $plotSer->setPlotStyle("$wireFrame");
-                                            $plotSeries[] = $plotSer;
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $wire_frame = self::get_attribute_boolean($chart_detail->wireframe, 'val');
+                                            $plot_ser = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            $plot_ser->set_plot_style("{$wire_frame}");
+                                            $plot_series[] = $plot_ser;
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                         case 'stockChart':
-                                            $plotSeries[] = $this->chartDataSeries($chartDetail, $chartDetailKey);
-                                            if (isset($chartDetail->upDownBars->gapWidth)) {
-                                                $gapWidth = self::getAttributeInteger($chartDetail->upDownBars->gapWidth, 'val');
+                                            $plot_series[] = $this->chart_data_series($chart_detail, $chart_detail_key);
+                                            if (isset($chart_detail->up_down_bars->gap_width)) {
+                                                $gap_width = self::get_attribute_integer($chart_detail->up_down_bars->gap_width, 'val');
                                             }
-                                            if (isset($chartDetail->upDownBars->upBars)) {
-                                                $useUpBars = true;
+                                            if (isset($chart_detail->up_down_bars->up_bars)) {
+                                                $use_up_bars = true;
                                             }
-                                            if (isset($chartDetail->upDownBars->downBars)) {
-                                                $useDownBars = true;
+                                            if (isset($chart_detail->up_down_bars->down_bars)) {
+                                                $use_down_bars = true;
                                             }
-                                            $plotAttributes = $this->readChartAttributes($chartDetail);
-
+                                            $plot_attributes = $this->read_chart_attributes($chart_detail);
                                             break;
                                     }
                                 }
-                                if ($plotAreaLayout == null) {
-                                    $plotAreaLayout = new Layout();
+                                if ($plot_area_layout == null) {
+                                    $plot_area_layout = new Layout();
                                 }
-                                $plotArea = new PlotArea($plotAreaLayout, $plotSeries);
-                                $this->setChartAttributes($plotAreaLayout, $plotAttributes);
-                                if ($plotNoFill) {
-                                    $plotArea->setNoFill(true);
+                                $plot_area = new Plot_Area($plot_area_layout, $plot_series);
+                                $this->set_chart_attributes($plot_area_layout, $plot_attributes);
+                                if ($plot_no_fill) {
+                                    $plot_area->set_no_fill(true);
                                 }
-                                if (!empty($gradientArray)) {
-                                    $plotArea->setGradientFillProperties($gradientArray, $gradientLin);
+                                if (!empty($gradient_array)) {
+                                    $plot_area->set_gradient_fill_properties($gradient_array, $gradient_lin);
                                 }
-                                if (is_int($gapWidth)) {
-                                    $plotArea->setGapWidth($gapWidth);
+                                if (is_int($gap_width)) {
+                                    $plot_area->set_gap_width($gap_width);
                                 }
-                                if ($useUpBars === true) {
-                                    $plotArea->setUseUpBars(true);
+                                if ($use_up_bars === true) {
+                                    $plot_area->set_use_up_bars(true);
                                 }
-                                if ($useDownBars === true) {
-                                    $plotArea->setUseDownBars(true);
+                                if ($use_down_bars === true) {
+                                    $plot_area->set_use_down_bars(true);
                                 }
-
                                 break;
                             case 'plotVisOnly':
-                                $plotVisOnly = (bool) self::getAttributeString($chartDetails, 'val');
-
+                                $plot_vis_only = (bool) self::get_attribute_string($chart_details, 'val');
                                 break;
                             case 'dispBlanksAs':
-                                $dispBlanksAs = self::getAttributeString($chartDetails, 'val');
-
+                                $disp_blanks_as = self::get_attribute_string($chart_details, 'val');
                                 break;
                             case 'title':
-                                $title = $this->chartTitle($chartDetails);
-
+                                $title = $this->chart_title($chart_details);
                                 break;
                             case 'legend':
-                                $legendPos = 'r';
-                                $legendLayout = null;
-                                $legendOverlay = false;
-                                $legendBorderLines = null;
-                                $legendFillColor = null;
-                                $legendText = null;
-                                $addLegendText = false;
-                                foreach ($chartDetails as $chartDetailKey => $chartDetail) {
-                                    $chartDetail = Xlsx::testSimpleXml($chartDetail);
-                                    switch ($chartDetailKey) {
+                                $legend_pos = 'r';
+                                $legend_layout = null;
+                                $legend_overlay = false;
+                                $legend_border_lines = null;
+                                $legend_fill_color = null;
+                                $legend_text = null;
+                                $add_legend_text = false;
+                                foreach ($chart_details as $chart_detail_key => $chart_detail) {
+                                    $chart_detail = Xlsx::test_simple_xml($chart_detail);
+                                    switch ($chart_detail_key) {
                                         case 'legendPos':
-                                            $legendPos = self::getAttributeString($chartDetail, 'val');
-
+                                            $legend_pos = self::get_attribute_string($chart_detail, 'val');
                                             break;
                                         case 'overlay':
-                                            $legendOverlay = self::getAttributeBoolean($chartDetail, 'val');
-
+                                            $legend_overlay = self::get_attribute_boolean($chart_detail, 'val');
                                             break;
                                         case 'layout':
-                                            $legendLayout = $this->chartLayoutDetails($chartDetail);
-
+                                            $legend_layout = $this->chart_layout_details($chart_detail);
                                             break;
                                         case 'spPr':
-                                            $children = $chartDetails->spPr->children($this->aNamespace);
-                                            if (isset($children->solidFill)) {
-                                                $legendFillColor = $this->readColor($children->solidFill);
+                                            $children = $chart_details->sp_pr->children($this->a_namespace);
+                                            if (isset($children->solid_fill)) {
+                                                $legend_fill_color = $this->read_color($children->solid_fill);
                                             }
                                             if (isset($children->ln)) {
-                                                $legendBorderLines = new GridLines();
-                                                $this->readLineStyle($chartDetails, $legendBorderLines);
+                                                $legend_border_lines = new Grid_Lines();
+                                                $this->read_line_style($chart_details, $legend_border_lines);
                                             }
-
                                             break;
                                         case 'txPr':
-                                            $children = $chartDetails->txPr->children($this->aNamespace);
-                                            $addLegendText = false;
-                                            $legendText = new AxisText();
-                                            if (isset($children->p->pPr->defRPr->solidFill)) {
-                                                $colorArray = $this->readColor($children->p->pPr->defRPr->solidFill);
-                                                $legendText->getFillColorObject()->setColorPropertiesArray($colorArray);
-                                                $addLegendText = true;
+                                            $children = $chart_details->tx_pr->children($this->a_namespace);
+                                            $add_legend_text = false;
+                                            $legend_text = new Axis_Text();
+                                            if (isset($children->p->p_pr->def_r_pr->solid_fill)) {
+                                                $color_array = $this->read_color($children->p->p_pr->def_r_pr->solid_fill);
+                                                $legend_text->get_fill_color_object()->set_color_properties_array($color_array);
+                                                $add_legend_text = true;
                                             }
-                                            if (isset($children->p->pPr->defRPr->effectLst)) {
-                                                $this->readEffects($children->p->pPr->defRPr, $legendText, false);
-                                                $addLegendText = true;
+                                            if (isset($children->p->p_pr->def_r_pr->effect_lst)) {
+                                                $this->read_effects($children->p->p_pr->def_r_pr, $legend_text, false);
+                                                $add_legend_text = true;
                                             }
-
                                             break;
                                     }
                                 }
-                                $legend = new Legend("$legendPos", $legendLayout, (bool) $legendOverlay);
-                                if ($legendFillColor !== null) {
-                                    $legend->getFillColor()->setColorPropertiesArray($legendFillColor);
+                                $legend = new Legend("{$legend_pos}", $legend_layout, (bool) $legend_overlay);
+                                if ($legend_fill_color !== null) {
+                                    $legend->get_fill_color()->set_color_properties_array($legend_fill_color);
                                 }
-                                if ($legendBorderLines !== null) {
-                                    $legend->setBorderLines($legendBorderLines);
+                                if ($legend_border_lines !== null) {
+                                    $legend->set_border_lines($legend_border_lines);
                                 }
-                                if ($addLegendText) {
-                                    $legend->setLegendText($legendText);
+                                if ($add_legend_text) {
+                                    $legend->set_legend_text($legend_text);
                                 }
-
                                 break;
                         }
                     }
             }
         }
-        $chart = new \PhpOffice\PhpSpreadsheet\Chart\Chart($chartName, $title, $legend, $plotArea, $plotVisOnly, (string) $dispBlanksAs, $XaxisLabel, $YaxisLabel, $xAxis, $yAxis);
-        if ($chartNoFill) {
-            $chart->setNoFill(true);
+        $chart = new \Php_Office\Php_Spreadsheet\Chart\Chart($chart_name, $title, $legend, $plot_area, $plot_vis_only, (string) $disp_blanks_as, $xaxis_label, $yaxis_label, $x_axis, $y_axis);
+        if ($chart_no_fill) {
+            $chart->set_no_fill(true);
         }
-        if ($chartFillColor !== null) {
-            $chart->getFillColor()->setColorPropertiesArray($chartFillColor);
+        if ($chart_fill_color !== null) {
+            $chart->get_fill_color()->set_color_properties_array($chart_fill_color);
         }
-        if ($chartBorderLines !== null) {
-            $chart->setBorderLines($chartBorderLines);
+        if ($chart_border_lines !== null) {
+            $chart->set_border_lines($chart_border_lines);
         }
-        $chart->setNoBorder($noBorder);
-        $chart->setRoundedCorners($roundedCorners);
-        if (is_bool($autoTitleDeleted)) {
-            $chart->setAutoTitleDeleted($autoTitleDeleted);
+        $chart->set_no_border($no_border);
+        $chart->set_rounded_corners($rounded_corners);
+        if (is_bool($auto_title_deleted)) {
+            $chart->set_auto_title_deleted($auto_title_deleted);
         }
-        if (is_int($rotX)) {
-            $chart->setRotX($rotX);
+        if (is_int($rot_x)) {
+            $chart->set_rot_x($rot_x);
         }
-        if (is_int($rotY)) {
-            $chart->setRotY($rotY);
+        if (is_int($rot_y)) {
+            $chart->set_rot_y($rot_y);
         }
-        if (is_int($rAngAx)) {
-            $chart->setRAngAx($rAngAx);
+        if (is_int($r_ang_ax)) {
+            $chart->set_r_ang_ax($r_ang_ax);
         }
         if (is_int($perspective)) {
-            $chart->setPerspective($perspective);
+            $chart->set_perspective($perspective);
         }
-
         return $chart;
     }
-
-    private function chartTitle(SimpleXMLElement $titleDetails): Title
+    private function chart_title(Simple_Xml_Element $title_details): Title
     {
         $caption = '';
-        $titleLayout = null;
-        $titleOverlay = false;
-        $titleFormula = null;
-        $titleFont = null;
-        foreach ($titleDetails as $titleDetailKey => $chartDetail) {
-            $chartDetail = Xlsx::testSimpleXml($chartDetail);
-            switch ($titleDetailKey) {
+        $title_layout = null;
+        $title_overlay = false;
+        $title_formula = null;
+        $title_font = null;
+        foreach ($title_details as $title_detail_key => $chart_detail) {
+            $chart_detail = Xlsx::test_simple_xml($chart_detail);
+            switch ($title_detail_key) {
                 case 'tx':
                     $caption = [];
-                    if (isset($chartDetail->rich)) {
-                        $titleDetails = $chartDetail->rich->children($this->aNamespace);
-                        foreach ($titleDetails as $titleKey => $titleDetail) {
-                            $titleDetail = Xlsx::testSimpleXml($titleDetail);
-                            switch ($titleKey) {
+                    if (isset($chart_detail->rich)) {
+                        $title_details = $chart_detail->rich->children($this->a_namespace);
+                        foreach ($title_details as $title_key => $title_detail) {
+                            $title_detail = Xlsx::test_simple_xml($title_detail);
+                            switch ($title_key) {
                                 case 'p':
-                                    $titleDetailPart = $titleDetail->children($this->aNamespace);
-                                    $caption[] = $this->parseRichText($titleDetailPart);
+                                    $title_detail_part = $title_detail->children($this->a_namespace);
+                                    $caption[] = $this->parse_rich_text($title_detail_part);
                             }
                         }
-                    } elseif (isset($chartDetail->strRef->strCache)) {
-                        foreach ($chartDetail->strRef->strCache->pt as $pt) {
+                    } elseif (isset($chart_detail->str_ref->str_cache)) {
+                        foreach ($chart_detail->str_ref->str_cache->pt as $pt) {
                             if (isset($pt->v)) {
                                 $caption[] = (string) $pt->v;
                             }
                         }
-                        if (isset($chartDetail->strRef->f)) {
-                            $titleFormula = (string) $chartDetail->strRef->f;
+                        if (isset($chart_detail->str_ref->f)) {
+                            $title_formula = (string) $chart_detail->str_ref->f;
                         }
                     }
-
                     break;
                 case 'overlay':
-                    $titleOverlay = self::getAttributeBoolean($chartDetail, 'val');
-
+                    $title_overlay = self::get_attribute_boolean($chart_detail, 'val');
                     break;
                 case 'layout':
-                    $titleLayout = $this->chartLayoutDetails($chartDetail);
-
+                    $title_layout = $this->chart_layout_details($chart_detail);
                     break;
                 case 'txPr':
-                    if (isset($chartDetail->children($this->aNamespace)->p)) {
-                        $titleFont = $this->parseFont($chartDetail->children($this->aNamespace)->p);
+                    if (isset($chart_detail->children($this->a_namespace)->p)) {
+                        $title_font = $this->parse_font($chart_detail->children($this->a_namespace)->p);
                     }
-
                     break;
             }
         }
-        $title = new Title($caption, $titleLayout, (bool) $titleOverlay);
-        if (!empty($titleFormula)) {
-            $title->setCellReference($titleFormula);
+        $title = new Title($caption, $title_layout, (bool) $title_overlay);
+        if (!empty($title_formula)) {
+            $title->set_cell_reference($title_formula);
         }
-        if ($titleFont !== null) {
-            $title->setFont($titleFont);
+        if ($title_font !== null) {
+            $title->set_font($title_font);
         }
-
         return $title;
     }
-
-    private function chartLayoutDetails(SimpleXMLElement $chartDetail): ?Layout
+    private function chart_layout_details(Simple_Xml_Element $chart_detail): ?Layout
     {
-        if (!isset($chartDetail->manualLayout)) {
+        if (!isset($chart_detail->manual_layout)) {
             return null;
         }
-        $details = $chartDetail->manualLayout->children($this->cNamespace);
+        $details = $chart_detail->manual_layout->children($this->c_namespace);
         if ($details === null) {
             return null;
         }
         $layout = [];
-        foreach ($details as $detailKey => $detail) {
-            $detail = Xlsx::testSimpleXml($detail);
-            $layout[$detailKey] = self::getAttributeString($detail, 'val');
+        foreach ($details as $detail_key => $detail) {
+            $detail = Xlsx::test_simple_xml($detail);
+            $layout[$detail_key] = self::get_attribute_string($detail, 'val');
         }
-
         return new Layout($layout);
     }
-
-    private function chartDataSeries(SimpleXMLElement $chartDetail, string $plotType): DataSeries
+    private function chart_data_series(Simple_Xml_Element $chart_detail, string $plot_type): Data_Series
     {
-        $multiSeriesType = null;
-        $smoothLine = false;
-        $seriesLabel = $seriesCategory = $seriesValues = $plotOrder = $seriesBubbles = [];
-        $plotDirection = null;
-
-        $seriesDetailSet = $chartDetail->children($this->cNamespace);
-        foreach ($seriesDetailSet as $seriesDetailKey => $seriesDetails) {
-            switch ($seriesDetailKey) {
+        $multi_series_type = null;
+        $smooth_line = false;
+        $series_label = $series_category = $series_values = $plot_order = $series_bubbles = [];
+        $plot_direction = null;
+        $series_detail_set = $chart_detail->children($this->c_namespace);
+        foreach ($series_detail_set as $series_detail_key => $series_details) {
+            switch ($series_detail_key) {
                 case 'grouping':
-                    $multiSeriesType = self::getAttributeString($chartDetail->grouping, 'val');
-
+                    $multi_series_type = self::get_attribute_string($chart_detail->grouping, 'val');
                     break;
                 case 'ser':
                     $marker = null;
-                    $seriesIndex = '';
-                    $fillColor = null;
-                    $pointSize = null;
-                    $noFill = false;
+                    $series_index = '';
+                    $fill_color = null;
+                    $point_size = null;
+                    $no_fill = false;
                     $bubble3D = false;
-                    $dptColors = [];
-                    $markerFillColor = null;
-                    $markerBorderColor = null;
-                    $lineStyle = null;
-                    $labelLayout = null;
-                    $trendLines = [];
-                    foreach ($seriesDetails as $seriesKey => $seriesDetail) {
-                        $seriesDetail = Xlsx::testSimpleXml($seriesDetail);
-                        switch ($seriesKey) {
+                    $dpt_colors = [];
+                    $marker_fill_color = null;
+                    $marker_border_color = null;
+                    $line_style = null;
+                    $label_layout = null;
+                    $trend_lines = [];
+                    foreach ($series_details as $series_key => $series_detail) {
+                        $series_detail = Xlsx::test_simple_xml($series_detail);
+                        switch ($series_key) {
                             case 'idx':
-                                $seriesIndex = self::getAttributeInteger($seriesDetail, 'val');
-
+                                $series_index = self::get_attribute_integer($series_detail, 'val');
                                 break;
                             case 'order':
-                                $seriesOrder = self::getAttributeInteger($seriesDetail, 'val');
-                                if ($seriesOrder !== null) {
-                                    $plotOrder[$seriesIndex] = $seriesOrder;
+                                $series_order = self::get_attribute_integer($series_detail, 'val');
+                                if ($series_order !== null) {
+                                    $plot_order[$series_index] = $series_order;
                                 }
-
                                 break;
                             case 'tx':
-                                $temp = $this->chartDataSeriesValueSet($seriesDetail);
+                                $temp = $this->chart_data_series_value_set($series_detail);
                                 if ($temp !== null) {
-                                    $seriesLabel[$seriesIndex] = $temp;
+                                    $series_label[$series_index] = $temp;
                                 }
-
                                 break;
                             case 'spPr':
-                                $children = $seriesDetail->children($this->aNamespace);
+                                $children = $series_detail->children($this->a_namespace);
                                 if (isset($children->ln)) {
                                     $ln = $children->ln;
-                                    if (is_countable($ln->noFill) && count($ln->noFill) === 1) {
-                                        $noFill = true;
+                                    if (is_countable($ln->no_fill) && count($ln->no_fill) === 1) {
+                                        $no_fill = true;
                                     }
-                                    $lineStyle = new GridLines();
-                                    $this->readLineStyle($seriesDetails, $lineStyle);
+                                    $line_style = new Grid_Lines();
+                                    $this->read_line_style($series_details, $line_style);
                                 }
-                                if (isset($children->effectLst)) {
-                                    if ($lineStyle === null) {
-                                        $lineStyle = new GridLines();
+                                if (isset($children->effect_lst)) {
+                                    if ($line_style === null) {
+                                        $line_style = new Grid_Lines();
                                     }
-                                    $this->readEffects($seriesDetails, $lineStyle);
+                                    $this->read_effects($series_details, $line_style);
                                 }
-                                if (isset($children->solidFill)) {
-                                    $fillColor = new ChartColor($this->readColor($children->solidFill));
+                                if (isset($children->solid_fill)) {
+                                    $fill_color = new Chart_Color($this->read_color($children->solid_fill));
                                 }
-
                                 break;
                             case 'dPt':
-                                $dptIdx = (int) self::getAttributeString($seriesDetail->idx, 'val');
-                                if (isset($seriesDetail->spPr)) {
-                                    $children = $seriesDetail->spPr->children($this->aNamespace);
-                                    if (isset($children->solidFill)) {
-                                        $arrayColors = $this->readColor($children->solidFill);
-                                        $dptColors[$dptIdx] = new ChartColor($arrayColors);
+                                $dpt_idx = (int) self::get_attribute_string($series_detail->idx, 'val');
+                                if (isset($series_detail->sp_pr)) {
+                                    $children = $series_detail->sp_pr->children($this->a_namespace);
+                                    if (isset($children->solid_fill)) {
+                                        $array_colors = $this->read_color($children->solid_fill);
+                                        $dpt_colors[$dpt_idx] = new Chart_Color($array_colors);
                                     }
                                 }
-
                                 break;
                             case 'trendline':
-                                $trendLine = new TrendLine();
-                                $this->readLineStyle($seriesDetail, $trendLine);
-                                $trendLineType = self::getAttributeString($seriesDetail->trendlineType, 'val');
-                                $dispRSqr = self::getAttributeBoolean($seriesDetail->dispRSqr, 'val');
-                                $dispEq = self::getAttributeBoolean($seriesDetail->dispEq, 'val');
-                                $order = self::getAttributeInteger($seriesDetail->order, 'val');
-                                $period = self::getAttributeInteger($seriesDetail->period, 'val');
-                                $forward = self::getAttributeFloat($seriesDetail->forward, 'val');
-                                $backward = self::getAttributeFloat($seriesDetail->backward, 'val');
-                                $intercept = self::getAttributeFloat($seriesDetail->intercept, 'val');
-                                $name = (string) $seriesDetail->name;
-                                $trendLine->setTrendLineProperties(
-                                    $trendLineType,
-                                    $order,
-                                    $period,
-                                    $dispRSqr,
-                                    $dispEq,
-                                    $backward,
-                                    $forward,
-                                    $intercept,
-                                    $name
-                                );
-                                $trendLines[] = $trendLine;
-
+                                $trend_line = new Trend_Line();
+                                $this->read_line_style($series_detail, $trend_line);
+                                $trend_line_type = self::get_attribute_string($series_detail->trendline_type, 'val');
+                                $disp_r_sqr = self::get_attribute_boolean($series_detail->disp_r_sqr, 'val');
+                                $disp_eq = self::get_attribute_boolean($series_detail->disp_eq, 'val');
+                                $order = self::get_attribute_integer($series_detail->order, 'val');
+                                $period = self::get_attribute_integer($series_detail->period, 'val');
+                                $forward = self::get_attribute_float($series_detail->forward, 'val');
+                                $backward = self::get_attribute_float($series_detail->backward, 'val');
+                                $intercept = self::get_attribute_float($series_detail->intercept, 'val');
+                                $name = (string) $series_detail->name;
+                                $trend_line->set_trend_line_properties($trend_line_type, $order, $period, $disp_r_sqr, $disp_eq, $backward, $forward, $intercept, $name);
+                                $trend_lines[] = $trend_line;
                                 break;
                             case 'marker':
-                                $marker = self::getAttributeString($seriesDetail->symbol, 'val');
-                                $pointSize = self::getAttributeString($seriesDetail->size, 'val');
-                                $pointSize = is_numeric($pointSize) ? ((int) $pointSize) : null;
-                                if (isset($seriesDetail->spPr)) {
-                                    $children = $seriesDetail->spPr->children($this->aNamespace);
-                                    if (isset($children->solidFill)) {
-                                        $markerFillColor = $this->readColor($children->solidFill);
+                                $marker = self::get_attribute_string($series_detail->symbol, 'val');
+                                $point_size = self::get_attribute_string($series_detail->size, 'val');
+                                $point_size = is_numeric($point_size) ? (int) $point_size : null;
+                                if (isset($series_detail->sp_pr)) {
+                                    $children = $series_detail->sp_pr->children($this->a_namespace);
+                                    if (isset($children->solid_fill)) {
+                                        $marker_fill_color = $this->read_color($children->solid_fill);
                                     }
-                                    if (isset($children->ln->solidFill)) {
-                                        $markerBorderColor = $this->readColor($children->ln->solidFill);
+                                    if (isset($children->ln->solid_fill)) {
+                                        $marker_border_color = $this->read_color($children->ln->solid_fill);
                                     }
                                 }
-
                                 break;
                             case 'smooth':
-                                $smoothLine = self::getAttributeBoolean($seriesDetail, 'val') ?? false;
-
+                                $smooth_line = self::get_attribute_boolean($series_detail, 'val') ?? false;
                                 break;
                             case 'cat':
-                                $temp = $this->chartDataSeriesValueSet($seriesDetail);
+                                $temp = $this->chart_data_series_value_set($series_detail);
                                 if ($temp !== null) {
-                                    $seriesCategory[$seriesIndex] = $temp;
+                                    $series_category[$series_index] = $temp;
                                 }
-
                                 break;
                             case 'val':
                             case 'yVal':
-                                $temp = $this->chartDataSeriesValueSet($seriesDetail, "$marker", $fillColor, "$pointSize");
+                                $temp = $this->chart_data_series_value_set($series_detail, "{$marker}", $fill_color, "{$point_size}");
                                 if ($temp !== null) {
-                                    $seriesValues[$seriesIndex] = $temp;
+                                    $series_values[$series_index] = $temp;
                                 }
-
                                 break;
                             case 'xVal':
-                                $temp = $this->chartDataSeriesValueSet($seriesDetail, "$marker", $fillColor, "$pointSize");
+                                $temp = $this->chart_data_series_value_set($series_detail, "{$marker}", $fill_color, "{$point_size}");
                                 if ($temp !== null) {
-                                    $seriesCategory[$seriesIndex] = $temp;
+                                    $series_category[$series_index] = $temp;
                                 }
-
                                 break;
                             case 'bubbleSize':
-                                $seriesBubble = $this->chartDataSeriesValueSet($seriesDetail, "$marker", $fillColor, "$pointSize");
-                                if ($seriesBubble !== null) {
-                                    $seriesBubbles[$seriesIndex] = $seriesBubble;
+                                $series_bubble = $this->chart_data_series_value_set($series_detail, "{$marker}", $fill_color, "{$point_size}");
+                                if ($series_bubble !== null) {
+                                    $series_bubbles[$series_index] = $series_bubble;
                                 }
-
                                 break;
                             case 'bubble3D':
-                                $bubble3D = self::getAttributeBoolean($seriesDetail, 'val');
-
+                                $bubble3D = self::get_attribute_boolean($series_detail, 'val');
                                 break;
                             case 'dLbls':
-                                $labelLayout = new Layout($this->readChartAttributes($seriesDetails));
-
+                                $label_layout = new Layout($this->read_chart_attributes($series_details));
                                 break;
                         }
                     }
-                    if ($labelLayout) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->setLabelLayout($labelLayout);
+                    if ($label_layout) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->set_label_layout($label_layout);
                         }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->setLabelLayout($labelLayout);
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->set_label_layout($label_layout);
                         }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->setLabelLayout($labelLayout);
-                        }
-                    }
-                    if ($noFill) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->setScatterLines(false);
-                        }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->setScatterLines(false);
-                        }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->setScatterLines(false);
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->set_label_layout($label_layout);
                         }
                     }
-                    if ($lineStyle !== null) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->copyLineStyles($lineStyle);
+                    if ($no_fill) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->set_scatter_lines(false);
                         }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->copyLineStyles($lineStyle);
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->set_scatter_lines(false);
                         }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->copyLineStyles($lineStyle);
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->set_scatter_lines(false);
+                        }
+                    }
+                    if ($line_style !== null) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->copy_line_styles($line_style);
+                        }
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->copy_line_styles($line_style);
+                        }
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->copy_line_styles($line_style);
                         }
                     }
                     if ($bubble3D) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->setBubble3D($bubble3D);
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->set_bubble3d($bubble3D);
                         }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->setBubble3D($bubble3D);
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->set_bubble3d($bubble3D);
                         }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->setBubble3D($bubble3D);
-                        }
-                    }
-                    if (!empty($dptColors)) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->setFillColor($dptColors);
-                        }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->setFillColor($dptColors);
-                        }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->setFillColor($dptColors);
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->set_bubble3d($bubble3D);
                         }
                     }
-                    if ($markerFillColor !== null) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->getMarkerFillColor()->setColorPropertiesArray($markerFillColor);
+                    if (!empty($dpt_colors)) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->set_fill_color($dpt_colors);
                         }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->getMarkerFillColor()->setColorPropertiesArray($markerFillColor);
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->set_fill_color($dpt_colors);
                         }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->getMarkerFillColor()->setColorPropertiesArray($markerFillColor);
-                        }
-                    }
-                    if ($markerBorderColor !== null) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->getMarkerBorderColor()->setColorPropertiesArray($markerBorderColor);
-                        }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->getMarkerBorderColor()->setColorPropertiesArray($markerBorderColor);
-                        }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->getMarkerBorderColor()->setColorPropertiesArray($markerBorderColor);
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->set_fill_color($dpt_colors);
                         }
                     }
-                    if ($smoothLine) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->setSmoothLine(true);
+                    if ($marker_fill_color !== null) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->get_marker_fill_color()->set_color_properties_array($marker_fill_color);
                         }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->setSmoothLine(true);
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->get_marker_fill_color()->set_color_properties_array($marker_fill_color);
                         }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->setSmoothLine(true);
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->get_marker_fill_color()->set_color_properties_array($marker_fill_color);
                         }
                     }
-                    if (!empty($trendLines)) {
-                        if (isset($seriesLabel[$seriesIndex])) {
-                            $seriesLabel[$seriesIndex]->setTrendLines($trendLines);
+                    if ($marker_border_color !== null) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->get_marker_border_color()->set_color_properties_array($marker_border_color);
                         }
-                        if (isset($seriesCategory[$seriesIndex])) {
-                            $seriesCategory[$seriesIndex]->setTrendLines($trendLines);
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->get_marker_border_color()->set_color_properties_array($marker_border_color);
                         }
-                        if (isset($seriesValues[$seriesIndex])) {
-                            $seriesValues[$seriesIndex]->setTrendLines($trendLines);
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->get_marker_border_color()->set_color_properties_array($marker_border_color);
+                        }
+                    }
+                    if ($smooth_line) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->set_smooth_line(true);
+                        }
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->set_smooth_line(true);
+                        }
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->set_smooth_line(true);
+                        }
+                    }
+                    if (!empty($trend_lines)) {
+                        if (isset($series_label[$series_index])) {
+                            $series_label[$series_index]->set_trend_lines($trend_lines);
+                        }
+                        if (isset($series_category[$series_index])) {
+                            $series_category[$series_index]->set_trend_lines($trend_lines);
+                        }
+                        if (isset($series_values[$series_index])) {
+                            $series_values[$series_index]->set_trend_lines($trend_lines);
                         }
                     }
             }
         }
-        $series = new DataSeries($plotType, $multiSeriesType, $plotOrder, $seriesLabel, $seriesCategory, $seriesValues, $plotDirection, $smoothLine);
-        $series->setPlotBubbleSizes($seriesBubbles);
-
+        $series = new Data_Series($plot_type, $multi_series_type, $plot_order, $series_label, $series_category, $series_values, $plot_direction, $smooth_line);
+        $series->set_plot_bubble_sizes($series_bubbles);
         return $series;
     }
-
-    private function chartDataSeriesValueSet(SimpleXMLElement $seriesDetail, ?string $marker = null, ?ChartColor $fillColor = null, ?string $pointSize = null): ?DataSeriesValues
+    private function chart_data_series_value_set(Simple_Xml_Element $series_detail, ?string $marker = null, ?Chart_Color $fill_color = null, ?string $point_size = null): ?Data_Series_Values
     {
-        if (isset($seriesDetail->strRef)) {
-            $seriesSource = (string) $seriesDetail->strRef->f;
-            $seriesValues = new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, $seriesSource, null, 0, null, $marker, $fillColor, "$pointSize");
-            if (isset($seriesDetail->strRef->strCache)) {
+        if (isset($series_detail->str_ref)) {
+            $series_source = (string) $series_detail->str_ref->f;
+            $series_values = new Data_Series_Values(Data_Series_Values::DATASERIES_TYPE_STRING, $series_source, null, 0, null, $marker, $fill_color, "{$point_size}");
+            if (isset($series_detail->str_ref->str_cache)) {
                 /** @var array{formatCode: string, dataValues: mixed[]} */
-                $seriesData = $this->chartDataSeriesValues($seriesDetail->strRef->strCache->children($this->cNamespace), 's');
-                $seriesValues
-                    ->setFormatCode($seriesData['formatCode'])
-                    ->setDataValues($seriesData['dataValues']);
+                $series_data = $this->chart_data_series_values($series_detail->str_ref->str_cache->children($this->c_namespace), 's');
+                $series_values->set_format_code($series_data['formatCode'])->set_data_values($series_data['dataValues']);
             }
-            return $seriesValues;
+            return $series_values;
         }
-        if (isset($seriesDetail->numRef)) {
-            $seriesSource = (string) $seriesDetail->numRef->f;
-            $seriesValues = new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, $seriesSource, null, 0, null, $marker, $fillColor, "$pointSize");
-            if (isset($seriesDetail->numRef->numCache)) {
+        if (isset($series_detail->num_ref)) {
+            $series_source = (string) $series_detail->num_ref->f;
+            $series_values = new Data_Series_Values(Data_Series_Values::DATASERIES_TYPE_NUMBER, $series_source, null, 0, null, $marker, $fill_color, "{$point_size}");
+            if (isset($series_detail->num_ref->num_cache)) {
                 /** @var array{formatCode: string, dataValues: mixed[]} */
-                $seriesData = $this->chartDataSeriesValues($seriesDetail->numRef->numCache->children($this->cNamespace));
-                $seriesValues
-                    ->setFormatCode($seriesData['formatCode'])
-                    ->setDataValues($seriesData['dataValues']);
+                $series_data = $this->chart_data_series_values($series_detail->num_ref->num_cache->children($this->c_namespace));
+                $series_values->set_format_code($series_data['formatCode'])->set_data_values($series_data['dataValues']);
             }
-            return $seriesValues;
+            return $series_values;
         }
-        if (isset($seriesDetail->multiLvlStrRef)) {
-            $seriesSource = (string) $seriesDetail->multiLvlStrRef->f;
-            $seriesValues = new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, $seriesSource, null, 0, null, $marker, $fillColor, "$pointSize");
-            if (isset($seriesDetail->multiLvlStrRef->multiLvlStrCache)) {
+        if (isset($series_detail->multi_lvl_str_ref)) {
+            $series_source = (string) $series_detail->multi_lvl_str_ref->f;
+            $series_values = new Data_Series_Values(Data_Series_Values::DATASERIES_TYPE_STRING, $series_source, null, 0, null, $marker, $fill_color, "{$point_size}");
+            if (isset($series_detail->multi_lvl_str_ref->multi_lvl_str_cache)) {
                 /** @var array{formatCode: string, dataValues: mixed[]} */
-                $seriesData = $this->chartDataSeriesValuesMultiLevel($seriesDetail->multiLvlStrRef->multiLvlStrCache->children($this->cNamespace), 's');
-                $seriesValues
-                    ->setFormatCode($seriesData['formatCode'])
-                    ->setDataValues($seriesData['dataValues']);
+                $series_data = $this->chart_data_series_values_multi_level($series_detail->multi_lvl_str_ref->multi_lvl_str_cache->children($this->c_namespace), 's');
+                $series_values->set_format_code($series_data['formatCode'])->set_data_values($series_data['dataValues']);
             }
-            return $seriesValues;
+            return $series_values;
         }
-        if (isset($seriesDetail->multiLvlNumRef)) {
-            $seriesSource = (string) $seriesDetail->multiLvlNumRef->f;
-            $seriesValues = new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, $seriesSource, null, 0, null, $marker, $fillColor, "$pointSize");
-            if (isset($seriesDetail->multiLvlNumRef->multiLvlNumCache)) {
+        if (isset($series_detail->multi_lvl_num_ref)) {
+            $series_source = (string) $series_detail->multi_lvl_num_ref->f;
+            $series_values = new Data_Series_Values(Data_Series_Values::DATASERIES_TYPE_STRING, $series_source, null, 0, null, $marker, $fill_color, "{$point_size}");
+            if (isset($series_detail->multi_lvl_num_ref->multi_lvl_num_cache)) {
                 /** @var array{formatCode: string, dataValues: mixed[]} */
-                $seriesData = $this->chartDataSeriesValuesMultiLevel($seriesDetail->multiLvlNumRef->multiLvlNumCache->children($this->cNamespace), 's');
-                $seriesValues
-                    ->setFormatCode($seriesData['formatCode'])
-                    ->setDataValues($seriesData['dataValues']);
+                $series_data = $this->chart_data_series_values_multi_level($series_detail->multi_lvl_num_ref->multi_lvl_num_cache->children($this->c_namespace), 's');
+                $series_values->set_format_code($series_data['formatCode'])->set_data_values($series_data['dataValues']);
             }
-            return $seriesValues;
+            return $series_values;
         }
-
-        if (isset($seriesDetail->v)) {
-            return new DataSeriesValues(
-                DataSeriesValues::DATASERIES_TYPE_STRING,
-                null,
-                null,
-                1,
-                [(string) $seriesDetail->v]
-            );
+        if (isset($series_detail->v)) {
+            return new Data_Series_Values(Data_Series_Values::DATASERIES_TYPE_STRING, null, null, 1, [(string) $series_detail->v]);
         }
-
         return null;
     }
-
     /** @return mixed[] */
-    private function chartDataSeriesValues(SimpleXMLElement $seriesValueSet, string $dataType = 'n'): array
+    private function chart_data_series_values(Simple_Xml_Element $series_value_set, string $data_type = 'n'): array
     {
-        $seriesVal = [];
-        $formatCode = '';
-        $pointCount = 0;
-
-        foreach ($seriesValueSet as $seriesValueIdx => $seriesValue) {
-            $seriesValue = Xlsx::testSimpleXml($seriesValue);
-            switch ($seriesValueIdx) {
+        $series_val = [];
+        $format_code = '';
+        $point_count = 0;
+        foreach ($series_value_set as $series_value_idx => $series_value) {
+            $series_value = Xlsx::test_simple_xml($series_value);
+            switch ($series_value_idx) {
                 case 'ptCount':
-                    $pointCount = self::getAttributeInteger($seriesValue, 'val');
-
+                    $point_count = self::get_attribute_integer($series_value, 'val');
                     break;
                 case 'formatCode':
-                    $formatCode = (string) $seriesValue;
-
+                    $format_code = (string) $series_value;
                     break;
                 case 'pt':
-                    $pointVal = self::getAttributeInteger($seriesValue, 'idx');
-                    if ($dataType == 's') {
-                        $seriesVal[$pointVal] = (string) $seriesValue->v;
-                    } elseif ((string) $seriesValue->v === ExcelError::NA()) {
-                        $seriesVal[$pointVal] = null;
+                    $point_val = self::get_attribute_integer($series_value, 'idx');
+                    if ($data_type == 's') {
+                        $series_val[$point_val] = (string) $series_value->v;
+                    } elseif ((string) $series_value->v === Excel_Error::NA()) {
+                        $series_val[$point_val] = null;
                     } else {
-                        $seriesVal[$pointVal] = (float) $seriesValue->v;
+                        $series_val[$point_val] = (float) $series_value->v;
                     }
-
                     break;
             }
         }
-
-        return [
-            'formatCode' => $formatCode,
-            'pointCount' => $pointCount,
-            'dataValues' => $seriesVal,
-        ];
+        return ['formatCode' => $format_code, 'pointCount' => $point_count, 'dataValues' => $series_val];
     }
-
     /** @return mixed[] */
-    private function chartDataSeriesValuesMultiLevel(SimpleXMLElement $seriesValueSet, string $dataType = 'n'): array
+    private function chart_data_series_values_multi_level(Simple_Xml_Element $series_value_set, string $data_type = 'n'): array
     {
-        $seriesVal = [];
-        $formatCode = '';
-        $pointCount = 0;
-
-        foreach ($seriesValueSet->lvl as $seriesLevel) {
-            foreach ($seriesLevel as $seriesValueIdx => $seriesValue) {
-                $seriesValue = Xlsx::testSimpleXml($seriesValue);
-                switch ($seriesValueIdx) {
+        $series_val = [];
+        $format_code = '';
+        $point_count = 0;
+        foreach ($series_value_set->lvl as $series_level) {
+            foreach ($series_level as $series_value_idx => $series_value) {
+                $series_value = Xlsx::test_simple_xml($series_value);
+                switch ($series_value_idx) {
                     case 'ptCount':
-                        $pointCount = self::getAttributeInteger($seriesValue, 'val');
-
+                        $point_count = self::get_attribute_integer($series_value, 'val');
                         break;
                     case 'formatCode':
-                        $formatCode = (string) $seriesValue;
-
+                        $format_code = (string) $series_value;
                         break;
                     case 'pt':
-                        $pointVal = self::getAttributeInteger($seriesValue, 'idx');
-                        if ($dataType == 's') {
-                            $seriesVal[$pointVal][] = (string) $seriesValue->v;
-                        } elseif ((string) $seriesValue->v === ExcelError::NA()) {
-                            $seriesVal[$pointVal] = null;
+                        $point_val = self::get_attribute_integer($series_value, 'idx');
+                        if ($data_type == 's') {
+                            $series_val[$point_val][] = (string) $series_value->v;
+                        } elseif ((string) $series_value->v === Excel_Error::NA()) {
+                            $series_val[$point_val] = null;
                         } else {
-                            $seriesVal[$pointVal][] = (float) $seriesValue->v;
+                            $series_val[$point_val][] = (float) $series_value->v;
                         }
-
                         break;
                 }
             }
         }
-
-        return [
-            'formatCode' => $formatCode,
-            'pointCount' => $pointCount,
-            'dataValues' => $seriesVal,
-        ];
+        return ['formatCode' => $format_code, 'pointCount' => $point_count, 'dataValues' => $series_val];
     }
-
-    private function parseRichText(SimpleXMLElement $titleDetailPart): RichText
+    private function parse_rich_text(Simple_Xml_Element $title_detail_part): Rich_Text
     {
-        $value = new RichText();
-        $defaultFontSize = null;
-        $defaultBold = null;
-        $defaultItalic = null;
-        $defaultUnderscore = null;
-        $defaultStrikethrough = null;
-        $defaultBaseline = null;
-        $defaultFontName = null;
-        $defaultLatin = null;
-        $defaultEastAsian = null;
-        $defaultComplexScript = null;
-        $defaultFontColor = null;
-        if (isset($titleDetailPart->pPr->defRPr)) {
-            $defaultFontSize = self::getAttributeInteger($titleDetailPart->pPr->defRPr, 'sz');
-            $defaultBold = self::getAttributeBoolean($titleDetailPart->pPr->defRPr, 'b');
-            $defaultItalic = self::getAttributeBoolean($titleDetailPart->pPr->defRPr, 'i');
-            $defaultUnderscore = self::getAttributeString($titleDetailPart->pPr->defRPr, 'u');
-            $defaultStrikethrough = self::getAttributeString($titleDetailPart->pPr->defRPr, 'strike');
-            $defaultBaseline = self::getAttributeInteger($titleDetailPart->pPr->defRPr, 'baseline');
-            if (isset($titleDetailPart->defRPr->rFont['val'])) {
-                $defaultFontName = (string) $titleDetailPart->defRPr->rFont['val'];
+        $value = new Rich_Text();
+        $default_font_size = null;
+        $default_bold = null;
+        $default_italic = null;
+        $default_underscore = null;
+        $default_strikethrough = null;
+        $default_baseline = null;
+        $default_font_name = null;
+        $default_latin = null;
+        $default_east_asian = null;
+        $default_complex_script = null;
+        $default_font_color = null;
+        if (isset($title_detail_part->p_pr->def_r_pr)) {
+            $default_font_size = self::get_attribute_integer($title_detail_part->p_pr->def_r_pr, 'sz');
+            $default_bold = self::get_attribute_boolean($title_detail_part->p_pr->def_r_pr, 'b');
+            $default_italic = self::get_attribute_boolean($title_detail_part->p_pr->def_r_pr, 'i');
+            $default_underscore = self::get_attribute_string($title_detail_part->p_pr->def_r_pr, 'u');
+            $default_strikethrough = self::get_attribute_string($title_detail_part->p_pr->def_r_pr, 'strike');
+            $default_baseline = self::get_attribute_integer($title_detail_part->p_pr->def_r_pr, 'baseline');
+            if (isset($title_detail_part->def_r_pr->r_font['val'])) {
+                $default_font_name = (string) $title_detail_part->def_r_pr->r_font['val'];
             }
-            if (isset($titleDetailPart->pPr->defRPr->latin)) {
-                $defaultLatin = self::getAttributeString($titleDetailPart->pPr->defRPr->latin, 'typeface');
+            if (isset($title_detail_part->p_pr->def_r_pr->latin)) {
+                $default_latin = self::get_attribute_string($title_detail_part->p_pr->def_r_pr->latin, 'typeface');
             }
-            if (isset($titleDetailPart->pPr->defRPr->ea)) {
-                $defaultEastAsian = self::getAttributeString($titleDetailPart->pPr->defRPr->ea, 'typeface');
+            if (isset($title_detail_part->p_pr->def_r_pr->ea)) {
+                $default_east_asian = self::get_attribute_string($title_detail_part->p_pr->def_r_pr->ea, 'typeface');
             }
-            if (isset($titleDetailPart->pPr->defRPr->cs)) {
-                $defaultComplexScript = self::getAttributeString($titleDetailPart->pPr->defRPr->cs, 'typeface');
+            if (isset($title_detail_part->p_pr->def_r_pr->cs)) {
+                $default_complex_script = self::get_attribute_string($title_detail_part->p_pr->def_r_pr->cs, 'typeface');
             }
-            if (isset($titleDetailPart->pPr->defRPr->solidFill)) {
-                $defaultFontColor = $this->readColor($titleDetailPart->pPr->defRPr->solidFill);
+            if (isset($title_detail_part->p_pr->def_r_pr->solid_fill)) {
+                $default_font_color = $this->read_color($title_detail_part->p_pr->def_r_pr->solid_fill);
             }
         }
-        foreach ($titleDetailPart as $titleDetailElementKey => $titleDetailElement) {
-            if ($titleDetailElementKey !== 'r') {
+        foreach ($title_detail_part as $title_detail_element_key => $title_detail_element) {
+            if ($title_detail_element_key !== 'r') {
                 continue;
             }
-            if (!isset($titleDetailElement->t)) {
+            if (!isset($title_detail_element->t)) {
                 continue;
             }
-            $objText = $value->createTextRun((string) $titleDetailElement->t);
-            if ($objText->getFont() === null) {
+            $obj_text = $value->create_text_run((string) $title_detail_element->t);
+            if ($obj_text->get_font() === null) {
                 // @codeCoverageIgnoreStart
                 continue;
                 // @codeCoverageIgnoreEnd
             }
-            $fontSize = null;
+            $font_size = null;
             $bold = null;
             $italic = null;
             $underscore = null;
             $strikethrough = null;
             $baseline = null;
-            $fontName = null;
-            $latinName = null;
-            $eastAsian = null;
-            $complexScript = null;
-            $fontColor = null;
-            $underlineColor = null;
-            if (isset($titleDetailElement->rPr)) {
+            $font_name = null;
+            $latin_name = null;
+            $east_asian = null;
+            $complex_script = null;
+            $font_color = null;
+            $underline_color = null;
+            if (isset($title_detail_element->r_pr)) {
                 // not used now, not sure it ever was, grandfathering
-                if (isset($titleDetailElement->rPr->rFont['val'])) {
+                if (isset($title_detail_element->r_pr->r_font['val'])) {
                     // @codeCoverageIgnoreStart
-                    $fontName = (string) $titleDetailElement->rPr->rFont['val'];
+                    $font_name = (string) $title_detail_element->r_pr->r_font['val'];
                     // @codeCoverageIgnoreEnd
                 }
-                if (isset($titleDetailElement->rPr->latin)) {
-                    $latinName = self::getAttributeString($titleDetailElement->rPr->latin, 'typeface');
+                if (isset($title_detail_element->r_pr->latin)) {
+                    $latin_name = self::get_attribute_string($title_detail_element->r_pr->latin, 'typeface');
                 }
-                if (isset($titleDetailElement->rPr->ea)) {
-                    $eastAsian = self::getAttributeString($titleDetailElement->rPr->ea, 'typeface');
+                if (isset($title_detail_element->r_pr->ea)) {
+                    $east_asian = self::get_attribute_string($title_detail_element->r_pr->ea, 'typeface');
                 }
-                if (isset($titleDetailElement->rPr->cs)) {
-                    $complexScript = self::getAttributeString($titleDetailElement->rPr->cs, 'typeface');
+                if (isset($title_detail_element->r_pr->cs)) {
+                    $complex_script = self::get_attribute_string($title_detail_element->r_pr->cs, 'typeface');
                 }
-                $fontSize = self::getAttributeInteger($titleDetailElement->rPr, 'sz');
-
+                $font_size = self::get_attribute_integer($title_detail_element->r_pr, 'sz');
                 // not used now, not sure it ever was, grandfathering
-                if (isset($titleDetailElement->rPr->solidFill)) {
-                    $fontColor = $this->readColor($titleDetailElement->rPr->solidFill);
+                if (isset($title_detail_element->r_pr->solid_fill)) {
+                    $font_color = $this->read_color($title_detail_element->r_pr->solid_fill);
                 }
-
-                $bold = self::getAttributeBoolean($titleDetailElement->rPr, 'b');
-                $italic = self::getAttributeBoolean($titleDetailElement->rPr, 'i');
-                $baseline = self::getAttributeInteger($titleDetailElement->rPr, 'baseline');
-                $underscore = self::getAttributeString($titleDetailElement->rPr, 'u');
-                if (isset($titleDetailElement->rPr->uFill->solidFill)) {
-                    $underlineColor = $this->readColor($titleDetailElement->rPr->uFill->solidFill);
+                $bold = self::get_attribute_boolean($title_detail_element->r_pr, 'b');
+                $italic = self::get_attribute_boolean($title_detail_element->r_pr, 'i');
+                $baseline = self::get_attribute_integer($title_detail_element->r_pr, 'baseline');
+                $underscore = self::get_attribute_string($title_detail_element->r_pr, 'u');
+                if (isset($title_detail_element->r_pr->u_fill->solid_fill)) {
+                    $underline_color = $this->read_color($title_detail_element->r_pr->u_fill->solid_fill);
                 }
-
-                $strikethrough = self::getAttributeString($titleDetailElement->rPr, 'strike');
+                $strikethrough = self::get_attribute_string($title_detail_element->r_pr, 'strike');
             }
-
-            $fontFound = false;
-            $latinName ??= $defaultLatin;
-            if ($latinName !== null) {
-                $objText->getFont()->setLatin($latinName);
-                $fontFound = true;
+            $font_found = false;
+            $latin_name ??= $default_latin;
+            if ($latin_name !== null) {
+                $obj_text->get_font()->set_latin($latin_name);
+                $font_found = true;
             }
-            $eastAsian ??= $defaultEastAsian;
-            if ($eastAsian !== null) {
-                $objText->getFont()->setEastAsian($eastAsian);
-                $fontFound = true;
+            $east_asian ??= $default_east_asian;
+            if ($east_asian !== null) {
+                $obj_text->get_font()->set_east_asian($east_asian);
+                $font_found = true;
             }
-            $complexScript ??= $defaultComplexScript;
-            if ($complexScript !== null) {
-                $objText->getFont()->setComplexScript($complexScript);
-                $fontFound = true;
+            $complex_script ??= $default_complex_script;
+            if ($complex_script !== null) {
+                $obj_text->get_font()->set_complex_script($complex_script);
+                $font_found = true;
             }
-            $fontName ??= $defaultFontName;
-            if ($fontName !== null) {
+            $font_name ??= $default_font_name;
+            if ($font_name !== null) {
                 // @codeCoverageIgnoreStart
-                $objText->getFont()->setName($fontName);
-                $fontFound = true;
+                $obj_text->get_font()->set_name($font_name);
+                $font_found = true;
                 // @codeCoverageIgnoreEnd
             }
-
-            $fontSize ??= $defaultFontSize;
-            if (is_int($fontSize)) {
-                $objText->getFont()->setSize(floor($fontSize / 100));
-                $fontFound = true;
+            $font_size ??= $default_font_size;
+            if (is_int($font_size)) {
+                $obj_text->get_font()->set_size(floor($font_size / 100));
+                $font_found = true;
             } else {
-                $objText->getFont()->setSize(null, true);
+                $obj_text->get_font()->set_size(null, true);
             }
-
-            $fontColor ??= $defaultFontColor;
-            if (!empty($fontColor)) {
-                $objText->getFont()->setChartColor($fontColor);
-                $fontFound = true;
+            $font_color ??= $default_font_color;
+            if (!empty($font_color)) {
+                $obj_text->get_font()->set_chart_color($font_color);
+                $font_found = true;
             }
-
-            $bold ??= $defaultBold;
+            $bold ??= $default_bold;
             if ($bold !== null) {
-                $objText->getFont()->setBold($bold);
-                $fontFound = true;
+                $obj_text->get_font()->set_bold($bold);
+                $font_found = true;
             }
-
-            $italic ??= $defaultItalic;
+            $italic ??= $default_italic;
             if ($italic !== null) {
-                $objText->getFont()->setItalic($italic);
-                $fontFound = true;
+                $obj_text->get_font()->set_italic($italic);
+                $font_found = true;
             }
-
-            $baseline ??= $defaultBaseline;
+            $baseline ??= $default_baseline;
             if ($baseline !== null) {
-                $objText->getFont()->setBaseLine($baseline);
+                $obj_text->get_font()->set_base_line($baseline);
                 if ($baseline > 0) {
-                    $objText->getFont()->setSuperscript(true);
+                    $obj_text->get_font()->set_superscript(true);
                 } elseif ($baseline < 0) {
-                    $objText->getFont()->setSubscript(true);
+                    $obj_text->get_font()->set_subscript(true);
                 }
-                $fontFound = true;
+                $font_found = true;
             }
-
-            $underscore ??= $defaultUnderscore;
+            $underscore ??= $default_underscore;
             if ($underscore !== null) {
                 if ($underscore == 'sng') {
-                    $objText->getFont()->setUnderline(Font::UNDERLINE_SINGLE);
+                    $obj_text->get_font()->set_underline(Font::UNDERLINE_SINGLE);
                 } elseif ($underscore == 'dbl') {
-                    $objText->getFont()->setUnderline(Font::UNDERLINE_DOUBLE);
+                    $obj_text->get_font()->set_underline(Font::UNDERLINE_DOUBLE);
                 } elseif ($underscore !== '') {
-                    $objText->getFont()->setUnderline($underscore);
+                    $obj_text->get_font()->set_underline($underscore);
                 } else {
-                    $objText->getFont()->setUnderline(Font::UNDERLINE_NONE);
+                    $obj_text->get_font()->set_underline(Font::UNDERLINE_NONE);
                 }
-                $fontFound = true;
-                if ($underlineColor) {
-                    $objText->getFont()->setUnderlineColor($underlineColor);
+                $font_found = true;
+                if ($underline_color) {
+                    $obj_text->get_font()->set_underline_color($underline_color);
                 }
             }
-
-            $strikethrough ??= $defaultStrikethrough;
+            $strikethrough ??= $default_strikethrough;
             if ($strikethrough !== null) {
-                $objText->getFont()->setStrikeType($strikethrough);
+                $obj_text->get_font()->set_strike_type($strikethrough);
                 if ($strikethrough == 'noStrike') {
-                    $objText->getFont()->setStrikethrough(false);
+                    $obj_text->get_font()->set_strikethrough(false);
                 } else {
-                    $objText->getFont()->setStrikethrough(true);
+                    $obj_text->get_font()->set_strikethrough(true);
                 }
-                $fontFound = true;
+                $font_found = true;
             }
-            if ($fontFound === false) {
-                $objText->setFont();
+            if ($font_found === false) {
+                $obj_text->set_font();
             }
         }
-
         return $value;
     }
-
-    private function parseFont(SimpleXMLElement $titleDetailPart): ?Font
+    private function parse_font(Simple_Xml_Element $title_detail_part): ?Font
     {
-        if (!isset($titleDetailPart->pPr->defRPr)) {
+        if (!isset($title_detail_part->p_pr->def_r_pr)) {
             return null;
         }
-        $fontArray = [];
-        $fontArray['size'] = self::getAttributeInteger($titleDetailPart->pPr->defRPr, 'sz');
-        if ($fontArray['size'] !== null && $fontArray['size'] >= 100) {
-            $fontArray['size'] /= 100.0;
+        $font_array = [];
+        $font_array['size'] = self::get_attribute_integer($title_detail_part->p_pr->def_r_pr, 'sz');
+        if ($font_array['size'] !== null && $font_array['size'] >= 100) {
+            $font_array['size'] /= 100.0;
         }
-        if ($fontArray['size'] !== null) {
-            $fontArray['size'] = (int) ($fontArray['size']);
+        if ($font_array['size'] !== null) {
+            $font_array['size'] = (int) $font_array['size'];
         }
-        $fontArray['bold'] = (bool) self::getAttributeBoolean($titleDetailPart->pPr->defRPr, 'b');
-        $fontArray['italic'] = (bool) self::getAttributeBoolean($titleDetailPart->pPr->defRPr, 'i');
-        $fontArray['underscore'] = self::getAttributeString($titleDetailPart->pPr->defRPr, 'u');
-        $strikethrough = self::getAttributeString($titleDetailPart->pPr->defRPr, 'strike');
+        $font_array['bold'] = (bool) self::get_attribute_boolean($title_detail_part->p_pr->def_r_pr, 'b');
+        $font_array['italic'] = (bool) self::get_attribute_boolean($title_detail_part->p_pr->def_r_pr, 'i');
+        $font_array['underscore'] = self::get_attribute_string($title_detail_part->p_pr->def_r_pr, 'u');
+        $strikethrough = self::get_attribute_string($title_detail_part->p_pr->def_r_pr, 'strike');
         if ($strikethrough !== null) {
             if ($strikethrough == 'noStrike') {
-                $fontArray['strikethrough'] = false;
+                $font_array['strikethrough'] = false;
             } else {
-                $fontArray['strikethrough'] = true;
+                $font_array['strikethrough'] = true;
             }
         }
-        $fontArray['cap'] = (string) self::getAttributeString($titleDetailPart->pPr->defRPr, 'cap');
-
-        if (isset($titleDetailPart->pPr->defRPr->latin)) {
-            $fontArray['latin'] = (string) self::getAttributeString($titleDetailPart->pPr->defRPr->latin, 'typeface');
+        $font_array['cap'] = (string) self::get_attribute_string($title_detail_part->p_pr->def_r_pr, 'cap');
+        if (isset($title_detail_part->p_pr->def_r_pr->latin)) {
+            $font_array['latin'] = (string) self::get_attribute_string($title_detail_part->p_pr->def_r_pr->latin, 'typeface');
         }
-        if (isset($titleDetailPart->pPr->defRPr->ea)) {
-            $fontArray['eastAsian'] = (string) self::getAttributeString($titleDetailPart->pPr->defRPr->ea, 'typeface');
+        if (isset($title_detail_part->p_pr->def_r_pr->ea)) {
+            $font_array['eastAsian'] = (string) self::get_attribute_string($title_detail_part->p_pr->def_r_pr->ea, 'typeface');
         }
-        if (isset($titleDetailPart->pPr->defRPr->cs)) {
-            $fontArray['complexScript'] = (string) self::getAttributeString($titleDetailPart->pPr->defRPr->cs, 'typeface');
+        if (isset($title_detail_part->p_pr->def_r_pr->cs)) {
+            $font_array['complexScript'] = (string) self::get_attribute_string($title_detail_part->p_pr->def_r_pr->cs, 'typeface');
         }
-        if (isset($titleDetailPart->pPr->defRPr->solidFill)) {
-            $fontArray['chartColor'] = new ChartColor($this->readColor($titleDetailPart->pPr->defRPr->solidFill));
+        if (isset($title_detail_part->p_pr->def_r_pr->solid_fill)) {
+            $font_array['chartColor'] = new Chart_Color($this->read_color($title_detail_part->p_pr->def_r_pr->solid_fill));
         }
         $font = new Font();
         //$font->setSize(null, true);
-        $font->applyFromArray($fontArray);
-
+        $font->apply_from_array($font_array);
         return $font;
     }
-
     /** @return mixed[] */
-    private function readChartAttributes(?SimpleXMLElement $chartDetail): array
+    private function read_chart_attributes(?Simple_Xml_Element $chart_detail): array
     {
-        $plotAttributes = [];
-        if (isset($chartDetail->dLbls)) {
-            if (isset($chartDetail->dLbls->dLblPos)) {
-                $plotAttributes['dLblPos'] = self::getAttributeString($chartDetail->dLbls->dLblPos, 'val');
+        $plot_attributes = [];
+        if (isset($chart_detail->d_lbls)) {
+            if (isset($chart_detail->d_lbls->d_lbl_pos)) {
+                $plot_attributes['dLblPos'] = self::get_attribute_string($chart_detail->d_lbls->d_lbl_pos, 'val');
             }
-            if (isset($chartDetail->dLbls->numFmt)) {
-                $plotAttributes['numFmtCode'] = self::getAttributeString($chartDetail->dLbls->numFmt, 'formatCode');
-                $plotAttributes['numFmtLinked'] = self::getAttributeBoolean($chartDetail->dLbls->numFmt, 'sourceLinked');
+            if (isset($chart_detail->d_lbls->num_fmt)) {
+                $plot_attributes['numFmtCode'] = self::get_attribute_string($chart_detail->d_lbls->num_fmt, 'formatCode');
+                $plot_attributes['numFmtLinked'] = self::get_attribute_boolean($chart_detail->d_lbls->num_fmt, 'sourceLinked');
             }
-            if (isset($chartDetail->dLbls->showLegendKey)) {
-                $plotAttributes['showLegendKey'] = self::getAttributeString($chartDetail->dLbls->showLegendKey, 'val');
+            if (isset($chart_detail->d_lbls->show_legend_key)) {
+                $plot_attributes['showLegendKey'] = self::get_attribute_string($chart_detail->d_lbls->show_legend_key, 'val');
             }
-            if (isset($chartDetail->dLbls->showVal)) {
-                $plotAttributes['showVal'] = self::getAttributeString($chartDetail->dLbls->showVal, 'val');
+            if (isset($chart_detail->d_lbls->show_val)) {
+                $plot_attributes['showVal'] = self::get_attribute_string($chart_detail->d_lbls->show_val, 'val');
             }
-            if (isset($chartDetail->dLbls->showCatName)) {
-                $plotAttributes['showCatName'] = self::getAttributeString($chartDetail->dLbls->showCatName, 'val');
+            if (isset($chart_detail->d_lbls->show_cat_name)) {
+                $plot_attributes['showCatName'] = self::get_attribute_string($chart_detail->d_lbls->show_cat_name, 'val');
             }
-            if (isset($chartDetail->dLbls->showSerName)) {
-                $plotAttributes['showSerName'] = self::getAttributeString($chartDetail->dLbls->showSerName, 'val');
+            if (isset($chart_detail->d_lbls->show_ser_name)) {
+                $plot_attributes['showSerName'] = self::get_attribute_string($chart_detail->d_lbls->show_ser_name, 'val');
             }
-            if (isset($chartDetail->dLbls->showPercent)) {
-                $plotAttributes['showPercent'] = self::getAttributeString($chartDetail->dLbls->showPercent, 'val');
+            if (isset($chart_detail->d_lbls->show_percent)) {
+                $plot_attributes['showPercent'] = self::get_attribute_string($chart_detail->d_lbls->show_percent, 'val');
             }
-            if (isset($chartDetail->dLbls->showBubbleSize)) {
-                $plotAttributes['showBubbleSize'] = self::getAttributeString($chartDetail->dLbls->showBubbleSize, 'val');
+            if (isset($chart_detail->d_lbls->show_bubble_size)) {
+                $plot_attributes['showBubbleSize'] = self::get_attribute_string($chart_detail->d_lbls->show_bubble_size, 'val');
             }
-            if (isset($chartDetail->dLbls->showLeaderLines)) {
-                $plotAttributes['showLeaderLines'] = self::getAttributeString($chartDetail->dLbls->showLeaderLines, 'val');
+            if (isset($chart_detail->d_lbls->show_leader_lines)) {
+                $plot_attributes['showLeaderLines'] = self::get_attribute_string($chart_detail->d_lbls->show_leader_lines, 'val');
             }
-            if (isset($chartDetail->dLbls->spPr)) {
-                $sppr = $chartDetail->dLbls->spPr->children($this->aNamespace);
-                if (isset($sppr->solidFill)) {
-                    $plotAttributes['labelFillColor'] = new ChartColor($this->readColor($sppr->solidFill));
+            if (isset($chart_detail->d_lbls->sp_pr)) {
+                $sppr = $chart_detail->d_lbls->sp_pr->children($this->a_namespace);
+                if (isset($sppr->solid_fill)) {
+                    $plot_attributes['labelFillColor'] = new Chart_Color($this->read_color($sppr->solid_fill));
                 }
-                if (isset($sppr->ln->solidFill)) {
-                    $plotAttributes['labelBorderColor'] = new ChartColor($this->readColor($sppr->ln->solidFill));
+                if (isset($sppr->ln->solid_fill)) {
+                    $plot_attributes['labelBorderColor'] = new Chart_Color($this->read_color($sppr->ln->solid_fill));
                 }
             }
-            if (isset($chartDetail->dLbls->txPr)) {
-                $txpr = $chartDetail->dLbls->txPr->children($this->aNamespace);
+            if (isset($chart_detail->d_lbls->tx_pr)) {
+                $txpr = $chart_detail->d_lbls->tx_pr->children($this->a_namespace);
                 if (isset($txpr->p)) {
-                    $plotAttributes['labelFont'] = $this->parseFont($txpr->p);
-                    if (isset($txpr->p->pPr->defRPr->effectLst)) {
-                        $labelEffects = new GridLines();
-                        $this->readEffects($txpr->p->pPr->defRPr, $labelEffects, false);
-                        $plotAttributes['labelEffects'] = $labelEffects;
+                    $plot_attributes['labelFont'] = $this->parse_font($txpr->p);
+                    if (isset($txpr->p->p_pr->def_r_pr->effect_lst)) {
+                        $label_effects = new Grid_Lines();
+                        $this->read_effects($txpr->p->p_pr->def_r_pr, $label_effects, false);
+                        $plot_attributes['labelEffects'] = $label_effects;
                     }
                 }
             }
         }
-
-        return $plotAttributes;
+        return $plot_attributes;
     }
-
     /** @param array<mixed> $plotAttributes */
-    private function setChartAttributes(Layout $plotArea, array $plotAttributes): void
+    private function set_chart_attributes(Layout $plot_area, array $plot_attributes): void
     {
-        foreach ($plotAttributes as $plotAttributeKey => $plotAttributeValue) {
+        foreach ($plot_attributes as $plot_attribute_key => $plot_attribute_value) {
             /** @var ?bool $plotAttributeValue */
-            switch ($plotAttributeKey) {
+            switch ($plot_attribute_key) {
                 case 'showLegendKey':
-                    $plotArea->setShowLegendKey($plotAttributeValue);
-
+                    $plot_area->set_show_legend_key($plot_attribute_value);
                     break;
                 case 'showVal':
-                    $plotArea->setShowVal($plotAttributeValue);
-
+                    $plot_area->set_show_val($plot_attribute_value);
                     break;
                 case 'showCatName':
-                    $plotArea->setShowCatName($plotAttributeValue);
-
+                    $plot_area->set_show_cat_name($plot_attribute_value);
                     break;
                 case 'showSerName':
-                    $plotArea->setShowSerName($plotAttributeValue);
-
+                    $plot_area->set_show_ser_name($plot_attribute_value);
                     break;
                 case 'showPercent':
-                    $plotArea->setShowPercent($plotAttributeValue);
-
+                    $plot_area->set_show_percent($plot_attribute_value);
                     break;
                 case 'showBubbleSize':
-                    $plotArea->setShowBubbleSize($plotAttributeValue);
-
+                    $plot_area->set_show_bubble_size($plot_attribute_value);
                     break;
                 case 'showLeaderLines':
-                    $plotArea->setShowLeaderLines($plotAttributeValue);
-
+                    $plot_area->set_show_leader_lines($plot_attribute_value);
                     break;
                 case 'labelFont':
                     /** @var ?Font $plotAttributeValue */
-                    $plotArea->setLabelFont($plotAttributeValue);
-
+                    $plot_area->set_label_font($plot_attribute_value);
                     break;
             }
         }
     }
-
-    private function readEffects(SimpleXMLElement $chartDetail, ?ChartProperties $chartObject, bool $getSppr = true): void
+    private function read_effects(Simple_Xml_Element $chart_detail, ?Chart_Properties $chart_object, bool $get_sppr = true): void
     {
-        if (!isset($chartObject)) {
+        if (!isset($chart_object)) {
             return;
         }
-        if ($getSppr) {
-            if (!isset($chartDetail->spPr)) {
+        if ($get_sppr) {
+            if (!isset($chart_detail->sp_pr)) {
                 return;
             }
-            $sppr = $chartDetail->spPr->children($this->aNamespace);
+            $sppr = $chart_detail->sp_pr->children($this->a_namespace);
         } else {
-            $sppr = $chartDetail;
+            $sppr = $chart_detail;
         }
-        if (isset($sppr->effectLst->glow)) {
-            $axisGlowSize = (float) self::getAttributeInteger($sppr->effectLst->glow, 'rad') / ChartProperties::POINTS_WIDTH_MULTIPLIER;
-            if ($axisGlowSize != 0.0) {
-                $colorArray = $this->readColor($sppr->effectLst->glow);
-                $chartObject->setGlowProperties($axisGlowSize, $colorArray['value'], $colorArray['alpha'], $colorArray['type']);
+        if (isset($sppr->effect_lst->glow)) {
+            $axis_glow_size = (float) self::get_attribute_integer($sppr->effect_lst->glow, 'rad') / Chart_Properties::POINTS_WIDTH_MULTIPLIER;
+            if ($axis_glow_size != 0.0) {
+                $color_array = $this->read_color($sppr->effect_lst->glow);
+                $chart_object->set_glow_properties($axis_glow_size, $color_array['value'], $color_array['alpha'], $color_array['type']);
             }
         }
-
-        if (isset($sppr->effectLst->softEdge)) {
-            $softEdgeSize = self::getAttributeString($sppr->effectLst->softEdge, 'rad');
-            if (is_numeric($softEdgeSize)) {
-                $chartObject->setSoftEdges(ChartProperties::xmlToPoints($softEdgeSize));
+        if (isset($sppr->effect_lst->soft_edge)) {
+            $soft_edge_size = self::get_attribute_string($sppr->effect_lst->soft_edge, 'rad');
+            if (is_numeric($soft_edge_size)) {
+                $chart_object->set_soft_edges(Chart_Properties::xml_to_points($soft_edge_size));
             }
         }
-
         $type = '';
-        foreach (self::SHADOW_TYPES as $shadowType) {
-            if (isset($sppr->effectLst->$shadowType)) {
-                $type = $shadowType;
-
+        foreach (self::SHADOW_TYPES as $shadow_type) {
+            if (isset($sppr->effect_lst->{$shadow_type})) {
+                $type = $shadow_type;
                 break;
             }
         }
         if ($type !== '') {
-            $blur = self::getAttributeString($sppr->effectLst->$type, 'blurRad');
-            $blur = is_numeric($blur) ? ChartProperties::xmlToPoints($blur) : null;
-            $dist = self::getAttributeString($sppr->effectLst->$type, 'dist');
-            $dist = is_numeric($dist) ? ChartProperties::xmlToPoints($dist) : null;
-            $direction = self::getAttributeString($sppr->effectLst->$type, 'dir');
-            $direction = is_numeric($direction) ? ChartProperties::xmlToAngle($direction) : null;
-            $algn = self::getAttributeString($sppr->effectLst->$type, 'algn');
-            $rot = self::getAttributeString($sppr->effectLst->$type, 'rotWithShape');
+            $blur = self::get_attribute_string($sppr->effect_lst->{$type}, 'blurRad');
+            $blur = is_numeric($blur) ? Chart_Properties::xml_to_points($blur) : null;
+            $dist = self::get_attribute_string($sppr->effect_lst->{$type}, 'dist');
+            $dist = is_numeric($dist) ? Chart_Properties::xml_to_points($dist) : null;
+            $direction = self::get_attribute_string($sppr->effect_lst->{$type}, 'dir');
+            $direction = is_numeric($direction) ? Chart_Properties::xml_to_angle($direction) : null;
+            $algn = self::get_attribute_string($sppr->effect_lst->{$type}, 'algn');
+            $rot = self::get_attribute_string($sppr->effect_lst->{$type}, 'rotWithShape');
             $size = [];
-            foreach (['sx', 'sy'] as $sizeType) {
-                $sizeValue = self::getAttributeString($sppr->effectLst->$type, $sizeType);
-                if (is_numeric($sizeValue)) {
-                    $size[$sizeType] = ChartProperties::xmlToTenthOfPercent($sizeValue);
+            foreach (['sx', 'sy'] as $size_type) {
+                $size_value = self::get_attribute_string($sppr->effect_lst->{$type}, $size_type);
+                if (is_numeric($size_value)) {
+                    $size[$size_type] = Chart_Properties::xml_to_tenth_of_percent($size_value);
                 } else {
-                    $size[$sizeType] = null;
+                    $size[$size_type] = null;
                 }
             }
-            foreach (['kx', 'ky'] as $sizeType) {
-                $sizeValue = self::getAttributeString($sppr->effectLst->$type, $sizeType);
-                if (is_numeric($sizeValue)) {
-                    $size[$sizeType] = ChartProperties::xmlToAngle($sizeValue);
+            foreach (['kx', 'ky'] as $size_type) {
+                $size_value = self::get_attribute_string($sppr->effect_lst->{$type}, $size_type);
+                if (is_numeric($size_value)) {
+                    $size[$size_type] = Chart_Properties::xml_to_angle($size_value);
                 } else {
-                    $size[$sizeType] = null;
+                    $size[$size_type] = null;
                 }
             }
-            $colorArray = $this->readColor($sppr->effectLst->$type);
-            $chartObject
-                ->setShadowProperty('effect', $type)
-                ->setShadowProperty('blur', $blur)
-                ->setShadowProperty('direction', $direction)
-                ->setShadowProperty('distance', $dist)
-                ->setShadowProperty('algn', $algn)
-                ->setShadowProperty('rotWithShape', $rot)
-                ->setShadowProperty('size', $size)
-                ->setShadowProperty('color', $colorArray);
+            $color_array = $this->read_color($sppr->effect_lst->{$type});
+            $chart_object->set_shadow_property('effect', $type)->set_shadow_property('blur', $blur)->set_shadow_property('direction', $direction)->set_shadow_property('distance', $dist)->set_shadow_property('algn', $algn)->set_shadow_property('rotWithShape', $rot)->set_shadow_property('size', $size)->set_shadow_property('color', $color_array);
         }
     }
-
-    private const SHADOW_TYPES = [
-        'outerShdw',
-        'innerShdw',
-    ];
-
+    private const SHADOW_TYPES = ['outerShdw', 'innerShdw'];
     /** @return array{type: ?string, value: ?string, alpha: ?int, brightness: ?int} */
-    private function readColor(SimpleXMLElement $colorXml): array
+    private function read_color(Simple_Xml_Element $color_xml): array
     {
-        $result = [
-            'type' => null,
-            'value' => null,
-            'alpha' => null,
-            'brightness' => null,
-        ];
-        foreach (ChartColor::EXCEL_COLOR_TYPES as $type) {
-            if (isset($colorXml->$type)) {
+        $result = ['type' => null, 'value' => null, 'alpha' => null, 'brightness' => null];
+        foreach (Chart_Color::EXCEL_COLOR_TYPES as $type) {
+            if (isset($color_xml->{$type})) {
                 $result['type'] = $type;
-                $result['value'] = self::getAttributeString($colorXml->$type, 'val');
-                if (isset($colorXml->$type->alpha)) {
-                    $alpha = self::getAttributeString($colorXml->$type->alpha, 'val');
+                $result['value'] = self::get_attribute_string($color_xml->{$type}, 'val');
+                if (isset($color_xml->{$type}->alpha)) {
+                    $alpha = self::get_attribute_string($color_xml->{$type}->alpha, 'val');
                     if (is_numeric($alpha)) {
-                        $result['alpha'] = ChartColor::alphaFromXml($alpha);
+                        $result['alpha'] = Chart_Color::alpha_from_xml($alpha);
                     }
                 }
-                if (isset($colorXml->$type->lumMod)) {
-                    $brightness = self::getAttributeString($colorXml->$type->lumMod, 'val');
+                if (isset($color_xml->{$type}->lum_mod)) {
+                    $brightness = self::get_attribute_string($color_xml->{$type}->lum_mod, 'val');
                     if (is_numeric($brightness)) {
-                        $result['brightness'] = ChartColor::alphaFromXml($brightness);
+                        $result['brightness'] = Chart_Color::alpha_from_xml($brightness);
                     }
                 }
-
                 break;
             }
         }
-
         return $result;
     }
-
-    private function readLineStyle(SimpleXMLElement $chartDetail, ?ChartProperties $chartObject): void
+    private function read_line_style(Simple_Xml_Element $chart_detail, ?Chart_Properties $chart_object): void
     {
-        if (!isset($chartObject, $chartDetail->spPr)) {
+        if (!isset($chart_object, $chart_detail->sp_pr)) {
             return;
         }
-        $sppr = $chartDetail->spPr->children($this->aNamespace);
-
+        $sppr = $chart_detail->sp_pr->children($this->a_namespace);
         if (!isset($sppr->ln)) {
             return;
         }
-        $lineWidth = null;
-        $lineWidthTemp = self::getAttributeString($sppr->ln, 'w');
-        if (is_numeric($lineWidthTemp)) {
-            $lineWidth = ChartProperties::xmlToPoints($lineWidthTemp);
+        $line_width = null;
+        $line_width_temp = self::get_attribute_string($sppr->ln, 'w');
+        if (is_numeric($line_width_temp)) {
+            $line_width = Chart_Properties::xml_to_points($line_width_temp);
         }
-        $compoundType = self::getAttributeString($sppr->ln, 'cmpd');
-        $dashType = self::getAttributeString($sppr->ln->prstDash, 'val');
-        $capType = self::getAttributeString($sppr->ln, 'cap');
+        $compound_type = self::get_attribute_string($sppr->ln, 'cmpd');
+        $dash_type = self::get_attribute_string($sppr->ln->prst_dash, 'val');
+        $cap_type = self::get_attribute_string($sppr->ln, 'cap');
         if (isset($sppr->ln->miter)) {
-            $joinType = ChartProperties::LINE_STYLE_JOIN_MITER;
+            $join_type = Chart_Properties::LINE_STYLE_JOIN_MITER;
         } elseif (isset($sppr->ln->bevel)) {
-            $joinType = ChartProperties::LINE_STYLE_JOIN_BEVEL;
+            $join_type = Chart_Properties::LINE_STYLE_JOIN_BEVEL;
         } else {
-            $joinType = '';
+            $join_type = '';
         }
-        $headArrowSize = 0;
-        $endArrowSize = 0;
-        $headArrowType = self::getAttributeString($sppr->ln->headEnd, 'type');
-        $headArrowWidth = self::getAttributeString($sppr->ln->headEnd, 'w');
-        $headArrowLength = self::getAttributeString($sppr->ln->headEnd, 'len');
-        $endArrowType = self::getAttributeString($sppr->ln->tailEnd, 'type');
-        $endArrowWidth = self::getAttributeString($sppr->ln->tailEnd, 'w');
-        $endArrowLength = self::getAttributeString($sppr->ln->tailEnd, 'len');
-        $chartObject->setLineStyleProperties(
-            $lineWidth,
-            $compoundType,
-            $dashType,
-            $capType,
-            $joinType,
-            $headArrowType,
-            $headArrowSize,
-            $endArrowType,
-            $endArrowSize,
-            $headArrowWidth,
-            $headArrowLength,
-            $endArrowWidth,
-            $endArrowLength
-        );
-        $colorArray = $this->readColor($sppr->ln->solidFill);
-        $chartObject->getLineColor()->setColorPropertiesArray($colorArray);
+        $head_arrow_size = 0;
+        $end_arrow_size = 0;
+        $head_arrow_type = self::get_attribute_string($sppr->ln->head_end, 'type');
+        $head_arrow_width = self::get_attribute_string($sppr->ln->head_end, 'w');
+        $head_arrow_length = self::get_attribute_string($sppr->ln->head_end, 'len');
+        $end_arrow_type = self::get_attribute_string($sppr->ln->tail_end, 'type');
+        $end_arrow_width = self::get_attribute_string($sppr->ln->tail_end, 'w');
+        $end_arrow_length = self::get_attribute_string($sppr->ln->tail_end, 'len');
+        $chart_object->set_line_style_properties($line_width, $compound_type, $dash_type, $cap_type, $join_type, $head_arrow_type, $head_arrow_size, $end_arrow_type, $end_arrow_size, $head_arrow_width, $head_arrow_length, $end_arrow_width, $end_arrow_length);
+        $color_array = $this->read_color($sppr->ln->solid_fill);
+        $chart_object->get_line_color()->set_color_properties_array($color_array);
     }
-
-    private function setAxisProperties(SimpleXMLElement $chartDetail, ?Axis $whichAxis): void
+    private function set_axis_properties(Simple_Xml_Element $chart_detail, ?Axis $which_axis): void
     {
-        if (!isset($whichAxis)) {
+        if (!isset($which_axis)) {
             return;
         }
-        if (isset($chartDetail->delete)) {
-            $whichAxis->setAxisOption('hidden', (string) self::getAttributeString($chartDetail->delete, 'val'));
+        if (isset($chart_detail->delete)) {
+            $which_axis->set_axis_option('hidden', (string) self::get_attribute_string($chart_detail->delete, 'val'));
         }
-        if (isset($chartDetail->numFmt)) {
-            $whichAxis->setAxisNumberProperties(
-                (string) self::getAttributeString($chartDetail->numFmt, 'formatCode'),
-                null,
-                (int) self::getAttributeInteger($chartDetail->numFmt, 'sourceLinked')
-            );
+        if (isset($chart_detail->num_fmt)) {
+            $which_axis->set_axis_number_properties((string) self::get_attribute_string($chart_detail->num_fmt, 'formatCode'), null, (int) self::get_attribute_integer($chart_detail->num_fmt, 'sourceLinked'));
         }
-        if (isset($chartDetail->crossBetween)) {
-            $whichAxis->setCrossBetween((string) self::getAttributeString($chartDetail->crossBetween, 'val'));
+        if (isset($chart_detail->cross_between)) {
+            $which_axis->set_cross_between((string) self::get_attribute_string($chart_detail->cross_between, 'val'));
         }
-        if (isset($chartDetail->dispUnits, $chartDetail->dispUnits->builtInUnit)) {
-            $whichAxis->setAxisOption('dispUnitsBuiltIn', (string) self::getAttributeString($chartDetail->dispUnits->builtInUnit, 'val'));
-            if (isset($chartDetail->dispUnits->dispUnitsLbl)) {
-                $whichAxis->setDispUnitsTitle(new Title());
+        if (isset($chart_detail->disp_units, $chart_detail->disp_units->built_in_unit)) {
+            $which_axis->set_axis_option('dispUnitsBuiltIn', (string) self::get_attribute_string($chart_detail->disp_units->built_in_unit, 'val'));
+            if (isset($chart_detail->disp_units->disp_units_lbl)) {
+                $which_axis->set_disp_units_title(new Title());
                 // TODO parse title elements
             }
         }
-        if (isset($chartDetail->majorTickMark)) {
-            $whichAxis->setAxisOption('major_tick_mark', (string) self::getAttributeString($chartDetail->majorTickMark, 'val'));
+        if (isset($chart_detail->major_tick_mark)) {
+            $which_axis->set_axis_option('major_tick_mark', (string) self::get_attribute_string($chart_detail->major_tick_mark, 'val'));
         }
-        if (isset($chartDetail->minorTickMark)) {
-            $whichAxis->setAxisOption('minor_tick_mark', (string) self::getAttributeString($chartDetail->minorTickMark, 'val'));
+        if (isset($chart_detail->minor_tick_mark)) {
+            $which_axis->set_axis_option('minor_tick_mark', (string) self::get_attribute_string($chart_detail->minor_tick_mark, 'val'));
         }
-        if (isset($chartDetail->tickLblPos)) {
-            $whichAxis->setAxisOption('axis_labels', (string) self::getAttributeString($chartDetail->tickLblPos, 'val'));
+        if (isset($chart_detail->tick_lbl_pos)) {
+            $which_axis->set_axis_option('axis_labels', (string) self::get_attribute_string($chart_detail->tick_lbl_pos, 'val'));
         }
-        if (isset($chartDetail->crosses)) {
-            $whichAxis->setAxisOption('horizontal_crosses', (string) self::getAttributeString($chartDetail->crosses, 'val'));
+        if (isset($chart_detail->crosses)) {
+            $which_axis->set_axis_option('horizontal_crosses', (string) self::get_attribute_string($chart_detail->crosses, 'val'));
         }
-        if (isset($chartDetail->crossesAt)) {
-            $whichAxis->setAxisOption('horizontal_crosses_value', (string) self::getAttributeString($chartDetail->crossesAt, 'val'));
+        if (isset($chart_detail->crosses_at)) {
+            $which_axis->set_axis_option('horizontal_crosses_value', (string) self::get_attribute_string($chart_detail->crosses_at, 'val'));
         }
-        if (isset($chartDetail->scaling->logBase)) {
-            $whichAxis->setAxisOption('logBase', (string) self::getAttributeString($chartDetail->scaling->logBase, 'val'));
+        if (isset($chart_detail->scaling->log_base)) {
+            $which_axis->set_axis_option('logBase', (string) self::get_attribute_string($chart_detail->scaling->log_base, 'val'));
         }
-        if (isset($chartDetail->scaling->orientation)) {
-            $whichAxis->setAxisOption('orientation', (string) self::getAttributeString($chartDetail->scaling->orientation, 'val'));
+        if (isset($chart_detail->scaling->orientation)) {
+            $which_axis->set_axis_option('orientation', (string) self::get_attribute_string($chart_detail->scaling->orientation, 'val'));
         }
-        if (isset($chartDetail->scaling->max)) {
-            $whichAxis->setAxisOption('maximum', (string) self::getAttributeString($chartDetail->scaling->max, 'val'));
+        if (isset($chart_detail->scaling->max)) {
+            $which_axis->set_axis_option('maximum', (string) self::get_attribute_string($chart_detail->scaling->max, 'val'));
         }
-        if (isset($chartDetail->scaling->min)) {
-            $whichAxis->setAxisOption('minimum', (string) self::getAttributeString($chartDetail->scaling->min, 'val'));
+        if (isset($chart_detail->scaling->min)) {
+            $which_axis->set_axis_option('minimum', (string) self::get_attribute_string($chart_detail->scaling->min, 'val'));
         }
-        if (isset($chartDetail->scaling->min)) {
-            $whichAxis->setAxisOption('minimum', (string) self::getAttributeString($chartDetail->scaling->min, 'val'));
+        if (isset($chart_detail->scaling->min)) {
+            $which_axis->set_axis_option('minimum', (string) self::get_attribute_string($chart_detail->scaling->min, 'val'));
         }
-        if (isset($chartDetail->majorUnit)) {
-            $whichAxis->setAxisOption('major_unit', (string) self::getAttributeString($chartDetail->majorUnit, 'val'));
+        if (isset($chart_detail->major_unit)) {
+            $which_axis->set_axis_option('major_unit', (string) self::get_attribute_string($chart_detail->major_unit, 'val'));
         }
-        if (isset($chartDetail->minorUnit)) {
-            $whichAxis->setAxisOption('minor_unit', (string) self::getAttributeString($chartDetail->minorUnit, 'val'));
+        if (isset($chart_detail->minor_unit)) {
+            $which_axis->set_axis_option('minor_unit', (string) self::get_attribute_string($chart_detail->minor_unit, 'val'));
         }
-        if (isset($chartDetail->baseTimeUnit)) {
-            $whichAxis->setAxisOption('baseTimeUnit', (string) self::getAttributeString($chartDetail->baseTimeUnit, 'val'));
+        if (isset($chart_detail->base_time_unit)) {
+            $which_axis->set_axis_option('baseTimeUnit', (string) self::get_attribute_string($chart_detail->base_time_unit, 'val'));
         }
-        if (isset($chartDetail->majorTimeUnit)) {
-            $whichAxis->setAxisOption('majorTimeUnit', (string) self::getAttributeString($chartDetail->majorTimeUnit, 'val'));
+        if (isset($chart_detail->major_time_unit)) {
+            $which_axis->set_axis_option('majorTimeUnit', (string) self::get_attribute_string($chart_detail->major_time_unit, 'val'));
         }
-        if (isset($chartDetail->minorTimeUnit)) {
-            $whichAxis->setAxisOption('minorTimeUnit', (string) self::getAttributeString($chartDetail->minorTimeUnit, 'val'));
+        if (isset($chart_detail->minor_time_unit)) {
+            $which_axis->set_axis_option('minorTimeUnit', (string) self::get_attribute_string($chart_detail->minor_time_unit, 'val'));
         }
-        if (isset($chartDetail->txPr)) {
-            $children = $chartDetail->txPr->children($this->aNamespace);
-            $addAxisText = false;
-            $axisText = new AxisText();
-            if (isset($children->bodyPr)) {
-                $textRotation = self::getAttributeString($children->bodyPr, 'rot');
-                if (is_numeric($textRotation)) {
-                    $axisText->setRotation((int) ChartProperties::xmlToAngle($textRotation));
-                    $addAxisText = true;
+        if (isset($chart_detail->tx_pr)) {
+            $children = $chart_detail->tx_pr->children($this->a_namespace);
+            $add_axis_text = false;
+            $axis_text = new Axis_Text();
+            if (isset($children->body_pr)) {
+                $text_rotation = self::get_attribute_string($children->body_pr, 'rot');
+                if (is_numeric($text_rotation)) {
+                    $axis_text->set_rotation((int) Chart_Properties::xml_to_angle($text_rotation));
+                    $add_axis_text = true;
                 }
             }
-            if (isset($children->p->pPr->defRPr)) {
-                $font = $this->parseFont($children->p);
+            if (isset($children->p->p_pr->def_r_pr)) {
+                $font = $this->parse_font($children->p);
                 if ($font !== null) {
-                    $axisText->setFont($font);
-                    $addAxisText = true;
+                    $axis_text->set_font($font);
+                    $add_axis_text = true;
                 }
             }
-            if (isset($children->p->pPr->defRPr->effectLst)) {
-                $this->readEffects($children->p->pPr->defRPr, $axisText, false);
-                $addAxisText = true;
+            if (isset($children->p->p_pr->def_r_pr->effect_lst)) {
+                $this->read_effects($children->p->p_pr->def_r_pr, $axis_text, false);
+                $add_axis_text = true;
             }
-            if ($addAxisText) {
-                $whichAxis->setAxisText($axisText);
+            if ($add_axis_text) {
+                $which_axis->set_axis_text($axis_text);
             }
         }
     }

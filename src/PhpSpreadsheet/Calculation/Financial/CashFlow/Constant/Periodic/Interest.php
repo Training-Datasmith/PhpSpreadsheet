@@ -1,21 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial\Cash_Flow\Constant\Periodic;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\Constant\Periodic;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow\CashFlowValidations;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\Constants as FinancialConstants;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Cash_Flow\Cash_Flow_Validations;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Constants as FinancialConstants;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Interest
 {
     private const FINANCIAL_MAX_ITERATIONS = 128;
-
-    private const FINANCIAL_PRECISION = 1.0e-08;
-
+    private const FINANCIAL_PRECISION = 1.0E-8;
     /**
      * IPMT.
      *
@@ -32,50 +28,32 @@ class Interest
      * @param mixed $futureValue Future Value
      * @param mixed $type Payment type: 0 = at the end of each period, 1 = at the beginning of each period
      */
-    public static function payment(
-        mixed $interestRate,
-        mixed $period,
-        mixed $numberOfPeriods,
-        mixed $presentValue,
-        mixed $futureValue = 0,
-        mixed $type = FinancialConstants::PAYMENT_END_OF_PERIOD
-    ): string|float {
-        $interestRate = Functions::flattenSingleValue($interestRate);
-        $period = Functions::flattenSingleValue($period);
-        $numberOfPeriods = Functions::flattenSingleValue($numberOfPeriods);
-        $presentValue = Functions::flattenSingleValue($presentValue);
-        $futureValue = ($futureValue === null) ? 0.0 : Functions::flattenSingleValue($futureValue);
-        $type = Functions::flattenSingleValue($type) ?? FinancialConstants::PAYMENT_END_OF_PERIOD;
-
+    public static function payment(mixed $interest_rate, mixed $period, mixed $number_of_periods, mixed $present_value, mixed $future_value = 0, mixed $type = Financial_Constants::PAYMENT_END_OF_PERIOD): string|float
+    {
+        $interest_rate = Functions::flatten_single_value($interest_rate);
+        $period = Functions::flatten_single_value($period);
+        $number_of_periods = Functions::flatten_single_value($number_of_periods);
+        $present_value = Functions::flatten_single_value($present_value);
+        $future_value = $future_value === null ? 0.0 : Functions::flatten_single_value($future_value);
+        $type = Functions::flatten_single_value($type) ?? Financial_Constants::PAYMENT_END_OF_PERIOD;
         try {
-            $interestRate = CashFlowValidations::validateRate($interestRate);
-            $period = CashFlowValidations::validateInt($period);
-            $numberOfPeriods = CashFlowValidations::validateInt($numberOfPeriods);
-            $presentValue = CashFlowValidations::validatePresentValue($presentValue);
-            $futureValue = CashFlowValidations::validateFutureValue($futureValue);
-            $type = CashFlowValidations::validatePeriodType($type);
+            $interest_rate = Cash_Flow_Validations::validate_rate($interest_rate);
+            $period = Cash_Flow_Validations::validate_int($period);
+            $number_of_periods = Cash_Flow_Validations::validate_int($number_of_periods);
+            $present_value = Cash_Flow_Validations::validate_present_value($present_value);
+            $future_value = Cash_Flow_Validations::validate_future_value($future_value);
+            $type = Cash_Flow_Validations::validate_period_type($type);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Validate parameters
-        if ($period <= 0 || $period > $numberOfPeriods) {
-            return ExcelError::NAN();
+        if ($period <= 0 || $period > $number_of_periods) {
+            return Excel_Error::NAN();
         }
-
         // Calculate
-        $interestAndPrincipal = new InterestAndPrincipal(
-            $interestRate,
-            $period,
-            $numberOfPeriods,
-            $presentValue,
-            $futureValue,
-            $type
-        );
-
-        return $interestAndPrincipal->interest();
+        $interest_and_principal = new Interest_And_Principal($interest_rate, $period, $number_of_periods, $present_value, $future_value, $type);
+        return $interest_and_principal->interest();
     }
-
     /**
      * ISPMT.
      *
@@ -89,44 +67,38 @@ class Interest
      * @param mixed $numberOfPeriods is the number of payments for the annuity
      * @param mixed $principleRemaining is the loan amount or present value of the payments
      */
-    public static function schedulePayment(mixed $interestRate, mixed $period, mixed $numberOfPeriods, mixed $principleRemaining): string|float
+    public static function schedule_payment(mixed $interest_rate, mixed $period, mixed $number_of_periods, mixed $principle_remaining): string|float
     {
-        $interestRate = Functions::flattenSingleValue($interestRate);
-        $period = Functions::flattenSingleValue($period);
-        $numberOfPeriods = Functions::flattenSingleValue($numberOfPeriods);
-        $principleRemaining = Functions::flattenSingleValue($principleRemaining);
-
+        $interest_rate = Functions::flatten_single_value($interest_rate);
+        $period = Functions::flatten_single_value($period);
+        $number_of_periods = Functions::flatten_single_value($number_of_periods);
+        $principle_remaining = Functions::flatten_single_value($principle_remaining);
         try {
-            $interestRate = CashFlowValidations::validateRate($interestRate);
-            $period = CashFlowValidations::validateInt($period);
-            $numberOfPeriods = CashFlowValidations::validateInt($numberOfPeriods);
-            $principleRemaining = CashFlowValidations::validateFloat($principleRemaining);
+            $interest_rate = Cash_Flow_Validations::validate_rate($interest_rate);
+            $period = Cash_Flow_Validations::validate_int($period);
+            $number_of_periods = Cash_Flow_Validations::validate_int($number_of_periods);
+            $principle_remaining = Cash_Flow_Validations::validate_float($principle_remaining);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Validate parameters
-        if ($period <= 0 || $period > $numberOfPeriods) {
-            return ExcelError::NAN();
+        if ($period <= 0 || $period > $number_of_periods) {
+            return Excel_Error::NAN();
         }
-
         // Return value
-        $returnValue = 0;
-
+        $return_value = 0;
         // Calculate
-        $principlePayment = ($principleRemaining * 1.0) / ($numberOfPeriods * 1.0);
+        $principle_payment = $principle_remaining * 1.0 / ($number_of_periods * 1.0);
         for ($i = 0; $i <= $period; ++$i) {
-            $returnValue = $interestRate * $principleRemaining * -1;
-            $principleRemaining -= $principlePayment;
+            $return_value = $interest_rate * $principle_remaining * -1;
+            $principle_remaining -= $principle_payment;
             // principle needs to be 0 after the last payment, don't let floating point screw it up
-            if ($i == $numberOfPeriods) {
-                $returnValue = 0.0;
+            if ($i == $number_of_periods) {
+                $return_value = 0.0;
             }
         }
-
-        return $returnValue;
+        return $return_value;
     }
-
     /**
      * RATE.
      *
@@ -151,38 +123,30 @@ class Interest
      * @param mixed $guess Your guess for what the rate will be.
      *                          If you omit guess, it is assumed to be 10 percent.
      */
-    public static function rate(
-        mixed $numberOfPeriods,
-        mixed $payment,
-        mixed $presentValue,
-        mixed $futureValue = 0.0,
-        mixed $type = FinancialConstants::PAYMENT_END_OF_PERIOD,
-        mixed $guess = 0.1
-    ): string|float {
-        $numberOfPeriods = Functions::flattenSingleValue($numberOfPeriods);
-        $payment = Functions::flattenSingleValue($payment);
-        $presentValue = Functions::flattenSingleValue($presentValue);
-        $futureValue = Functions::flattenSingleValue($futureValue) ?? 0.0;
-        $type = Functions::flattenSingleValue($type) ?? FinancialConstants::PAYMENT_END_OF_PERIOD;
-        $guess = Functions::flattenSingleValue($guess) ?? 0.1;
-
+    public static function rate(mixed $number_of_periods, mixed $payment, mixed $present_value, mixed $future_value = 0.0, mixed $type = Financial_Constants::PAYMENT_END_OF_PERIOD, mixed $guess = 0.1): string|float
+    {
+        $number_of_periods = Functions::flatten_single_value($number_of_periods);
+        $payment = Functions::flatten_single_value($payment);
+        $present_value = Functions::flatten_single_value($present_value);
+        $future_value = Functions::flatten_single_value($future_value) ?? 0.0;
+        $type = Functions::flatten_single_value($type) ?? Financial_Constants::PAYMENT_END_OF_PERIOD;
+        $guess = Functions::flatten_single_value($guess) ?? 0.1;
         try {
-            $numberOfPeriods = CashFlowValidations::validateFloat($numberOfPeriods);
-            $payment = CashFlowValidations::validateFloat($payment);
-            $presentValue = CashFlowValidations::validatePresentValue($presentValue);
-            $futureValue = CashFlowValidations::validateFutureValue($futureValue);
-            $type = CashFlowValidations::validatePeriodType($type);
-            $guess = CashFlowValidations::validateFloat($guess);
+            $number_of_periods = Cash_Flow_Validations::validate_float($number_of_periods);
+            $payment = Cash_Flow_Validations::validate_float($payment);
+            $present_value = Cash_Flow_Validations::validate_present_value($present_value);
+            $future_value = Cash_Flow_Validations::validate_future_value($future_value);
+            $type = Cash_Flow_Validations::validate_period_type($type);
+            $guess = Cash_Flow_Validations::validate_float($guess);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         $rate = $guess;
         // rest of code adapted from python/numpy
         $close = false;
         $iter = 0;
         while (!$close && $iter < self::FINANCIAL_MAX_ITERATIONS) {
-            $nextdiff = self::rateNextGuess($rate, $numberOfPeriods, $payment, $presentValue, $futureValue, $type);
+            $nextdiff = self::rate_next_guess($rate, $number_of_periods, $payment, $present_value, $future_value, $type);
             if (!is_numeric($nextdiff)) {
                 break;
             }
@@ -191,25 +155,20 @@ class Interest
             ++$iter;
             $rate = $rate1;
         }
-
-        return $close ? $rate : ExcelError::NAN();
+        return $close ? $rate : Excel_Error::NAN();
     }
-
-    private static function rateNextGuess(float $rate, float $numberOfPeriods, float $payment, float $presentValue, float $futureValue, int $type): string|float
+    private static function rate_next_guess(float $rate, float $number_of_periods, float $payment, float $present_value, float $future_value, int $type): string|float
     {
         if ($rate == 0.0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-        $tt1 = ($rate + 1) ** $numberOfPeriods;
-        $tt2 = ($rate + 1) ** ($numberOfPeriods - 1);
-        $numerator = $futureValue + $tt1 * $presentValue + $payment * ($tt1 - 1) * ($rate * $type + 1) / $rate;
-        $denominator = $numberOfPeriods * $tt2 * $presentValue - $payment * ($tt1 - 1)
-            * ($rate * $type + 1) / ($rate * $rate) + $numberOfPeriods
-            * $payment * $tt2 * ($rate * $type + 1) / $rate + $payment * ($tt1 - 1) * $type / $rate;
+        $tt1 = ($rate + 1) ** $number_of_periods;
+        $tt2 = ($rate + 1) ** ($number_of_periods - 1);
+        $numerator = $future_value + $tt1 * $present_value + $payment * ($tt1 - 1) * ($rate * $type + 1) / $rate;
+        $denominator = $number_of_periods * $tt2 * $present_value - $payment * ($tt1 - 1) * ($rate * $type + 1) / ($rate * $rate) + $number_of_periods * $payment * $tt2 * ($rate * $type + 1) / $rate + $payment * ($tt1 - 1) * $type / $rate;
         if ($denominator == 0) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
         return $numerator / $denominator;
     }
 }

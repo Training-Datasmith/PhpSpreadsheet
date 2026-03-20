@@ -1,27 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Cell\AddressHelper;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Cell\Address_Helper;
+use Php_Office\Php_Spreadsheet\Cell\Coordinate;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Address
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     public const ADDRESS_ABSOLUTE = 1;
     public const ADDRESS_COLUMN_RELATIVE = 2;
     public const ADDRESS_ROW_RELATIVE = 3;
     public const ADDRESS_RELATIVE = 4;
-
     public const REFERENCE_STYLE_A1 = true;
     public const REFERENCE_STYLE_R1C1 = false;
-
     /**
      * ADDRESS.
      *
@@ -50,79 +45,58 @@ class Address
      * @return mixed[]|string If an array of values is passed as the $testValue argument, then the returned result will also be
      *            an array with the same dimensions
      */
-    public static function cell(mixed $row, mixed $column, mixed $relativity = 1, mixed $referenceStyle = true, mixed $sheetName = ''): array|string
+    public static function cell(mixed $row, mixed $column, mixed $relativity = 1, mixed $reference_style = true, mixed $sheet_name = ''): array|string
     {
-        if (
-            is_array($row) || is_array($column)
-            || is_array($relativity) || is_array($referenceStyle) || is_array($sheetName)
-        ) {
-            return self::evaluateArrayArguments(
-                [self::class, __FUNCTION__],
-                $row,
-                $column,
-                $relativity,
-                $referenceStyle,
-                $sheetName
-            );
+        if (is_array($row) || is_array($column) || is_array($relativity) || is_array($reference_style) || is_array($sheet_name)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $row, $column, $relativity, $reference_style, $sheet_name);
         }
-
-        $relativity = ($relativity === null) ? 1 : (int) StringHelper::convertToString($relativity);
-        $referenceStyle ??= true;
-        $row = (int) StringHelper::convertToString($row);
-        $column = (int) StringHelper::convertToString($column);
-
-        if (($row < 1) || ($column < 1)) {
-            return ExcelError::VALUE();
+        $relativity = $relativity === null ? 1 : (int) String_Helper::convert_to_string($relativity);
+        $reference_style ??= true;
+        $row = (int) String_Helper::convert_to_string($row);
+        $column = (int) String_Helper::convert_to_string($column);
+        if ($row < 1 || $column < 1) {
+            return Excel_Error::VALUE();
         }
-
-        $sheetName = self::sheetName(StringHelper::convertToString($sheetName));
-
-        if (is_int($referenceStyle)) {
-            $referenceStyle = (bool) $referenceStyle;
+        $sheet_name = self::sheet_name(String_Helper::convert_to_string($sheet_name));
+        if (is_int($reference_style)) {
+            $reference_style = (bool) $reference_style;
         }
-        if ((!is_bool($referenceStyle)) || $referenceStyle === self::REFERENCE_STYLE_A1) {
-            return self::formatAsA1($row, $column, $relativity, $sheetName);
+        if (!is_bool($reference_style) || $reference_style === self::REFERENCE_STYLE_A1) {
+            return self::format_as_a1($row, $column, $relativity, $sheet_name);
         }
-
-        return self::formatAsR1C1($row, $column, $relativity, $sheetName);
+        return self::format_as_r1c1($row, $column, $relativity, $sheet_name);
     }
-
-    private static function sheetName(string $sheetName): string
+    private static function sheet_name(string $sheet_name): string
     {
-        if ($sheetName > '') {
-            if (str_contains($sheetName, ' ') || str_contains($sheetName, '[')) {
-                $sheetName = "'{$sheetName}'";
+        if ($sheet_name > '') {
+            if (str_contains($sheet_name, ' ') || str_contains($sheet_name, '[')) {
+                $sheet_name = "'{$sheet_name}'";
             }
-            $sheetName .= '!';
+            $sheet_name .= '!';
         }
-
-        return $sheetName;
+        return $sheet_name;
     }
-
-    private static function formatAsA1(int $row, int $column, int $relativity, string $sheetName): string
+    private static function format_as_a1(int $row, int $column, int $relativity, string $sheet_name): string
     {
-        $rowRelative = $columnRelative = '$';
-        if (($relativity == self::ADDRESS_COLUMN_RELATIVE) || ($relativity == self::ADDRESS_RELATIVE)) {
-            $columnRelative = '';
+        $row_relative = $column_relative = '$';
+        if ($relativity == self::ADDRESS_COLUMN_RELATIVE || $relativity == self::ADDRESS_RELATIVE) {
+            $column_relative = '';
         }
-        if (($relativity == self::ADDRESS_ROW_RELATIVE) || ($relativity == self::ADDRESS_RELATIVE)) {
-            $rowRelative = '';
+        if ($relativity == self::ADDRESS_ROW_RELATIVE || $relativity == self::ADDRESS_RELATIVE) {
+            $row_relative = '';
         }
-        $column = Coordinate::stringFromColumnIndex($column);
-
-        return "{$sheetName}{$columnRelative}{$column}{$rowRelative}{$row}";
+        $column = Coordinate::string_from_column_index($column);
+        return "{$sheet_name}{$column_relative}{$column}{$row_relative}{$row}";
     }
-
-    private static function formatAsR1C1(int $row, int $column, int $relativity, string $sheetName): string
+    private static function format_as_r1c1(int $row, int $column, int $relativity, string $sheet_name): string
     {
-        if (($relativity == self::ADDRESS_COLUMN_RELATIVE) || ($relativity == self::ADDRESS_RELATIVE)) {
+        if ($relativity == self::ADDRESS_COLUMN_RELATIVE || $relativity == self::ADDRESS_RELATIVE) {
             $column = "[{$column}]";
         }
-        if (($relativity == self::ADDRESS_ROW_RELATIVE) || ($relativity == self::ADDRESS_RELATIVE)) {
+        if ($relativity == self::ADDRESS_ROW_RELATIVE || $relativity == self::ADDRESS_RELATIVE) {
             $row = "[{$row}]";
         }
-        [$rowChar, $colChar] = AddressHelper::getRowAndColumnChars();
-
-        return "{$sheetName}$rowChar{$row}$colChar{$column}";
+        [$row_char, $col_char] = Address_Helper::get_row_and_column_chars();
+        return "{$sheet_name}{$row_char}{$row}{$col_char}{$column}";
     }
 }

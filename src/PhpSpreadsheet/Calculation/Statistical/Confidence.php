@@ -1,18 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Confidence
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * CONFIDENCE.
      *
@@ -28,29 +25,25 @@ class Confidence
      * @return array<mixed>|float|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function CONFIDENCE(mixed $alpha, mixed $stdDev, mixed $size)
+    public static function CONFIDENCE(mixed $alpha, mixed $std_dev, mixed $size)
     {
-        if (is_array($alpha) || is_array($stdDev) || is_array($size)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $alpha, $stdDev, $size);
+        if (is_array($alpha) || is_array($std_dev) || is_array($size)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $alpha, $std_dev, $size);
         }
-
         try {
-            $alpha = StatisticalValidations::validateFloat($alpha);
-            $stdDev = StatisticalValidations::validateFloat($stdDev);
-            $size = StatisticalValidations::validateInt($size);
+            $alpha = Statistical_Validations::validate_float($alpha);
+            $std_dev = Statistical_Validations::validate_float($std_dev);
+            $size = Statistical_Validations::validate_int($size);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($alpha <= 0) || ($alpha >= 1) || ($stdDev <= 0) || ($size < 1)) {
-            return ExcelError::NAN();
+        if ($alpha <= 0 || $alpha >= 1 || $std_dev <= 0 || $size < 1) {
+            return Excel_Error::NAN();
         }
         /** @var float $temp */
-        $temp = Distributions\StandardNormal::inverse(1 - $alpha / 2);
-
+        $temp = Distributions\Standard_Normal::inverse(1 - $alpha / 2);
         /** @var float */
-        $result = Functions::scalar($temp * $stdDev / sqrt($size));
-
+        $result = Functions::scalar($temp * $std_dev / sqrt($size));
         return $result;
     }
 }

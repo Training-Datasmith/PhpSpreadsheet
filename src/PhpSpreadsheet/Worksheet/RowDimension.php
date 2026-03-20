@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-use PhpOffice\PhpSpreadsheet\Helper\Dimension as CssDimension;
-
-class RowDimension extends Dimension
+use Php_Office\Php_Spreadsheet\Helper\Dimension as CssDimension;
+class Row_Dimension extends Dimension
 {
     /**
      * Row height (in pt).
@@ -14,62 +12,48 @@ class RowDimension extends Dimension
      * When this is set to a negative value, the row height should be ignored by IWriter
      */
     private float $height = -1;
-
     /**
      * ZeroHeight for Row?
      */
-    private bool $zeroHeight = false;
-
-    private bool $customFormat = false;
-
-    private bool $visibleAfterFilter = true;
-
-    public function setVisibleAfterFilter(bool $visibleAfterFilter): self
+    private bool $zero_height = false;
+    private bool $custom_format = false;
+    private bool $visible_after_filter = true;
+    public function set_visible_after_filter(bool $visible_after_filter): self
     {
-        $this->visibleAfterFilter = $visibleAfterFilter;
-
+        $this->visible_after_filter = $visible_after_filter;
         return $this;
     }
-
-    public function getVisibleAfterFilter(): bool
+    public function get_visible_after_filter(): bool
     {
-        return $this->visibleAfterFilter;
+        return $this->visible_after_filter;
     }
-
     /**
      * @param ?int $rowIndex Numeric row index
      */
-    public function __construct(private ?int $rowIndex = 0)
+    public function __construct(private ?int $row_index = 0)
     {
         // set dimension as unformatted by default
         parent::__construct();
     }
-
-    public function getRowIndex(): ?int
+    public function get_row_index(): ?int
     {
-        return $this->rowIndex;
+        return $this->row_index;
     }
-
-    public function setRowIndex(int $index): static
+    public function set_row_index(int $index): static
     {
-        $this->rowIndex = $index;
-
+        $this->row_index = $index;
         return $this;
     }
-
     /**
      * Get Row Height.
      * By default, this will be in points; but this method also accepts an optional unit of measure
      *    argument, and will convert the value from points to the specified UoM.
      *    A value of -1 tells Excel to display this column in its default height.
      */
-    public function getRowHeight(?string $unitOfMeasure = null): float
+    public function get_row_height(?string $unit_of_measure = null): float
     {
-        return ($unitOfMeasure === null || $this->height < 0)
-            ? $this->height
-            : (new CssDimension($this->height . CssDimension::UOM_POINTS))->toUnit($unitOfMeasure);
+        return $unit_of_measure === null || $this->height < 0 ? $this->height : (new Css_Dimension($this->height . Css_Dimension::UOM_POINTS))->to_unit($unit_of_measure);
     }
-
     /**
      * Set Row Height.
      *
@@ -77,40 +61,31 @@ class RowDimension extends Dimension
      * By default, this will be the passed argument value; but this method also accepts an optional unit of measure
      *    argument, and will convert the passed argument value to points from the specified UoM
      */
-    public function setRowHeight(float $height, ?string $unitOfMeasure = null): static
+    public function set_row_height(float $height, ?string $unit_of_measure = null): static
     {
-        $this->height = ($unitOfMeasure === null || $height < 0)
-            ? $height
-            : (new CssDimension("{$height}{$unitOfMeasure}"))->height();
-        $this->customFormat = false;
-
+        $this->height = $unit_of_measure === null || $height < 0 ? $height : (new Css_Dimension("{$height}{$unit_of_measure}"))->height();
+        $this->custom_format = false;
         return $this;
     }
-
-    public function getZeroHeight(): bool
+    public function get_zero_height(): bool
     {
-        return $this->zeroHeight;
+        return $this->zero_height;
     }
-
-    public function setZeroHeight(bool $zeroHeight): static
+    public function set_zero_height(bool $zero_height): static
     {
-        $this->zeroHeight = $zeroHeight;
-
+        $this->zero_height = $zero_height;
         return $this;
     }
-
-    public function getCustomFormat(): bool
+    public function get_custom_format(): bool
     {
-        return $this->customFormat;
+        return $this->custom_format;
     }
-
-    public function setCustomFormat(bool $customFormat, ?float $height = -1): self
+    public function set_custom_format(bool $custom_format, ?float $height = -1): self
     {
-        $this->customFormat = $customFormat;
+        $this->custom_format = $custom_format;
         if ($height !== null) {
             $this->height = $height;
         }
-
         return $this;
     }
 }

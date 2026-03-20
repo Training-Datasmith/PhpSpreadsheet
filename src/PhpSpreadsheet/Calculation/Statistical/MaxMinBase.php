@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Statistical;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Statistical;
-
-abstract class MaxMinBase
+abstract class Max_Min_Base
 {
-    protected static function datatypeAdjustmentAllowStrings(int|float|string|bool $value): int|float
+    protected static function datatype_adjustment_allow_strings(int|float|string|bool $value): int|float
     {
         if (is_bool($value)) {
             return (int) $value;
@@ -14,7 +13,6 @@ abstract class MaxMinBase
         if (is_string($value)) {
             return 0;
         }
-
         return $value;
     }
 }

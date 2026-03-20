@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
 /**
  * <code>
@@ -65,7 +64,7 @@ namespace PhpOffice\PhpSpreadsheet\Worksheet;
  * &H - code for "shadow style"
  * </code>
  */
-class HeaderFooter
+class Header_Footer
 {
     // Header/footer image location
     public const IMAGE_HEADER_LEFT = 'LH';
@@ -92,290 +91,244 @@ class HeaderFooter
     public const IMAGE_FOOTER_RIGHT_ODD = 'RF';
     public const IMAGE_FOOTER_RIGHT_FIRST = 'RFFIRST';
     public const IMAGE_FOOTER_RIGHT_EVEN = 'RFEVEN';
-
     /**
      * OddHeader.
      */
-    private string $oddHeader = '';
-
+    private string $odd_header = '';
     /**
      * OddFooter.
      */
-    private string $oddFooter = '';
-
+    private string $odd_footer = '';
     /**
      * EvenHeader.
      */
-    private string $evenHeader = '';
-
+    private string $even_header = '';
     /**
      * EvenFooter.
      */
-    private string $evenFooter = '';
-
+    private string $even_footer = '';
     /**
      * FirstHeader.
      */
-    private string $firstHeader = '';
-
+    private string $first_header = '';
     /**
      * FirstFooter.
      */
-    private string $firstFooter = '';
-
+    private string $first_footer = '';
     /**
      * Different header for Odd/Even, defaults to false.
      */
-    private bool $differentOddEven = false;
-
+    private bool $different_odd_even = false;
     /**
      * Different header for first page, defaults to false.
      */
-    private bool $differentFirst = false;
-
+    private bool $different_first = false;
     /**
      * Scale with document, defaults to true.
      */
-    private bool $scaleWithDocument = true;
-
+    private bool $scale_with_document = true;
     /**
      * Align with margins, defaults to true.
      */
-    private bool $alignWithMargins = true;
-
+    private bool $align_with_margins = true;
     /**
      * Header/footer images.
      *
      * @var HeaderFooterDrawing[]
      */
-    private array $headerFooterImages = [];
-
+    private array $header_footer_images = [];
     /**
      * Get OddHeader.
      */
-    public function getOddHeader(): string
+    public function get_odd_header(): string
     {
-        return $this->oddHeader;
+        return $this->odd_header;
     }
-
     /**
      * Set OddHeader.
      *
      * @return $this
      */
-    public function setOddHeader(string $oddHeader): static
+    public function set_odd_header(string $odd_header): static
     {
-        $this->oddHeader = $oddHeader;
-
+        $this->odd_header = $odd_header;
         return $this;
     }
-
     /**
      * Get OddFooter.
      */
-    public function getOddFooter(): string
+    public function get_odd_footer(): string
     {
-        return $this->oddFooter;
+        return $this->odd_footer;
     }
-
     /**
      * Set OddFooter.
      *
      * @return $this
      */
-    public function setOddFooter(string $oddFooter): static
+    public function set_odd_footer(string $odd_footer): static
     {
-        $this->oddFooter = $oddFooter;
-
+        $this->odd_footer = $odd_footer;
         return $this;
     }
-
     /**
      * Get EvenHeader.
      */
-    public function getEvenHeader(): string
+    public function get_even_header(): string
     {
-        return $this->evenHeader;
+        return $this->even_header;
     }
-
     /**
      * Set EvenHeader.
      *
      * @return $this
      */
-    public function setEvenHeader(string $eventHeader): static
+    public function set_even_header(string $event_header): static
     {
-        $this->evenHeader = $eventHeader;
-
+        $this->even_header = $event_header;
         return $this;
     }
-
     /**
      * Get EvenFooter.
      */
-    public function getEvenFooter(): string
+    public function get_even_footer(): string
     {
-        return $this->evenFooter;
+        return $this->even_footer;
     }
-
     /**
      * Set EvenFooter.
      *
      * @return $this
      */
-    public function setEvenFooter(string $evenFooter): static
+    public function set_even_footer(string $even_footer): static
     {
-        $this->evenFooter = $evenFooter;
-
+        $this->even_footer = $even_footer;
         return $this;
     }
-
     /**
      * Get FirstHeader.
      */
-    public function getFirstHeader(): string
+    public function get_first_header(): string
     {
-        return $this->firstHeader;
+        return $this->first_header;
     }
-
     /**
      * Set FirstHeader.
      *
      * @return $this
      */
-    public function setFirstHeader(string $firstHeader): static
+    public function set_first_header(string $first_header): static
     {
-        $this->firstHeader = $firstHeader;
-
+        $this->first_header = $first_header;
         return $this;
     }
-
     /**
      * Get FirstFooter.
      */
-    public function getFirstFooter(): string
+    public function get_first_footer(): string
     {
-        return $this->firstFooter;
+        return $this->first_footer;
     }
-
     /**
      * Set FirstFooter.
      *
      * @return $this
      */
-    public function setFirstFooter(string $firstFooter): static
+    public function set_first_footer(string $first_footer): static
     {
-        $this->firstFooter = $firstFooter;
-
+        $this->first_footer = $first_footer;
         return $this;
     }
-
     /**
      * Get DifferentOddEven.
      */
-    public function getDifferentOddEven(): bool
+    public function get_different_odd_even(): bool
     {
-        return $this->differentOddEven;
+        return $this->different_odd_even;
     }
-
     /**
      * Set DifferentOddEven.
      *
      * @return $this
      */
-    public function setDifferentOddEven(bool $differentOddEvent): static
+    public function set_different_odd_even(bool $different_odd_event): static
     {
-        $this->differentOddEven = $differentOddEvent;
-
+        $this->different_odd_even = $different_odd_event;
         return $this;
     }
-
     /**
      * Get DifferentFirst.
      */
-    public function getDifferentFirst(): bool
+    public function get_different_first(): bool
     {
-        return $this->differentFirst;
+        return $this->different_first;
     }
-
     /**
      * Set DifferentFirst.
      *
      * @return $this
      */
-    public function setDifferentFirst(bool $differentFirst): static
+    public function set_different_first(bool $different_first): static
     {
-        $this->differentFirst = $differentFirst;
-
+        $this->different_first = $different_first;
         return $this;
     }
-
     /**
      * Get ScaleWithDocument.
      */
-    public function getScaleWithDocument(): bool
+    public function get_scale_with_document(): bool
     {
-        return $this->scaleWithDocument;
+        return $this->scale_with_document;
     }
-
     /**
      * Set ScaleWithDocument.
      *
      * @return $this
      */
-    public function setScaleWithDocument(bool $scaleWithDocument): static
+    public function set_scale_with_document(bool $scale_with_document): static
     {
-        $this->scaleWithDocument = $scaleWithDocument;
-
+        $this->scale_with_document = $scale_with_document;
         return $this;
     }
-
     /**
      * Get AlignWithMargins.
      */
-    public function getAlignWithMargins(): bool
+    public function get_align_with_margins(): bool
     {
-        return $this->alignWithMargins;
+        return $this->align_with_margins;
     }
-
     /**
      * Set AlignWithMargins.
      *
      * @return $this
      */
-    public function setAlignWithMargins(bool $alignWithMargins): static
+    public function set_align_with_margins(bool $align_with_margins): static
     {
-        $this->alignWithMargins = $alignWithMargins;
-
+        $this->align_with_margins = $align_with_margins;
         return $this;
     }
-
     /**
      * Add header/footer image.
      *
      * @return $this
      */
-    public function addImage(HeaderFooterDrawing $image, string $location = self::IMAGE_HEADER_LEFT): static
+    public function add_image(Header_Footer_Drawing $image, string $location = self::IMAGE_HEADER_LEFT): static
     {
-        $this->headerFooterImages[$location] = $image;
-
+        $this->header_footer_images[$location] = $image;
         return $this;
     }
-
     /**
      * Remove header/footer image.
      *
      * @return $this
      */
-    public function removeImage(string $location = self::IMAGE_HEADER_LEFT): static
+    public function remove_image(string $location = self::IMAGE_HEADER_LEFT): static
     {
-        if (isset($this->headerFooterImages[$location])) {
-            unset($this->headerFooterImages[$location]);
+        if (isset($this->header_footer_images[$location])) {
+            unset($this->header_footer_images[$location]);
         }
-
         return $this;
     }
-
     /**
      * Set header/footer images.
      *
@@ -383,53 +336,29 @@ class HeaderFooter
      *
      * @return $this
      */
-    public function setImages(array $images): static
+    public function set_images(array $images): static
     {
-        $this->headerFooterImages = $images;
-
+        $this->header_footer_images = $images;
         return $this;
     }
-
-    private const IMAGE_SORT_ORDER = [
-        self::IMAGE_HEADER_LEFT,
-        self::IMAGE_HEADER_LEFT_FIRST,
-        self::IMAGE_HEADER_LEFT_EVEN,
-        self::IMAGE_HEADER_CENTER,
-        self::IMAGE_HEADER_CENTER_FIRST,
-        self::IMAGE_HEADER_CENTER_EVEN,
-        self::IMAGE_HEADER_RIGHT,
-        self::IMAGE_HEADER_RIGHT_FIRST,
-        self::IMAGE_HEADER_RIGHT_EVEN,
-        self::IMAGE_FOOTER_LEFT,
-        self::IMAGE_FOOTER_LEFT_FIRST,
-        self::IMAGE_FOOTER_LEFT_EVEN,
-        self::IMAGE_FOOTER_CENTER,
-        self::IMAGE_FOOTER_CENTER_FIRST,
-        self::IMAGE_FOOTER_CENTER_EVEN,
-        self::IMAGE_FOOTER_RIGHT,
-        self::IMAGE_FOOTER_RIGHT_FIRST,
-        self::IMAGE_FOOTER_RIGHT_EVEN,
-    ];
-
+    private const IMAGE_SORT_ORDER = [self::IMAGE_HEADER_LEFT, self::IMAGE_HEADER_LEFT_FIRST, self::IMAGE_HEADER_LEFT_EVEN, self::IMAGE_HEADER_CENTER, self::IMAGE_HEADER_CENTER_FIRST, self::IMAGE_HEADER_CENTER_EVEN, self::IMAGE_HEADER_RIGHT, self::IMAGE_HEADER_RIGHT_FIRST, self::IMAGE_HEADER_RIGHT_EVEN, self::IMAGE_FOOTER_LEFT, self::IMAGE_FOOTER_LEFT_FIRST, self::IMAGE_FOOTER_LEFT_EVEN, self::IMAGE_FOOTER_CENTER, self::IMAGE_FOOTER_CENTER_FIRST, self::IMAGE_FOOTER_CENTER_EVEN, self::IMAGE_FOOTER_RIGHT, self::IMAGE_FOOTER_RIGHT_FIRST, self::IMAGE_FOOTER_RIGHT_EVEN];
     /**
      * Get header/footer images.
      *
      * @return HeaderFooterDrawing[]
      */
-    public function getImages(): array
+    public function get_images(): array
     {
         // Sort array - not sure why needed
         $images = [];
         foreach (self::IMAGE_SORT_ORDER as $key) {
-            if (isset($this->headerFooterImages[$key])) {
-                $images[$key] = $this->headerFooterImages[$key];
+            if (isset($this->header_footer_images[$key])) {
+                $images[$key] = $this->header_footer_images[$key];
             }
         }
-        $this->headerFooterImages = $images;
-
-        return $this->headerFooterImages;
+        $this->header_footer_images = $images;
+        return $this->header_footer_images;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
@@ -438,9 +367,9 @@ class HeaderFooter
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
             if (is_object($value)) {
-                $this->$key = clone $value;
+                $this->{$key} = clone $value;
             } else {
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

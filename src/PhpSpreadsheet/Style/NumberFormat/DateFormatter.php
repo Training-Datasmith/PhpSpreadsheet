@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Style\Number_Format;
 
 use Composer\Pcre\Preg;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
+use Php_Office\Php_Spreadsheet\Shared\Date;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 use Throwable;
-
-class DateFormatter
+class Date_Formatter
 {
     /**
      * Search/replace values to convert Excel date/time format masks to PHP format masks.
@@ -46,7 +44,6 @@ class DateFormatter
         //    fractional seconds - no php equivalent
         '.s' => '',
     ];
-
     /**
      * Search/replace values to convert Excel date/time format masks hours to PHP format masks (24 hr clock).
      */
@@ -60,7 +57,6 @@ class DateFormatter
         //    seconds
         'ss' => 's',
     ];
-
     /**
      * Search/replace values to convert Excel date/time format masks hours to PHP format masks (12 hr clock).
      */
@@ -74,16 +70,11 @@ class DateFormatter
         //    seconds
         'ss' => 's',
     ];
-
     private const HOURS_IN_DAY = 24;
     private const MINUTES_IN_DAY = 60 * self::HOURS_IN_DAY;
     private const SECONDS_IN_DAY = 60 * self::MINUTES_IN_DAY;
     private const INTERVAL_PRECISION = 10;
-    private const INTERVAL_LEADING_ZERO = [
-        '[hh]',
-        '[mm]',
-        '[ss]',
-    ];
+    private const INTERVAL_LEADING_ZERO = ['[hh]', '[mm]', '[ss]'];
     private const INTERVAL_ROUND_PRECISION = [
         // hours and minutes truncate
         '[h]' => self::INTERVAL_PRECISION,
@@ -94,37 +85,25 @@ class DateFormatter
         '[s]' => 0,
         '[ss]' => 0,
     ];
-    private const INTERVAL_MULTIPLIER = [
-        '[h]' => self::HOURS_IN_DAY,
-        '[hh]' => self::HOURS_IN_DAY,
-        '[m]' => self::MINUTES_IN_DAY,
-        '[mm]' => self::MINUTES_IN_DAY,
-        '[s]' => self::SECONDS_IN_DAY,
-        '[ss]' => self::SECONDS_IN_DAY,
-    ];
-
+    private const INTERVAL_MULTIPLIER = ['[h]' => self::HOURS_IN_DAY, '[hh]' => self::HOURS_IN_DAY, '[m]' => self::MINUTES_IN_DAY, '[mm]' => self::MINUTES_IN_DAY, '[s]' => self::SECONDS_IN_DAY, '[ss]' => self::SECONDS_IN_DAY];
     /** @param float|int|numeric-string $value */
-    private static function tryInterval(bool &$seekingBracket, string &$block, mixed $value, string $format): void
+    private static function try_interval(bool &$seeking_bracket, string &$block, mixed $value, string $format): void
     {
-        if ($seekingBracket) {
+        if ($seeking_bracket) {
             if (str_contains($block, $format)) {
-                $hours = (string) (int) round(
-                    self::INTERVAL_MULTIPLIER[$format] * $value,
-                    self::INTERVAL_ROUND_PRECISION[$format]
-                );
+                $hours = (string) (int) round(self::INTERVAL_MULTIPLIER[$format] * $value, self::INTERVAL_ROUND_PRECISION[$format]);
                 if (strlen($hours) === 1 && in_array($format, self::INTERVAL_LEADING_ZERO, true)) {
-                    $hours = "0$hours";
+                    $hours = "0{$hours}";
                 }
                 $block = str_replace($format, $hours, $block);
-                $seekingBracket = false;
+                $seeking_bracket = false;
             }
         }
     }
-
     /** @param float|int $value value to be formatted */
     public static function format(mixed $value, string $format): string
     {
-        if ($value < 0 && Preg::isMatch('/^\[?[hms]/i', $format)) {
+        if ($value < 0 && Preg::is_match('/^\[?[hms]/i', $format)) {
             return '-' . self::format(-$value, $format);
         }
         // strip off first part containing e.g. [$-F800] or [$USD-409]
@@ -132,13 +111,10 @@ class DateFormatter
         // language info is in hexadecimal
         // strip off chinese part like [DBNum1][$-804]
         $format = Preg::replace('/^(\[DBNum\d\])*(\[\$[^\]]*\])/i', '', $format);
-
         // OpenOffice.org uses upper-case number formats, e.g. 'YYYY', convert to lower-case;
         //    but we don't want to change any quoted strings
-        $format = Preg::replaceCallback('/(?:^|")([^"]*)(?:$|")/', self::setLowerCaseCallback(...), $format);
-
+        $format = Preg::replace_callback('/(?:^|")([^"]*)(?:$|")/', self::set_lower_case_callback(...), $format);
         // Only process the non-quoted blocks for date format characters
-
         $blocks = explode('"', $format);
         foreach ($blocks as $key => &$block) {
             if ($key % 2 == 0) {
@@ -146,13 +122,13 @@ class DateFormatter
                 if (!strpos($block, 'A')) {
                     // 24-hour time format
                     // when [h]:mm format, the [h] should replace to the hours of the value * 24
-                    $seekingBracket = true;
-                    self::tryInterval($seekingBracket, $block, $value, '[h]');
-                    self::tryInterval($seekingBracket, $block, $value, '[hh]');
-                    self::tryInterval($seekingBracket, $block, $value, '[mm]');
-                    self::tryInterval($seekingBracket, $block, $value, '[m]');
-                    self::tryInterval($seekingBracket, $block, $value, '[s]');
-                    self::tryInterval($seekingBracket, $block, $value, '[ss]');
+                    $seeking_bracket = true;
+                    self::try_interval($seeking_bracket, $block, $value, '[h]');
+                    self::try_interval($seeking_bracket, $block, $value, '[hh]');
+                    self::try_interval($seeking_bracket, $block, $value, '[mm]');
+                    self::try_interval($seeking_bracket, $block, $value, '[m]');
+                    self::try_interval($seeking_bracket, $block, $value, '[s]');
+                    self::try_interval($seeking_bracket, $block, $value, '[ss]');
                     $block = strtr($block, self::DATE_FORMAT_REPLACEMENTS24);
                 } else {
                     // 12-hour time format
@@ -161,63 +137,59 @@ class DateFormatter
             }
         }
         $format = implode('"', $blocks);
-
         // escape any quoted characters so that DateTime format() will render them correctly
-        $format = Preg::replaceCallback('/"(.*)"/U', self::escapeQuotesCallback(...), $format);
-
+        $format = Preg::replace_callback('/"(.*)"/U', self::escape_quotes_callback(...), $format);
         try {
-            $dateObj = Date::excelToDateTimeObject($value);
+            $date_obj = Date::excel_to_date_time_object($value);
         } catch (Throwable) {
-            return StringHelper::convertToString($value);
+            return String_Helper::convert_to_string($value);
         }
         // If the colon preceding minute had been quoted, as happens in
         // Excel 2003 XML formats, m will not have been changed to i above.
         // Change it now.
-        $format = Preg::replace('/\\\:m/', ':i', $format);
-        $microseconds = (int) $dateObj->format('u');
+        $format = Preg::replace('/\\\\:m/', ':i', $format);
+        $microseconds = (int) $date_obj->format('u');
         if (str_contains($format, ':s.000')) {
             $milliseconds = (int) round($microseconds / 1000.0);
             if ($milliseconds === 1000) {
                 $milliseconds = 0;
-                $dateObj->modify('+1 second');
+                $date_obj->modify('+1 second');
             }
-            $dateObj->modify("-$microseconds microseconds");
+            $date_obj->modify("-{$microseconds} microseconds");
             $format = str_replace(':s.000', ':s.' . sprintf('%03d', $milliseconds), $format);
         } elseif (str_contains($format, ':s.00')) {
             $centiseconds = (int) round($microseconds / 10000.0);
             if ($centiseconds === 100) {
                 $centiseconds = 0;
-                $dateObj->modify('+1 second');
+                $date_obj->modify('+1 second');
             }
-            $dateObj->modify("-$microseconds microseconds");
+            $date_obj->modify("-{$microseconds} microseconds");
             $format = str_replace(':s.00', ':s.' . sprintf('%02d', $centiseconds), $format);
         } elseif (str_contains($format, ':s.0')) {
             $deciseconds = (int) round($microseconds / 100000.0);
             if ($deciseconds === 10) {
                 $deciseconds = 0;
-                $dateObj->modify('+1 second');
+                $date_obj->modify('+1 second');
             }
-            $dateObj->modify("-$microseconds microseconds");
+            $date_obj->modify("-{$microseconds} microseconds");
             $format = str_replace(':s.0', ':s.' . sprintf('%1d', $deciseconds), $format);
-        } else { // no fractional second
+        } else {
+            // no fractional second
             if ($microseconds >= 500000) {
-                $dateObj->modify('+1 second');
+                $date_obj->modify('+1 second');
             }
-            $dateObj->modify("-$microseconds microseconds");
+            $date_obj->modify("-{$microseconds} microseconds");
         }
-
-        return $dateObj->format($format);
+        return $date_obj->format($format);
     }
-
     /** @param array<?string> $matches */
-    private static function setLowercaseCallback(array $matches): string
+    private static function set_lowercase_callback(array $matches): string
     {
         /** @var string[] $matches */
         return mb_strtolower($matches[0]);
     }
-
     /** @param array<?string> $matches */
-    private static function escapeQuotesCallback(array $matches): string
+    private static function escape_quotes_callback(array $matches): string
     {
         /** @var string[] $matches */
         return '\\' . implode('\\', mb_str_split($matches[1], 1, 'UTF-8'));

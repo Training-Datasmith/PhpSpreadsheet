@@ -1,53 +1,44 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Ods;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Ods;
-
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-class AutoFilters
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Auto_Filter;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
+class Auto_Filters
 {
-    public function __construct(private readonly XMLWriter $objWriter, private readonly Spreadsheet $spreadsheet)
+    public function __construct(private readonly Xml_Writer $obj_writer, private readonly Spreadsheet $spreadsheet)
     {
     }
-
     public function write(): void
     {
-        $wrapperWritten = false;
-        $sheetCount = $this->spreadsheet->getSheetCount();
-        for ($i = 0; $i < $sheetCount; ++$i) {
-            $worksheet = $this->spreadsheet->getSheet($i);
-            $autofilter = $worksheet->getAutoFilter();
-            if (!empty($autofilter->getRange())) {
-                if ($wrapperWritten === false) {
-                    $this->objWriter->startElement('table:database-ranges');
-                    $wrapperWritten = true;
+        $wrapper_written = false;
+        $sheet_count = $this->spreadsheet->get_sheet_count();
+        for ($i = 0; $i < $sheet_count; ++$i) {
+            $worksheet = $this->spreadsheet->get_sheet($i);
+            $autofilter = $worksheet->get_auto_filter();
+            if (!empty($autofilter->get_range())) {
+                if ($wrapper_written === false) {
+                    $this->obj_writer->start_element('table:database-ranges');
+                    $wrapper_written = true;
                 }
-                $this->objWriter->startElement('table:database-range');
-                $this->objWriter->writeAttribute('table:orientation', 'column');
-                $this->objWriter->writeAttribute('table:display-filter-buttons', 'true');
-                $this->objWriter->writeAttribute(
-                    'table:target-range-address',
-                    $this->formatRange($worksheet, $autofilter)
-                );
-                $this->objWriter->endElement();
+                $this->obj_writer->start_element('table:database-range');
+                $this->obj_writer->write_attribute('table:orientation', 'column');
+                $this->obj_writer->write_attribute('table:display-filter-buttons', 'true');
+                $this->obj_writer->write_attribute('table:target-range-address', $this->format_range($worksheet, $autofilter));
+                $this->obj_writer->end_element();
             }
         }
-
-        if ($wrapperWritten === true) {
-            $this->objWriter->endElement();
+        if ($wrapper_written === true) {
+            $this->obj_writer->end_element();
         }
     }
-
-    protected function formatRange(Worksheet $worksheet, AutoFilter $autofilter): string
+    protected function format_range(Worksheet $worksheet, Auto_Filter $autofilter): string
     {
-        $title = $worksheet->getTitle();
-        $range = $autofilter->getRange();
-
+        $title = $worksheet->get_title();
+        $range = $autofilter->get_range();
         return "'{$title}'.{$range}";
     }
 }

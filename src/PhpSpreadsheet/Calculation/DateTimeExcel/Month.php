@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
 use DateTime;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
 class Month
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * EDATE.
      *
@@ -36,27 +33,23 @@ class Month
      *         If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function adjust(mixed $dateValue, array|string|bool|float|int $adjustmentMonths): DateTime|float|int|string|array
+    public static function adjust(mixed $date_value, array|string|bool|float|int $adjustment_months): DateTime|float|int|string|array
     {
-        if (is_array($dateValue) || is_array($adjustmentMonths)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $dateValue, $adjustmentMonths);
+        if (is_array($date_value) || is_array($adjustment_months)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $date_value, $adjustment_months);
         }
-
         try {
-            $dateValue = Helpers::getDateValue($dateValue, false);
-            $adjustmentMonths = Helpers::validateNumericNull($adjustmentMonths);
+            $date_value = Helpers::get_date_value($date_value, false);
+            $adjustment_months = Helpers::validate_numeric_null($adjustment_months);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-        $dateValue = floor($dateValue);
-        $adjustmentMonths = floor($adjustmentMonths);
-
+        $date_value = floor($date_value);
+        $adjustment_months = floor($adjustment_months);
         // Execute function
-        $PHPDateObject = Helpers::adjustDateByMonths($dateValue, $adjustmentMonths);
-
-        return Helpers::returnIn3FormatsObject($PHPDateObject);
+        $php_date_object = Helpers::adjust_date_by_months($date_value, $adjustment_months);
+        return Helpers::return_in3formats_object($php_date_object);
     }
-
     /**
      * EOMONTH.
      *
@@ -80,27 +73,24 @@ class Month
      *         If an array of values is passed as the argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function lastDay(mixed $dateValue, array|float|int|bool|string $adjustmentMonths): array|string|DateTime|float|int
+    public static function last_day(mixed $date_value, array|float|int|bool|string $adjustment_months): array|string|DateTime|float|int
     {
-        if (is_array($dateValue) || is_array($adjustmentMonths)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $dateValue, $adjustmentMonths);
+        if (is_array($date_value) || is_array($adjustment_months)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $date_value, $adjustment_months);
         }
-
         try {
-            $dateValue = Helpers::getDateValue($dateValue, false);
-            $adjustmentMonths = Helpers::validateNumericNull($adjustmentMonths);
+            $date_value = Helpers::get_date_value($date_value, false);
+            $adjustment_months = Helpers::validate_numeric_null($adjustment_months);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-        $dateValue = floor($dateValue);
-        $adjustmentMonths = floor($adjustmentMonths);
-
+        $date_value = floor($date_value);
+        $adjustment_months = floor($adjustment_months);
         // Execute function
-        $PHPDateObject = Helpers::adjustDateByMonths($dateValue, $adjustmentMonths + 1);
-        $adjustDays = (int) $PHPDateObject->format('d');
-        $adjustDaysString = '-' . $adjustDays . ' days';
-        $PHPDateObject->modify($adjustDaysString);
-
-        return Helpers::returnIn3FormatsObject($PHPDateObject);
+        $php_date_object = Helpers::adjust_date_by_months($date_value, $adjustment_months + 1);
+        $adjust_days = (int) $php_date_object->format('d');
+        $adjust_days_string = '-' . $adjust_days . ' days';
+        $php_date_object->modify($adjust_days_string);
+        return Helpers::return_in3formats_object($php_date_object);
     }
 }

@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Pdf;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Writer\Pdf;
-
+use Php_Office\Php_Spreadsheet\Worksheet\Page_Setup;
+use Php_Office\Php_Spreadsheet\Writer\Pdf;
 class Mpdf extends Pdf
 {
     public const SIMULATED_BODY_START = '<!-- simulated body start -->';
     private const BODY_TAG = '<body>';
-
     /**
      * Gets the implementation of external PDF library that should be used.
      *
@@ -19,11 +16,10 @@ class Mpdf extends Pdf
      *
      * @return \Mpdf\Mpdf implementation
      */
-    protected function createExternalWriterInstance(array $config): \Mpdf\Mpdf
+    protected function create_external_writer_instance(array $config): \Mpdf\Mpdf
     {
         return new \Mpdf\Mpdf($config);
     }
-
     /**
      * Save Spreadsheet to file.
      *
@@ -31,67 +27,54 @@ class Mpdf extends Pdf
      */
     public function save($filename, int $flags = 0): void
     {
-        $fileHandle = parent::prepareForSave($filename);
-
+        $file_handle = parent::prepare_for_save($filename);
         //  Check for paper size and page orientation
-        $setup = $this->spreadsheet->getSheet($this->getSheetIndex() ?? 0)->getPageSetup();
-        $orientation = $this->getOrientation() ?? $setup->getOrientation();
-        $orientation = ($orientation === PageSetup::ORIENTATION_LANDSCAPE) ? 'L' : 'P';
-        $printPaperSize = $this->getPaperSize() ?? $setup->getPaperSize();
-        $paperSize = self::$paperSizes[$printPaperSize] ?? PageSetup::getPaperSizeDefault();
-
+        $setup = $this->spreadsheet->get_sheet($this->get_sheet_index() ?? 0)->get_page_setup();
+        $orientation = $this->get_orientation() ?? $setup->get_orientation();
+        $orientation = $orientation === Page_Setup::ORIENTATION_LANDSCAPE ? 'L' : 'P';
+        $print_paper_size = $this->get_paper_size() ?? $setup->get_paper_size();
+        $paper_size = self::$paper_sizes[$print_paper_size] ?? Page_Setup::get_paper_size_default();
         //  Create PDF
-        $config = ['tempDir' => $this->tempDir . '/mpdf'];
-        $pdf = $this->createExternalWriterInstance($config);
+        $config = ['tempDir' => $this->temp_dir . '/mpdf'];
+        $pdf = $this->create_external_writer_instance($config);
         $ortmp = $orientation;
-        $pdf->_setPageSize($paperSize, $ortmp);
-        $pdf->DefOrientation = $orientation;
-        $pdf->AddPageByArray([
-            'orientation' => $orientation,
-            'margin-left' => $this->inchesToMm($this->spreadsheet->getActiveSheet()->getPageMargins()->getLeft()),
-            'margin-right' => $this->inchesToMm($this->spreadsheet->getActiveSheet()->getPageMargins()->getRight()),
-            'margin-top' => $this->inchesToMm($this->spreadsheet->getActiveSheet()->getPageMargins()->getTop()),
-            'margin-bottom' => $this->inchesToMm($this->spreadsheet->getActiveSheet()->getPageMargins()->getBottom()),
-        ]);
-
+        $pdf->_set_page_size($paper_size, $ortmp);
+        $pdf->def_orientation = $orientation;
+        $pdf->add_page_by_array(['orientation' => $orientation, 'margin-left' => $this->inches_to_mm($this->spreadsheet->get_active_sheet()->get_page_margins()->get_left()), 'margin-right' => $this->inches_to_mm($this->spreadsheet->get_active_sheet()->get_page_margins()->get_right()), 'margin-top' => $this->inches_to_mm($this->spreadsheet->get_active_sheet()->get_page_margins()->get_top()), 'margin-bottom' => $this->inches_to_mm($this->spreadsheet->get_active_sheet()->get_page_margins()->get_bottom())]);
         //  Document info
-        $pdf->SetTitle($this->spreadsheet->getProperties()->getTitle());
-        $pdf->SetAuthor($this->spreadsheet->getProperties()->getCreator());
-        $pdf->SetSubject($this->spreadsheet->getProperties()->getSubject());
-        $pdf->SetKeywords($this->spreadsheet->getProperties()->getKeywords());
-        $pdf->SetCreator($this->spreadsheet->getProperties()->getCreator());
-
-        $html = $this->generateHTMLAll();
-        $bodyLocation = strpos($html, self::SIMULATED_BODY_START);
-        if ($bodyLocation === false) {
-            $bodyLocation = strpos($html, self::BODY_TAG);
-            if ($bodyLocation !== false) {
-                $bodyLocation += strlen(self::BODY_TAG);
+        $pdf->set_title($this->spreadsheet->get_properties()->get_title());
+        $pdf->set_author($this->spreadsheet->get_properties()->get_creator());
+        $pdf->set_subject($this->spreadsheet->get_properties()->get_subject());
+        $pdf->set_keywords($this->spreadsheet->get_properties()->get_keywords());
+        $pdf->set_creator($this->spreadsheet->get_properties()->get_creator());
+        $html = $this->generate_html_all();
+        $body_location = strpos($html, self::SIMULATED_BODY_START);
+        if ($body_location === false) {
+            $body_location = strpos($html, self::BODY_TAG);
+            if ($body_location !== false) {
+                $body_location += strlen(self::BODY_TAG);
             }
         }
         // Make sure first data presented to Mpdf includes body tag
         //   (and any htmlpageheader/htmlpagefooter tags)
         //   so that Mpdf doesn't parse it as content. Issue 2432.
-        if ($bodyLocation !== false) {
-            $pdf->WriteHTML(substr($html, 0, $bodyLocation));
-            $html = substr($html, $bodyLocation);
+        if ($body_location !== false) {
+            $pdf->write_html(substr($html, 0, $body_location));
+            $html = substr($html, $body_location);
         }
         foreach (explode("\n", $html) as $line) {
-            $pdf->WriteHTML("$line\n");
+            $pdf->write_html("{$line}\n");
         }
-
         //  Write to file
         /** @var string */
         $str = $pdf->Output('', 'S');
-        fwrite($fileHandle, $str);
-
-        parent::restoreStateAfterSave();
+        fwrite($file_handle, $str);
+        parent::restore_state_after_save();
     }
-
     /**
      * Convert inches to mm.
      */
-    private function inchesToMm(float $inches): float
+    private function inches_to_mm(float $inches): float
     {
         return $inches * 25.4;
     }

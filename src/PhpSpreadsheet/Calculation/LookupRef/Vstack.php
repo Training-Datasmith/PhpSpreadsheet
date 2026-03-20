@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Vstack
 {
     /**
@@ -13,21 +11,20 @@ class Vstack
      *
      * @return mixed[]
      */
-    public static function vstack(mixed ...$inputData): array|string
+    public static function vstack(mixed ...$input_data): array|string
     {
-        $returnMatrix = [];
-
+        $return_matrix = [];
         $columns = 0;
-        foreach ($inputData as $matrix) {
+        foreach ($input_data as $matrix) {
             if (!is_array($matrix)) {
                 $count = 1;
             } else {
-                $count = count(reset($matrix)); //* @phpstan-ignore-line
+                $count = count(reset($matrix));
+                //* @phpstan-ignore-line
             }
             $columns = max($columns, $count);
         }
-
-        foreach ($inputData as $matrix) {
+        foreach ($input_data as $matrix) {
             if (!is_array($matrix)) {
                 $matrix = [$matrix];
             }
@@ -35,10 +32,9 @@ class Vstack
                 if (!is_array($row)) {
                     $row = [$row];
                 }
-                $returnMatrix[] = array_values(array_pad($row, $columns, ExcelError::NA()));
+                $return_matrix[] = array_values(array_pad($row, $columns, Excel_Error::NA()));
             }
         }
-
-        return $returnMatrix;
+        return $return_matrix;
     }
 }

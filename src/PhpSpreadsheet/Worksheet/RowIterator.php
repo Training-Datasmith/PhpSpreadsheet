@@ -1,32 +1,27 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
 use Iterator as NativeIterator;
-use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-
+use Php_Office\Php_Spreadsheet\Exception as PhpSpreadsheetException;
 /**
  * @implements NativeIterator<int, Row>
  */
-class RowIterator implements NativeIterator
+class Row_Iterator implements Native_Iterator
 {
     /**
      * Current iterator position.
      */
     private int $position = 1;
-
     /**
      * Start position.
      */
-    private int $startRow = 1;
-
+    private int $start_row = 1;
     /**
      * End position.
      */
-    private int $endRow = 1;
-
+    private int $end_row = 1;
     /**
      * Create a new row iterator.
      *
@@ -34,17 +29,15 @@ class RowIterator implements NativeIterator
      * @param int $startRow The row number at which to start iterating
      * @param ?int $endRow Optionally, the row number at which to stop iterating
      */
-    public function __construct(private Worksheet $subject, int $startRow = 1, ?int $endRow = null)
+    public function __construct(private Worksheet $subject, int $start_row = 1, ?int $end_row = null)
     {
-        $this->resetEnd($endRow);
-        $this->resetStart($startRow);
+        $this->reset_end($end_row);
+        $this->reset_start($start_row);
     }
-
     public function __destruct()
     {
         unset($this->subject);
     }
-
     /**
      * (Re)Set the start row and the current row pointer.
      *
@@ -52,23 +45,18 @@ class RowIterator implements NativeIterator
      *
      * @return $this
      */
-    public function resetStart(int $startRow = 1): static
+    public function reset_start(int $start_row = 1): static
     {
-        if ($startRow > $this->subject->getHighestRow()) {
-            throw new PhpSpreadsheetException(
-                "Start row ({$startRow}) is beyond highest row ({$this->subject->getHighestRow()})"
-            );
+        if ($start_row > $this->subject->get_highest_row()) {
+            throw new Php_Spreadsheet_Exception("Start row ({$start_row}) is beyond highest row ({$this->subject->get_highest_row()})");
         }
-
-        $this->startRow = $startRow;
-        if ($this->endRow < $this->startRow) {
-            $this->endRow = $this->startRow;
+        $this->start_row = $start_row;
+        if ($this->end_row < $this->start_row) {
+            $this->end_row = $this->start_row;
         }
-        $this->seek($startRow);
-
+        $this->seek($start_row);
         return $this;
     }
-
     /**
      * (Re)Set the end row.
      *
@@ -76,13 +64,11 @@ class RowIterator implements NativeIterator
      *
      * @return $this
      */
-    public function resetEnd(?int $endRow = null): static
+    public function reset_end(?int $end_row = null): static
     {
-        $this->endRow = $endRow ?: $this->subject->getHighestRow();
-
+        $this->end_row = $end_row ?: $this->subject->get_highest_row();
         return $this;
     }
-
     /**
      * Set the row pointer to the selected row.
      *
@@ -92,22 +78,19 @@ class RowIterator implements NativeIterator
      */
     public function seek(int $row = 1): static
     {
-        if (($row < $this->startRow) || ($row > $this->endRow)) {
-            throw new PhpSpreadsheetException("Row $row is out of range ({$this->startRow} - {$this->endRow})");
+        if ($row < $this->start_row || $row > $this->end_row) {
+            throw new Php_Spreadsheet_Exception("Row {$row} is out of range ({$this->start_row} - {$this->end_row})");
         }
         $this->position = $row;
-
         return $this;
     }
-
     /**
      * Rewind the iterator to the starting row.
      */
     public function rewind(): void
     {
-        $this->position = $this->startRow;
+        $this->position = $this->start_row;
     }
-
     /**
      * Return the current row in this worksheet.
      */
@@ -115,7 +98,6 @@ class RowIterator implements NativeIterator
     {
         return new Row($this->subject, $this->position);
     }
-
     /**
      * Return the current iterator key.
      */
@@ -123,7 +105,6 @@ class RowIterator implements NativeIterator
     {
         return $this->position;
     }
-
     /**
      * Set the iterator to its next value.
      */
@@ -131,7 +112,6 @@ class RowIterator implements NativeIterator
     {
         ++$this->position;
     }
-
     /**
      * Set the iterator to its previous value.
      */
@@ -139,12 +119,11 @@ class RowIterator implements NativeIterator
     {
         --$this->position;
     }
-
     /**
      * Indicate if more rows exist in the worksheet range of rows that we're iterating.
      */
     public function valid(): bool
     {
-        return $this->position <= $this->endRow && $this->position >= $this->startRow;
+        return $this->position <= $this->end_row && $this->position >= $this->start_row;
     }
 }

@@ -1,193 +1,162 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-
-class RichDataDrawing
+use Php_Office\Php_Spreadsheet\Shared\Xml_Writer;
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Worksheet\Drawing;
+class Rich_Data_Drawing
 {
     /** @var Drawing[] */
     private array $drawings = [];
-
     /**
      * Generate all Rich Data XML files.
      *
      * @return array<string,string> [path => XML content]
      */
-    public function generateFiles(Spreadsheet $spreadsheet): array
+    public function generate_files(Spreadsheet $spreadsheet): array
     {
-        $worksheetCount = $spreadsheet->getSheetCount();
-
+        $worksheet_count = $spreadsheet->get_sheet_count();
         $index = 0;
-        for ($i = 0; $i < $worksheetCount; ++$i) {
-            $worksheet = $spreadsheet->getSheet($i);
-            $iterator = $worksheet->getInCellDrawingCollection()->getIterator();
+        for ($i = 0; $i < $worksheet_count; ++$i) {
+            $worksheet = $spreadsheet->get_sheet($i);
+            $iterator = $worksheet->get_in_cell_drawing_collection()->getIterator();
             while ($iterator->valid()) {
                 /** @var Drawing $pDrawing */
-                $pDrawing = $iterator->current();
-                $indexedFilename = $pDrawing->getIndexedFilename();
-                if (!isset($this->drawings[$indexedFilename])) {
-                    $pDrawing->setIndex(++$index);
-                    $this->drawings[$indexedFilename] = $pDrawing;
+                $p_drawing = $iterator->current();
+                $indexed_filename = $p_drawing->get_indexed_filename();
+                if (!isset($this->drawings[$indexed_filename])) {
+                    $p_drawing->set_index(++$index);
+                    $this->drawings[$indexed_filename] = $p_drawing;
                 } else {
-                    $pDrawing->setIndex($this->drawings[$indexedFilename]->getIndex());
+                    $p_drawing->set_index($this->drawings[$indexed_filename]->get_index());
                 }
                 $iterator->next();
             }
         }
-
-        return (count($this->drawings) === 0) ? [] : [
-            'xl/richData/rdrichvalue.xml' => $this->writeRdrichvalueXML(),
-            'xl/richData/rdrichvaluestructure.xml' => $this->writeRdrichvaluestructureXML(),
-            'xl/richData/rdRichValueTypes.xml' => $this->writeRdRichValueTypesXML(),
-            'xl/richData/richValueRel.xml' => $this->writeRichValueRelXML(),
-            'xl/richData/_rels/richValueRel.xml.rels' => $this->writeRichValueRelRelsXML(),
-        ];
+        return count($this->drawings) === 0 ? [] : ['xl/richData/rdrichvalue.xml' => $this->write_rdrichvalue_xml(), 'xl/richData/rdrichvaluestructure.xml' => $this->write_rdrichvaluestructure_xml(), 'xl/richData/rdRichValueTypes.xml' => $this->write_rd_rich_value_types_xml(), 'xl/richData/richValueRel.xml' => $this->write_rich_value_rel_xml(), 'xl/richData/_rels/richValueRel.xml.rels' => $this->write_rich_value_rel_rels_xml()];
     }
-
     /**
      * @return Drawing[]
      */
-    public function getDrawings(): array
+    public function get_drawings(): array
     {
         return $this->drawings;
     }
-
-    private function writeRdrichvalueXML(): string
+    private function write_rdrichvalue_xml(): string
     {
-        $xml = new XMLWriter(XMLWriter::STORAGE_MEMORY);
-        $xml->startDocument('1.0', 'UTF-8', 'yes');
-        $xml->startElement('rvData');
-        $xml->writeAttribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata');
-        $xml->writeAttribute('count', (string) count($this->drawings));
-
+        $xml = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
+        $xml->start_document('1.0', 'UTF-8', 'yes');
+        $xml->start_element('rvData');
+        $xml->write_attribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata');
+        $xml->write_attribute('count', (string) count($this->drawings));
         $index = 0;
         foreach ($this->drawings as $drawing) {
-            $xml->startElement('rv');
-            $xml->writeAttribute('s', '0');
-            $xml->writeElement('v', (string) $index++);
-            $xml->writeElement('v', '5');
-            $xml->endElement(); // rv
+            $xml->start_element('rv');
+            $xml->write_attribute('s', '0');
+            $xml->write_element('v', (string) $index++);
+            $xml->write_element('v', '5');
+            $xml->end_element();
+            // rv
         }
-
-        $xml->endElement(); // rvData
-
-        return $xml->getData();
+        $xml->end_element();
+        // rvData
+        return $xml->get_data();
     }
-
-    private function writeRdrichvaluestructureXML(): string
+    private function write_rdrichvaluestructure_xml(): string
     {
-        $xml = new XMLWriter(XMLWriter::STORAGE_MEMORY);
-        $xml->startDocument('1.0', 'UTF-8', 'yes');
-        $xml->startElement('rvStructures');
-        $xml->writeAttribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata');
-        $xml->writeAttribute('count', '1');
-
-        $xml->startElement('s');
-        $xml->writeAttribute('t', '_localImage');
-
-        $xml->startElement('k');
-        $xml->writeAttribute('n', '_rvRel:LocalImageIdentifier');
-        $xml->writeAttribute('t', 'i');
-        $xml->endElement();
-
-        $xml->startElement('k');
-        $xml->writeAttribute('n', 'CalcOrigin');
-        $xml->writeAttribute('t', 'i');
-        $xml->endElement();
-
-        $xml->endElement(); // s
-
-        $xml->endElement(); // rvStructures
-
-        return $xml->getData();
+        $xml = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
+        $xml->start_document('1.0', 'UTF-8', 'yes');
+        $xml->start_element('rvStructures');
+        $xml->write_attribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata');
+        $xml->write_attribute('count', '1');
+        $xml->start_element('s');
+        $xml->write_attribute('t', '_localImage');
+        $xml->start_element('k');
+        $xml->write_attribute('n', '_rvRel:LocalImageIdentifier');
+        $xml->write_attribute('t', 'i');
+        $xml->end_element();
+        $xml->start_element('k');
+        $xml->write_attribute('n', 'CalcOrigin');
+        $xml->write_attribute('t', 'i');
+        $xml->end_element();
+        $xml->end_element();
+        // s
+        $xml->end_element();
+        // rvStructures
+        return $xml->get_data();
     }
-
-    private function writeRdRichValueTypesXML(): string
+    private function write_rd_rich_value_types_xml(): string
     {
-        $xml = new XMLWriter(XMLWriter::STORAGE_MEMORY);
-        $xml->startDocument('1.0', 'UTF-8', 'yes');
-        $xml->startElement('rvTypesInfo');
-        $xml->writeAttribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2');
-        $xml->writeAttribute('xmlns:mc', 'http://schemas.openxmlformats.org/markup-compatibility/2006');
-        $xml->writeAttribute('mc:Ignorable', 'x');
-        $xml->writeAttribute('xmlns:x', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
-
-        $xml->startElement('global');
-        $xml->startElement('keyFlags');
-
-        $keys = [
-            '_Self', '_DisplayString', '_Flags', '_Format',
-            '_SubLabel', '_Attribution', '_Icon', '_Display',
-            '_CanonicalPropertyNames', '_ClassificationId',
-        ];
-
+        $xml = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
+        $xml->start_document('1.0', 'UTF-8', 'yes');
+        $xml->start_element('rvTypesInfo');
+        $xml->write_attribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2');
+        $xml->write_attribute('xmlns:mc', 'http://schemas.openxmlformats.org/markup-compatibility/2006');
+        $xml->write_attribute('mc:Ignorable', 'x');
+        $xml->write_attribute('xmlns:x', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+        $xml->start_element('global');
+        $xml->start_element('keyFlags');
+        $keys = ['_Self', '_DisplayString', '_Flags', '_Format', '_SubLabel', '_Attribution', '_Icon', '_Display', '_CanonicalPropertyNames', '_ClassificationId'];
         foreach ($keys as $key) {
-            $xml->startElement('key');
-            $xml->writeAttribute('name', $key);
-
-            $xml->startElement('flag');
-            $xml->writeAttribute('name', 'ExcludeFromCalcComparison');
-            $xml->writeAttribute('value', '1');
+            $xml->start_element('key');
+            $xml->write_attribute('name', $key);
+            $xml->start_element('flag');
+            $xml->write_attribute('name', 'ExcludeFromCalcComparison');
+            $xml->write_attribute('value', '1');
             if ($key === '_Self') {
-                $xml->startElement('flag');
-                $xml->writeAttribute('name', 'ExcludeFromFile');
-                $xml->writeAttribute('value', '1');
-                $xml->endElement();
+                $xml->start_element('flag');
+                $xml->write_attribute('name', 'ExcludeFromFile');
+                $xml->write_attribute('value', '1');
+                $xml->end_element();
             }
-            $xml->endElement(); // flag
-            $xml->endElement(); // key
+            $xml->end_element();
+            // flag
+            $xml->end_element();
+            // key
         }
-
-        $xml->endElement(); // keyFlags
-        $xml->endElement(); // global
-        $xml->endElement(); // rvTypesInfo
-
-        return $xml->getData();
+        $xml->end_element();
+        // keyFlags
+        $xml->end_element();
+        // global
+        $xml->end_element();
+        // rvTypesInfo
+        return $xml->get_data();
     }
-
-    private function writeRichValueRelXML(): string
+    private function write_rich_value_rel_xml(): string
     {
-        $xml = new XMLWriter(XMLWriter::STORAGE_MEMORY);
-        $xml->startDocument('1.0', 'UTF-8', 'yes');
-        $xml->startElement('richValueRels');
-        $xml->writeAttribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2022/richvaluerel');
-        $xml->writeAttribute('xmlns:r', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships');
-
+        $xml = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
+        $xml->start_document('1.0', 'UTF-8', 'yes');
+        $xml->start_element('richValueRels');
+        $xml->write_attribute('xmlns', 'http://schemas.microsoft.com/office/spreadsheetml/2022/richvaluerel');
+        $xml->write_attribute('xmlns:r', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships');
         $index = 0;
         foreach ($this->drawings as $drawing) {
-            $xml->startElement('rel');
-            $xml->writeAttribute('r:id', 'rId' . ++$index);
-            $xml->endElement();
+            $xml->start_element('rel');
+            $xml->write_attribute('r:id', 'rId' . ++$index);
+            $xml->end_element();
         }
-
-        $xml->endElement(); // richValueRels
-
-        return $xml->getData();
+        $xml->end_element();
+        // richValueRels
+        return $xml->get_data();
     }
-
-    private function writeRichValueRelRelsXML(): string
+    private function write_rich_value_rel_rels_xml(): string
     {
-        $xml = new XMLWriter(XMLWriter::STORAGE_MEMORY);
-        $xml->startDocument('1.0', 'UTF-8', 'yes');
-        $xml->startElement('Relationships');
-        $xml->writeAttribute('xmlns', 'http://schemas.openxmlformats.org/package/2006/relationships');
-
+        $xml = new Xml_Writer(Xml_Writer::STORAGE_MEMORY);
+        $xml->start_document('1.0', 'UTF-8', 'yes');
+        $xml->start_element('Relationships');
+        $xml->write_attribute('xmlns', 'http://schemas.openxmlformats.org/package/2006/relationships');
         $index = 0;
         foreach ($this->drawings as $drawing) {
-            $xml->startElement('Relationship');
-            $xml->writeAttribute('Id', 'rId' . ++$index);
-            $xml->writeAttribute('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image');
-            $xml->writeAttribute('Target', '../media/' . $drawing->getIndexedFilename());
-            $xml->endElement();
+            $xml->start_element('Relationship');
+            $xml->write_attribute('Id', 'rId' . ++$index);
+            $xml->write_attribute('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image');
+            $xml->write_attribute('Target', '../media/' . $drawing->get_indexed_filename());
+            $xml->end_element();
         }
-
-        $xml->endElement(); // Relationships
-
-        return $xml->getData();
+        $xml->end_element();
+        // Relationships
+        return $xml->get_data();
     }
 }

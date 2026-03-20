@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Database;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig;
-
-class DSum extends DatabaseAbstract
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Math_Trig;
+class D_Sum extends Database_Abstract
 {
     /**
      * DSUM.
@@ -32,15 +30,12 @@ class DSum extends DatabaseAbstract
      *                                        the column label in which you specify a condition for the
      *                                        column.
      */
-    public static function evaluate(array $database, array|null|int|string $field, array $criteria, bool $returnNull = false): null|float|string
+    public static function evaluate(array $database, array|null|int|string $field, array $criteria, bool $return_null = false): null|float|string
     {
-        $field = self::fieldExtract($database, $field);
+        $field = self::field_extract($database, $field);
         if ($field === null) {
-            return $returnNull ? null : ExcelError::VALUE();
+            return $return_null ? null : Excel_Error::VALUE();
         }
-
-        return MathTrig\Sum::sumIgnoringStrings(
-            self::getFilteredColumn($database, $field, $criteria)
-        );
+        return Math_Trig\Sum::sum_ignoring_strings(self::get_filtered_column($database, $field, $criteria));
     }
 }

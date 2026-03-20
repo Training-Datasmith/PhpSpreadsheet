@@ -1,149 +1,118 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engine;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engine;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-
-class ArrayArgumentHelper
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+class Array_Argument_Helper
 {
-    protected int $indexStart = 0;
-
+    protected int $index_start = 0;
     /** @var mixed[] */
     protected array $arguments;
-
-    protected int $argumentCount;
-
+    protected int $argument_count;
     /** @var int[] */
     protected array $rows;
-
     /** @var int[] */
     protected array $columns;
-
     /** @param mixed[] $arguments */
     public function initialise(array $arguments): void
     {
         $keys = array_keys($arguments);
-        $this->indexStart = (int) array_shift($keys);
+        $this->index_start = (int) array_shift($keys);
         $this->rows = $this->rows($arguments);
         $this->columns = $this->columns($arguments);
-
-        $this->argumentCount = count($arguments);
-        $this->arguments = $this->flattenSingleCellArrays($arguments, $this->rows, $this->columns);
-
+        $this->argument_count = count($arguments);
+        $this->arguments = $this->flatten_single_cell_arrays($arguments, $this->rows, $this->columns);
         $this->rows = $this->rows($arguments);
         $this->columns = $this->columns($arguments);
-
-        if ($this->arrayArguments() > 2) {
+        if ($this->array_arguments() > 2) {
             throw new Exception('Formulae with more than two array arguments are not supported');
         }
     }
-
     /** @return mixed[] */
     public function arguments(): array
     {
         return $this->arguments;
     }
-
-    public function hasArrayArgument(): bool
+    public function has_array_argument(): bool
     {
-        return $this->arrayArguments() > 0;
+        return $this->array_arguments() > 0;
     }
-
-    public function getFirstArrayArgumentNumber(): int
+    public function get_first_array_argument_number(): int
     {
-        $rowArrays = $this->filterArray($this->rows);
-        $columnArrays = $this->filterArray($this->columns);
-
-        for ($index = $this->indexStart; $index < $this->argumentCount; ++$index) {
-            if (isset($rowArrays[$index]) || isset($columnArrays[$index])) {
+        $row_arrays = $this->filter_array($this->rows);
+        $column_arrays = $this->filter_array($this->columns);
+        for ($index = $this->index_start; $index < $this->argument_count; ++$index) {
+            if (isset($row_arrays[$index]) || isset($column_arrays[$index])) {
                 return ++$index;
             }
         }
-
         return 0;
     }
-
-    public function getSingleRowVector(): ?int
+    public function get_single_row_vector(): ?int
     {
-        $rowVectors = $this->getRowVectors();
-
-        return count($rowVectors) === 1 ? array_pop($rowVectors) : null;
+        $row_vectors = $this->get_row_vectors();
+        return count($row_vectors) === 1 ? array_pop($row_vectors) : null;
     }
-
     /** @return int[] */
-    private function getRowVectors(): array
+    private function get_row_vectors(): array
     {
-        $rowVectors = [];
-        for ($index = $this->indexStart; $index < ($this->indexStart + $this->argumentCount); ++$index) {
+        $row_vectors = [];
+        for ($index = $this->index_start; $index < $this->index_start + $this->argument_count; ++$index) {
             if ($this->rows[$index] === 1 && $this->columns[$index] > 1) {
-                $rowVectors[] = $index;
+                $row_vectors[] = $index;
             }
         }
-
-        return $rowVectors;
+        return $row_vectors;
     }
-
-    public function getSingleColumnVector(): ?int
+    public function get_single_column_vector(): ?int
     {
-        $columnVectors = $this->getColumnVectors();
-
-        return count($columnVectors) === 1 ? array_pop($columnVectors) : null;
+        $column_vectors = $this->get_column_vectors();
+        return count($column_vectors) === 1 ? array_pop($column_vectors) : null;
     }
-
     /** @return int[] */
-    private function getColumnVectors(): array
+    private function get_column_vectors(): array
     {
-        $columnVectors = [];
-        for ($index = $this->indexStart; $index < ($this->indexStart + $this->argumentCount); ++$index) {
+        $column_vectors = [];
+        for ($index = $this->index_start; $index < $this->index_start + $this->argument_count; ++$index) {
             if ($this->rows[$index] > 1 && $this->columns[$index] === 1) {
-                $columnVectors[] = $index;
+                $column_vectors[] = $index;
             }
         }
-
-        return $columnVectors;
+        return $column_vectors;
     }
-
     /** @return int[] */
-    public function getMatrixPair(): array
+    public function get_matrix_pair(): array
     {
-        for ($i = $this->indexStart; $i < ($this->indexStart + $this->argumentCount - 1); ++$i) {
-            for ($j = $i + 1; $j < $this->argumentCount; ++$j) {
+        for ($i = $this->index_start; $i < $this->index_start + $this->argument_count - 1; ++$i) {
+            for ($j = $i + 1; $j < $this->argument_count; ++$j) {
                 if (isset($this->rows[$i], $this->rows[$j])) {
                     return [$i, $j];
                 }
             }
         }
-
         return [];
     }
-
-    public function isVector(int $argument): bool
+    public function is_vector(int $argument): bool
     {
         return $this->rows[$argument] === 1 || $this->columns[$argument] === 1;
     }
-
-    public function isRowVector(int $argument): bool
+    public function is_row_vector(int $argument): bool
     {
         return $this->rows[$argument] === 1;
     }
-
-    public function isColumnVector(int $argument): bool
+    public function is_column_vector(int $argument): bool
     {
         return $this->columns[$argument] === 1;
     }
-
-    public function rowCount(int $argument): int
+    public function row_count(int $argument): int
     {
         return $this->rows[$argument];
     }
-
-    public function columnCount(int $argument): int
+    public function column_count(int $argument): int
     {
         return $this->columns[$argument];
     }
-
     /**
      * @param mixed[] $arguments
      *
@@ -151,12 +120,8 @@ class ArrayArgumentHelper
      */
     private function rows(array $arguments): array
     {
-        return array_map(
-            fn ($argument): int => is_countable($argument) ? count($argument) : 1,
-            $arguments
-        );
+        return array_map(fn($argument): int => is_countable($argument) ? count($argument) : 1, $arguments);
     }
-
     /**
      * @param mixed[] $arguments
      *
@@ -164,15 +129,9 @@ class ArrayArgumentHelper
      */
     private function columns(array $arguments): array
     {
-        return array_map(
-            fn (mixed $argument): int => is_array($argument) && is_array($argument[array_keys($argument)[0]])
-                    ? count($argument[array_keys($argument)[0]])
-                    : 1,
-            $arguments
-        );
+        return array_map(fn(mixed $argument): int => is_array($argument) && is_array($argument[array_keys($argument)[0]]) ? count($argument[array_keys($argument)[0]]) : 1, $arguments);
     }
-
-    public function arrayArguments(): int
+    public function array_arguments(): int
     {
         $count = 0;
         foreach (array_keys($this->arguments) as $argument) {
@@ -180,10 +139,8 @@ class ArrayArgumentHelper
                 ++$count;
             }
         }
-
         return $count;
     }
-
     /**
      * @param mixed[] $arguments
      * @param int[] $rows
@@ -191,7 +148,7 @@ class ArrayArgumentHelper
      *
      * @return mixed[]
      */
-    private function flattenSingleCellArrays(array $arguments, array $rows, array $columns): array
+    private function flatten_single_cell_arrays(array $arguments, array $rows, array $columns): array
     {
         foreach ($arguments as $index => $argument) {
             if ($rows[$index] === 1 && $columns[$index] === 1) {
@@ -201,20 +158,15 @@ class ArrayArgumentHelper
                 $arguments[$index] = $argument;
             }
         }
-
         return $arguments;
     }
-
     /**
      * @param mixed[] $array
      *
      * @return mixed[]
      */
-    private function filterArray(array $array): array
+    private function filter_array(array $array): array
     {
-        return array_filter(
-            $array,
-            fn ($value): bool => $value > 1
-        );
+        return array_filter($array, fn($value): bool => $value > 1);
     }
 }

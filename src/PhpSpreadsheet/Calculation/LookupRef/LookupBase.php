@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-abstract class LookupBase
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+abstract class Lookup_Base
 {
-    protected static function validateLookupArray(mixed $lookupArray): void
+    protected static function validate_lookup_array(mixed $lookup_array): void
     {
-        if (!is_array($lookupArray)) {
-            throw new Exception(ExcelError::REF());
+        if (!is_array($lookup_array)) {
+            throw new Exception(Excel_Error::REF());
         }
     }
-
     /**
      * @param mixed[] $lookupArray
      * @param float|int|string $index_number number >= 1
      */
-    protected static function validateIndexLookup(array $lookupArray, $index_number): int
+    protected static function validate_index_lookup(array $lookup_array, $index_number): int
     {
         // index_number must be a number greater than or equal to 1.
         // Excel results are inconsistent when index is non-numeric.
@@ -29,41 +26,30 @@ abstract class LookupBase
         //   when cellref is '=SQRT(-1)'. So just try our best here.
         // Similar results if string (literal yields VALUE, cellRef REF).
         if (!is_numeric($index_number)) {
-            throw new Exception(ExcelError::throwError($index_number));
+            throw new Exception(Excel_Error::throw_error($index_number));
         }
         if ($index_number < 1) {
-            throw new Exception(ExcelError::VALUE());
+            throw new Exception(Excel_Error::VALUE());
         }
-
         // index_number must be less than or equal to the number of columns in lookupArray
-        if (empty($lookupArray)) {
-            throw new Exception(ExcelError::REF());
+        if (empty($lookup_array)) {
+            throw new Exception(Excel_Error::REF());
         }
-
         return (int) $index_number;
     }
-
-    protected static function checkMatch(
-        bool $bothNumeric,
-        bool $bothNotNumeric,
-        bool $notExactMatch,
-        int $rowKey,
-        string $cellDataLower,
-        string $lookupLower,
-        ?int $rowNumber
-    ): ?int {
+    protected static function check_match(bool $both_numeric, bool $both_not_numeric, bool $not_exact_match, int $row_key, string $cell_data_lower, string $lookup_lower, ?int $row_number): ?int
+    {
         // remember the last key, but only if datatypes match
-        if ($bothNumeric || $bothNotNumeric) {
+        if ($both_numeric || $both_not_numeric) {
             // Spreadsheets software returns first exact match,
             // we have sorted and we might have broken key orders
             // we want the first one (by its initial index)
-            if ($notExactMatch) {
-                $rowNumber = $rowKey;
-            } elseif (($cellDataLower == $lookupLower) && (($rowNumber === null) || ($rowKey < $rowNumber))) {
-                $rowNumber = $rowKey;
+            if ($not_exact_match) {
+                $row_number = $row_key;
+            } elseif ($cell_data_lower == $lookup_lower && ($row_number === null || $row_key < $row_number)) {
+                $row_number = $row_key;
             }
         }
-
-        return $rowNumber;
+        return $row_number;
     }
 }

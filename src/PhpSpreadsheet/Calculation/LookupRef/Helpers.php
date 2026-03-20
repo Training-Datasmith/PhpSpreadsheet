@@ -1,77 +1,64 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Lookup_Ref;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
-
-use PhpOffice\PhpSpreadsheet\Cell\AddressHelper;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\DefinedName;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
+use Php_Office\Php_Spreadsheet\Cell\Address_Helper;
+use Php_Office\Php_Spreadsheet\Cell\Cell;
+use Php_Office\Php_Spreadsheet\Defined_Name;
+use Php_Office\Php_Spreadsheet\Worksheet\Worksheet;
 class Helpers
 {
     public const CELLADDRESS_USE_A1 = true;
-
     public const CELLADDRESS_USE_R1C1 = false;
-
-    private static function convertR1C1(string &$cellAddress1, ?string &$cellAddress2, bool $a1, ?int $baseRow = null, ?int $baseCol = null): string
+    private static function convert_r1c1(string &$cell_address1, ?string &$cell_address2, bool $a1, ?int $base_row = null, ?int $base_col = null): string
     {
         if ($a1 === self::CELLADDRESS_USE_R1C1) {
-            $cellAddress1 = AddressHelper::convertToA1($cellAddress1, $baseRow ?? 1, $baseCol ?? 1);
-            if ($cellAddress2) {
-                $cellAddress2 = AddressHelper::convertToA1($cellAddress2, $baseRow ?? 1, $baseCol ?? 1);
+            $cell_address1 = Address_Helper::convert_to_a1($cell_address1, $base_row ?? 1, $base_col ?? 1);
+            if ($cell_address2) {
+                $cell_address2 = Address_Helper::convert_to_a1($cell_address2, $base_row ?? 1, $base_col ?? 1);
             }
         }
-
-        return $cellAddress1 . ($cellAddress2 ? ":$cellAddress2" : '');
+        return $cell_address1 . ($cell_address2 ? ":{$cell_address2}" : '');
     }
-
-    private static function adjustSheetTitle(string &$sheetTitle, ?string $value): void
+    private static function adjust_sheet_title(string &$sheet_title, ?string $value): void
     {
-        if ($sheetTitle) {
-            $sheetTitle .= '!';
-            if (stripos($value ?? '', $sheetTitle) === 0) {
-                $sheetTitle = '';
+        if ($sheet_title) {
+            $sheet_title .= '!';
+            if (stripos($value ?? '', $sheet_title) === 0) {
+                $sheet_title = '';
             }
         }
     }
-
     /** @return array{string, ?string, string} */
-    public static function extractCellAddresses(string $cellAddress, bool $a1, Worksheet $sheet, string $sheetName = '', ?int $baseRow = null, ?int $baseCol = null): array
+    public static function extract_cell_addresses(string $cell_address, bool $a1, Worksheet $sheet, string $sheet_name = '', ?int $base_row = null, ?int $base_col = null): array
     {
-        $cellAddress1 = $cellAddress;
-        $cellAddress2 = null;
-        $namedRange = DefinedName::resolveName($cellAddress1, $sheet, $sheetName);
-        if ($namedRange !== null) {
-            $workSheet = $namedRange->getWorkSheet();
-            $sheetTitle = ($workSheet === null) ? '' : $workSheet->getTitle();
-            $value = (string) preg_replace('/^=/', '', $namedRange->getValue());
-            self::adjustSheetTitle($sheetTitle, $value);
-            $cellAddress1 = $sheetTitle . $value;
-            $cellAddress = $cellAddress1;
+        $cell_address1 = $cell_address;
+        $cell_address2 = null;
+        $named_range = Defined_Name::resolve_name($cell_address1, $sheet, $sheet_name);
+        if ($named_range !== null) {
+            $work_sheet = $named_range->get_work_sheet();
+            $sheet_title = $work_sheet === null ? '' : $work_sheet->get_title();
+            $value = (string) preg_replace('/^=/', '', $named_range->get_value());
+            self::adjust_sheet_title($sheet_title, $value);
+            $cell_address1 = $sheet_title . $value;
+            $cell_address = $cell_address1;
             $a1 = self::CELLADDRESS_USE_A1;
         }
-        if (str_contains($cellAddress, ':')) {
-            [$cellAddress1, $cellAddress2] = explode(':', $cellAddress);
+        if (str_contains($cell_address, ':')) {
+            [$cell_address1, $cell_address2] = explode(':', $cell_address);
         }
-        $cellAddress = self::convertR1C1($cellAddress1, $cellAddress2, $a1, $baseRow, $baseCol);
-
-        return [$cellAddress1, $cellAddress2, $cellAddress];
+        $cell_address = self::convert_r1c1($cell_address1, $cell_address2, $a1, $base_row, $base_col);
+        return [$cell_address1, $cell_address2, $cell_address];
     }
-
     /** @return array{string, ?Worksheet, string} */
-    public static function extractWorksheet(string $cellAddress, Cell $cell): array
+    public static function extract_worksheet(string $cell_address, Cell $cell): array
     {
-        $sheetName = '';
-        if (str_contains($cellAddress, '!')) {
-            [$sheetName, $cellAddress] = Worksheet::extractSheetTitle($cellAddress, true, true);
+        $sheet_name = '';
+        if (str_contains($cell_address, '!')) {
+            [$sheet_name, $cell_address] = Worksheet::extract_sheet_title($cell_address, true, true);
         }
-
-        $worksheet = ($sheetName !== '')
-            ? $cell->getWorksheet()->getParentOrThrow()->getSheetByName($sheetName)
-            : $cell->getWorksheet();
-
-        return [$cellAddress, $worksheet, $sheetName];
+        $worksheet = $sheet_name !== '' ? $cell->get_worksheet()->get_parent_or_throw()->get_sheet_by_name($sheet_name) : $cell->get_worksheet();
+        return [$cell_address, $worksheet, $sheet_name];
     }
 }

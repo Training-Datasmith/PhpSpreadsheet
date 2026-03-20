@@ -1,17 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Date_Time_Excel;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel;
-
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Functions;
-
-class NetworkDays
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Functions;
+class Network_Days
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * NETWORKDAYS.
      *
@@ -35,95 +32,78 @@ class NetworkDays
      *         If an array of values is passed for the $startDate or $endDate arguments, then the returned result
      *            will also be an array with matching dimensions
      */
-    public static function count(mixed $startDate, mixed $endDate, mixed ...$dateArgs): array|string|int
+    public static function count(mixed $start_date, mixed $end_date, mixed ...$date_args): array|string|int
     {
-        if (is_array($startDate) || is_array($endDate)) {
-            return self::evaluateArrayArgumentsSubset(
-                [self::class, __FUNCTION__],
-                2,
-                $startDate,
-                $endDate,
-                ...$dateArgs
-            );
+        if (is_array($start_date) || is_array($end_date)) {
+            return self::evaluate_array_arguments_subset([self::class, __FUNCTION__], 2, $start_date, $end_date, ...$date_args);
         }
-
         try {
             //    Retrieve the mandatory start and end date that are referenced in the function definition
-            $sDate = Helpers::getDateValue($startDate);
-            $eDate = Helpers::getDateValue($endDate);
-            $startDate = min($sDate, $eDate);
-            $endDate = max($sDate, $eDate);
+            $s_date = Helpers::get_date_value($start_date);
+            $e_date = Helpers::get_date_value($end_date);
+            $start_date = min($s_date, $e_date);
+            $end_date = max($s_date, $e_date);
             //    Get the optional days
-            $dateArgs = Functions::flattenArray($dateArgs);
+            $date_args = Functions::flatten_array($date_args);
             //    Test any extra holiday parameters
-            $holidayArray = [];
-            foreach ($dateArgs as $holidayDate) {
-                $holidayArray[] = Helpers::getDateValue($holidayDate);
+            $holiday_array = [];
+            foreach ($date_args as $holiday_date) {
+                $holiday_array[] = Helpers::get_date_value($holiday_date);
             }
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         // Execute function
-        $startDow = self::calcStartDow($startDate);
-        $endDow = self::calcEndDow($endDate);
-        $wholeWeekDays = (int) floor(($endDate - $startDate) / 7) * 5;
-        $partWeekDays = self::calcPartWeekDays($startDow, $endDow);
-
+        $start_dow = self::calc_start_dow($start_date);
+        $end_dow = self::calc_end_dow($end_date);
+        $whole_week_days = (int) floor(($end_date - $start_date) / 7) * 5;
+        $part_week_days = self::calc_part_week_days($start_dow, $end_dow);
         //    Test any extra holiday parameters
-        $holidayCountedArray = [];
-        foreach ($holidayArray as $holidayDate) {
-            if (!($holidayDate >= $startDate)) {
+        $holiday_counted_array = [];
+        foreach ($holiday_array as $holiday_date) {
+            if (!($holiday_date >= $start_date)) {
                 continue;
             }
-            if (!($holidayDate <= $endDate)) {
+            if (!($holiday_date <= $end_date)) {
                 continue;
             }
-            if (!(Week::day($holidayDate, 2) < 6)) {
+            if (!(Week::day($holiday_date, 2) < 6)) {
                 continue;
             }
-            if (in_array($holidayDate, $holidayCountedArray)) {
+            if (in_array($holiday_date, $holiday_counted_array)) {
                 continue;
             }
-            --$partWeekDays;
-            $holidayCountedArray[] = $holidayDate;
+            --$part_week_days;
+            $holiday_counted_array[] = $holiday_date;
         }
-
-        return self::applySign($wholeWeekDays + $partWeekDays, $sDate, $eDate);
+        return self::apply_sign($whole_week_days + $part_week_days, $s_date, $e_date);
     }
-
-    private static function calcStartDow(float $startDate): int
+    private static function calc_start_dow(float $start_date): int
     {
-        $startDow = 6 - (int) Week::day($startDate, 2);
-        if ($startDow < 0) {
+        $start_dow = 6 - (int) Week::day($start_date, 2);
+        if ($start_dow < 0) {
             return 5;
         }
-
-        return $startDow;
+        return $start_dow;
     }
-
-    private static function calcEndDow(float $endDate): int
+    private static function calc_end_dow(float $end_date): int
     {
-        $endDow = (int) Week::day($endDate, 2);
-        if ($endDow >= 6) {
+        $end_dow = (int) Week::day($end_date, 2);
+        if ($end_dow >= 6) {
             return 0;
         }
-
-        return $endDow;
+        return $end_dow;
     }
-
-    private static function calcPartWeekDays(int $startDow, int $endDow): int
+    private static function calc_part_week_days(int $start_dow, int $end_dow): int
     {
-        $partWeekDays = $endDow + $startDow;
-        if ($partWeekDays > 5) {
-            $partWeekDays -= 5;
+        $part_week_days = $end_dow + $start_dow;
+        if ($part_week_days > 5) {
+            $part_week_days -= 5;
         }
-
-        return $partWeekDays;
+        return $part_week_days;
     }
-
-    private static function applySign(int $result, float $sDate, float $eDate): int
+    private static function apply_sign(int $result, float $s_date, float $e_date): int
     {
-        return ($sDate > $eDate) ? -$result : $result;
+        return $s_date > $e_date ? -$result : $result;
     }
 }

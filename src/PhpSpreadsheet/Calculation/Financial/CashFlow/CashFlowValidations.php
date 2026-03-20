@@ -1,41 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Financial\Cash_Flow;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Financial\CashFlow;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\Constants as FinancialConstants;
-use PhpOffice\PhpSpreadsheet\Calculation\Financial\FinancialValidations;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class CashFlowValidations extends FinancialValidations
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Constants as FinancialConstants;
+use Php_Office\Php_Spreadsheet\Calculation\Financial\Financial_Validations;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Cash_Flow_Validations extends Financial_Validations
 {
-    public static function validateRate(mixed $rate): float
+    public static function validate_rate(mixed $rate): float
     {
-        return self::validateFloat($rate);
+        return self::validate_float($rate);
     }
-
-    public static function validatePeriodType(mixed $type): int
+    public static function validate_period_type(mixed $type): int
     {
-        $rate = self::validateInt($type);
-        if (
-            $type !== FinancialConstants::PAYMENT_END_OF_PERIOD
-            && $type !== FinancialConstants::PAYMENT_BEGINNING_OF_PERIOD
-        ) {
-            throw new Exception(ExcelError::NAN());
+        $rate = self::validate_int($type);
+        if ($type !== Financial_Constants::PAYMENT_END_OF_PERIOD && $type !== Financial_Constants::PAYMENT_BEGINNING_OF_PERIOD) {
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $rate;
     }
-
-    public static function validatePresentValue(mixed $presentValue): float
+    public static function validate_present_value(mixed $present_value): float
     {
-        return self::validateFloat($presentValue);
+        return self::validate_float($present_value);
     }
-
-    public static function validateFutureValue(mixed $futureValue): float
+    public static function validate_future_value(mixed $future_value): float
     {
-        return self::validateFloat($futureValue);
+        return self::validate_float($future_value);
     }
 }

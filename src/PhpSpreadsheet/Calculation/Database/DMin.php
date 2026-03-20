@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Database;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Database;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Minimum;
-
-class DMin extends DatabaseAbstract
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+use Php_Office\Php_Spreadsheet\Calculation\Statistical\Minimum;
+class D_Min extends Database_Abstract
 {
     /**
      * DMIN.
@@ -33,15 +31,12 @@ class DMin extends DatabaseAbstract
      *                                        the column label in which you specify a condition for the
      *                                        column.
      */
-    public static function evaluate(array $database, array|null|int|string $field, array $criteria, bool $returnError = true): float|string|null
+    public static function evaluate(array $database, array|null|int|string $field, array $criteria, bool $return_error = true): float|string|null
     {
-        $field = self::fieldExtract($database, $field);
+        $field = self::field_extract($database, $field);
         if ($field === null) {
-            return $returnError ? ExcelError::VALUE() : null;
+            return $return_error ? Excel_Error::VALUE() : null;
         }
-
-        return Minimum::min(
-            self::getFilteredColumn($database, $field, $criteria)
-        );
+        return Minimum::min(self::get_filtered_column($database, $field, $criteria));
     }
 }

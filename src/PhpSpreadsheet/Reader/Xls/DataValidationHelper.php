@@ -1,220 +1,151 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xls;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xls;
-
-use PhpOffice\PhpSpreadsheet\Cell\AddressRange;
-use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
-use PhpOffice\PhpSpreadsheet\Exception as PhpSpreadsheetException;
-use PhpOffice\PhpSpreadsheet\Reader\Xls;
-
-class DataValidationHelper extends Xls
+use Php_Office\Php_Spreadsheet\Cell\Address_Range;
+use Php_Office\Php_Spreadsheet\Cell\Data_Validation;
+use Php_Office\Php_Spreadsheet\Exception as PhpSpreadsheetException;
+use Php_Office\Php_Spreadsheet\Reader\Xls;
+class Data_Validation_Helper extends Xls
 {
     /**
      * @var array<int, string>
      */
-    private static array $types = [
-        0x00 => DataValidation::TYPE_NONE,
-        0x01 => DataValidation::TYPE_WHOLE,
-        0x02 => DataValidation::TYPE_DECIMAL,
-        0x03 => DataValidation::TYPE_LIST,
-        0x04 => DataValidation::TYPE_DATE,
-        0x05 => DataValidation::TYPE_TIME,
-        0x06 => DataValidation::TYPE_TEXTLENGTH,
-        0x07 => DataValidation::TYPE_CUSTOM,
-    ];
-
+    private static array $types = [0x0 => Data_Validation::TYPE_NONE, 0x1 => Data_Validation::TYPE_WHOLE, 0x2 => Data_Validation::TYPE_DECIMAL, 0x3 => Data_Validation::TYPE_LIST, 0x4 => Data_Validation::TYPE_DATE, 0x5 => Data_Validation::TYPE_TIME, 0x6 => Data_Validation::TYPE_TEXTLENGTH, 0x7 => Data_Validation::TYPE_CUSTOM];
     /**
      * @var array<int, string>
      */
-    private static array $errorStyles = [
-        0x00 => DataValidation::STYLE_STOP,
-        0x01 => DataValidation::STYLE_WARNING,
-        0x02 => DataValidation::STYLE_INFORMATION,
-    ];
-
+    private static array $error_styles = [0x0 => Data_Validation::STYLE_STOP, 0x1 => Data_Validation::STYLE_WARNING, 0x2 => Data_Validation::STYLE_INFORMATION];
     /**
      * @var array<int, string>
      */
-    private static array $operators = [
-        0x00 => DataValidation::OPERATOR_BETWEEN,
-        0x01 => DataValidation::OPERATOR_NOTBETWEEN,
-        0x02 => DataValidation::OPERATOR_EQUAL,
-        0x03 => DataValidation::OPERATOR_NOTEQUAL,
-        0x04 => DataValidation::OPERATOR_GREATERTHAN,
-        0x05 => DataValidation::OPERATOR_LESSTHAN,
-        0x06 => DataValidation::OPERATOR_GREATERTHANOREQUAL,
-        0x07 => DataValidation::OPERATOR_LESSTHANOREQUAL,
-    ];
-
+    private static array $operators = [0x0 => Data_Validation::OPERATOR_BETWEEN, 0x1 => Data_Validation::OPERATOR_NOTBETWEEN, 0x2 => Data_Validation::OPERATOR_EQUAL, 0x3 => Data_Validation::OPERATOR_NOTEQUAL, 0x4 => Data_Validation::OPERATOR_GREATERTHAN, 0x5 => Data_Validation::OPERATOR_LESSTHAN, 0x6 => Data_Validation::OPERATOR_GREATERTHANOREQUAL, 0x7 => Data_Validation::OPERATOR_LESSTHANOREQUAL];
     public static function type(int $type): ?string
     {
         return self::$types[$type] ?? null;
     }
-
-    public static function errorStyle(int $errorStyle): ?string
+    public static function error_style(int $error_style): ?string
     {
-        return self::$errorStyles[$errorStyle] ?? null;
+        return self::$error_styles[$error_style] ?? null;
     }
-
     public static function operator(int $operator): ?string
     {
         return self::$operators[$operator] ?? null;
     }
-
     /**
      * Read DATAVALIDATION record.
      */
-    protected function readDataValidation2(Xls $xls): void
+    protected function read_data_validation2(Xls $xls): void
     {
-        $length = self::getUInt2d($xls->data, $xls->pos + 2);
-        $recordData = $xls->readRecordData($xls->data, $xls->pos + 4, $length);
-
+        $length = self::get_u_int2d($xls->data, $xls->pos + 2);
+        $record_data = $xls->read_record_data($xls->data, $xls->pos + 4, $length);
         // move stream pointer forward to next record
         $xls->pos += 4 + $length;
-
-        if ($xls->readDataOnly) {
+        if ($xls->read_data_only) {
             return;
         }
-
         // offset: 0; size: 4; Options
-        $options = self::getInt4d($recordData, 0);
-
+        $options = self::get_int4d($record_data, 0);
         // bit: 0-3; mask: 0x0000000F; type
-        $type = (0x0000000F & $options) >> 0;
+        $type = (0xf & $options) >> 0;
         $type = self::type($type);
-
         // bit: 4-6; mask: 0x00000070; error type
-        $errorStyle = (0x00000070 & $options) >> 4;
-        $errorStyle = self::errorStyle($errorStyle);
-
+        $error_style = (0x70 & $options) >> 4;
+        $error_style = self::error_style($error_style);
         // bit: 7; mask: 0x00000080; 1= formula is explicit (only applies to list)
         // I have only seen cases where this is 1
         //$explicitFormula = (0x00000080 & $options) >> 7;
-
         // bit: 8; mask: 0x00000100; 1= empty cells allowed
-        $allowBlank = (0x00000100 & $options) >> 8;
-
+        $allow_blank = (0x100 & $options) >> 8;
         // bit: 9; mask: 0x00000200; 1= suppress drop down arrow in list type validity
-        $suppressDropDown = (0x00000200 & $options) >> 9;
-
+        $suppress_drop_down = (0x200 & $options) >> 9;
         // bit: 18; mask: 0x00040000; 1= show prompt box if cell selected
-        $showInputMessage = (0x00040000 & $options) >> 18;
-
+        $show_input_message = (0x40000 & $options) >> 18;
         // bit: 19; mask: 0x00080000; 1= show error box if invalid values entered
-        $showErrorMessage = (0x00080000 & $options) >> 19;
-
+        $show_error_message = (0x80000 & $options) >> 19;
         // bit: 20-23; mask: 0x00F00000; condition operator
-        $operator = (0x00F00000 & $options) >> 20;
+        $operator = (0xf00000 & $options) >> 20;
         $operator = self::operator($operator);
-
-        if ($type === null || $errorStyle === null || $operator === null) {
+        if ($type === null || $error_style === null || $operator === null) {
             return;
         }
-
         // offset: 4; size: var; title of the prompt box
         $offset = 4;
-        $string = self::readUnicodeStringLong(substr($recordData, $offset));
-        $promptTitle = $string['value'] !== chr(0) ? $string['value'] : '';
+        $string = self::read_unicode_string_long(substr($record_data, $offset));
+        $prompt_title = $string['value'] !== chr(0) ? $string['value'] : '';
         $offset += $string['size'];
-
         // offset: var; size: var; title of the error box
-        $string = self::readUnicodeStringLong(substr($recordData, $offset));
-        $errorTitle = $string['value'] !== chr(0) ? $string['value'] : '';
+        $string = self::read_unicode_string_long(substr($record_data, $offset));
+        $error_title = $string['value'] !== chr(0) ? $string['value'] : '';
         $offset += $string['size'];
-
         // offset: var; size: var; text of the prompt box
-        $string = self::readUnicodeStringLong(substr($recordData, $offset));
+        $string = self::read_unicode_string_long(substr($record_data, $offset));
         $prompt = $string['value'] !== chr(0) ? $string['value'] : '';
         $offset += $string['size'];
-
         // offset: var; size: var; text of the error box
-        $string = self::readUnicodeStringLong(substr($recordData, $offset));
+        $string = self::read_unicode_string_long(substr($record_data, $offset));
         $error = $string['value'] !== chr(0) ? $string['value'] : '';
         $offset += $string['size'];
-
         // offset: var; size: 2; size of the formula data for the first condition
-        $sz1 = self::getUInt2d($recordData, $offset);
+        $sz1 = self::get_u_int2d($record_data, $offset);
         $offset += 2;
-
         // offset: var; size: 2; not used
         $offset += 2;
-
         // offset: var; size: $sz1; formula data for first condition (without size field)
-        $formula1 = substr($recordData, $offset, $sz1);
-        $formula1 = pack('v', $sz1) . $formula1; // prepend the length
-
+        $formula1 = substr($record_data, $offset, $sz1);
+        $formula1 = pack('v', $sz1) . $formula1;
+        // prepend the length
         try {
-            $formula1 = $xls->getFormulaFromStructure($formula1);
-
+            $formula1 = $xls->get_formula_from_structure($formula1);
             // in list type validity, null characters are used as item separators
-            if ($type == DataValidation::TYPE_LIST) {
+            if ($type == Data_Validation::TYPE_LIST) {
                 $formula1 = str_replace(chr(0), ',', $formula1);
             }
-        } catch (PhpSpreadsheetException) {
+        } catch (Php_Spreadsheet_Exception) {
             return;
         }
         $offset += $sz1;
-
         // offset: var; size: 2; size of the formula data for the first condition
-        $sz2 = self::getUInt2d($recordData, $offset);
+        $sz2 = self::get_u_int2d($record_data, $offset);
         $offset += 2;
-
         // offset: var; size: 2; not used
         $offset += 2;
-
         // offset: var; size: $sz2; formula data for second condition (without size field)
-        $formula2 = substr($recordData, $offset, $sz2);
-        $formula2 = pack('v', $sz2) . $formula2; // prepend the length
-
+        $formula2 = substr($record_data, $offset, $sz2);
+        $formula2 = pack('v', $sz2) . $formula2;
+        // prepend the length
         try {
-            $formula2 = $xls->getFormulaFromStructure($formula2);
-        } catch (PhpSpreadsheetException) {
+            $formula2 = $xls->get_formula_from_structure($formula2);
+        } catch (Php_Spreadsheet_Exception) {
             return;
         }
         $offset += $sz2;
-
         // offset: var; size: var; cell range address list with
-        $cellRangeAddressList = Biff8::readBIFF8CellRangeAddressList(substr($recordData, $offset));
+        $cell_range_address_list = Biff8::read_biff8cell_range_address_list(substr($record_data, $offset));
         /** @var string[] */
-        $cellRangeAddresses = $cellRangeAddressList['cellRangeAddresses'];
-        $maxRow = (string) AddressRange::MAX_ROW;
-        $maxCol = AddressRange::MAX_COLUMN;
-        $maxXlsRow = (string) AddressRange::MAX_ROW_XLS;
-        $maxXlsColumnString = AddressRange::MAX_COLUMN_XLS;
-
-        foreach ($cellRangeAddresses as $cellRange) {
-            $cellRange = preg_replace(
-                [
-                    "/([a-z]+)1:([a-z]+)$maxXlsRow/i",
-                    "/([a-z]+\\d+):([a-z]+)$maxXlsRow/i",
-                    "/A(\\d+):$maxXlsColumnString(\\d+)/i",
-                    "/([a-z]+\\d+):$maxXlsColumnString(\\d+)/i",
-                ],
-                [
-                    '$1:$2',
-                    '$1:${2}' . $maxRow,
-                    '$1:$2',
-                    '$1:' . $maxCol . '$2',
-                ],
-                $cellRange
-            ) ?? $cellRange;
-            $objValidation = new DataValidation();
-            $objValidation->setType($type);
-            $objValidation->setErrorStyle($errorStyle);
-            $objValidation->setAllowBlank((bool) $allowBlank);
-            $objValidation->setShowInputMessage((bool) $showInputMessage);
-            $objValidation->setShowErrorMessage((bool) $showErrorMessage);
-            $objValidation->setShowDropDown(!$suppressDropDown);
-            $objValidation->setOperator($operator);
-            $objValidation->setErrorTitle($errorTitle);
-            $objValidation->setError($error);
-            $objValidation->setPromptTitle($promptTitle);
-            $objValidation->setPrompt($prompt);
-            $objValidation->setFormula1($formula1);
-            $objValidation->setFormula2($formula2);
-            $xls->phpSheet->setDataValidation($cellRange, $objValidation);
+        $cell_range_addresses = $cell_range_address_list['cellRangeAddresses'];
+        $max_row = (string) Address_Range::MAX_ROW;
+        $max_col = Address_Range::MAX_COLUMN;
+        $max_xls_row = (string) Address_Range::MAX_ROW_XLS;
+        $max_xls_column_string = Address_Range::MAX_COLUMN_XLS;
+        foreach ($cell_range_addresses as $cell_range) {
+            $cell_range = preg_replace(["/([a-z]+)1:([a-z]+){$max_xls_row}/i", "/([a-z]+\\d+):([a-z]+){$max_xls_row}/i", "/A(\\d+):{$max_xls_column_string}(\\d+)/i", "/([a-z]+\\d+):{$max_xls_column_string}(\\d+)/i"], ['$1:$2', '$1:${2}' . $max_row, '$1:$2', '$1:' . $max_col . '$2'], $cell_range) ?? $cell_range;
+            $obj_validation = new Data_Validation();
+            $obj_validation->set_type($type);
+            $obj_validation->set_error_style($error_style);
+            $obj_validation->set_allow_blank((bool) $allow_blank);
+            $obj_validation->set_show_input_message((bool) $show_input_message);
+            $obj_validation->set_show_error_message((bool) $show_error_message);
+            $obj_validation->set_show_drop_down(!$suppress_drop_down);
+            $obj_validation->set_operator($operator);
+            $obj_validation->set_error_title($error_title);
+            $obj_validation->set_error($error);
+            $obj_validation->set_prompt_title($prompt_title);
+            $obj_validation->set_prompt($prompt);
+            $obj_validation->set_formula1($formula1);
+            $obj_validation->set_formula2($formula2);
+            $xls->php_sheet->set_data_validation($cell_range, $obj_validation);
         }
     }
 }

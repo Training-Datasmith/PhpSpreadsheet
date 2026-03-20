@@ -1,93 +1,71 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Reader\Xml\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Reader\Xml\Style;
-
-use PhpOffice\PhpSpreadsheet\Style\Font as FontUnderline;
-use SimpleXMLElement;
-
-class Font extends StyleBase
+use Php_Office\Php_Spreadsheet\Style\Font as FontUnderline;
+use Simple_Xml_Element;
+class Font extends Style_Base
 {
-    protected const UNDERLINE_STYLES = [
-        FontUnderline::UNDERLINE_NONE,
-        FontUnderline::UNDERLINE_DOUBLE,
-        FontUnderline::UNDERLINE_DOUBLEACCOUNTING,
-        FontUnderline::UNDERLINE_SINGLE,
-        FontUnderline::UNDERLINE_SINGLEACCOUNTING,
-    ];
-
+    protected const UNDERLINE_STYLES = [Font_Underline::UNDERLINE_NONE, Font_Underline::UNDERLINE_DOUBLE, Font_Underline::UNDERLINE_DOUBLEACCOUNTING, Font_Underline::UNDERLINE_SINGLE, Font_Underline::UNDERLINE_SINGLEACCOUNTING];
     /**
      * @param mixed[][] $style
      *
      * @return mixed[][]
      */
-    protected function parseUnderline(array $style, string $styleAttributeValue): array
+    protected function parse_underline(array $style, string $style_attribute_value): array
     {
-        if (self::identifyFixedStyleValue(self::UNDERLINE_STYLES, $styleAttributeValue)) {
-            $style['font']['underline'] = $styleAttributeValue;
+        if (self::identify_fixed_style_value(self::UNDERLINE_STYLES, $style_attribute_value)) {
+            $style['font']['underline'] = $style_attribute_value;
         }
-
         return $style;
     }
-
     /**
      * @param mixed[][] $style
      *
      * @return mixed[][]
      */
-    protected function parseVerticalAlign(array $style, string $styleAttributeValue): array
+    protected function parse_vertical_align(array $style, string $style_attribute_value): array
     {
-        if ($styleAttributeValue == 'Superscript') {
+        if ($style_attribute_value == 'Superscript') {
             $style['font']['superscript'] = true;
         }
-        if ($styleAttributeValue == 'Subscript') {
+        if ($style_attribute_value == 'Subscript') {
             $style['font']['subscript'] = true;
         }
-
         return $style;
     }
-
     /** @return mixed[] */
-    public function parseStyle(SimpleXMLElement $styleAttributes): array
+    public function parse_style(Simple_Xml_Element $style_attributes): array
     {
         $style = [];
-
-        foreach ($styleAttributes as $styleAttributeKey => $styleAttributeValue) {
-            $styleAttributeValue = (string) $styleAttributeValue;
-            switch ($styleAttributeKey) {
+        foreach ($style_attributes as $style_attribute_key => $style_attribute_value) {
+            $style_attribute_value = (string) $style_attribute_value;
+            switch ($style_attribute_key) {
                 case 'FontName':
-                    $style['font']['name'] = $styleAttributeValue;
-
+                    $style['font']['name'] = $style_attribute_value;
                     break;
                 case 'Size':
-                    $style['font']['size'] = $styleAttributeValue;
-
+                    $style['font']['size'] = $style_attribute_value;
                     break;
                 case 'Color':
                     /** @var string[][][] $style */
-                    $style['font']['color']['rgb'] = substr($styleAttributeValue, 1);
-
+                    $style['font']['color']['rgb'] = substr($style_attribute_value, 1);
                     break;
                 case 'Bold':
-                    $style['font']['bold'] = $styleAttributeValue === '1';
-
+                    $style['font']['bold'] = $style_attribute_value === '1';
                     break;
                 case 'Italic':
-                    $style['font']['italic'] = $styleAttributeValue === '1';
-
+                    $style['font']['italic'] = $style_attribute_value === '1';
                     break;
                 case 'Underline':
-                    $style = $this->parseUnderline($style, $styleAttributeValue);
-
+                    $style = $this->parse_underline($style, $style_attribute_value);
                     break;
                 case 'VerticalAlign':
-                    $style = $this->parseVerticalAlign($style, $styleAttributeValue);
-
+                    $style = $this->parse_vertical_align($style, $style_attribute_value);
                     break;
             }
         }
-
         return $style;
     }
 }

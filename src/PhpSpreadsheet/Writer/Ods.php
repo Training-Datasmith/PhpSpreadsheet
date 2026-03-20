@@ -1,99 +1,79 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer;
 
-namespace PhpOffice\PhpSpreadsheet\Writer;
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Content;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Meta;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\MetaInf;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Mimetype;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Settings;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Styles;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Thumbnails;
-use ZipStream\Exception\OverflowException;
-use ZipStream\ZipStream;
-
-class Ods extends BaseWriter
+use Php_Office\Php_Spreadsheet\Spreadsheet;
+use Php_Office\Php_Spreadsheet\Writer\Exception as WriterException;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Content;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Meta;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Meta_Inf;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Mimetype;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Settings;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Styles;
+use Php_Office\Php_Spreadsheet\Writer\Ods\Thumbnails;
+use Zip_Stream\Exception\OverflowException;
+use Zip_Stream\Zip_Stream;
+class Ods extends Base_Writer
 {
     /**
      * Private PhpSpreadsheet.
      */
-    private Spreadsheet $spreadSheet;
-
-    private readonly Content $writerPartContent;
-
-    private readonly Meta $writerPartMeta;
-
-    private readonly MetaInf $writerPartMetaInf;
-
-    private readonly Mimetype $writerPartMimetype;
-
-    private readonly Settings $writerPartSettings;
-
-    private readonly Styles $writerPartStyles;
-
-    private readonly Thumbnails $writerPartThumbnails;
-
+    private Spreadsheet $spread_sheet;
+    private readonly Content $writer_part_content;
+    private readonly Meta $writer_part_meta;
+    private readonly Meta_Inf $writer_part_meta_inf;
+    private readonly Mimetype $writer_part_mimetype;
+    private readonly Settings $writer_part_settings;
+    private readonly Styles $writer_part_styles;
+    private readonly Thumbnails $writer_part_thumbnails;
     /**
      * Create a new Ods.
      */
     public function __construct(Spreadsheet $spreadsheet)
     {
-        $this->setSpreadsheet($spreadsheet);
-
-        $this->writerPartContent = new Content($this);
-        $this->writerPartMeta = new Meta($this);
-        $this->writerPartMetaInf = new MetaInf($this);
-        $this->writerPartMimetype = new Mimetype($this);
-        $this->writerPartSettings = new Settings($this);
-        $this->writerPartStyles = new Styles($this);
-        $this->writerPartThumbnails = new Thumbnails($this);
+        $this->set_spreadsheet($spreadsheet);
+        $this->writer_part_content = new Content($this);
+        $this->writer_part_meta = new Meta($this);
+        $this->writer_part_meta_inf = new Meta_Inf($this);
+        $this->writer_part_mimetype = new Mimetype($this);
+        $this->writer_part_settings = new Settings($this);
+        $this->writer_part_styles = new Styles($this);
+        $this->writer_part_thumbnails = new Thumbnails($this);
     }
-
-    public function getWriterPartContent(): Content
+    public function get_writer_part_content(): Content
     {
-        return $this->writerPartContent;
+        return $this->writer_part_content;
     }
-
-    public function getWriterPartMeta(): Meta
+    public function get_writer_part_meta(): Meta
     {
-        return $this->writerPartMeta;
+        return $this->writer_part_meta;
     }
-
-    public function getWriterPartMetaInf(): MetaInf
+    public function get_writer_part_meta_inf(): Meta_Inf
     {
-        return $this->writerPartMetaInf;
+        return $this->writer_part_meta_inf;
     }
-
-    public function getWriterPartMimetype(): Mimetype
+    public function get_writer_part_mimetype(): Mimetype
     {
-        return $this->writerPartMimetype;
+        return $this->writer_part_mimetype;
     }
-
-    public function getWriterPartSettings(): Settings
+    public function get_writer_part_settings(): Settings
     {
-        return $this->writerPartSettings;
+        return $this->writer_part_settings;
     }
-
-    public function getWriterPartStyles(): Styles
+    public function get_writer_part_styles(): Styles
     {
-        return $this->writerPartStyles;
+        return $this->writer_part_styles;
     }
-
-    public function getWriterPartThumbnails(): Thumbnails
+    public function get_writer_part_thumbnails(): Thumbnails
     {
-        return $this->writerPartThumbnails;
+        return $this->writer_part_thumbnails;
     }
-
     /** @param array<string, callable> $additionalNumberFormats */
-    public function useAdditionalNumberFormats(array $additionalNumberFormats): void
+    public function use_additional_number_formats(array $additional_number_formats): void
     {
-        $this->writerPartContent->additionalNumberFormats = $additionalNumberFormats;
+        $this->writer_part_content->additional_number_formats = $additional_number_formats;
     }
-
     /**
      * Save PhpSpreadsheet to file.
      *
@@ -101,56 +81,46 @@ class Ods extends BaseWriter
      */
     public function save($filename, int $flags = 0): void
     {
-        $this->processFlags($flags);
-
+        $this->process_flags($flags);
         // garbage collect
-        $this->spreadSheet->garbageCollect();
-
-        $this->openFileHandle($filename);
-
-        $zip = $this->createZip();
-
-        $zip->addFile('META-INF/manifest.xml', $this->getWriterPartMetaInf()->write());
-        $zip->addFile('Thumbnails/thumbnail.png', $this->getWriterPartthumbnails()->write());
+        $this->spread_sheet->garbage_collect();
+        $this->open_file_handle($filename);
+        $zip = $this->create_zip();
+        $zip->add_file('META-INF/manifest.xml', $this->get_writer_part_meta_inf()->write());
+        $zip->add_file('Thumbnails/thumbnail.png', $this->get_writer_partthumbnails()->write());
         // Settings always need to be written before Content; Styles after Content
-        $zip->addFile('settings.xml', $this->getWriterPartsettings()->write());
-        $zip->addFile('content.xml', $this->getWriterPartcontent()->write());
-        $zip->addFile('meta.xml', $this->getWriterPartmeta()->write());
-        $zip->addFile('mimetype', $this->getWriterPartmimetype()->write());
-        $zip->addFile('styles.xml', $this->getWriterPartstyles()->write());
-
+        $zip->add_file('settings.xml', $this->get_writer_partsettings()->write());
+        $zip->add_file('content.xml', $this->get_writer_partcontent()->write());
+        $zip->add_file('meta.xml', $this->get_writer_partmeta()->write());
+        $zip->add_file('mimetype', $this->get_writer_partmimetype()->write());
+        $zip->add_file('styles.xml', $this->get_writer_partstyles()->write());
         // Close file
         try {
             $zip->finish();
         } catch (OverflowException) {
-            throw new WriterException('Could not close resource.');
+            throw new Writer_Exception('Could not close resource.');
         }
-
-        $this->maybeCloseFileHandle();
+        $this->maybe_close_file_handle();
     }
-
     /**
      * Create zip object.
      */
-    private function createZip(): ZipStream
+    private function create_zip(): Zip_Stream
     {
         // Try opening the ZIP file
-        if (!is_resource($this->fileHandle)) {
-            throw new WriterException('Could not open resource for writing.');
+        if (!is_resource($this->file_handle)) {
+            throw new Writer_Exception('Could not open resource for writing.');
         }
-
         // Create new ZIP stream
-        return ZipStream0::newZipStream($this->fileHandle);
+        return Zip_Stream0::new_zip_stream($this->file_handle);
     }
-
     /**
      * Get Spreadsheet object.
      */
-    public function getSpreadsheet(): Spreadsheet
+    public function get_spreadsheet(): Spreadsheet
     {
-        return $this->spreadSheet;
+        return $this->spread_sheet;
     }
-
     /**
      * Set Spreadsheet object.
      *
@@ -158,10 +128,9 @@ class Ods extends BaseWriter
      *
      * @return $this
      */
-    public function setSpreadsheet(Spreadsheet $spreadsheet): static
+    public function set_spreadsheet(Spreadsheet $spreadsheet): static
     {
-        $this->spreadSheet = $spreadsheet;
-
+        $this->spread_sheet = $spreadsheet;
         return $this;
     }
 }

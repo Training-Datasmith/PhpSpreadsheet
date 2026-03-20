@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
-class ConvertHex extends ConvertBase
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
+class Convert_Hex extends Convert_Base
 {
     /**
      * toBinary.
@@ -40,25 +38,21 @@ class ConvertHex extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toBinary($value, $places = null): array|string
+    public static function to_binary($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateHex($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_hex($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $dec = self::toDecimal($value);
-
-        return ConvertDecimal::toBinary($dec, $places);
+        $dec = self::to_decimal($value);
+        return Convert_Decimal::to_binary($dec, $places);
     }
-
     /**
      * toDecimal.
      *
@@ -80,38 +74,32 @@ class ConvertHex extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toDecimal($value): array|string|float|int
+    public static function to_decimal($value): array|string|float|int
     {
         if (is_array($value)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $value);
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $value);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateHex($value);
+            $value = self::validate_value($value);
+            $value = self::validate_hex($value);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
         if (strlen($value) > 10) {
-            return ExcelError::NAN();
+            return Excel_Error::NAN();
         }
-
-        $binX = '';
+        $bin_x = '';
         foreach (mb_str_split($value, 1, 'UTF-8') as $char) {
-            $binX .= str_pad(base_convert($char, 16, 2), 4, '0', STR_PAD_LEFT);
+            $bin_x .= str_pad(base_convert($char, 16, 2), 4, '0', STR_PAD_LEFT);
         }
-        if (strlen($binX) == 40 && $binX[0] == '1') {
+        if (strlen($bin_x) == 40 && $bin_x[0] == '1') {
             for ($i = 0; $i < 40; ++$i) {
-                $binX[$i] = ($binX[$i] == '1' ? '0' : '1');
+                $bin_x[$i] = $bin_x[$i] == '1' ? '0' : '1';
             }
-
-            return (bindec($binX) + 1) * -1;
+            return (bindec($bin_x) + 1) * -1;
         }
-
-        return bindec($binX);
+        return bindec($bin_x);
     }
-
     /**
      * toOctal.
      *
@@ -147,31 +135,26 @@ class ConvertHex extends ConvertBase
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function toOctal($value, $places = null): array|string
+    public static function to_octal($value, $places = null): array|string
     {
         if (is_array($value) || is_array($places)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $value, $places);
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $value, $places);
         }
-
         try {
-            $value = self::validateValue($value);
-            $value = self::validateHex($value);
-            $places = self::validatePlaces($places);
+            $value = self::validate_value($value);
+            $value = self::validate_hex($value);
+            $places = self::validate_places($places);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        $decimal = self::toDecimal($value);
-
-        return ConvertDecimal::toOctal($decimal, $places);
+        $decimal = self::to_decimal($value);
+        return Convert_Decimal::to_octal($decimal, $places);
     }
-
-    protected static function validateHex(string $value): string
+    protected static function validate_hex(string $value): string
     {
         if (strlen($value) > preg_match_all('/[0123456789ABCDEF]/', $value)) {
-            throw new Exception(ExcelError::NAN());
+            throw new Exception(Excel_Error::NAN());
         }
-
         return $value;
     }
 }

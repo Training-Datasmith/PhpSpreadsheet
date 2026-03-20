@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Token;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Token;
-
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-use PhpOffice\PhpSpreadsheet\Calculation\Engine\BranchPruner;
-use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
-
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+use Php_Office\Php_Spreadsheet\Calculation\Engine\Branch_Pruner;
+use Php_Office\Php_Spreadsheet\Shared\String_Helper;
 class Stack
 {
     /**
@@ -16,16 +14,13 @@ class Stack
      * @var array<int, array<mixed>>
      */
     private array $stack = [];
-
     /**
      * Count of entries in the parser stack.
      */
     private int $count = 0;
-
-    public function __construct(private readonly BranchPruner $branchPruner)
+    public function __construct(private readonly Branch_Pruner $branch_pruner)
     {
     }
-
     /**
      * Return the number of entries on the stack.
      */
@@ -33,59 +28,46 @@ class Stack
     {
         return $this->count;
     }
-
     /**
      * Push a new entry onto the stack.
      */
     public function push(string $type, mixed $value, ?string $reference = null): void
     {
-        $stackItem = $this->getStackItem($type, $value, $reference);
-        $this->stack[$this->count++] = $stackItem;
-
+        $stack_item = $this->get_stack_item($type, $value, $reference);
+        $this->stack[$this->count++] = $stack_item;
         if ($type === 'Function') {
-            $localeFunction = Calculation::localeFunc(StringHelper::convertToString($value));
-            if ($localeFunction != $value) {
-                $this->stack[($this->count - 1)]['localeValue'] = $localeFunction;
+            $locale_function = Calculation::locale_func(String_Helper::convert_to_string($value));
+            if ($locale_function != $value) {
+                $this->stack[$this->count - 1]['localeValue'] = $locale_function;
             }
         }
     }
-
     /** @param array<mixed> $stackItem */
-    public function pushStackItem(array $stackItem): void
+    public function push_stack_item(array $stack_item): void
     {
-        $this->stack[$this->count++] = $stackItem;
+        $this->stack[$this->count++] = $stack_item;
     }
-
     /** @return array<mixed> */
-    public function getStackItem(string $type, mixed $value, ?string $reference = null): array
+    public function get_stack_item(string $type, mixed $value, ?string $reference = null): array
     {
-        $stackItem = [
-            'type' => $type,
-            'value' => $value,
-            'reference' => $reference,
-        ];
-
+        $stack_item = ['type' => $type, 'value' => $value, 'reference' => $reference];
         // will store the result under this alias
-        $storeKey = $this->branchPruner->currentCondition();
-        if (isset($storeKey) || $reference === 'NULL') {
-            $stackItem['storeKey'] = $storeKey;
+        $store_key = $this->branch_pruner->current_condition();
+        if (isset($store_key) || $reference === 'NULL') {
+            $stack_item['storeKey'] = $store_key;
         }
-
         // will only run computation if the matching store key is true
-        $onlyIf = $this->branchPruner->currentOnlyIf();
-        if (isset($onlyIf) || $reference === 'NULL') {
-            $stackItem['onlyIf'] = $onlyIf;
+        $only_if = $this->branch_pruner->current_only_if();
+        if (isset($only_if) || $reference === 'NULL') {
+            $stack_item['onlyIf'] = $only_if;
         }
-
         // will only run computation if the matching store key is false
-        $onlyIfNot = $this->branchPruner->currentOnlyIfNot();
-        if (isset($onlyIfNot) || $reference === 'NULL') {
-            $stackItem['onlyIfNot'] = $onlyIfNot;
+        $only_if_not = $this->branch_pruner->current_only_if_not();
+        if (isset($only_if_not) || $reference === 'NULL') {
+            $stack_item['onlyIfNot'] = $only_if_not;
         }
-
-        return $stackItem;
+        return $stack_item;
     }
-
     /**
      * Pop the last entry from the stack.
      *
@@ -96,10 +78,8 @@ class Stack
         if ($this->count > 0) {
             return $this->stack[--$this->count];
         }
-
         return null;
     }
-
     /**
      * Return an entry from the stack without removing it.
      *
@@ -110,10 +90,8 @@ class Stack
         if ($this->count - $n < 0) {
             return null;
         }
-
         return $this->stack[$this->count - $n];
     }
-
     /**
      * Clear the stack.
      */

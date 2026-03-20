@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Internal;
 
-namespace PhpOffice\PhpSpreadsheet\Calculation\Internal;
-
-class MakeMatrix
+class Make_Matrix
 {
     /**
      * @param mixed[] $args

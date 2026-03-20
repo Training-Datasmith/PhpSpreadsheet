@@ -1,19 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Calculation\Engineering;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Calculation\Engineering;
 
 use Complex\Complex as ComplexObject;
 use Complex\Exception as ComplexException;
-use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
-use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-
+use Php_Office\Php_Spreadsheet\Calculation\Array_Enabled;
+use Php_Office\Php_Spreadsheet\Calculation\Exception;
+use Php_Office\Php_Spreadsheet\Calculation\Information\Excel_Error;
 class Complex
 {
-    use ArrayEnabled;
-
+    use Array_Enabled;
     /**
      * COMPLEX.
      *
@@ -33,32 +30,26 @@ class Complex
      * @return array<mixed>|string If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function COMPLEX(mixed $realNumber = 0.0, mixed $imaginary = 0.0, mixed $suffix = 'i'): array|string
+    public static function COMPLEX(mixed $real_number = 0.0, mixed $imaginary = 0.0, mixed $suffix = 'i'): array|string
     {
-        if (is_array($realNumber) || is_array($imaginary) || is_array($suffix)) {
-            return self::evaluateArrayArguments([self::class, __FUNCTION__], $realNumber, $imaginary, $suffix);
+        if (is_array($real_number) || is_array($imaginary) || is_array($suffix)) {
+            return self::evaluate_array_arguments([self::class, __FUNCTION__], $real_number, $imaginary, $suffix);
         }
-
-        $realNumber ??= 0.0;
+        $real_number ??= 0.0;
         $imaginary ??= 0.0;
         $suffix ??= 'i';
-
         try {
-            $realNumber = EngineeringValidations::validateFloat($realNumber);
-            $imaginary = EngineeringValidations::validateFloat($imaginary);
+            $real_number = Engineering_Validations::validate_float($real_number);
+            $imaginary = Engineering_Validations::validate_float($imaginary);
         } catch (Exception $e) {
-            return $e->getMessage();
+            return $e->get_message();
         }
-
-        if (($suffix === 'i') || ($suffix === 'j') || ($suffix === '')) {
-            $complex = new ComplexObject($realNumber, $imaginary, $suffix);
-
+        if ($suffix === 'i' || $suffix === 'j' || $suffix === '') {
+            $complex = new Complex_Object($real_number, $imaginary, $suffix);
             return (string) $complex;
         }
-
-        return ExcelError::VALUE();
+        return Excel_Error::VALUE();
     }
-
     /**
      * IMAGINARY.
      *
@@ -75,21 +66,18 @@ class Complex
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMAGINARY($complexNumber): array|string|float
+    public static function IMAGINARY($complex_number): array|string|float
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        return $complex->getImaginary();
+        return $complex->get_imaginary();
     }
-
     /**
      * IMREAL.
      *
@@ -105,18 +93,16 @@ class Complex
      *         If an array of numbers is passed as an argument, then the returned result will also be an array
      *            with the same dimensions
      */
-    public static function IMREAL($complexNumber): array|string|float
+    public static function IMREAL($complex_number): array|string|float
     {
-        if (is_array($complexNumber)) {
-            return self::evaluateSingleArgumentArray([self::class, __FUNCTION__], $complexNumber);
+        if (is_array($complex_number)) {
+            return self::evaluate_single_argument_array([self::class, __FUNCTION__], $complex_number);
         }
-
         try {
-            $complex = new ComplexObject($complexNumber);
-        } catch (ComplexException) {
-            return ExcelError::NAN();
+            $complex = new Complex_Object($complex_number);
+        } catch (Complex_Exception) {
+            return Excel_Error::NAN();
         }
-
-        return $complex->getReal();
+        return $complex->get_real();
     }
 }

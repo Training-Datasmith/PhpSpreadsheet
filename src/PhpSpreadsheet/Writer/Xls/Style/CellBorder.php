@@ -1,42 +1,21 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xls\Style;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xls\Style;
-
-use PhpOffice\PhpSpreadsheet\Style\Border;
-
-class CellBorder
+use Php_Office\Php_Spreadsheet\Style\Border;
+class Cell_Border
 {
     /**
      * @var array<string, int>
      */
-    protected static array $styleMap = [
-        Border::BORDER_NONE => 0x00,
-        Border::BORDER_THIN => 0x01,
-        Border::BORDER_MEDIUM => 0x02,
-        Border::BORDER_DASHED => 0x03,
-        Border::BORDER_DOTTED => 0x04,
-        Border::BORDER_THICK => 0x05,
-        Border::BORDER_DOUBLE => 0x06,
-        Border::BORDER_HAIR => 0x07,
-        Border::BORDER_MEDIUMDASHED => 0x08,
-        Border::BORDER_DASHDOT => 0x09,
-        Border::BORDER_MEDIUMDASHDOT => 0x0A,
-        Border::BORDER_DASHDOTDOT => 0x0B,
-        Border::BORDER_MEDIUMDASHDOTDOT => 0x0C,
-        Border::BORDER_SLANTDASHDOT => 0x0D,
-        Border::BORDER_OMIT => 0x00,
-    ];
-
+    protected static array $style_map = [Border::BORDER_NONE => 0x0, Border::BORDER_THIN => 0x1, Border::BORDER_MEDIUM => 0x2, Border::BORDER_DASHED => 0x3, Border::BORDER_DOTTED => 0x4, Border::BORDER_THICK => 0x5, Border::BORDER_DOUBLE => 0x6, Border::BORDER_HAIR => 0x7, Border::BORDER_MEDIUMDASHED => 0x8, Border::BORDER_DASHDOT => 0x9, Border::BORDER_MEDIUMDASHDOT => 0xa, Border::BORDER_DASHDOTDOT => 0xb, Border::BORDER_MEDIUMDASHDOTDOT => 0xc, Border::BORDER_SLANTDASHDOT => 0xd, Border::BORDER_OMIT => 0x0];
     public static function style(Border $border): int
     {
-        $borderStyle = $border->getBorderStyle();
-
-        if (array_key_exists($borderStyle, self::$styleMap)) {
-            return self::$styleMap[$borderStyle];
+        $border_style = $border->get_border_style();
+        if (array_key_exists($border_style, self::$style_map)) {
+            return self::$style_map[$border_style];
         }
-
-        return self::$styleMap[Border::BORDER_NONE];
+        return self::$style_map[Border::BORDER_NONE];
     }
 }

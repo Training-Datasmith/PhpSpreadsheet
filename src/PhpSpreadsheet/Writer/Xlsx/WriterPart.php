@@ -1,21 +1,18 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-abstract class WriterPart
+use Php_Office\Php_Spreadsheet\Writer\Xlsx;
+abstract class Writer_Part
 {
     /**
      * Get parent Xlsx object.
      */
-    public function getParentWriter(): Xlsx
+    public function get_parent_writer(): Xlsx
     {
-        return $this->parentWriter;
+        return $this->parent_writer;
     }
-
     /**
      * Set parent Xlsx object.
      */
@@ -23,7 +20,8 @@ abstract class WriterPart
         /**
          * Parent Xlsx object.
          */
-        private readonly Xlsx $parentWriter
-    ) {
+        private readonly Xlsx $parent_writer
+    )
+    {
     }
 }

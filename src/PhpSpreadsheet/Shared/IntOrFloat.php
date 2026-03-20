@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Shared;
 
-namespace PhpOffice\PhpSpreadsheet\Shared;
-
-class IntOrFloat
+class Int_Or_Float
 {
     /**
      * Help some functions with large results operate correctly on 32-bit,
@@ -12,8 +11,7 @@ class IntOrFloat
      */
     public static function evaluate(float|int $value): float|int
     {
-        $iValue = (int) $value;
-
-        return ($value == $iValue) ? $iValue : $value;
+        $i_value = (int) $value;
+        return $value == $i_value ? $i_value : $value;
     }
 }

@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet;
-
-use PhpOffice\PhpSpreadsheet\Shared\PasswordHasher;
-
+use Php_Office\Php_Spreadsheet\Shared\Password_Hasher;
 class Protection
 {
     public const ALGORITHM_MD2 = 'MD2';
@@ -18,332 +16,244 @@ class Protection
     public const ALGORITHM_RIPEMD_128 = 'RIPEMD-128';
     public const ALGORITHM_RIPEMD_160 = 'RIPEMD-160';
     public const ALGORITHM_WHIRLPOOL = 'WHIRLPOOL';
-
     /**
      * Autofilters are locked when sheet is protected, default true.
      */
-    private ?bool $autoFilter = null;
-
+    private ?bool $auto_filter = null;
     /**
      * Deleting columns is locked when sheet is protected, default true.
      */
-    private ?bool $deleteColumns = null;
-
+    private ?bool $delete_columns = null;
     /**
      * Deleting rows is locked when sheet is protected, default true.
      */
-    private ?bool $deleteRows = null;
-
+    private ?bool $delete_rows = null;
     /**
      * Formatting cells is locked when sheet is protected, default true.
      */
-    private ?bool $formatCells = null;
-
+    private ?bool $format_cells = null;
     /**
      * Formatting columns is locked when sheet is protected, default true.
      */
-    private ?bool $formatColumns = null;
-
+    private ?bool $format_columns = null;
     /**
      * Formatting rows is locked when sheet is protected, default true.
      */
-    private ?bool $formatRows = null;
-
+    private ?bool $format_rows = null;
     /**
      * Inserting columns is locked when sheet is protected, default true.
      */
-    private ?bool $insertColumns = null;
-
+    private ?bool $insert_columns = null;
     /**
      * Inserting hyperlinks is locked when sheet is protected, default true.
      */
-    private ?bool $insertHyperlinks = null;
-
+    private ?bool $insert_hyperlinks = null;
     /**
      * Inserting rows is locked when sheet is protected, default true.
      */
-    private ?bool $insertRows = null;
-
+    private ?bool $insert_rows = null;
     /**
      * Objects are locked when sheet is protected, default false.
      */
     private ?bool $objects = null;
-
     /**
      * Pivot tables are locked when the sheet is protected, default true.
      */
-    private ?bool $pivotTables = null;
-
+    private ?bool $pivot_tables = null;
     /**
      * Scenarios are locked when sheet is protected, default false.
      */
     private ?bool $scenarios = null;
-
     /**
      * Selection of locked cells is locked when sheet is protected, default false.
      */
-    private ?bool $selectLockedCells = null;
-
+    private ?bool $select_locked_cells = null;
     /**
      * Selection of unlocked cells is locked when sheet is protected, default false.
      */
-    private ?bool $selectUnlockedCells = null;
-
+    private ?bool $select_unlocked_cells = null;
     /**
      * Sheet is locked when sheet is protected, default false.
      */
     private ?bool $sheet = null;
-
     /**
      * Sorting is locked when sheet is protected, default true.
      */
     private ?bool $sort = null;
-
     /**
      * Hashed password.
      */
     private string $password = '';
-
     /**
      * Algorithm name.
      */
     private string $algorithm = '';
-
     /**
      * Salt value.
      */
     private string $salt = '';
-
     /**
      * Spin count.
      */
-    private int $spinCount = 10000;
-
+    private int $spin_count = 10000;
     /**
      * Is some sort of protection enabled?
      */
-    public function isProtectionEnabled(): bool
+    public function is_protection_enabled(): bool
     {
-        return
-            $this->password !== ''
-            || isset($this->sheet)
-            || isset($this->objects)
-            || isset($this->scenarios)
-            || isset($this->formatCells)
-            || isset($this->formatColumns)
-            || isset($this->formatRows)
-            || isset($this->insertColumns)
-            || isset($this->insertRows)
-            || isset($this->insertHyperlinks)
-            || isset($this->deleteColumns)
-            || isset($this->deleteRows)
-            || isset($this->selectLockedCells)
-            || isset($this->sort)
-            || isset($this->autoFilter)
-            || isset($this->pivotTables)
-            || isset($this->selectUnlockedCells);
+        return $this->password !== '' || isset($this->sheet) || isset($this->objects) || isset($this->scenarios) || isset($this->format_cells) || isset($this->format_columns) || isset($this->format_rows) || isset($this->insert_columns) || isset($this->insert_rows) || isset($this->insert_hyperlinks) || isset($this->delete_columns) || isset($this->delete_rows) || isset($this->select_locked_cells) || isset($this->sort) || isset($this->auto_filter) || isset($this->pivot_tables) || isset($this->select_unlocked_cells);
     }
-
-    public function getSheet(): ?bool
+    public function get_sheet(): ?bool
     {
         return $this->sheet;
     }
-
-    public function setSheet(?bool $sheet): self
+    public function set_sheet(?bool $sheet): self
     {
         $this->sheet = $sheet;
-
         return $this;
     }
-
-    public function getObjects(): ?bool
+    public function get_objects(): ?bool
     {
         return $this->objects;
     }
-
-    public function setObjects(?bool $objects): self
+    public function set_objects(?bool $objects): self
     {
         $this->objects = $objects;
-
         return $this;
     }
-
-    public function getScenarios(): ?bool
+    public function get_scenarios(): ?bool
     {
         return $this->scenarios;
     }
-
-    public function setScenarios(?bool $scenarios): self
+    public function set_scenarios(?bool $scenarios): self
     {
         $this->scenarios = $scenarios;
-
         return $this;
     }
-
-    public function getFormatCells(): ?bool
+    public function get_format_cells(): ?bool
     {
-        return $this->formatCells;
+        return $this->format_cells;
     }
-
-    public function setFormatCells(?bool $formatCells): self
+    public function set_format_cells(?bool $format_cells): self
     {
-        $this->formatCells = $formatCells;
-
+        $this->format_cells = $format_cells;
         return $this;
     }
-
-    public function getFormatColumns(): ?bool
+    public function get_format_columns(): ?bool
     {
-        return $this->formatColumns;
+        return $this->format_columns;
     }
-
-    public function setFormatColumns(?bool $formatColumns): self
+    public function set_format_columns(?bool $format_columns): self
     {
-        $this->formatColumns = $formatColumns;
-
+        $this->format_columns = $format_columns;
         return $this;
     }
-
-    public function getFormatRows(): ?bool
+    public function get_format_rows(): ?bool
     {
-        return $this->formatRows;
+        return $this->format_rows;
     }
-
-    public function setFormatRows(?bool $formatRows): self
+    public function set_format_rows(?bool $format_rows): self
     {
-        $this->formatRows = $formatRows;
-
+        $this->format_rows = $format_rows;
         return $this;
     }
-
-    public function getInsertColumns(): ?bool
+    public function get_insert_columns(): ?bool
     {
-        return $this->insertColumns;
+        return $this->insert_columns;
     }
-
-    public function setInsertColumns(?bool $insertColumns): self
+    public function set_insert_columns(?bool $insert_columns): self
     {
-        $this->insertColumns = $insertColumns;
-
+        $this->insert_columns = $insert_columns;
         return $this;
     }
-
-    public function getInsertRows(): ?bool
+    public function get_insert_rows(): ?bool
     {
-        return $this->insertRows;
+        return $this->insert_rows;
     }
-
-    public function setInsertRows(?bool $insertRows): self
+    public function set_insert_rows(?bool $insert_rows): self
     {
-        $this->insertRows = $insertRows;
-
+        $this->insert_rows = $insert_rows;
         return $this;
     }
-
-    public function getInsertHyperlinks(): ?bool
+    public function get_insert_hyperlinks(): ?bool
     {
-        return $this->insertHyperlinks;
+        return $this->insert_hyperlinks;
     }
-
-    public function setInsertHyperlinks(?bool $insertHyperLinks): self
+    public function set_insert_hyperlinks(?bool $insert_hyper_links): self
     {
-        $this->insertHyperlinks = $insertHyperLinks;
-
+        $this->insert_hyperlinks = $insert_hyper_links;
         return $this;
     }
-
-    public function getDeleteColumns(): ?bool
+    public function get_delete_columns(): ?bool
     {
-        return $this->deleteColumns;
+        return $this->delete_columns;
     }
-
-    public function setDeleteColumns(?bool $deleteColumns): self
+    public function set_delete_columns(?bool $delete_columns): self
     {
-        $this->deleteColumns = $deleteColumns;
-
+        $this->delete_columns = $delete_columns;
         return $this;
     }
-
-    public function getDeleteRows(): ?bool
+    public function get_delete_rows(): ?bool
     {
-        return $this->deleteRows;
+        return $this->delete_rows;
     }
-
-    public function setDeleteRows(?bool $deleteRows): self
+    public function set_delete_rows(?bool $delete_rows): self
     {
-        $this->deleteRows = $deleteRows;
-
+        $this->delete_rows = $delete_rows;
         return $this;
     }
-
-    public function getSelectLockedCells(): ?bool
+    public function get_select_locked_cells(): ?bool
     {
-        return $this->selectLockedCells;
+        return $this->select_locked_cells;
     }
-
-    public function setSelectLockedCells(?bool $selectLockedCells): self
+    public function set_select_locked_cells(?bool $select_locked_cells): self
     {
-        $this->selectLockedCells = $selectLockedCells;
-
+        $this->select_locked_cells = $select_locked_cells;
         return $this;
     }
-
-    public function getSort(): ?bool
+    public function get_sort(): ?bool
     {
         return $this->sort;
     }
-
-    public function setSort(?bool $sort): self
+    public function set_sort(?bool $sort): self
     {
         $this->sort = $sort;
-
         return $this;
     }
-
-    public function getAutoFilter(): ?bool
+    public function get_auto_filter(): ?bool
     {
-        return $this->autoFilter;
+        return $this->auto_filter;
     }
-
-    public function setAutoFilter(?bool $autoFilter): self
+    public function set_auto_filter(?bool $auto_filter): self
     {
-        $this->autoFilter = $autoFilter;
-
+        $this->auto_filter = $auto_filter;
         return $this;
     }
-
-    public function getPivotTables(): ?bool
+    public function get_pivot_tables(): ?bool
     {
-        return $this->pivotTables;
+        return $this->pivot_tables;
     }
-
-    public function setPivotTables(?bool $pivotTables): self
+    public function set_pivot_tables(?bool $pivot_tables): self
     {
-        $this->pivotTables = $pivotTables;
-
+        $this->pivot_tables = $pivot_tables;
         return $this;
     }
-
-    public function getSelectUnlockedCells(): ?bool
+    public function get_select_unlocked_cells(): ?bool
     {
-        return $this->selectUnlockedCells;
+        return $this->select_unlocked_cells;
     }
-
-    public function setSelectUnlockedCells(?bool $selectUnlockedCells): self
+    public function set_select_unlocked_cells(?bool $select_unlocked_cells): self
     {
-        $this->selectUnlockedCells = $selectUnlockedCells;
-
+        $this->select_unlocked_cells = $select_unlocked_cells;
         return $this;
     }
-
     /**
      * Get hashed password.
      */
-    public function getPassword(): string
+    public function get_password(): string
     {
         return $this->password;
     }
-
     /**
      * Set Password.
      *
@@ -351,93 +261,77 @@ class Protection
      *
      * @return $this
      */
-    public function setPassword(string $password, bool $alreadyHashed = false): static
+    public function set_password(string $password, bool $already_hashed = false): static
     {
-        if (!$alreadyHashed) {
-            $salt = $this->generateSalt();
-            $this->setSalt($salt);
-            $password = PasswordHasher::hashPassword($password, $this->getAlgorithm(), $this->getSalt(), $this->getSpinCount());
+        if (!$already_hashed) {
+            $salt = $this->generate_salt();
+            $this->set_salt($salt);
+            $password = Password_Hasher::hash_password($password, $this->get_algorithm(), $this->get_salt(), $this->get_spin_count());
         }
-
         $this->password = $password;
-
         return $this;
     }
-
-    public function setHashValue(string $password): self
+    public function set_hash_value(string $password): self
     {
-        return $this->setPassword($password, true);
+        return $this->set_password($password, true);
     }
-
     /**
      * Create a pseudorandom string.
      */
-    private function generateSalt(): string
+    private function generate_salt(): string
     {
         return base64_encode(random_bytes(16));
     }
-
     /**
      * Get algorithm name.
      */
-    public function getAlgorithm(): string
+    public function get_algorithm(): string
     {
         return $this->algorithm;
     }
-
     /**
      * Set algorithm name.
      */
-    public function setAlgorithm(string $algorithm): self
+    public function set_algorithm(string $algorithm): self
     {
-        return $this->setAlgorithmName($algorithm);
+        return $this->set_algorithm_name($algorithm);
     }
-
     /**
      * Set algorithm name.
      */
-    public function setAlgorithmName(string $algorithm): self
+    public function set_algorithm_name(string $algorithm): self
     {
         $this->algorithm = $algorithm;
-
         return $this;
     }
-
-    public function getSalt(): string
+    public function get_salt(): string
     {
         return $this->salt;
     }
-
-    public function setSalt(string $salt): self
+    public function set_salt(string $salt): self
     {
-        return $this->setSaltValue($salt);
+        return $this->set_salt_value($salt);
     }
-
-    public function setSaltValue(string $salt): self
+    public function set_salt_value(string $salt): self
     {
         $this->salt = $salt;
-
         return $this;
     }
-
     /**
      * Get spin count.
      */
-    public function getSpinCount(): int
+    public function get_spin_count(): int
     {
-        return $this->spinCount;
+        return $this->spin_count;
     }
-
     /**
      * Set spin count.
      */
-    public function setSpinCount(int $spinCount): self
+    public function set_spin_count(int $spin_count): self
     {
-        $this->spinCount = $spinCount;
-
+        $this->spin_count = $spin_count;
         return $this;
     }
-
     /**
      * Verify that the given non-hashed password can "unlock" the protection.
      */
@@ -446,12 +340,9 @@ class Protection
         if ($this->password === '') {
             return true;
         }
-
-        $hash = PasswordHasher::hashPassword($password, $this->getAlgorithm(), $this->getSalt(), $this->getSpinCount());
-
-        return $this->getPassword() === $hash;
+        $hash = Password_Hasher::hash_password($password, $this->get_algorithm(), $this->get_salt(), $this->get_spin_count());
+        return $this->get_password() === $hash;
     }
-
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
@@ -460,9 +351,9 @@ class Protection
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
             if (is_object($value)) {
-                $this->$key = clone $value;
+                $this->{$key} = clone $value;
             } else {
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

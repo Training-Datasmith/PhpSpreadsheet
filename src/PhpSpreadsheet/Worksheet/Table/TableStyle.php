@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Worksheet\Table;
 
-namespace PhpOffice\PhpSpreadsheet\Worksheet\Table;
-
-use PhpOffice\PhpSpreadsheet\Style\Style;
-use PhpOffice\PhpSpreadsheet\Worksheet\Table;
-
-class TableStyle
+use Php_Office\Php_Spreadsheet\Style\Style;
+use Php_Office\Php_Spreadsheet\Worksheet\Table;
+class Table_Style
 {
     public const TABLE_STYLE_NONE = '';
     public const TABLE_STYLE_LIGHT1 = 'TableStyleLight1';
@@ -70,37 +68,30 @@ class TableStyle
     public const TABLE_STYLE_DARK9 = 'TableStyleDark9';
     public const TABLE_STYLE_DARK10 = 'TableStyleDark10';
     public const TABLE_STYLE_DARK11 = 'TableStyleDark11';
-
     /**
      * Show First Column.
      */
-    private bool $showFirstColumn = false;
-
+    private bool $show_first_column = false;
     /**
      * Show Last Column.
      */
-    private bool $showLastColumn = false;
-
+    private bool $show_last_column = false;
     /**
      * Show Row Stripes.
      */
-    private bool $showRowStripes = false;
-
+    private bool $show_row_stripes = false;
     /**
      * Show Column Stripes.
      */
-    private bool $showColumnStripes = false;
-
+    private bool $show_column_stripes = false;
     /**
      * TableDxfsStyle.
      */
-    private ?TableDxfsStyle $tableStyle = null;
-
+    private ?Table_Dxfs_Style $table_style = null;
     /**
      * Table.
      */
     private ?Table $table = null;
-
     /**
      * Create a new Table Style.
      *
@@ -109,142 +100,120 @@ class TableStyle
     public function __construct(private string $theme = self::TABLE_STYLE_MEDIUM2)
     {
     }
-
     /**
      * Get theme.
      */
-    public function getTheme(): string
+    public function get_theme(): string
     {
         return $this->theme;
     }
-
     /**
      * Set theme.
      */
-    public function setTheme(string $theme): self
+    public function set_theme(string $theme): self
     {
         $this->theme = $theme;
-
         return $this;
     }
-
     /**
      * Get show First Column.
      */
-    public function getShowFirstColumn(): bool
+    public function get_show_first_column(): bool
     {
-        return $this->showFirstColumn;
+        return $this->show_first_column;
     }
-
     /**
      * Set show First Column.
      */
-    public function setShowFirstColumn(bool $showFirstColumn): self
+    public function set_show_first_column(bool $show_first_column): self
     {
-        $this->showFirstColumn = $showFirstColumn;
-
+        $this->show_first_column = $show_first_column;
         return $this;
     }
-
     /**
      * Get show Last Column.
      */
-    public function getShowLastColumn(): bool
+    public function get_show_last_column(): bool
     {
-        return $this->showLastColumn;
+        return $this->show_last_column;
     }
-
     /**
      * Set show Last Column.
      */
-    public function setShowLastColumn(bool $showLastColumn): self
+    public function set_show_last_column(bool $show_last_column): self
     {
-        $this->showLastColumn = $showLastColumn;
-
+        $this->show_last_column = $show_last_column;
         return $this;
     }
-
     /**
      * Get show Row Stripes.
      */
-    public function getShowRowStripes(): bool
+    public function get_show_row_stripes(): bool
     {
-        return $this->showRowStripes;
+        return $this->show_row_stripes;
     }
-
     /**
      * Set show Row Stripes.
      */
-    public function setShowRowStripes(bool $showRowStripes): self
+    public function set_show_row_stripes(bool $show_row_stripes): self
     {
-        $this->showRowStripes = $showRowStripes;
-
+        $this->show_row_stripes = $show_row_stripes;
         return $this;
     }
-
     /**
      * Get show Column Stripes.
      */
-    public function getShowColumnStripes(): bool
+    public function get_show_column_stripes(): bool
     {
-        return $this->showColumnStripes;
+        return $this->show_column_stripes;
     }
-
     /**
      * Set show Column Stripes.
      */
-    public function setShowColumnStripes(bool $showColumnStripes): self
+    public function set_show_column_stripes(bool $show_column_stripes): self
     {
-        $this->showColumnStripes = $showColumnStripes;
-
+        $this->show_column_stripes = $show_column_stripes;
         return $this;
     }
-
     /**
      * Get this Style's Dxfs TableStyle.
      */
-    public function getTableDxfsStyle(): ?TableDxfsStyle
+    public function get_table_dxfs_style(): ?Table_Dxfs_Style
     {
-        return $this->tableStyle;
+        return $this->table_style;
     }
-
     /**
      * Set this Style's Dxfs TableStyle.
      *
      * @param Style[] $dxfs
      */
-    public function setTableDxfsStyle(TableDxfsStyle $tableStyle, array $dxfs): self
+    public function set_table_dxfs_style(Table_Dxfs_Style $table_style, array $dxfs): self
     {
-        $this->tableStyle = $tableStyle;
-
-        if ($this->tableStyle->getHeaderRow() !== null && isset($dxfs[$this->tableStyle->getHeaderRow()])) {
-            $this->tableStyle->setHeaderRowStyle($dxfs[$this->tableStyle->getHeaderRow()]);
+        $this->table_style = $table_style;
+        if ($this->table_style->get_header_row() !== null && isset($dxfs[$this->table_style->get_header_row()])) {
+            $this->table_style->set_header_row_style($dxfs[$this->table_style->get_header_row()]);
         }
-        if ($this->tableStyle->getFirstRowStripe() !== null && isset($dxfs[$this->tableStyle->getFirstRowStripe()])) {
-            $this->tableStyle->setFirstRowStripeStyle($dxfs[$this->tableStyle->getFirstRowStripe()]);
+        if ($this->table_style->get_first_row_stripe() !== null && isset($dxfs[$this->table_style->get_first_row_stripe()])) {
+            $this->table_style->set_first_row_stripe_style($dxfs[$this->table_style->get_first_row_stripe()]);
         }
-        if ($this->tableStyle->getSecondRowStripe() !== null && isset($dxfs[$this->tableStyle->getSecondRowStripe()])) {
-            $this->tableStyle->setSecondRowStripeStyle($dxfs[$this->tableStyle->getSecondRowStripe()]);
+        if ($this->table_style->get_second_row_stripe() !== null && isset($dxfs[$this->table_style->get_second_row_stripe()])) {
+            $this->table_style->set_second_row_stripe_style($dxfs[$this->table_style->get_second_row_stripe()]);
         }
-
         return $this;
     }
-
     /**
      * Get this Style's Table.
      */
-    public function getTable(): ?Table
+    public function get_table(): ?Table
     {
         return $this->table;
     }
-
     /**
      * Set this Style's Table.
      */
-    public function setTable(?Table $table = null): self
+    public function set_table(?Table $table = null): self
     {
         $this->table = $table;
-
         return $this;
     }
 }

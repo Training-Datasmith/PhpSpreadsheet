@@ -1,237 +1,43 @@
 <?php
 
-declare(strict_types=1);
-
-namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+declare (strict_types=1);
+namespace Php_Office\Php_Spreadsheet\Writer\Xlsx;
 
 use Composer\Pcre\Preg;
-use PhpOffice\PhpSpreadsheet\Calculation\Calculation;
-
-class FunctionPrefix
+use Php_Office\Php_Spreadsheet\Calculation\Calculation;
+class Function_Prefix
 {
-    public const XLFNREGEXP = '/(?:_xlfn\.)?((?:_xlws\.)?\b('
-        // functions added with Excel 2010
-        . 'beta[.]dist'
-        . '|beta[.]inv'
-        . '|binom[.]dist'
-        . '|binom[.]inv'
-        . '|ceiling[.]precise'
-        . '|chisq[.]dist'
-        . '|chisq[.]dist[.]rt'
-        . '|chisq[.]inv'
-        . '|chisq[.]inv[.]rt'
-        . '|chisq[.]test'
-        . '|confidence[.]norm'
-        . '|confidence[.]t'
-        . '|covariance[.]p'
-        . '|covariance[.]s'
-        . '|erf[.]precise'
-        . '|erfc[.]precise'
-        . '|expon[.]dist'
-        . '|f[.]dist'
-        . '|f[.]dist[.]rt'
-        . '|f[.]inv'
-        . '|f[.]inv[.]rt'
-        . '|f[.]test'
-        . '|floor[.]precise'
-        . '|gamma[.]dist'
-        . '|gamma[.]inv'
-        . '|gammaln[.]precise'
-        . '|lognorm[.]dist'
-        . '|lognorm[.]inv'
-        . '|mode[.]mult'
-        . '|mode[.]sngl'
-        . '|negbinom[.]dist'
-        . '|networkdays[.]intl'
-        . '|norm[.]dist'
-        . '|norm[.]inv'
-        . '|norm[.]s[.]dist'
-        . '|norm[.]s[.]inv'
-        . '|percentile[.]exc'
-        . '|percentile[.]inc'
-        . '|percentrank[.]exc'
-        . '|percentrank[.]inc'
-        . '|poisson[.]dist'
-        . '|quartile[.]exc'
-        . '|quartile[.]inc'
-        . '|rank[.]avg'
-        . '|rank[.]eq'
-        . '|stdev[.]p'
-        . '|stdev[.]s'
-        . '|t[.]dist'
-        . '|t[.]dist[.]2t'
-        . '|t[.]dist[.]rt'
-        . '|t[.]inv'
-        . '|t[.]inv[.]2t'
-        . '|t[.]test'
-        . '|var[.]p'
-        . '|var[.]s'
-        . '|weibull[.]dist'
-        . '|z[.]test'
-        // probably added with Excel 2010 but not properly documented
-        . '|base'
-        // functions added with Excel 2013
-        . '|acot'
-        . '|acoth'
-        . '|arabic'
-        . '|averageifs'
-        . '|binom[.]dist[.]range'
-        . '|bitand'
-        . '|bitlshift'
-        . '|bitor'
-        . '|bitrshift'
-        . '|bitxor'
-        . '|ceiling[.]math'
-        . '|combina'
-        . '|cot'
-        . '|coth'
-        . '|csc'
-        . '|csch'
-        . '|days'
-        . '|dbcs'
-        . '|decimal'
-        . '|encodeurl'
-        . '|filterxml'
-        . '|floor[.]math'
-        . '|formulatext'
-        . '|gamma'
-        . '|gauss'
-        . '|ifna'
-        . '|imcosh'
-        . '|imcot'
-        . '|imcsc'
-        . '|imcsch'
-        . '|imsec'
-        . '|imsech'
-        . '|imsinh'
-        . '|imtan'
-        . '|isformula'
-        . '|iso[.]ceiling'
-        . '|isoweeknum'
-        . '|munit'
-        . '|numbervalue'
-        . '|pduration'
-        . '|permutationa'
-        . '|phi'
-        . '|rri'
-        . '|sec'
-        . '|sech'
-        . '|sheet'
-        . '|sheets'
-        . '|skew[.]p'
-        . '|unichar'
-        . '|unicode'
-        . '|webservice'
-        . '|xor'
-        // functions added with Excel 2016
-        . '|forecast[.]et2'
-        . '|forecast[.]ets[.]confint'
-        . '|forecast[.]ets[.]seasonality'
-        . '|forecast[.]ets[.]stat'
-        . '|forecast[.]linear'
-        . '|switch'
-        // functions added with Excel 2019
-        . '|concat'
-        . '|ifs'
-        . '|maxifs'
-        . '|minifs'
-        . '|textjoin'
-        // functions added with Excel 365
-        . '|anchorarray'
-        . '|arraytotext'
-        . '|bycol'
-        . '|byrow'
-        . '|call'
-        . '|choosecols'
-        . '|chooserows'
-        . '|drop'
-        . '|expand'
-        . '|filter'
-        . '|groupby'
-        . '|hstack'
-        . '|isomitted'
-        . '|lambda'
-        . '|let'
-        . '|makearray'
-        . '|map'
-        . '|randarray'
-        . '|reduce'
-        . '|register[.]id'
-        . '|scan'
-        . '|sequence'
-        . '|single'
-        . '|sort'
-        . '|sortby'
-        . '|take'
-        . '|textafter'
-        . '|textbefore'
-        . '|textjoin'
-        . '|textsplit'
-        . '|tocol'
-        . '|torow'
-        . '|unique'
-        . '|valuetotext'
-        . '|vstack'
-        . '|wrapcols'
-        . '|wraprows'
-        . '|xlookup'
-        . '|xmatch'
-        . '))\s*\(/Umui';
-
-    public const XLWSREGEXP = '/(?<!_xlws\.)('
-        // functions added with Excel 365
-        . 'filter'
-        . '|sort'
-        . ')\s*\(/mui';
-
+    public const XLFNREGEXP = '/(?:_xlfn\.)?((?:_xlws\.)?\b(' . 'beta[.]dist' . '|beta[.]inv' . '|binom[.]dist' . '|binom[.]inv' . '|ceiling[.]precise' . '|chisq[.]dist' . '|chisq[.]dist[.]rt' . '|chisq[.]inv' . '|chisq[.]inv[.]rt' . '|chisq[.]test' . '|confidence[.]norm' . '|confidence[.]t' . '|covariance[.]p' . '|covariance[.]s' . '|erf[.]precise' . '|erfc[.]precise' . '|expon[.]dist' . '|f[.]dist' . '|f[.]dist[.]rt' . '|f[.]inv' . '|f[.]inv[.]rt' . '|f[.]test' . '|floor[.]precise' . '|gamma[.]dist' . '|gamma[.]inv' . '|gammaln[.]precise' . '|lognorm[.]dist' . '|lognorm[.]inv' . '|mode[.]mult' . '|mode[.]sngl' . '|negbinom[.]dist' . '|networkdays[.]intl' . '|norm[.]dist' . '|norm[.]inv' . '|norm[.]s[.]dist' . '|norm[.]s[.]inv' . '|percentile[.]exc' . '|percentile[.]inc' . '|percentrank[.]exc' . '|percentrank[.]inc' . '|poisson[.]dist' . '|quartile[.]exc' . '|quartile[.]inc' . '|rank[.]avg' . '|rank[.]eq' . '|stdev[.]p' . '|stdev[.]s' . '|t[.]dist' . '|t[.]dist[.]2t' . '|t[.]dist[.]rt' . '|t[.]inv' . '|t[.]inv[.]2t' . '|t[.]test' . '|var[.]p' . '|var[.]s' . '|weibull[.]dist' . '|z[.]test' . '|base' . '|acot' . '|acoth' . '|arabic' . '|averageifs' . '|binom[.]dist[.]range' . '|bitand' . '|bitlshift' . '|bitor' . '|bitrshift' . '|bitxor' . '|ceiling[.]math' . '|combina' . '|cot' . '|coth' . '|csc' . '|csch' . '|days' . '|dbcs' . '|decimal' . '|encodeurl' . '|filterxml' . '|floor[.]math' . '|formulatext' . '|gamma' . '|gauss' . '|ifna' . '|imcosh' . '|imcot' . '|imcsc' . '|imcsch' . '|imsec' . '|imsech' . '|imsinh' . '|imtan' . '|isformula' . '|iso[.]ceiling' . '|isoweeknum' . '|munit' . '|numbervalue' . '|pduration' . '|permutationa' . '|phi' . '|rri' . '|sec' . '|sech' . '|sheet' . '|sheets' . '|skew[.]p' . '|unichar' . '|unicode' . '|webservice' . '|xor' . '|forecast[.]et2' . '|forecast[.]ets[.]confint' . '|forecast[.]ets[.]seasonality' . '|forecast[.]ets[.]stat' . '|forecast[.]linear' . '|switch' . '|concat' . '|ifs' . '|maxifs' . '|minifs' . '|textjoin' . '|anchorarray' . '|arraytotext' . '|bycol' . '|byrow' . '|call' . '|choosecols' . '|chooserows' . '|drop' . '|expand' . '|filter' . '|groupby' . '|hstack' . '|isomitted' . '|lambda' . '|let' . '|makearray' . '|map' . '|randarray' . '|reduce' . '|register[.]id' . '|scan' . '|sequence' . '|single' . '|sort' . '|sortby' . '|take' . '|textafter' . '|textbefore' . '|textjoin' . '|textsplit' . '|tocol' . '|torow' . '|unique' . '|valuetotext' . '|vstack' . '|wrapcols' . '|wraprows' . '|xlookup' . '|xmatch' . '))\s*\(/Umui';
+    public const XLWSREGEXP = '/(?<!_xlws\.)(' . 'filter' . '|sort' . ')\s*\(/mui';
     /**
      * Prefix function name in string with _xlfn. where required.
      */
-    protected static function addXlfnPrefix(string $functionString): string
+    protected static function add_xlfn_prefix(string $function_string): string
     {
-        return Preg::replace(self::XLFNREGEXP, '_xlfn.$1(', $functionString);
+        return Preg::replace(self::XLFNREGEXP, '_xlfn.$1(', $function_string);
     }
-
     /**
      * Prefix function name in string with _xlws. where required.
      */
-    protected static function addXlwsPrefix(string $functionString): string
+    protected static function add_xlws_prefix(string $function_string): string
     {
-        return Preg::replace(self::XLWSREGEXP, '_xlws.$1(', $functionString);
+        return Preg::replace(self::XLWSREGEXP, '_xlws.$1(', $function_string);
     }
-
     /**
      * Prefix function name in string with _xlfn. where required.
      */
-    public static function addFunctionPrefix(string $functionString): string
+    public static function add_function_prefix(string $function_string): string
     {
-        $functionString = Preg::replaceCallback(
-            Calculation::CALCULATION_REGEXP_CELLREF_SPILL,
-            fn (array $matches): string => 'ANCHORARRAY(' . substr((string) $matches[0], 0, -1) . ')',
-            $functionString
-        );
-
-        return self::addXlwsPrefix(self::addXlfnPrefix($functionString));
+        $function_string = Preg::replace_callback(Calculation::CALCULATION_REGEXP_CELLREF_SPILL, fn(array $matches): string => 'ANCHORARRAY(' . substr((string) $matches[0], 0, -1) . ')', $function_string);
+        return self::add_xlws_prefix(self::add_xlfn_prefix($function_string));
     }
-
     /**
      * Prefix function name in string with _xlfn. where required.
      * Leading character, expected to be equals sign, is stripped.
      */
-    public static function addFunctionPrefixStripEquals(string $functionString): string
+    public static function add_function_prefix_strip_equals(string $function_string): string
     {
-        $functionString = Preg::replace(
-            [
-                '/\b(CEILING|FLOOR)[.]ODS\s*[(]/',
-                '/\b(CEILING|FLOOR)[.]XCL\s*[(]/',
-            ],
-            [
-                '$1.MATH(',
-                '$1(',
-            ],
-            $functionString
-        );
-
-        return self::addFunctionPrefix(substr($functionString, 1));
+        $function_string = Preg::replace(['/\b(CEILING|FLOOR)[.]ODS\s*[(]/', '/\b(CEILING|FLOOR)[.]XCL\s*[(]/'], ['$1.MATH(', '$1('], $function_string);
+        return self::add_function_prefix(substr($function_string, 1));
     }
 }
